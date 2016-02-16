@@ -8,17 +8,17 @@
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/forms/mainwindow.ui" isTestSource="false" />
     </content>
-    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Debug0/ImageCLEF_automoc.cpp">
-      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Debug0/ImageCLEF_automoc.cpp" isTestSource="false" />
+    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Debug/ImageCLEF_automoc.cpp">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Debug/ImageCLEF_automoc.cpp" isTestSource="false" />
     </content>
-    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/MinSizeRel0/ImageCLEF_automoc.cpp">
-      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/MinSizeRel0/ImageCLEF_automoc.cpp" isTestSource="false" />
+    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/MinSizeRel/ImageCLEF_automoc.cpp">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/MinSizeRel/ImageCLEF_automoc.cpp" isTestSource="false" />
     </content>
-    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/RelWithDebInfo0/ImageCLEF_automoc.cpp">
-      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/RelWithDebInfo0/ImageCLEF_automoc.cpp" isTestSource="false" />
+    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/RelWithDebInfo/ImageCLEF_automoc.cpp">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/RelWithDebInfo/ImageCLEF_automoc.cpp" isTestSource="false" />
     </content>
-    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Release0/ImageCLEF_automoc.cpp">
-      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Release0/ImageCLEF_automoc.cpp" isTestSource="false" />
+    <content url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Release/ImageCLEF_automoc.cpp">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Release/ImageCLEF_automoc.cpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
@@ -74,10 +74,10 @@
           <root url="file:///usr/local/Cellar/qt5/5.5.1_2/lib/QtXmlPatterns.framework/Headers" />
           <root url="file:///usr/local/Cellar/qt5/5.5.1_2/lib/QtPrintSupport.framework/Headers" />
           <root url="file:///usr/local/Cellar/qt5/5.5.1_2/mkspecs/macx-clang" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Release0" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/RelWithDebInfo0" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/MinSizeRel0" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Debug0" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/MinSizeRel" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Debug" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Release" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/RelWithDebInfo" />
           <root url="file:///Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/AudioToolbox.framework/Headers" />
           <root url="file:///Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Carbon.framework/Headers" />
           <root url="file:///Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers" />
@@ -301,10 +301,10 @@
           <root url="file:///usr/local/Cellar/qt5/5.5.1_2/lib/QtXmlPatterns.framework/Headers" />
           <root url="file:///usr/local/Cellar/qt5/5.5.1_2/lib/QtPrintSupport.framework/Headers" />
           <root url="file:///usr/local/Cellar/qt5/5.5.1_2/mkspecs/macx-clang" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Release0" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/RelWithDebInfo0" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/MinSizeRel0" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Debug0" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/MinSizeRel" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Debug" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Release" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/RelWithDebInfo" />
           <root url="file:///Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/AudioToolbox.framework/Headers" />
           <root url="file:///Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Carbon.framework/Headers" />
           <root url="file:///Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers" />
@@ -478,10 +478,10 @@
           <root url="file:///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include" />
         </SOURCES>
         <excluded>
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Release0/ImageCLEF_automoc.cpp" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/RelWithDebInfo0/ImageCLEF_automoc.cpp" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/MinSizeRel0/ImageCLEF_automoc.cpp" />
-          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d78951de/d78951de/Debug0/ImageCLEF_automoc.cpp" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/MinSizeRel/ImageCLEF_automoc.cpp" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Debug/ImageCLEF_automoc.cpp" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/Release/ImageCLEF_automoc.cpp" />
+          <root url="file://$USER_HOME$/Library/Caches/CLion12/cmake/generated/d788d5be/d788d5be/RelWithDebInfo/ImageCLEF_automoc.cpp" />
         </excluded>
       </library>
     </orderEntry>

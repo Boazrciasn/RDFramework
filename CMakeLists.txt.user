@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.6.0, 2016-02-13T13:59:13. -->
+<!-- Written by QtCreator 3.6.0, 2016-02-16T11:26:53. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -151,7 +151,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeBuildConfiguration</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
-    <value type="QString" key="CMakeProjectManager.CMakeBuildConfiguration.InitialArgument">-DCMAKE_BUILD_TYPE=Release</value>
+    <value type="QString" key="CMakeProjectManager.CMakeBuildConfiguration.InitialArgument"></value>
     <value type="bool" key="CMakeProjectManager.CMakeBuildConfiguration.UseNinja">false</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/Users/barisozcan/ClionProjects/build-ImageClef-Desktop-Release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
@@ -335,8 +335,9 @@
     </valuelist>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">ImageCLEF</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
+    <value type="bool" key="CMakeProjectManager.CMakeRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <value type="int" key="PE.EnvironmentAspect.Base">1</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">ImageCLEF</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
