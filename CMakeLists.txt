@@ -16,8 +16,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
-set(HEADERS include/mainwindow.h)
-set(SOURCES main.cpp src/mainwindow.cpp)
+set(HEADERS include/mainwindow.h include/Reader.h)
+set(SOURCES main.cpp src/mainwindow.cpp src/Reader.cpp)
 
 # Create Qt MOC files
 QT5_WRAP_UI(UISrcs forms/mainwindow.ui)
