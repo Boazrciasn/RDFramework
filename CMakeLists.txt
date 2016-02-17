@@ -16,11 +16,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
-set(HEADERS include/mainwindow.h include/Reader.h)
-set(SOURCES main.cpp src/mainwindow.cpp src/Reader.cpp)
+set(HEADERS include/mainwindow.h include/Reader.h include/mydialog.h)
+set(SOURCES main.cpp src/mainwindow.cpp src/Reader.cpp src/mydialog.cpp)
 
 # Create Qt MOC files
-QT5_WRAP_UI(UISrcs forms/mainwindow.ui)
+QT5_WRAP_UI(UISrcs forms/mainwindow.ui forms/mydialog.ui)
 
 add_executable("${project_name}" ${SOURCES} ${HEADERS} ${UISrcs})
 target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES})

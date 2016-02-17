@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>804</height>
+    <width>394</width>
+    <height>794</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,7 +28,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>600</width>
+           <width>300</width>
            <height>500</height>
           </size>
          </property>
@@ -46,7 +46,7 @@
       </layout>
      </widget>
     </item>
-    <item alignment="Qt::AlignBottom">
+    <item>
      <widget class="QWidget" name="widget_2" native="true">
       <property name="enabled">
        <bool>true</bool>
@@ -169,7 +169,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>636</width>
+     <width>394</width>
      <height>22</height>
     </rect>
    </property>

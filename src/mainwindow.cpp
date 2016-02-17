@@ -80,6 +80,11 @@ void MainWindow::on_pushButton_clicked()
             QImage image(fileName);
             ui->label->setPixmap(QPixmap::fromImage(image));
             ui->label->resize(ui->label->pixmap()->size());
+
+
+            mDialog = new MyDialog(this);
+            mDialog->show();
+            mDialog->setFNames(this->fNames,dir);
         }
 }
 
@@ -92,6 +97,7 @@ void MainWindow::on_pushButton_3_clicked()
     QImage image(fileName);
     ui->label->setPixmap(QPixmap::fromImage(image));
     ui->label->resize(ui->label->pixmap()->size());
+    mDialog->setLabel(image);
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -103,4 +109,5 @@ void MainWindow::on_pushButton_2_clicked()
     QImage image(fileName);
     ui->label->setPixmap(QPixmap::fromImage(image));
     ui->label->resize(ui->label->pixmap()->size());
+    mDialog->setLabel(image);
 }

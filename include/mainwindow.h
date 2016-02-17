@@ -8,6 +8,7 @@
 #include <QImage>
 #include <QThread>
 #include "include/Reader.h"
+#include "include/mydialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +36,7 @@ private:
     void setLable();
 
     Ui::MainWindow *ui;
+    MyDialog *mDialog;
     Reader *reader;
     QString dir;                // file directory
     vector<QString> fNames;     // file names are stored
