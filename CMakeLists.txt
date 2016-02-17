@@ -10,6 +10,9 @@ SET(CMAKE_PREFIX_PATH : "/usr/local/Cellar/qt5/5.5.1_2")
 # OpenCV package
 FIND_PACKAGE(OpenCV 3 REQUIRED)
 
+#add OpenCV directories
+include_directories(${OpenCV_INCLUDE_DIRS} include/)
+
 # Qt5 package
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 set(CMAKE_AUTOMOC ON)
