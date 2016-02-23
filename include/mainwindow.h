@@ -9,6 +9,7 @@
 #include <QThread>
 #include "include/Reader.h"
 #include "include/mydialog.h"
+#include "include/PageParser.h"
 
 namespace Ui {
 class MainWindow;
@@ -41,6 +42,10 @@ private:
     QString dir;                // file directory
     vector<QString> fNames;     // file names are stored
     int fileIndex;              // index of file being viewed
+
+    PageParser *pageParser;
+    vector<QString> words;     // file names are stored
+    vector<QString> coords;     // file names are stored
 
     int process_type = -1;      // 0 for IMG / 1 for video
     int nParticles = 100;

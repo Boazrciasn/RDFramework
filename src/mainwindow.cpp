@@ -77,8 +77,20 @@ void MainWindow::on_pushButton_clicked()
 
     if (!this->fNames.empty())
         {
-            QString fileName = dir + "/" +this->fNames[fileIndex] + ".jpg";
-            QImage image(fileName);
+            QString fileNameI = dir + "/" +this->fNames[fileIndex] + ".jpg";
+            QString fileNameXML = dir + "/" +this->fNames[fileIndex] + ".xml";
+
+
+            // TEST PARSER
+            pageParser = new PageParser();
+            pageParser->readFromTo(fileNameXML,this->words,this->coords);
+
+             qDebug() << "\n Parser Results: \n";
+             qDebug() << "Words length:" << this->words.size();
+             qDebug() << "Coords length:" << this->coords.size();
+
+
+            QImage image(fileNameI);
             ui->label->setPixmap(QPixmap::fromImage(image));
             ui->label->resize(ui->label->pixmap()->size());
 
