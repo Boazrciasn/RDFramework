@@ -1,0 +1,15 @@
+{
+    "name": "com.ubuntu.developer.username.boazrciasn-imageclef",
+    "description": "description of Boazrciasn-ImageCLEF",
+    "framework": "ubuntu-sdk-14.04-qml",
+    "architecture": "all",
+    "title": "Boazrciasn-ImageCLEF",
+    "hooks": {
+        "Boazrciasn-ImageCLEF": {
+            "apparmor": "Boazrciasn-ImageCLEF.json",
+            "desktop": "Boazrciasn-ImageCLEF.desktop"
+        }
+    },
+    "version": "0.1",
+    "maintainer": ""
+}

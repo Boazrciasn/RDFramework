@@ -77,23 +77,21 @@ void MainWindow::on_pushButton_clicked()
 
     if (!this->fNames.empty())
         {
-            QString fileNameI = dir + "/" +this->fNames[fileIndex] + ".jpg";
-            QString fileNameXML = dir + "/" +this->fNames[fileIndex] + ".xml";
-
+            QString fileName = dir + "/" +this->fNames[fileIndex];
 
             // TEST PARSER
             pageParser = new PageParser();
-            pageParser->readFromTo(fileNameXML,this->words,this->coords);
+            pageParser->readFromTo(fileName,this->words,this->coords);
+            pageParser->cropPolygons(fileName + ".jpg",this->words,this->coords);
 
-             qDebug() << "\n Parser Results: \n";
-             qDebug() << "Words length:" << this->words.size();
-             qDebug() << "Coords length:" << this->coords.size();
+            qDebug() << "\n Parser Results: \n";
+            qDebug() << fileName;
+            qDebug() << "Words length:" << this->words.size();
+            qDebug() << "Coords length:" << this->coords.size();
 
-
-            QImage image(fileNameI);
+            QImage image(fileName + ".jpg");
             ui->label->setPixmap(QPixmap::fromImage(image));
             ui->label->resize(ui->label->pixmap()->size());
-
 
             mDialog = new MyDialog(this);
             mDialog->show();

@@ -14,6 +14,9 @@ class PageParser{
 public:
     void readFromTo(QString filename, vector<QString> &words, vector<QString> &coords);
     void getElements(QDomElement root, QString tagname, QString attribute1, QString attribute2);
+    void cropPolygons(const QString filename,
+                                 vector<QString> &words,
+                                 vector<QString> &coordinates);
 private:
     vector<QString> *words;
     vector<QString> *coords;
