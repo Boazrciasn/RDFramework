@@ -1,10 +1,17 @@
 #include "include/PageParser.h"
+#include "include/Util.h"
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include <QtXml/QDomElement>
 #include <QtXml/QDomDocument>
 #include <QtXml/QDomNode>
 #include <QDebug>
 #include <QDir>
 #include <QPainter>
+#include <QChar>
 
 void PageParser::readFromTo(QString filename, vector<QString> &words, vector<QString> &coords)
 {
@@ -55,8 +62,13 @@ void PageParser::getElements(QDomElement root, QString tagname, QString attribut
             QDomNode coordNode = coords.at(0);
             QDomElement coordElement = coordNode.toElement();
 
-            this->words->push_back(uniCodeElement.text());
-            this->coords->push_back(coordElement.attribute("points"));
+            QString word = uniCodeElement.text();
+            word = Util::cleanNumberAndPunctuation(word);
+            if(word != "")
+            {
+                this->words->push_back(word);
+                this->coords->push_back(coordElement.attribute("points"));
+            }
         }
     }
 }
@@ -65,22 +77,28 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
                              vector<QString>& words,
                              vector<QString>& coordinates)
 {
+
     QImage image(filename + ".jpg");
+    qDebug() << "Scanning " << (filename + ".jpg");
+    qDebug() << "Number of words :" << words.size();
+    qDebug() << "Number of words :" << coordinates.size();
+
     for(unsigned int j=0;j<words.size();j++)
     {
         //each word represents a directory name
         QString word   = saveDir + "/" + words[j];
-        QString coordsStr =coordinates[j];
-
         //check if directory exist
         QDir dir(word);
         if (!dir.exists())
         {
             dir.mkpath(".");
+            if(!dir.exists())
+                 qDebug() << "ERROR : " << dir << " can not be created!" ;
         }
 
-        QPolygon poly;
+        QString coordsStr =coordinates[j];
         QStringList coords = coordsStr.split(" ");
+        QPolygon poly;
         for(int i=0; i< coords.count(); i++)
         {
             QString pointStr = coords[i];
@@ -90,29 +108,19 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
             poly <<  QPoint(x,y);
         }
 
-        // image to copy polygon into
-        QImage newImage(image.width(),image.height(),image.format());
-        // draw only the points within the polygon
-        for (int x = 0; x < image.width(); ++x)
-        {
-            for (int y = 0; y < image.width(); ++y)
-            {
-                QPoint p(x, y);
-                if (poly.containsPoint(p, Qt::OddEvenFill))
-                {
-                    QRgb color = image.pixel(p);
-                    newImage.setPixel(p, color);
-                }
-            }
-        }
-
         QRect rect =  poly.boundingRect();
-        QImage cropped = newImage.copy(rect);
+        QImage cropped = image.copy(rect);
+        cv::Mat croppedMat = Util::toCv(cropped);
+        cv::Mat im_gray, img_bw;
+        //cv::cvtColor(croppedMat, im_gray, CV_BGR2GRAY);
+        //cv::threshold(im_gray, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+       // cropped = Util::toQt(croppedMat);
+
         QFileInfo fileInfo(filename);
-        QString fileNameWithoutExt = fileInfo.fileName().left(fileInfo.fileName().length()-4);
+        QString fileNameWithoutExt = fileInfo.fileName();
         QString fnameToSave = word + "/" + fileNameWithoutExt + QString::number(j) + ".jpg";
-        qDebug() << "fname : " << fnameToSave ;
-        cropped.save(fnameToSave);
+        if(!cropped.save(fnameToSave))
+             qDebug() << "ERROR : " << fnameToSave << " can not be saved!" ;
 
     }
 }
