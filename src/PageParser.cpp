@@ -61,15 +61,15 @@ void PageParser::getElements(QDomElement root, QString tagname, QString attribut
     }
 }
 
-void PageParser::cropPolygons(const QString filename,
+void PageParser::cropPolygons(const QString filename, QString saveDir,
                              vector<QString>& words,
                              vector<QString>& coordinates)
 {
-    QImage image(filename);
+    QImage image(filename + ".jpg");
     for(unsigned int j=0;j<words.size();j++)
     {
         //each word represents a directory name
-        QString word   =words[j];
+        QString word   = saveDir + "/" + words[j];
         QString coordsStr =coordinates[j];
 
         //check if directory exist
@@ -110,7 +110,7 @@ void PageParser::cropPolygons(const QString filename,
         QImage cropped = newImage.copy(rect);
         QFileInfo fileInfo(filename);
         QString fileNameWithoutExt = fileInfo.fileName().left(fileInfo.fileName().length()-4);
-        QString fnameToSave = ".//" + word + "//" + fileNameWithoutExt + QString::number(j) + ".jpg";
+        QString fnameToSave = word + "/" + fileNameWithoutExt + QString::number(j) + ".jpg";
         qDebug() << "fname : " << fnameToSave ;
         cropped.save(fnameToSave);
 

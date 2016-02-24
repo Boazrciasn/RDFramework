@@ -31,6 +31,8 @@ private slots:
     void on_previous_clicked();
     void on_next_clicked();
 
+    void on_extractWords_clicked();
+
 private:
     void setLable();
 

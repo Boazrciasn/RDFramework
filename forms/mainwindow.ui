@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>394</width>
-    <height>794</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -160,6 +160,13 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="extractWords">
+      <property name="text">
+       <string>Extract Word Samples</string>
+      </property>
      </widget>
     </item>
    </layout>

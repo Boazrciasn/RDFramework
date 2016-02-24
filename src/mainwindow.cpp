@@ -60,24 +60,13 @@ void MainWindow::on_browse_clicked()
     if (!this->fNames.empty())
     {
         QString fileName = dir + "/" +this->fNames[fileIndex];
-
-        // TEST PARSER
-        pageParser = new PageParser();
-        pageParser->readFromTo(fileName,this->words,this->coords);
-//        pageParser->cropPolygons(fileName + ".jpg",this->words,this->coords);
-
-        qDebug() << "\n Parser Results: \n";
-        qDebug() << fileName;
-        qDebug() << "Words length:" << this->words.size();
-        qDebug() << "Coords length:" << this->coords.size();
-
         QImage image(fileName + ".jpg");
         ui->label->setPixmap(QPixmap::fromImage(image));
         ui->label->resize(ui->label->pixmap()->size());
 
-        mDialog = new MyDialog(this);
-        mDialog->show();
-        mDialog->setFNames(this->fNames,dir);
+//        mDialog = new MyDialog(this);
+//        mDialog->show();
+//        mDialog->setFNames(this->fNames,dir);
     }
 }
 
@@ -93,7 +82,7 @@ void MainWindow::on_previous_clicked()
     QImage image(fileName);
     ui->label->setPixmap(QPixmap::fromImage(image));
     ui->label->resize(ui->label->pixmap()->size());
-    mDialog->setLabel(image);
+//    mDialog->setLabel(image);
 }
 
 // ****************************** //
@@ -108,5 +97,23 @@ void MainWindow::on_next_clicked()
     QImage image(fileName);
     ui->label->setPixmap(QPixmap::fromImage(image));
     ui->label->resize(ui->label->pixmap()->size());
-    mDialog->setLabel(image);
+//    mDialog->setLabel(image);
+}
+
+void MainWindow::on_extractWords_clicked()
+{
+    QString saveDir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    pageParser = new PageParser();
+
+    for (int i = 0; i < (int)this->fNames.size(); i++) {
+        QString fileName = dir + "/" +this->fNames[i];
+        pageParser->readFromTo(fileName,this->words,this->coords);
+        pageParser->cropPolygons(fileName, saveDir,this->words,this->coords);
+        this->words.clear();
+        this->coords.clear();
+    }
+
+
+    delete pageParser;
+    pageParser = NULL;
 }
