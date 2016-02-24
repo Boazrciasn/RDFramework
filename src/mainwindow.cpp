@@ -14,15 +14,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Rectangle_button->setChecked(true);
     connect(ui->runButton, SIGNAL (clicked()), this, SLOT (update()));
 
-//    QLabel *imageLabel = new QLabel;
-//    imageLabel->setBackgroundRole(QPalette::Base);
-//    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-//    imageLabel->setScaledContents(true);
+    //    QLabel *imageLabel = new QLabel;
+    //    imageLabel->setBackgroundRole(QPalette::Base);
+    //    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //    imageLabel->setScaledContents(true);
 
-//    QScrollArea *scrollArea = new QScrollArea;
-//    scrollArea->setBackgroundRole(QPalette::Dark);
-//    scrollArea->setWidget(imageLabel);
-//    setCentralWidget(scrollArea);
+    //    QScrollArea *scrollArea = new QScrollArea;
+    //    scrollArea->setBackgroundRole(QPalette::Dark);
+    //    scrollArea->setWidget(imageLabel);
+    //    setCentralWidget(scrollArea);
 }
 
 // ****************************** //
@@ -32,11 +32,11 @@ void MainWindow::update()
 {
     if (ui->IMG_button->isChecked()){
         process_type = 0;
-//        processImg();
+        //        processImg();
     }
     else if (ui->Video_button->isChecked()){
         process_type = 1;
-//        processVideo();
+        //        processVideo();
     }
     else
         process_type = -1;
@@ -45,61 +45,46 @@ void MainWindow::update()
 // ****************************** //
 // ****************************** //
 
-//void MainWindow::setLable()
-//{
-//    QImage image(out.data, out.cols, out.rows, out.step, QImage::Format_Indexed8);
-//    QPixmap tmp = QPixmap::fromImage(image);
-//    ui->label->setPixmap(tmp);
-//    ui->label->resize(ui->label->pixmap()->size());
-//    repaint();
-//}
-
-// ****************************** //
-// ****************************** //
-
 MainWindow::~MainWindow()
 {
     delete ui;
-//    delete PF;
+    //    delete PF;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_browse_clicked()
 {
-//    QFileDialog dialog(this);
-//    dialog.setNameFilter(tr("Images (*.png *.xpm *.jpg)"));
-//    dialog.setViewMode(QFileDialog::Detail);
-//    QString fileName = QFileDialog::getOpenFileName(this,
-//                                                    tr("Open Images"), "/home/vvglab/Pictures/pages_devel", tr("Image Files (*.png *.jpg *.bmp)"));
-
     dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     fileIndex = 0;
     reader->readFromTo(dir.toStdString(),this->fNames);
 
     if (!this->fNames.empty())
-        {
-            QString fileName = dir + "/" +this->fNames[fileIndex];
+    {
+        QString fileName = dir + "/" +this->fNames[fileIndex];
 
-            // TEST PARSER
-            pageParser = new PageParser();
-            pageParser->readFromTo(fileName,this->words,this->coords);
-            pageParser->cropPolygons(fileName + ".jpg",this->words,this->coords);
+        // TEST PARSER
+        pageParser = new PageParser();
+        pageParser->readFromTo(fileName,this->words,this->coords);
+//        pageParser->cropPolygons(fileName + ".jpg",this->words,this->coords);
 
-            qDebug() << "\n Parser Results: \n";
-            qDebug() << fileName;
-            qDebug() << "Words length:" << this->words.size();
-            qDebug() << "Coords length:" << this->coords.size();
+        qDebug() << "\n Parser Results: \n";
+        qDebug() << fileName;
+        qDebug() << "Words length:" << this->words.size();
+        qDebug() << "Coords length:" << this->coords.size();
 
-            QImage image(fileName + ".jpg");
-            ui->label->setPixmap(QPixmap::fromImage(image));
-            ui->label->resize(ui->label->pixmap()->size());
+        QImage image(fileName + ".jpg");
+        ui->label->setPixmap(QPixmap::fromImage(image));
+        ui->label->resize(ui->label->pixmap()->size());
 
-            mDialog = new MyDialog(this);
-            mDialog->show();
-            mDialog->setFNames(this->fNames,dir);
-        }
+        mDialog = new MyDialog(this);
+        mDialog->show();
+        mDialog->setFNames(this->fNames,dir);
+    }
 }
 
-void MainWindow::on_pushButton_3_clicked()
+// ****************************** //
+// ****************************** //
+
+void MainWindow::on_previous_clicked()
 {
     fileIndex--;
     if (fileIndex < 0)
@@ -111,7 +96,10 @@ void MainWindow::on_pushButton_3_clicked()
     mDialog->setLabel(image);
 }
 
-void MainWindow::on_pushButton_2_clicked()
+// ****************************** //
+// ****************************** //
+
+void MainWindow::on_next_clicked()
 {
     fileIndex++;
     if (fileIndex >= (int)this->fNames.size())

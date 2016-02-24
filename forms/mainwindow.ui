@@ -139,21 +139,21 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="browse">
          <property name="text">
           <string>Browse ...</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="previous">
          <property name="text">
           <string>&lt;&lt;</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="next">
          <property name="text">
           <string>&gt;&gt;</string>
          </property>

@@ -27,11 +27,9 @@ public slots:
     void update();
 
 private slots:
-    void on_pushButton_clicked();
-
-    void on_pushButton_3_clicked();
-
-    void on_pushButton_2_clicked();
+    void on_browse_clicked();
+    void on_previous_clicked();
+    void on_next_clicked();
 
 private:
     void setLable();
