@@ -50,7 +50,7 @@ QImage Util::toQt(const cv::Mat &src)
 
 QString Util::cleanNumberAndPunctuation(QString toClean)
 {
-    QString puncs ="!'^+%&/()=?_-}][{½$#£><@.,:;|";
+    QString puncs ="!'^+%&/()=?_-{}][{½$#£><@.,:;|\"§*/";
     QString toReturn="";
     int i=0;
     int j=toClean.length();
@@ -72,13 +72,31 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     }
 
     toReturn = toClean.mid(i,j-i+1);
-    //check if the word is a number
+
+    //FIXME: got to refactor the code here sorry for bold coding.
+    i = 0;
+    j=toReturn.length();
+
+
+    //check if the word starts or ends with a number or a whole number
     bool isNumber;
     toReturn.toInt(&isNumber);
-    if (!isNumber)
+
+
+    /* FIXME: if there is a number, return "Numbers/number/.. */
+
+/*  if (!isNumber)
     {
         return toReturn.toLower();
     }
-    return "";
+*/
+    if (toReturn[i].isDigit() || toReturn[j].isDigit() ) {
+
+        toReturn ="Numbers/" +toReturn;
+        return toReturn;
+    }
+
+
+    return toReturn.toLower();
 }
 
