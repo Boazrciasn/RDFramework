@@ -10,8 +10,78 @@ cv::Mat Util::toCv(const QImage &image , int cv_type)
 
 QImage Util::toQt(const cv::Mat &src, QImage::Format format)
 {
-    return QImage(src.data, src.cols, src.rows,
-                  static_cast<int>(src.step), format);
+   // return QImage(src.data, src.cols, src.rows,
+     //             static_cast<int>(src.step), format);
+
+    quint16 width = src.cols;
+
+                quint16 height = src.rows;
+
+
+                QImage dest = QImage(width, height, format);
+
+
+                if(src.type() == CV_8UC3)
+
+                {
+
+                    for(int i = 0; i < height; i++)
+
+                    {
+
+                        const quint8 *pSrc = src.ptr<quint8>(i);
+
+                        quint8 *pDest = dest.scanLine(i);
+
+                        for(int j = 0; j < width; j++)
+
+                        {
+
+                            *pDest++ = *pSrc++;
+
+                            *pDest++ = *pSrc++;
+
+                            *pDest++ = *pSrc++;
+
+                        }
+
+                    }
+
+                }
+
+                else if(src.type() == CV_8UC1)
+
+                {
+
+                    for(int i = 0; i < height; i++)
+
+                    {
+
+                        const quint8 *pSrc = src.ptr<quint8>(i);
+
+                        quint8 *pDest = dest.scanLine(i);
+
+                        for (int j = 0; j < width; j++)
+
+                        {
+
+                            quint8 val = *pSrc++;
+
+                            *pDest++ = val;
+
+                            *pDest++ = val;
+
+                            *pDest++ = val;
+
+                        }
+
+                    }
+
+                }
+
+
+                return dest;
+
 }
 
 QString Util::cleanNumberAndPunctuation(QString toClean)
