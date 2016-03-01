@@ -112,14 +112,14 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
         QImage cropped = image.copy(rect);
         cv::Mat croppedMat = Util::toCv(cropped);
         cv::Mat im_gray, img_bw;
-        //cv::cvtColor(croppedMat, im_gray, CV_BGR2GRAY);
-        //cv::threshold(im_gray, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-       // cropped = Util::toQt(croppedMat);
+        cv::cvtColor(croppedMat, im_gray, CV_BGR2GRAY);
+        cv::threshold(im_gray, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+        QImage binaryIM = Util::toQt(img_bw);
 
         QFileInfo fileInfo(filename);
         QString fileNameWithoutExt = fileInfo.fileName();
         QString fnameToSave = word + "/" + fileNameWithoutExt + QString::number(j) + ".jpg";
-        if(!cropped.save(fnameToSave))
+        if(!binaryIM.save(fnameToSave))
              qDebug() << "ERROR : " << fnameToSave << " can not be saved!" ;
 
     }

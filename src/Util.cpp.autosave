@@ -26,11 +26,12 @@ cv::Mat Util::toCv(const QImage &image)
     return mat2;
 }
 
-QImage Util::toQt(const cv::Mat &src)
+QImage Util::toQt(const cv::Mat &src, )
 {
-    cv::Mat rgb;
-    cv::cvtColor(src, rgb, CV_BGR2RGB);
-    return QImage((const unsigned char*)(rgb.data), rgb.cols, rgb.rows, QImage::Format_RGB888);
+    QImage mat_to_qimage_ref(cv::Mat &mat, )
+    {
+      return QImage(mat.data, mat.cols, mat.rows, mat.step, format);
+    }
 }
 
 
