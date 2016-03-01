@@ -10,19 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     reader = new Reader();
     ui->setupUi(this);
+    ui->label->setScaledContents(true);
     ui->IMG_button->setChecked(true);
     ui->Rectangle_button->setChecked(true);
     connect(ui->runButton, SIGNAL (clicked()), this, SLOT (update()));
-
-    //    QLabel *imageLabel = new QLabel;
-    //    imageLabel->setBackgroundRole(QPalette::Base);
-    //    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    //    imageLabel->setScaledContents(true);
-
-    //    QScrollArea *scrollArea = new QScrollArea;
-    //    scrollArea->setBackgroundRole(QPalette::Dark);
-    //    scrollArea->setWidget(imageLabel);
-    //    setCentralWidget(scrollArea);
 }
 
 // ****************************** //
