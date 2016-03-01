@@ -3,40 +3,19 @@
 
 
 
-//cv::Mat Util::toCv(const QImage &image)
-//{
-//    QImage   swapped = image.rgbSwapped();
-//    return cv::Mat( swapped.height(), swapped.width(), CV_8UC3,
-//                    const_cast<uchar*>(swapped.bits()), swapped.bytesPerLine() ).clone();
-
-//}
-
-//QImage Util::toQt(const cv::Mat &src)
-//{
-//   QImage image( src.data, src.cols, src.rows, src.step, QImage::Format_Indexed8 );
-//   return image;
-//}
-
 cv::Mat Util::toCv(const QImage &image)
 {
-    cv::Mat mat = cv::Mat(image.height(), image.width(), CV_8UC4, (uchar*)image.bits(), image.bytesPerLine());
-    cv::Mat mat2 = cv::Mat(mat.rows, mat.cols, CV_8UC3 );
-    int from_to[] = { 0,0,  1,1,  2,2 };
-    cv::mixChannels( &mat, 1, &mat2, 1, from_to, 3 );
-    return mat2;
+    QImage   swapped = image.rgbSwapped();
+    return cv::Mat( swapped.height(), swapped.width(), CV_8UC3,
+                    const_cast<uchar*>(swapped.bits()), swapped.bytesPerLine() ).clone();
+
 }
 
 QImage Util::toQt(const cv::Mat &src)
 {
-    cv::Mat rgb;
-    cv::cvtColor(src, rgb, CV_BGR2RGB);
-    return QImage((const unsigned char*)(rgb.data), rgb.cols, rgb.rows, QImage::Format_RGB888);
+   QImage image( src.data, src.cols, src.rows, src.step, QImage::Format_Indexed8 );
+   return image;
 }
-
-
-
-
-
 
 
 QString Util::cleanNumberAndPunctuation(QString toClean)
