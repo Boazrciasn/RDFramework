@@ -3,20 +3,16 @@
 
 
 
-cv::Mat Util::toCv(const QImage &image)
+cv::Mat Util::toCv(const QImage &image , int cv_type)
 {
-    QImage   swapped = image.rgbSwapped();
-    return cv::Mat( swapped.height(), swapped.width(), CV_8UC3,
-                    const_cast<uchar*>(swapped.bits()), swapped.bytesPerLine() ).clone();
-
+    return cv::Mat(image.height(), image.width(), cv_type, (void *)image.scanLine(0), image.bytesPerLine());
 }
 
-QImage Util::toQt(const cv::Mat &src)
+QImage Util::toQt(const cv::Mat &src, QImage::Format format)
 {
-   QImage image( src.data, src.cols, src.rows, src.step, QImage::Format_Indexed8 );
-   return image;
+    return QImage(src.data, src.cols, src.rows,
+                  static_cast<int>(src.step), format);
 }
-
 
 QString Util::cleanNumberAndPunctuation(QString toClean)
 {
