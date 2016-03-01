@@ -17,6 +17,7 @@ public:
     void cropPolygons(const QString filename, QString saveDir,
                                  vector<QString> &words,
                                  vector<QString> &coordinates);
+
 private:
     vector<QString> *words;
     vector<QString> *coords;
