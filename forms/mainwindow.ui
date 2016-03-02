@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>825</height>
+    <width>412</width>
+    <height>1043</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -200,10 +200,17 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>394</width>
+     <width>412</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>file</string>
+    </property>
+    <addaction name="actionAnnotation_Extractor"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -214,6 +221,11 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAnnotation_Extractor">
+   <property name="text">
+    <string>Annotation Extractor</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

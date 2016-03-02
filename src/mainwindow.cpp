@@ -1,4 +1,5 @@
 #include "include/mainwindow.h"
+#include "include/annextractordialog.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
 
@@ -107,4 +108,10 @@ void MainWindow::on_extractWords_clicked()
 
     delete pageParser;
     pageParser = NULL;
+}
+
+void MainWindow::on_actionAnnotation_Extractor_triggered()
+{
+    AnnExtractorDialog *mDialog = new AnnExtractorDialog(this);
+    mDialog->exec();
 }

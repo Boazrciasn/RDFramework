@@ -33,6 +33,8 @@ private slots:
 
     void on_extractWords_clicked();
 
+    void on_actionAnnotation_Extractor_triggered();
+
 private:
     void setLable();
 
