@@ -36,14 +36,18 @@ void Reader::readFromTo(string filename, vector<QString> &imgName)
         cerr<<"Couldn't open directory!"<<endl;
 }
 
+
 void Reader::findImages(QString baseDir, QString query, vector<QString> &foundImages)
 {
     query = "*"+query+"*";
         QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot ) ;
     while (it.hasNext()){
         it.next();
-        readFromTo(it.filePath().toStdString(),foundImages);
-       // foundImages.push_back(it.filePath());
-       // qDebug() << it.fileName();
+        QDirIterator itFile(baseDir+"/"+it.fileName(),QDir::Files);
+        while(itFile.hasNext()){
+            itFile.next();
+            foundImages.push_back(itFile.filePath());
+        }
+
     }
 }
