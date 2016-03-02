@@ -1,4 +1,8 @@
 #include "include/Reader.h"
+#include <QDir>
+#include<QDebug>
+#include "QApplication"
+#include<QDirIterator>
 
 void Reader::readFromTo(string filename, vector<QString> &imgName)
 {
@@ -9,7 +13,7 @@ void Reader::readFromTo(string filename, vector<QString> &imgName)
 
         QString prev = "abdd";
 
-        // read from folder untill it is empty
+        // read from folder until it is empty
         while((ent = readdir(m_dir)) != NULL)
         {
             // get filename and convert it to string
@@ -30,4 +34,23 @@ void Reader::readFromTo(string filename, vector<QString> &imgName)
     }
     else
         cerr<<"Couldn't open directory!"<<endl;
+}
+
+void Reader::findImages(QString baseDir, QString query, vector<QString> &foundImages)
+{
+
+    query = "*"+query+"*";
+
+    QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot ) ;
+    while (it.hasNext()){
+        it.next();
+        foundImages.push_back(it.filePath());
+        qDebug() << it.fileName();
+    }
+
+
+
+
+
+
 }
