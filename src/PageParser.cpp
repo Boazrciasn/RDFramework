@@ -110,16 +110,16 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
 
         QRect rect =  poly.boundingRect();
         QImage cropped = image.copy(rect);
-        cv::Mat croppedMat = Util::toCv(cropped);
+        cv::Mat croppedMat = Util::toCv(cropped,CV_8UC4);
         cv::Mat im_gray, img_bw;
-        //cv::cvtColor(croppedMat, im_gray, CV_BGR2GRAY);
-        //cv::threshold(im_gray, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-       // cropped = Util::toQt(croppedMat);
+        cv::cvtColor(croppedMat, im_gray, CV_BGR2GRAY);
+        cv::threshold(im_gray, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+        QImage saveQIM = Util::toQt(img_bw, QImage::Format_RGB888);
 
         QFileInfo fileInfo(filename);
         QString fileNameWithoutExt = fileInfo.fileName();
         QString fnameToSave = word + "/" + fileNameWithoutExt + QString::number(j) + ".jpg";
-        if(!cropped.save(fnameToSave))
+        if(!saveQIM.save(fnameToSave))
              qDebug() << "ERROR : " << fnameToSave << " can not be saved!" ;
 
     }
