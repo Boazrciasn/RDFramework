@@ -50,6 +50,9 @@ void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
 
     QRect myRect(a, b);
 
+    ui->width_height_label->setText(" W: " + QString::number(myRect.width()) +
+                                    " H: " + QString::number(myRect.height()));
+
 //    QPixmap OriginalPix(*ui->imageLabel->pixmap());
 
     QImage newImage;
@@ -137,7 +140,11 @@ void AnnExtractorDialog::on_previous_button_clicked()
     qDebug()<<fNames[fileIndex];
     QImage image(fNames[fileIndex]);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-    ui->out_info_label->setText(fNames[fileIndex]);
+    QString fname =  fNames[fileIndex];
+    int posLastSlash = fname.lastIndexOf("/",-1);
+    int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
+
+    ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
     ui->imageLabel->repaint();
 }
 
@@ -152,6 +159,10 @@ void AnnExtractorDialog::on_next_button_clicked()
     qDebug()<<fNames[fileIndex];
     QImage image(fNames[fileIndex]);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-    ui->out_info_label->setText(fNames[fileIndex]);
+    QString fname =  fNames[fileIndex];
+    int posLastSlash = fname.lastIndexOf("/",-1);
+    int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
+
+    ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
     ui->imageLabel->repaint();
 }
