@@ -6,6 +6,7 @@
 #include <QMouseEvent>
 #include <QRubberBand>
 #include "include/dialogextracted.h"
+#include "include/Reader.h"
 #include <QDialog>
 
 namespace Ui {
@@ -34,8 +35,9 @@ private slots:
 
 private:
     Ui::AnnExtractorDialog *ui;
+    Reader reader;
     QImage copyImage;
-    QString fileName;
+    QString dir;
     QPoint myPoint;
     QRubberBand *rubberBand;
     std::vector<QString> fNames;     // file names are stored

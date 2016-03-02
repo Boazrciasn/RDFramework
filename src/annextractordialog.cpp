@@ -67,7 +67,6 @@ void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
 
 void AnnExtractorDialog::on_browse_button_clicked()
 {
-    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
     QString searchChar = ui->search_char->text();
 
     if (searchChar.size() != 1){
@@ -76,19 +75,45 @@ void AnnExtractorDialog::on_browse_button_clicked()
         return;
     }
 
+    dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    fNames.clear();
+    reader.findImages(dir,searchChar,fNames);
 
-    if (!fileName.isEmpty()) {
-        QImage image(fileName);
-
-        if (image.isNull()) {
-            QMessageBox::information(this, tr("Image Viewer"),
-                                     tr("Cannot load %1.").arg(fileName));
-            return;
-        }
-
-        ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-        ui->imageLabel->repaint();
+    if(fNames.size() == 0)
+    {
+        QMessageBox::information(this, tr("Reader"),
+                                 tr("loading faild!"));
+        return;
     }
+
+    fileIndex = 0;
+    QImage image(fNames[fileIndex]);
+    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+    ui->out_info_label->setText(fNames[fileIndex]);
+    ui->imageLabel->repaint();
+
+//    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
+//    QString searchChar = ui->search_char->text();
+
+//    if (searchChar.size() != 1){
+//        QMessageBox::information(this, tr("Image Viewer"),
+//                                 tr("Please check your input parameters!"));
+//        return;
+//    }
+
+
+//    if (!fileName.isEmpty()) {
+//        QImage image(fileName);
+
+//        if (image.isNull()) {
+//            QMessageBox::information(this, tr("Image Viewer"),
+//                                     tr("Cannot load %1.").arg(fileName));
+//            return;
+//        }
+
+//        ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+//        ui->imageLabel->repaint();
+//    }
 }
 
 void AnnExtractorDialog::on_save_button_clicked()
@@ -102,10 +127,31 @@ void AnnExtractorDialog::on_save_button_clicked()
 
 void AnnExtractorDialog::on_previous_button_clicked()
 {
+    fileIndex--;
+    if (fileIndex < 0)
+    {
+        fileIndex++;
+        return;
+    }
 
+    qDebug()<<fNames[fileIndex];
+    QImage image(fNames[fileIndex]);
+    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+    ui->out_info_label->setText(fNames[fileIndex]);
+    ui->imageLabel->repaint();
 }
 
 void AnnExtractorDialog::on_next_button_clicked()
 {
-
+    fileIndex++;
+    if (fileIndex >= (int)this->fNames.size())
+    {
+        fileIndex--;
+        return;
+    }
+    qDebug()<<fNames[fileIndex];
+    QImage image(fNames[fileIndex]);
+    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+    ui->out_info_label->setText(fNames[fileIndex]);
+    ui->imageLabel->repaint();
 }

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>435</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Annotation Extractor</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,35 +23,42 @@
    </item>
    <item alignment="Qt::AlignBottom">
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLineEdit" name="search_char"/>
-      </item>
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
        <widget class="QPushButton" name="browse_button">
         <property name="text">
          <string>Browse...</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="save_button">
-        <property name="text">
-         <string>Save</string>
-        </property>
-       </widget>
-      </item>
-      <item>
+      <item row="1" column="3">
        <widget class="QPushButton" name="previous_button">
         <property name="text">
          <string>&lt;&lt;</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="4">
        <widget class="QPushButton" name="next_button">
         <property name="text">
          <string>&gt;&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="save_button">
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="search_char"/>
+      </item>
+      <item row="0" column="0" colspan="5">
+       <widget class="QLabel" name="out_info_label">
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
