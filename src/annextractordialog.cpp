@@ -58,13 +58,14 @@ void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
     QImage newImage;
     newImage = OriginalPix.toImage();
     this->copyImage = newImage.copy(myRect);
-
+    ui->preview_label->setPixmap(QPixmap::fromImage(this->copyImage));
+    ui->preview_label->repaint();
 //    ui->imageLabel->setPixmap(QPixmap::fromImage(copyImage));
 //    ui->imageLabel->repaint();
 
-    DialogExtracted *mDialog = new DialogExtracted(this);
-    mDialog->setLabel(this->copyImage);
-    mDialog->exec();
+//    DialogExtracted *mDialog = new DialogExtracted(this);
+//    mDialog->setLabel(this->copyImage);
+//    mDialog->exec();
 }
 
 
@@ -89,11 +90,44 @@ void AnnExtractorDialog::on_browse_button_clicked()
         return;
     }
 
-    fileIndex = 0;
+    // Add save dir
+    int posLastSlash = dir.lastIndexOf("/",-1);
+    this->saveDir = dir.mid(0,posLastSlash) + "/AnnotationResults/" + ui->search_char->text();
+
+    QFile textFileRead(this->saveDir + "/lastSession.txt");
+    if (textFileRead.exists()) {
+        textFileRead.open(QIODevice::ReadOnly);
+        QString str = textFileRead.readLine();
+        QStringList strList = str.split("#");
+        savedFileCounter = ((QString)strList[0]).toInt();
+        fileIndex = ((QString)strList[1]).toInt() + 1;
+
+        qDebug() << savedFileCounter << " - " << fileIndex;
+    }else {
+        fileIndex = 0;
+        savedFileCounter = 0;
+    }
+
     QImage image(fNames[fileIndex]);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-    ui->out_info_label->setText(fNames[fileIndex]);
+    QString fname =  fNames[fileIndex];
+    posLastSlash = fname.lastIndexOf("/",-1);
+    int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
+
+    ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
     ui->imageLabel->repaint();
+
+
+    QDir dir_save(saveDir);
+    if (!dir_save.exists())
+    {
+        dir_save.mkpath(".");
+        if(!dir_save.exists())
+             qDebug() << "ERROR : " << dir_save << " can not be created!" ;
+    }
+
+//    savedFileCounter = 0;   // initial value
+
 
 //    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
 //    QString searchChar = ui->search_char->text();
@@ -123,9 +157,19 @@ void AnnExtractorDialog::on_save_button_clicked()
 {
     rubberBand->hide();
 
-    if(!this->copyImage.save("./test.jpg"))
+    QString file = this->saveDir + "/" + ui->search_char->text() + "_" + QString::number(savedFileCounter) + ".jpg";
+    if(!this->copyImage.save(file))
         QMessageBox::information(this, tr("SAVE FAILED"),
                                  tr("Unable to save."));
+    savedFileCounter++;
+
+
+    QFile textFile(this->saveDir + "/lastSession.txt");
+    textFile.open(QIODevice::WriteOnly);
+    textFile.write(QByteArray::number(savedFileCounter));
+    textFile.write("#");
+    textFile.write(QByteArray::number(fileIndex));
+    textFile.close();
 }
 
 void AnnExtractorDialog::on_previous_button_clicked()
@@ -136,8 +180,6 @@ void AnnExtractorDialog::on_previous_button_clicked()
         fileIndex++;
         return;
     }
-
-    qDebug()<<fNames[fileIndex];
     QImage image(fNames[fileIndex]);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
     QString fname =  fNames[fileIndex];
@@ -156,7 +198,6 @@ void AnnExtractorDialog::on_next_button_clicked()
         fileIndex--;
         return;
     }
-    qDebug()<<fNames[fileIndex];
     QImage image(fNames[fileIndex]);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
     QString fname =  fNames[fileIndex];

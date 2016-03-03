@@ -38,10 +38,12 @@ private:
     Reader reader;
     QImage copyImage;
     QString dir;
+    QString saveDir;
     QPoint myPoint;
     QRubberBand *rubberBand;
     std::vector<QString> fNames;     // file names are stored
     int fileIndex;              // index of file being viewed
+    int savedFileCounter;
 };
 
 #endif // ANNEXTRACTORDIALOG_H
