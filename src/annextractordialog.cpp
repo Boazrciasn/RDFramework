@@ -102,6 +102,8 @@ void AnnExtractorDialog::on_browse_button_clicked()
         savedFileCounter = ((QString)strList[0]).toInt();
         fileIndex = ((QString)strList[1]).toInt() + 1;
 
+        ui->counter_label->setText(QString::number(savedFileCounter));
+
         qDebug() << savedFileCounter << " - " << fileIndex;
     }else {
         fileIndex = 0;
@@ -162,7 +164,7 @@ void AnnExtractorDialog::on_save_button_clicked()
         QMessageBox::information(this, tr("SAVE FAILED"),
                                  tr("Unable to save."));
     savedFileCounter++;
-
+    ui->counter_label->setText(QString::number(savedFileCounter));
 
     QFile textFile(this->saveDir + "/lastSession.txt");
     textFile.open(QIODevice::WriteOnly);

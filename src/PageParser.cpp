@@ -63,7 +63,7 @@ void PageParser::getElements(QDomElement root, QString tagname, QString attribut
             QDomElement coordElement = coordNode.toElement();
 
             QString word = uniCodeElement.text();
-            word = Util::cleanNumberAndPunctuation(word);
+//            word = Util::cleanNumberAndPunctuation(word);
             if(word != "")
             {
                 this->words->push_back(word);
@@ -114,7 +114,8 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
         cv::Mat im_gray, img_bw;
         cv::cvtColor(croppedMat, im_gray, CV_BGR2GRAY);
         cv::threshold(im_gray, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-        QImage saveQIM = Util::toQt(img_bw, QImage::Format_RGB888);
+//        QImage saveQIM = Util::toQt(img_bw, QImage::Format_RGB888);
+        QImage saveQIM = Util::toQt(im_gray, QImage::Format_RGB888);
 
         QFileInfo fileInfo(filename);
         QString fileNameWithoutExt = fileInfo.fileName();
