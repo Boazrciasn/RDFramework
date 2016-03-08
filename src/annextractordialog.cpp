@@ -112,6 +112,13 @@ void AnnExtractorDialog::on_browse_button_clicked()
 
     QImage image(fNames[fileIndex]);
     ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->imageLabel->setScaledContents(true);
+    ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
+    ui->imageLabel->setPixmap(*newScaledPixmap);
     QString fname =  fNames[fileIndex];
     posLastSlash = fname.lastIndexOf("/",-1);
     int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
@@ -183,7 +190,14 @@ void AnnExtractorDialog::on_previous_button_clicked()
         return;
     }
     QImage image(fNames[fileIndex]);
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->imageLabel->setScaledContents(true);
+    ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
+    ui->imageLabel->setPixmap(*newScaledPixmap);
+
     QString fname =  fNames[fileIndex];
     int posLastSlash = fname.lastIndexOf("/",-1);
     int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
@@ -201,7 +215,15 @@ void AnnExtractorDialog::on_next_button_clicked()
         return;
     }
     QImage image(fNames[fileIndex]);
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
+
+
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->imageLabel->setScaledContents(true);
+    ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
+    ui->imageLabel->setPixmap(*newScaledPixmap);
     QString fname =  fNames[fileIndex];
     int posLastSlash = fname.lastIndexOf("/",-1);
     int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));

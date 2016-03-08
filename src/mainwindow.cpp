@@ -53,7 +53,13 @@ void MainWindow::on_browse_clicked()
     {
         QString fileName = dir + "/" +this->fNames[fileIndex];
         QImage image(fileName + ".jpg");
-        ui->label->setPixmap(QPixmap::fromImage(image));
+        QPixmap pixmap = QPixmap::fromImage(image);
+        QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        scaledImage.setDevicePixelRatio(devicePixelRatio());
+        QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+        ui->label->setPixmap(*newScaledPixmap);
+
+        ui->label->setScaledContents(true);
         ui->label->resize(ui->label->pixmap()->size());
 
 //        mDialog = new MyDialog(this);
@@ -72,8 +78,15 @@ void MainWindow::on_previous_clicked()
         fileIndex++;
     QString fileName = dir + "/" +this->fNames[fileIndex] + ".jpg";
     QImage image(fileName);
-    ui->label->setPixmap(QPixmap::fromImage(image));
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->label->setPixmap(*newScaledPixmap);
+
+    ui->label->setScaledContents(true);
     ui->label->resize(ui->label->pixmap()->size());
+
 //    mDialog->setLabel(image);
 }
 
@@ -87,9 +100,15 @@ void MainWindow::on_next_clicked()
         fileIndex--;
     QString fileName = dir + "/" +this->fNames[fileIndex] + ".jpg";
     QImage image(fileName);
-    ui->label->setPixmap(QPixmap::fromImage(image));
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->label->setPixmap(*newScaledPixmap);
+
+    ui->label->setScaledContents(true);
     ui->label->resize(ui->label->pixmap()->size());
-//    mDialog->setLabel(image);
+
 }
 
 void MainWindow::on_extractWords_clicked()

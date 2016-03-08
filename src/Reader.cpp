@@ -40,7 +40,8 @@ void Reader::readFromTo(string filename, vector<QString> &imgName)
 void Reader::findImages(QString baseDir, QString query, vector<QString> &foundImages)
 {
     query = "*"+query+"*";
-        QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot ) ;
+
+        QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
     while (it.hasNext()){
         it.next();
         QDirIterator itFile(baseDir+"/"+it.fileName(),QDir::Files);
