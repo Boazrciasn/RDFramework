@@ -11,6 +11,7 @@ public:
     static cv::Mat toCv(const QImage &image, int cv_type);
     static QImage toQt(const cv::Mat &src, QImage::Format format);
     static QString cleanNumberAndPunctuation(QString toClean);
+    static QString fileNameWithoutPath(QString& filePath);
 };
 
 #endif

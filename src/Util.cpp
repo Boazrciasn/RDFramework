@@ -99,3 +99,11 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     return toReturn.toLower();
 }
 
+QString Util::fileNameWithoutPath(QString& filePath){
+    int posLastDot = filePath.lastIndexOf(".",-1);
+    int posLastSlash= filePath.lastIndexOf("/",-1);
+    QString fname = filePath.mid(posLastSlash+1,posLastDot-posLastSlash-1);
+    filePath = filePath.mid(0,posLastSlash);
+    return fname;
+}
+

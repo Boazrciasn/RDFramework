@@ -6,9 +6,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "QString"
 #include <QDir>
-#include<QDebug>
+#include <QDebug>
 #include "QApplication"
-#include<QDirIterator>
+#include <QDirIterator>
 
 #include <dirent.h>
 #include <iostream>
