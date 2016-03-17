@@ -323,7 +323,7 @@ void RandomDesicionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& pa
         //qDebug() << "EntRight" << rightChildEntr ;
         int sizeLeft  = left.size();
         int sizeRight = right.size();
-        float totalsize = sizeLeft + sizeRight ;
+        float totalsize = parentPixels.size() ;
         float avgEntropyChild  = (sizeLeft/totalsize) * leftChildEntr;
               avgEntropyChild += (sizeRight/totalsize)* rightChildEntr;
 
