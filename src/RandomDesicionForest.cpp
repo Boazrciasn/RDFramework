@@ -3,6 +3,8 @@
 #include <QFileDialog>
 #include <QImage>
 
+// given the directory of the all samples
+// read subsampled part of the images into pixel cloud
 void RandomDesicionForest::readTrainingImageFiles(){
     /* initialize random seed: */
     srand (time(NULL));
@@ -23,8 +25,10 @@ void RandomDesicionForest::readTrainingImageFiles(){
    {
        QString filePath = *it;
        QString fileName = Util::fileNameWithoutPath(filePath) ;
+       //each directory contains lastsession.txt
        if(!fileName.contains("_")) continue;
 
+       //sample filenames a_0, a_11
        QString letter = fileName.split("_")[0];
        QString sampleId = fileName.split("_")[1];
        int id = sampleId.toInt();
@@ -33,6 +37,7 @@ void RandomDesicionForest::readTrainingImageFiles(){
        filePath += "/" + fileName + ".jpg";
        Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
        // draw perImagePixel pixels from image
+       // bootstrap, subsample
        for(int k=0;k<perImagePixel;k++){
             int i = rand() % image.rows;
             int j = rand() % image.cols;
@@ -44,6 +49,8 @@ void RandomDesicionForest::readTrainingImageFiles(){
    }
    fNames.clear();
 }
+
+//given the image path, fills in the pixel vector
 void RandomDesicionForest::imageToPixels(vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf ){
    Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
    for(int i =0; i<image.rows;i++){
@@ -54,27 +61,34 @@ void RandomDesicionForest::imageToPixels(vector<Pixel*>& res, QString& filePath,
        }
    }
 }
+
 void RandomDesicionForest::printPixelCloud(){
    for (vector<Pixel*>::iterator it = pixelCloud.begin() ; it != pixelCloud.end(); ++it){
        printPixel(*it);
    }
 }
+
 void RandomDesicionForest::printPixel(Pixel* px){
-    qDebug() << "Coor("    << px->position.x    << ","     << px->position.y
-             << ") Label(" << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
-             << ") = "   << px->intensity;
+    qDebug() << "Pixel{ Coor("    << px->position.x     << ","     << px->position.y
+             << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
+             << ") = "            << px->intensity << "}";
 }
+
+//random teta value
 void RandomDesicionForest::generateTeta(Coord& crd)
 {
     // random number between -probe_distance, probe_distance
     crd.x = (rand() % (2*probe_distanceX)) - probe_distanceX;
     crd.y = (rand() % (2*probe_distanceY)) - probe_distanceY;
 }
+
+//random taw value
 int RandomDesicionForest::generateTaw()
 {
-    // random number between -probe_distance, probe_distance
+    // random number between -127, +127
     return (rand() % 256) - 127;
 }
+
 float RandomDesicionForest::calculateEntropy(Mat& hist)
 {
     float entr = 0;
@@ -93,29 +107,33 @@ float RandomDesicionForest::calculateEntropy(Mat& hist)
     //cout << "ENTROPY : " << entr;
     return entr;
 }
+
 float RandomDesicionForest::calculateEntropyOfVector(vector<Pixel*>& pixels)
 {
     Mat hist = createHistogram(pixels);
     return calculateEntropy(hist);
 }
-// 1 by number of labels histogram
+
+// creates histogram out of a pixel vector
 Mat RandomDesicionForest::createHistogram(vector<Pixel*>& pixels){
     Mat hist = Mat::zeros(1,NUM_LABELS,DataType<float>::type);
     for (vector<Pixel*>::iterator it = pixels.begin() ; it != pixels.end(); ++it)
     {
         Pixel* px = *it;
         int index = letterIndex(px->imgInfo->label);
-        //qDebug() << "letter " << asciiVal << " A: "  << asciiA << " i: " << index;
         hist.at<float>(0,index)++;
     }
-    //printHistogram(hist);
     return hist;
 }
+
+// given a letter returns its index on label histogram
 int RandomDesicionForest::letterIndex(char letter){
     int asciiVal = (int)letter;
     int asciiA = (int)'a';
     return asciiVal-asciiA;
 }
+
+// checks if a pixel will travel to the left of a given node
 bool RandomDesicionForest::isLeft(Pixel* p, Node&node, Mat& img)
 {
     int new_teta1X = node.teta1.x + p->position.x ;
@@ -148,6 +166,8 @@ bool RandomDesicionForest::isLeft(Pixel* p, Node&node, Mat& img)
 
     return ((intensity1- intensity2) <= node.taw);
 }
+
+// divide pixel vector into 2 parts according to the parameters of parent node
 void RandomDesicionForest::divide(vector<Pixel*>& parentPixels,
                                   vector<Pixel*>& left,
                                   vector<Pixel*>& right, Node& parent){
@@ -163,11 +183,15 @@ void RandomDesicionForest::divide(vector<Pixel*>& parentPixels,
         }
     }
 }
+
+// returns the image the pixel belongs to
 Mat RandomDesicionForest::getPixelImage(Pixel* px){
     QString path = dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
                        + QString::number(px->imgInfo->sampleId)  + ".jpg";
     return imread(path.toStdString());
 }
+
+// create the tree
 void RandomDesicionForest::train()
 {
     Node root;
@@ -182,8 +206,9 @@ void RandomDesicionForest::train()
     constructTree(treee,root,pixelCloud);
     tree = treee;
     qDebug() << "TREE CONSTRUCTED: LEAVES:" << numOfLeaves << " LETTER SAMPLES: " << numOfLetters;
-
 }
+
+// checks if pixels of a letter belong to that letter
 bool RandomDesicionForest::test(vector<Pixel*>& letterPixels, char letter){
     Mat hist = Mat::zeros(1,NUM_LABELS,DataType<float>::type);
     for (vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it){
@@ -198,6 +223,8 @@ bool RandomDesicionForest::test(vector<Pixel*>& letterPixels, char letter){
     int letterIndexOriginal  = letterIndex(letter);
     return(letterIndexPredicted==letterIndexOriginal);
 }
+
+// return the index of the bin with maximum number of pixels
 int RandomDesicionForest::getLabelIndex(Mat& hist){
     int max_val=-1;
     int max_index=0;
@@ -209,6 +236,9 @@ int RandomDesicionForest::getLabelIndex(Mat& hist){
     }
     return max_index;
 }
+
+// starting from the node with nodeID
+// recursively find the leaf node the pixel belongs to
 Node RandomDesicionForest::getLeafNode(Pixel*px, int nodeId){
 
     Node root = tree[nodeId];
@@ -222,6 +252,8 @@ Node RandomDesicionForest::getLeafNode(Pixel*px, int nodeId){
       childId++;
     return getLeafNode(px,childId);
 }
+
+// create child nodes from nodes by tuning each node
 void RandomDesicionForest::constructTree(vector<Node>& tree, Node& root, vector<Pixel*>& pixels) {
 
     float rootEntropy = calculateEntropyOfVector(pixels);
@@ -271,6 +303,7 @@ void RandomDesicionForest::constructTree(vector<Node>& tree, Node& root, vector<
     constructTree(tree,rightChildNode,right);
 }
 
+// find best teta and taw parameters for the given node
 void RandomDesicionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& parent)
 {
     vector<Pixel*> left;
