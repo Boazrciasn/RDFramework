@@ -85,7 +85,7 @@ void RandomDecisionForest::generateTeta(Coord& crd)
 //random taw value
 int RandomDecisionForest::generateTaw()
 {
-    // random number between -127, +127
+    // random number between -127, +128
     return (rand() % 256) - 127;
 }
 
