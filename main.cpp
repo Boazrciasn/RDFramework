@@ -21,7 +21,9 @@ int main(int argc, char *argv[]) {
     //rdf->printPixelCloud();
     rdf->train();
 
+
    // rdf->printTree();
+
 
     vector<Pixel*> res;
     QString filename = tempdir + "/a/a_0.jpg";

@@ -289,7 +289,8 @@ void RandomDecisionForest::constructTree(vector<Node>& tree, Node& root, vector<
     //qDebug() << "Root ID : "<< root.id;
 
     //no more child construction
-    if( MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH || pixels.size() <= MIN_LEAF_PIXELS ){
+
+    if(MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH || pixels.size() <= MIN_LEAF_PIXELS ){
         //qDebug() << "Leaf Reached";
         root.isLeaf = true;
         root.hist = createHistogram(pixels);

@@ -9,7 +9,9 @@
 #include <QThread>
 #include "include/Reader.h"
 #include "include/mydialog.h"
+#include "histogramdialog.h"
 #include "include/PageParser.h"
+#include "include/Util.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,15 +26,13 @@ public:
     ~MainWindow();
 
 public slots:
-    void update();
+    void display();
 
 private slots:
     void on_browse_clicked();
     void on_previous_clicked();
     void on_next_clicked();
-
     void on_extractWords_clicked();
-
     void on_actionAnnotation_Extractor_triggered();
 
 private:
@@ -40,6 +40,7 @@ private:
 
     Ui::MainWindow *ui;
     MyDialog *mDialog;
+    HistogramDialog *histDialog;
     Reader *reader;
     QString dir;                // file directory
     vector<QString> fNames;     // file names are stored
