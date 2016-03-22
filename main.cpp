@@ -13,13 +13,18 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
+    QString tempdir = "/Users/barisozcan/Documents/Development/ImageCLEF/AnnotationResults";
     RandomDecisionForest* rdf = new RandomDecisionForest(10,15);
+    rdf->setTrainPath(tempdir);
     rdf->readTrainingImageFiles();
     qDebug() << " CloudSize = " << rdf->pixelCloudSize();
+    //rdf->printPixelCloud();
     rdf->train();
 
+   // rdf->printTree();
+
     vector<Pixel*> res;
-    QString filename = "/home/mahiratmis/Desktop/AnnotationResults/a/a_0.jpg";
+    QString filename = tempdir + "/a/a_0.jpg";
     ImageInfo* img_inf = new ImageInfo('a',0);
     rdf->imageToPixels(res,filename,img_inf);
     if(rdf->test(res,'a'))
@@ -28,14 +33,13 @@ int main(int argc, char *argv[]) {
         qDebug() << "COME ONNN";
 
     vector<Pixel*> res2;
-    filename = "/home/mahiratmis/Desktop/AnnotationResults/b/b_10.jpg";
-    img_inf = new ImageInfo('b',10);
+    filename = tempdir + "/a/a_10.jpg";
+    img_inf = new ImageInfo('a',10);
     rdf->imageToPixels(res2,filename,img_inf);
-    if(rdf->test(res,'b'))
+    if(rdf->test(res,'a'))
         qDebug() << "YEAYYYYY";
     else
         qDebug() << "COME ONNN";
-
 
 
     QDesktopWidget dw;
