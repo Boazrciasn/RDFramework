@@ -9,9 +9,9 @@
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles(){
     /* initialize random seed: */
-    int ib = time(NULL);
-    srand (1458663210);
-    qDebug()<< " TIME : " <<ib;
+
+    srand (time(NULL));
+
 
     min_InfoGain =1;
     max_InfoGain =-1;
@@ -292,9 +292,9 @@ void RandomDecisionForest::constructTree(vector<Node>& tree, Node& root, vector<
 
     if(MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH || pixels.size() <= MIN_LEAF_PIXELS ){
         //qDebug() << "Leaf Reached";
-        root.isLeaf = true;
-        root.hist = createHistogram(pixels);
-        //qDebug() << "Leaf at " << current_depth << " Id:" << root.id;
+        tree[root.id-1].isLeaf = true;
+        tree[root.id-1].hist = createHistogram(pixels);
+        //qDebug() << "Leaf Id:" << root.id;
         //printHistogram(root.hist);
         numOfLeaves++;
         return;
@@ -315,24 +315,27 @@ void RandomDecisionForest::constructTree(vector<Node>& tree, Node& root, vector<
    // qDebug() << "Tree Max İndex: " << tree.size();
     Node leftChildNode;
     leftChildNode.id = 2*root.id;
-    qDebug() << "Left Child " << QString::number(leftChildNode.id) << "Created";
     tree[leftChildNode.id-1] = leftChildNode;
+
     leftChildNode.isLeaf=false;
     leftChildNode.taw = generateTaw();
     generateTeta(leftChildNode.teta1);
     generateTeta(leftChildNode.teta2);
+  //  qDebug() << "Left Child " << QString::number(tree[leftChildNode.id-1].id)  << "Created LEAF :" <<tree[leftChildNode.id-1].isLeaf;
     constructTree(tree,leftChildNode,left);
+
     //qDebug() <<"Is" << leftChildNode.id << " is Leaf :" << leftChildNode.isLeaf;
 
     Node rightChildNode;
     rightChildNode.id = 2*root.id+1;
-    qDebug() << "Right Child " << QString::number(rightChildNode.id) << "Created";
     tree[rightChildNode.id-1] = rightChildNode;
     rightChildNode.isLeaf=false;
     rightChildNode.taw = generateTaw();
     generateTeta(rightChildNode.teta1);
     generateTeta(rightChildNode.teta2);
+  //  qDebug() << "Right Child " << QString::number(tree[rightChildNode.id-1].id) << "Created LEAF :"<< tree[rightChildNode.id-1].isLeaf;
     constructTree(tree,rightChildNode,right);
+
 
 }
 
