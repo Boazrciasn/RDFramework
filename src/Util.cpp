@@ -2,7 +2,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 
-
 cv::Mat Util::toCv(const QImage &image , int cv_type)
 {
     return cv::Mat(image.height(), image.width(), cv_type, (void *)image.scanLine(0), image.bytesPerLine());
@@ -99,3 +98,9 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     return toReturn.toLower();
 }
 
+void Util::plot(const cv::Mat &hist, QWidget *parent)
+{
+    HistogramDialog *histDialog = new HistogramDialog(parent);
+    histDialog->show();
+    histDialog->plot(hist);
+}

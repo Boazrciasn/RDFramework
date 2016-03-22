@@ -1,5 +1,6 @@
 #include "include/mainwindow.h"
 #include "include/annextractordialog.h"
+#include "include/TextRegionDetector.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
 
@@ -45,7 +46,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_browse_clicked()
 {
-    dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), "/home/vvglab/Desktop/ImageCLEF2016/pages_devel"/*QDir::currentPath()*/,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     fileIndex = 0;
     reader->readFromTo(dir.toStdString(),this->fNames);
 
@@ -53,6 +54,27 @@ void MainWindow::on_browse_clicked()
     {
         QString fileName = dir + "/" +this->fNames[fileIndex];
         QImage image(fileName + ".jpg");
+
+
+        // Testing
+        cv::Mat img_bw = Util::toCv(image,CV_8UC4);
+        cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
+        cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+        img_bw.convertTo(img_bw,CV_32FC1);
+        img_bw = 255 - img_bw;
+
+        QVector<QRect> out = TextRegionDetector::detectRegions(img_bw,this);
+
+        QPainter qPainter(&image);
+        qPainter.setBrush(Qt::NoBrush);
+        qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+
+        for (int i = 0; i < out.size(); i++) {
+            qPainter.drawRect(out[i]);
+        }
+        image.save("out.jpg");
+
+
         QPixmap pixmap = QPixmap::fromImage(image);
         QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         scaledImage.setDevicePixelRatio(devicePixelRatio());

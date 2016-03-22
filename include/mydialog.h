@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <vector>
+#include "qcustomplot/qcustomplot.h" // the header file of QCustomPlot. Don't forget to add it to your project, if you use an IDE, so it gets compiled.
 
 namespace Ui {
 class MyDialog;
@@ -20,9 +21,7 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
-
     void on_comboBox_activated(int index);
 
 private:

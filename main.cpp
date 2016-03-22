@@ -10,13 +10,13 @@ int main(int argc, char *argv[]) {
 
     QApplication app(argc, argv);
     MainWindow w;
-    QString dir  = "/Users/barisozcan/Documents/Computer_Vision/ImageCLEF/Samples";
-    Reader read;
-    vector<QString> vec;
-    read.findImages(dir,"x",vec);
-    for (int i = 0; i < vec.size(); ++i) {
-        qDebug()<< vec.at(i);
-    }
+//    QString dir  = "/Users/barisozcan/Documents/Computer_Vision/ImageCLEF/Samples";
+//    Reader read;
+//    vector<QString> vec;
+//    read.findImages(dir,"x",vec);
+//    for (int i = 0; i < vec.size(); ++i) {
+//        qDebug()<< vec.at(i);
+//    }
 
 
     QDesktopWidget dw;

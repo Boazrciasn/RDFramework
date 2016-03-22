@@ -9,7 +9,9 @@
 #include <QThread>
 #include "include/Reader.h"
 #include "include/mydialog.h"
+#include "histogramdialog.h"
 #include "include/PageParser.h"
+#include "include/Util.h"
 
 namespace Ui {
 class MainWindow;
@@ -40,6 +42,7 @@ private:
 
     Ui::MainWindow *ui;
     MyDialog *mDialog;
+    HistogramDialog *histDialog;
     Reader *reader;
     QString dir;                // file directory
     vector<QString> fNames;     // file names are stored
