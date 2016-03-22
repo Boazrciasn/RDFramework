@@ -13,7 +13,7 @@ void RandomDesicionForest::readTrainingImageFiles(){
     max_InfoGain =-1;
 
    //QString dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-   dir = "/home/mahiratmis/Desktop/AnnotationResults";
+   dir = "/home/mahiratmis/Desktop/AnnotationResults"; // Got make dir generic here.
    vector<QString>fNames;
    Reader * reader = new Reader();
    reader->findImages(dir, "", fNames);
@@ -36,6 +36,7 @@ void RandomDesicionForest::readTrainingImageFiles(){
 
        filePath += "/" + fileName + ".jpg";
        Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+
        // draw perImagePixel pixels from image
        // bootstrap, subsample
        for(int k=0;k<perImagePixel;k++){
@@ -331,6 +332,7 @@ void RandomDesicionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& pa
         float infoGain = parentEntr - avgEntropyChild;
         //qDebug() << "InfoGain" << infoGain ;
 
+        // Non-improving epoch here !
         if(infoGain > max_InfoGain)
             max_InfoGain = infoGain;
         else if(infoGain < min_InfoGain)

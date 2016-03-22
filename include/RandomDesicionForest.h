@@ -93,6 +93,8 @@ public:
     int letterIndex(char px);
     void imageToPixels(vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf);
     bool test(vector<Pixel*>& letterPixels, char letter);
+    // Keep all images on memory
+    std::vector<cv::Mat> imagesContainer;
 
 private:
     QString dir;
