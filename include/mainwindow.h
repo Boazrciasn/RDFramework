@@ -26,15 +26,13 @@ public:
     ~MainWindow();
 
 public slots:
-    void update();
+    void display();
 
 private slots:
     void on_browse_clicked();
     void on_previous_clicked();
     void on_next_clicked();
-
     void on_extractWords_clicked();
-
     void on_actionAnnotation_Extractor_triggered();
 
 private:

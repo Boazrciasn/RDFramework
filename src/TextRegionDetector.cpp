@@ -20,7 +20,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
     cv::minMaxLoc(hist,&minVal,&maxVal);
     hist = hist/maxVal;
 
-    Util::plot(hist,parent);
+//    Util::plot(hist,parent);
 
     // binarize
     QVector<double> y(range);

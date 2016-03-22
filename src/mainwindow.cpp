@@ -21,18 +21,36 @@ MainWindow::MainWindow(QWidget *parent) :
 // ****************************** //
 // ****************************** //
 
-void MainWindow::update()
+void MainWindow::display()
 {
-    if (ui->IMG_button->isChecked()){
-        process_type = 0;
-        //        processImg();
+    QString fileName = dir + "/" +this->fNames[fileIndex];
+    QImage image(fileName + ".jpg");
+
+    // Testing
+    cv::Mat img_bw = Util::toCv(image,CV_8UC4);
+    cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
+    cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    img_bw.convertTo(img_bw,CV_32FC1);
+    img_bw = 255 - img_bw;
+
+    QVector<QRect> out = TextRegionDetector::detectRegions(img_bw,this);
+    QPainter qPainter(&image);
+    qPainter.setBrush(Qt::NoBrush);
+    qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
+
+    for (int i = 0; i < out.size(); i++) {
+        qPainter.drawRect(out[i]);
     }
-    else if (ui->Video_button->isChecked()){
-        process_type = 1;
-        //        processVideo();
-    }
-    else
-        process_type = -1;
+    image.save("out.jpg");
+
+
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+
+    ui->label->setPixmap(*newScaledPixmap);
+    ui->label->resize(ui->label->pixmap()->size());
 }
 
 // ****************************** //
@@ -41,7 +59,6 @@ void MainWindow::update()
 MainWindow::~MainWindow()
 {
     delete ui;
-    //    delete PF;
 }
 
 void MainWindow::on_browse_clicked()
@@ -52,38 +69,7 @@ void MainWindow::on_browse_clicked()
 
     if (!this->fNames.empty())
     {
-        QString fileName = dir + "/" +this->fNames[fileIndex];
-        QImage image(fileName + ".jpg");
-
-
-        // Testing
-        cv::Mat img_bw = Util::toCv(image,CV_8UC4);
-        cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
-        cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-        img_bw.convertTo(img_bw,CV_32FC1);
-        img_bw = 255 - img_bw;
-
-        QVector<QRect> out = TextRegionDetector::detectRegions(img_bw,this);
-
-        QPainter qPainter(&image);
-        qPainter.setBrush(Qt::NoBrush);
-        qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
-
-        for (int i = 0; i < out.size(); i++) {
-            qPainter.drawRect(out[i]);
-        }
-        image.save("out.jpg");
-
-
-        QPixmap pixmap = QPixmap::fromImage(image);
-        QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        scaledImage.setDevicePixelRatio(devicePixelRatio());
-        QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
-        ui->label->setPixmap(*newScaledPixmap);
-
-        ui->label->setScaledContents(true);
-        ui->label->resize(ui->label->pixmap()->size());
-
+        display();
 //        mDialog = new MyDialog(this);
 //        mDialog->show();
 //        mDialog->setFNames(this->fNames,dir);
@@ -98,18 +84,7 @@ void MainWindow::on_previous_clicked()
     fileIndex--;
     if (fileIndex < 0)
         fileIndex++;
-    QString fileName = dir + "/" +this->fNames[fileIndex] + ".jpg";
-    QImage image(fileName);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    scaledImage.setDevicePixelRatio(devicePixelRatio());
-    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
-    ui->label->setPixmap(*newScaledPixmap);
-
-    ui->label->setScaledContents(true);
-    ui->label->resize(ui->label->pixmap()->size());
-
-//    mDialog->setLabel(image);
+    display();
 }
 
 // ****************************** //
@@ -120,17 +95,7 @@ void MainWindow::on_next_clicked()
     fileIndex++;
     if (fileIndex >= (int)this->fNames.size())
         fileIndex--;
-    QString fileName = dir + "/" +this->fNames[fileIndex] + ".jpg";
-    QImage image(fileName);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    scaledImage.setDevicePixelRatio(devicePixelRatio());
-    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
-    ui->label->setPixmap(*newScaledPixmap);
-
-    ui->label->setScaledContents(true);
-    ui->label->resize(ui->label->pixmap()->size());
-
+    display();
 }
 
 void MainWindow::on_extractWords_clicked()
