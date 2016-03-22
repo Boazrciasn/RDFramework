@@ -16,11 +16,12 @@
 
 #include <time.h>       /* time */
 
-#define MAX_NUMITERATION_FOR_DIVISION 200
+#define MAX_NUMITERATION_FOR_DIVISION 1
 #define PIXEL_CLOUD_SIZE 1000
 #define MIN_ENTROPY 0.05
 #define NUM_LABELS 23
 #define MAX_DEPTH 16
+#define MIN_LEAF_PIXELS 10
 
 using namespace cv;
 using namespace std;
@@ -86,6 +87,7 @@ public:
     int pixelCloudSize();
     void printHistogram(Mat& hist);
     void printNode(Node& node);
+    void printTree();
     Mat getPixelImage(Pixel* px);
     Node getLeafNode(Pixel*px, int nodeId);
     int getLabelIndex(Mat& hist);
@@ -94,6 +96,11 @@ public:
     bool test(vector<Pixel*>& letterPixels, char letter);
     // Keep all images on memory
     std::vector<cv::Mat> imagesContainer;
+    // Test and Train dirs :
+    QString testpath, trainpath;
+
+    void setTrainPath(QString path);
+    void setTestPath(QString path);
 
 private:
     QString dir;
@@ -105,6 +112,7 @@ private:
     float min_InfoGain;
     float max_InfoGain;
     vector<Node>tree;
+
 };
 
 #endif
