@@ -13,6 +13,7 @@ public:
     static QImage toQt(const cv::Mat &src, QImage::Format format);
     static QString cleanNumberAndPunctuation(QString toClean);
     static void plot(const cv::Mat &hist,QWidget *parent);
+    static QString fileNameWithoutPath(QString& filePath);
 };
 
 #endif
