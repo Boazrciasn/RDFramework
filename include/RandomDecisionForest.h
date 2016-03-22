@@ -1,5 +1,5 @@
-#ifndef CPV_RANDOM_DESICION_FOREST
-#define CPV_RANDOM_DESICION_FOREST
+#ifndef CPV_RANDOM_DECISION_FOREST
+#define CPV_RANDOM_DECISION_FOREST
 
 
 #include <opencv2/core/core.hpp>
@@ -61,12 +61,11 @@ struct Node
 };
 
 
-class RandomDesicionForest{
+class RandomDecisionForest{
 public:
-    RandomDesicionForest(int probe_dstanceX,int probe_dstanceY){
+    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY){
         probe_distanceX = probe_dstanceX;
         probe_distanceY = probe_dstanceY;
-        initialTaw = 100;
         numOfLeaves = 0;
         numOfLetters = 0;
     }
@@ -100,7 +99,6 @@ private:
     QString dir;
     vector<Pixel*> pixelCloud;
     int probe_distanceX, probe_distanceY;
-    int initialTaw;
     int numOfLetters;
     int numOfLeaves;
     int depth;

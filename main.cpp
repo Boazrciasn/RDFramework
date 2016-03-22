@@ -5,7 +5,7 @@
 #include "QDebug"
 #include "vector"
 
-#include "include/RandomDesicionForest.h"
+#include "include/RandomDecisionForest.h"
 
 
 int main(int argc, char *argv[]) {
@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-    RandomDesicionForest* rdf = new RandomDesicionForest(10,15);
+    RandomDecisionForest* rdf = new RandomDecisionForest(10,15);
     rdf->readTrainingImageFiles();
     qDebug() << " CloudSize = " << rdf->pixelCloudSize();
     rdf->train();
