@@ -10,7 +10,9 @@ public:
     static QVector<QRect> detectRegions(const cv::Mat &img_bw, QWidget *parent);
 
 private:
-    static QVector<double> extractCoordinateFrom(QVector<double> y);
+    static QVector<int> extractCoordinateFrom(QVector<int> y);
+    static void getRange(const cv::Mat &img_bw, int &leftMargin, int &rightMargin, QWidget *parent);
+    static void extractROI(cv::Mat &regHist, int &leftMargin, int &rightMargin);
 };
 
 #endif

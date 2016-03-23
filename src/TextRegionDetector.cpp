@@ -4,6 +4,12 @@
 
 QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget *parent)
 {
+
+    int leftMargin = 0, rightMargin = img_bw.cols;
+//    qDebug() << "Default: " << leftMargin << "  " << rightMargin;
+    getRange(img_bw,leftMargin, rightMargin,parent);
+    qDebug() << "Computed: " << leftMargin << "  " << rightMargin;
+
     // calculate histogram
     QVector<QRect> result;
     int range = img_bw.rows;
@@ -23,7 +29,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 //    Util::plot(hist,parent);
 
     // binarize
-    QVector<double> y(range);
+    QVector<int> y(range);
 
     for (int i=0; i < range; ++i)
     {
@@ -33,13 +39,13 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
             y[i] = 1;
     }
 
-    QVector<double> line_y = extractCoordinateFrom(y);
+    QVector<int> line_y = extractCoordinateFrom(y);
     y.clear();
 
     // for each line
-    range = img_bw.cols - 400;
-    QVector<double> x(range);
-    QVector<double> line_x;
+    range = rightMargin;
+    QVector<int> x(range);
+    QVector<int> line_x;
 
     for (int row = 0; row < line_y.size()-1; row+=2) {
         hist.release();
@@ -59,11 +65,11 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
             hist.at<float>(i) = cv::sum(hist(cv::Range(i-10,i+10),cv::Range::all()))[0]/20;
         }
 
-//        Util::plot(hist,parent);
+        Util::plot(hist,parent);
 
         for (int i=0; i < range; ++i)
         {
-            if (hist.at<float>(i) < 0.08)
+            if (hist.at<float>(i) < 0.08 || i < leftMargin)
                 x[i]  = 0;
             else
                 x[i] = 1;
@@ -85,7 +91,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 }
 
 
-QVector<double> TextRegionDetector::extractCoordinateFrom(QVector<double> coord)
+QVector<int> TextRegionDetector::extractCoordinateFrom(QVector<int> coord)
 {
     // look for tmp reagion to merge
     int range = coord.size();
@@ -97,7 +103,7 @@ QVector<double> TextRegionDetector::extractCoordinateFrom(QVector<double> coord)
                     for (; j < i; ++j)
                         coord[j] = 1;
 
-    QVector<double> result;
+    QVector<int> result;
 
 
     //add dumy
@@ -115,6 +121,9 @@ QVector<double> TextRegionDetector::extractCoordinateFrom(QVector<double> coord)
             start = false;
         }
     }
+
+    if(start)
+        result.push_back(range);
 
     //add dumy
     result.push_back(range);
@@ -143,4 +152,75 @@ QVector<double> TextRegionDetector::extractCoordinateFrom(QVector<double> coord)
     result.pop_back();
     result.pop_front();
     return result;
+}
+
+void TextRegionDetector::getRange(const cv::Mat &img_bw, int &leftMargin, int &rightMargin, QWidget *parent)
+{
+    cv::Mat region;
+    float meanVal;
+
+    for (int i=0; i < img_bw.cols; ++i)
+    {
+        int tmp = cv::sum(img_bw.col(i))[0];
+        region.push_back(tmp);
+    }
+
+    region.convertTo(region,CV_32FC1);
+    double minVals, maxVals;
+    cv::minMaxLoc(region,&minVals,&maxVals);
+    region = region/maxVals;
+
+    // average filter
+    for (int i=50; i < region.rows-50; ++i)
+        region.at<float>(i) = cv::sum(region(cv::Range(i-50,i+50),cv::Range::all()))[0]/100;
+
+    // calculate mean
+    meanVal = cv::mean(region(cv::Range(1000,1800),cv::Range::all()))[0];
+//    qDebug() << meanVal;
+
+    // binarize
+    for (int i=0; i < region.rows; ++i)
+    {
+        if (region.at<float>(i) < meanVal*0.6 || region.at<float>(i) > meanVal*2)
+            region.at<float>(i)  = 0;
+        else
+            region.at<float>(i) = 1;
+    }
+
+    extractROI(region, leftMargin, rightMargin);
+//    Util::plot(region,parent);
+}
+
+void TextRegionDetector::extractROI(cv::Mat &regHist, int &leftMargin, int &rightMargin)
+{
+    QVector<int> result;
+
+    bool start = false;
+    for (int i=0; i < regHist.rows; ++i)
+    {
+        if (!start && regHist.at<float>(i) == 1)
+        {
+            result.push_back(i);
+            start = true;
+        }else if(start && regHist.at<float>(i) == 0){
+            result.push_back(i);
+            start = false;
+        }
+    }
+
+    if(start)
+        result.push_back(regHist.rows);
+
+    leftMargin = result[0];
+    rightMargin = result[1];
+
+    int range = rightMargin - leftMargin;
+
+    for (int i = 2; i < result.size(); i +=2)
+        if(range < (result[i+1] - result[i]))
+        {
+            rightMargin = result[i+1];
+            leftMargin = result[i];
+            range = rightMargin - leftMargin;
+        }
 }
