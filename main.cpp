@@ -35,10 +35,10 @@ int main(int argc, char *argv[]) {
         qDebug() << "COME ONNN";
 
     vector<Pixel*> res2;
-    filename = tempdir + "/a/a_10.jpg";
-    img_inf = new ImageInfo('a',10);
+    filename = tempdir + "/b/b_10.jpg";
+    img_inf = new ImageInfo('b',10);
     rdf->imageToPixels(res2,filename,img_inf);
-    if(rdf->test(res,'a'))
+    if(rdf->test(res,'b'))
         qDebug() << "YEAYYYYY";
     else
         qDebug() << "COME ONNN";

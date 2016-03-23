@@ -349,6 +349,7 @@ void RandomDecisionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& pa
     float maxGain=0;
     int itr=0;
 
+
     while(itr <  MAX_NUMITERATION_FOR_DIVISION)
     {
         //printNode(parent);
@@ -366,26 +367,34 @@ void RandomDecisionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& pa
 
         float parentEntr = calculateEntropyOfVector(parentPixels);
         float infoGain = parentEntr - avgEntropyChild;
-        //qDebug() << "InfoGain" << infoGain ;
+       // qDebug() << "InfoGain" << infoGain ;
 
         // Non-improving epoch here !
         if(infoGain > max_InfoGain)
+        {
             max_InfoGain = infoGain;
+        }
         else if(infoGain < min_InfoGain)
+        {
             min_InfoGain = infoGain;
+        }
 
+        // Non-improving epoch :
         if(infoGain > maxGain){
             maxTeta1 = parent.teta1;
             maxTeta2 = parent.teta2;
             maxTaw   = parent.taw;
+            maxGain = infoGain;
+            itr = 0 ;
         }
+        else
+            itr++;
 
        left.clear();
        right.clear();
        generateTeta(parent.teta1);
        generateTeta(parent.teta2);
        parent.taw = generateTaw();
-       itr++;
     }
 
     parent.taw = maxTaw;

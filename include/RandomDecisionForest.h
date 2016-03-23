@@ -16,7 +16,7 @@
 
 #include <time.h>       /* time */
 
-#define MAX_NUMITERATION_FOR_DIVISION 1
+#define MAX_NUMITERATION_FOR_DIVISION 5
 #define PIXEL_CLOUD_SIZE 1000
 #define MIN_ENTROPY 0.05
 #define NUM_LABELS 23
