@@ -2,6 +2,22 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 
+void deneme()
+{
+    cv::Mat_<float> A(3, 3);
+    cv::Mat_<int> B(5, 5);
+    A.setTo(0);
+    B.setTo(10);
+
+    doForAllPixels<float>(A, [](float pixval) {
+        return pixval + 1;
+    });
+
+    doForAllPixels<int>(B, [](int pixval) {
+        return pixval * 5;
+    });
+}
+
 cv::Mat Util::toCv(const QImage &image , int cv_type)
 {
     return cv::Mat(image.height(), image.width(), cv_type, (void *)image.scanLine(0), image.bytesPerLine());

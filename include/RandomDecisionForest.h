@@ -63,12 +63,12 @@ struct Node
 
 
 class RandomDecisionForest{
+
 public:
-    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY){
+    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY) : m_tree(pow(2, MAX_DEPTH)-1)
+    {
         probe_distanceX = probe_dstanceX;
         probe_distanceY = probe_dstanceY;
-        numOfLeaves = 0;
-        numOfLetters = 0;
     }
     void readTrainingImageFiles();
     void printPixelCloud();
@@ -79,10 +79,18 @@ public:
     float calculateEntropyOfVector(vector<Pixel*>& pixels);
     Mat createHistogram(vector<Pixel*>& pixels);
     bool isLeft(Pixel* p, Node& node, Mat& img);
-    void divide(vector<Pixel*>& parentPixels,
-                vector<Pixel*>& left, vector<Pixel*>& right, Node& parent);
+
+    inline void divide(vector<Pixel*>& parentPixels, vector<Pixel*>& left, vector<Pixel*>& right, Node& parent)
+    {
+        for (auto px : parentPixels)
+        {
+            auto img = getPixelImage(px);
+            (isLeft(px, parent, img) ? left : right).push_back(px);
+        }
+    }
+
     void train();
-    void constructTree(vector<Node>& tree, Node& root, vector<Pixel*>& pixels);
+    void constructTree(vector<Node>& m_tree, Node& root, vector<Pixel*>& pixels);
     void tuneParameters(vector<Pixel*>& parentPixels, Node& parent);
     int pixelCloudSize();
     void printHistogram(Mat& hist);
@@ -90,28 +98,47 @@ public:
     void printTree();
     Mat getPixelImage(Pixel* px);
     Node getLeafNode(Pixel*px, int nodeId);
-    int getLabelIndex(Mat& hist);
-    int letterIndex(char px);
+
+    inline int getMaxLikelihoodIndex(Mat& hist)
+    {
+        int max_val=-1;
+        int max_index=0;
+        for(int i=0;i<hist.cols;i++)
+        {
+            if(hist.at<float>(0, i) > max_val)
+            {
+                max_val = hist.at<float>(0, i);
+                max_index = i;
+            }
+        }
+
+        return max_index;
+    }
+
+    inline int letterIndex(char letter)
+    {
+        return letter-'a';
+    }
     void imageToPixels(vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf);
     bool test(vector<Pixel*>& letterPixels, char letter);
     // Keep all images on memory
     std::vector<cv::Mat> imagesContainer;
     // Test and Train dirs :
-    QString testpath, trainpath;
+    QString testpath, m_trainpath;
 
     void setTrainPath(QString path);
     void setTestPath(QString path);
 
 private:
-    QString dir;
+    QString m_dir;
     vector<Pixel*> pixelCloud;
     int probe_distanceX, probe_distanceY;
-    int numOfLetters;
-    int numOfLeaves;
+    int numOfLetters = 0;
+    int numOfLeaves = 0;
     int depth;
     float min_InfoGain;
     float max_InfoGain;
-    vector<Node>tree;
+    vector<Node> m_tree;
 
 };
 
