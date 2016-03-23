@@ -65,7 +65,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
             hist.at<float>(i) = cv::sum(hist(cv::Range(i-10,i+10),cv::Range::all()))[0]/20;
         }
 
-        Util::plot(hist,parent);
+//        Util::plot(hist,parent);
 
         for (int i=0; i < range; ++i)
         {
