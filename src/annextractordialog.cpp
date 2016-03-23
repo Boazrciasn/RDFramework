@@ -86,7 +86,7 @@ void AnnExtractorDialog::on_browse_button_clicked()
     if(fNames.size() == 0)
     {
         QMessageBox::information(this, tr("Reader"),
-                                 tr("loading faild!"));
+                                 tr("loading failed!"));
         return;
     }
 

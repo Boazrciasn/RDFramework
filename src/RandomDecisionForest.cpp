@@ -2,18 +2,23 @@
 #include "include/Reader.h"
 #include <QFileDialog>
 #include <QImage>
+#include <QDialog>
+#include <QObject>
 
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles(){
     /* initialize random seed: */
+
     srand (time(NULL));
+
 
     min_InfoGain =1;
     max_InfoGain =-1;
 
-   //QString dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-   dir = "/home/mahiratmis/Desktop/AnnotationResults"; // Got make dir generic here.
+   this->dir = this->trainpath;
+
+//    dir = "/home/mahiratmis/Desktop/AnnotationResults"; // Got make dir generic here.
    vector<QString>fNames;
    Reader * reader = new Reader();
    reader->findImages(dir, "", fNames);
@@ -36,7 +41,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
 
        filePath += "/" + fileName + ".jpg";
        Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-
+       //Create VECTOR HERE
        // draw perImagePixel pixels from image
        // bootstrap, subsample
        for(int k=0;k<perImagePixel;k++){
@@ -46,6 +51,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
             Pixel* px = new Pixel(Coord(i,j),intensity,img_inf);
             pixelCloud.push_back(px);
        }
+
        image.release();
    }
    fNames.clear();
@@ -54,6 +60,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
 //given the image path, fills the vector with in the pixels of the image
 void RandomDecisionForest::imageToPixels(vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf ){
    Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+
    for(int i =0; i<image.rows;i++){
        for(int j =0; j<image.cols;j++){
             unsigned char intensity = image.at<uchar>(i,j);
@@ -61,6 +68,7 @@ void RandomDecisionForest::imageToPixels(vector<Pixel*>& res, QString& filePath,
             res.push_back(px);
        }
    }
+
 }
 
 void RandomDecisionForest::printPixelCloud(){
@@ -187,8 +195,9 @@ void RandomDecisionForest::divide(vector<Pixel*>& parentPixels,
 
 // returns the image the pixel belongs to
 Mat RandomDecisionForest::getPixelImage(Pixel* px){
-    QString path = dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
+    QString path = this->dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
                        + QString::number(px->imgInfo->sampleId)  + ".jpg";
+    //qDebug()<<"IMAGE :"<< path;
     return imread(path.toStdString());
 }
 
@@ -201,7 +210,7 @@ void RandomDecisionForest::train()
     root.taw = generateTaw();
     generateTeta(root.teta1);
     generateTeta(root.teta2);
-    vector<Node>treee(pow(2,NUM_LABELS)-1);
+    vector<Node>treee(pow(2,MAX_DEPTH)-1);
     treee[root.id-1] = root;
     depth=1;
     constructTree(treee,root,pixelCloud);
@@ -225,6 +234,17 @@ bool RandomDecisionForest::test(vector<Pixel*>& letterPixels, char letter){
     return(letterIndexPredicted==letterIndexOriginal);
 }
 
+void RandomDecisionForest::setTrainPath(QString path)
+{
+    this->trainpath = path;
+}
+
+void RandomDecisionForest::setTestPath(QString path)
+{
+    this->testpath = path;
+}
+
+
 // return the index of the bin with maximum number of pixels
 int RandomDecisionForest::getLabelIndex(Mat& hist){
     int max_val=-1;
@@ -244,27 +264,37 @@ Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
 
     Node root = tree[nodeId];
     if(root.isLeaf) {
+       // qDebug()<<"LEAF REACHED :"<<root.id;
         return root;
     }
 
     Mat img = getPixelImage(px);
     int childId = root.id *2 ;
+    //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
     if(!isLeft(px,root,img))
       childId++;
-    return getLeafNode(px,childId);
+    return getLeafNode(px,childId-1);
 }
+
+
 
 // create child nodes from nodes by tuning each node
 void RandomDecisionForest::constructTree(vector<Node>& tree, Node& root, vector<Pixel*>& pixels) {
 
     float rootEntropy = calculateEntropyOfVector(pixels);
-    int current_depth = log2(root.id);
+    int current_depth = log2(root.id) + 1;
+    //qDebug()<< " curr depth : " << current_depth << "root id :" << root.id;
+    if(current_depth>depth)
+        depth = current_depth;
+    //qDebug() << "Root ID : "<< root.id;
+
     //no more child construction
-    if(MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH){
+
+    if(MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH || pixels.size() <= MIN_LEAF_PIXELS ){
         //qDebug() << "Leaf Reached";
-        root.isLeaf = true;
-        root.hist = createHistogram(pixels);
-        //qDebug() << "Leaf at " << depth << " CurrDepth:" << current_depth;
+        tree[root.id-1].isLeaf = true;
+        tree[root.id-1].hist = createHistogram(pixels);
+        //qDebug() << "Leaf Id:" << root.id;
         //printHistogram(root.hist);
         numOfLeaves++;
         return;
@@ -282,26 +312,31 @@ void RandomDecisionForest::constructTree(vector<Node>& tree, Node& root, vector<
     //qDebug() << "Left " << left.size() << "Right " << right.size();
     //qDebug() << "Divided Pixels";
 
-    //qDebug() << "Tree Max İndex: " << tree.size();
+   // qDebug() << "Tree Max İndex: " << tree.size();
     Node leftChildNode;
     leftChildNode.id = 2*root.id;
-    //qDebug() << "Left Child " << QString::number(leftChildNode.id) << "Created";
     tree[leftChildNode.id-1] = leftChildNode;
+
     leftChildNode.isLeaf=false;
     leftChildNode.taw = generateTaw();
     generateTeta(leftChildNode.teta1);
     generateTeta(leftChildNode.teta2);
+  //  qDebug() << "Left Child " << QString::number(tree[leftChildNode.id-1].id)  << "Created LEAF :" <<tree[leftChildNode.id-1].isLeaf;
     constructTree(tree,leftChildNode,left);
+
+    //qDebug() <<"Is" << leftChildNode.id << " is Leaf :" << leftChildNode.isLeaf;
 
     Node rightChildNode;
     rightChildNode.id = 2*root.id+1;
-    //qDebug() << "Right Child " << QString::number(rightChildNode.id) << "Created";
     tree[rightChildNode.id-1] = rightChildNode;
     rightChildNode.isLeaf=false;
     rightChildNode.taw = generateTaw();
     generateTeta(rightChildNode.teta1);
     generateTeta(rightChildNode.teta2);
+  //  qDebug() << "Right Child " << QString::number(tree[rightChildNode.id-1].id) << "Created LEAF :"<< tree[rightChildNode.id-1].isLeaf;
     constructTree(tree,rightChildNode,right);
+
+
 }
 
 // find best teta and taw parameters for the given node
@@ -313,6 +348,8 @@ void RandomDecisionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& pa
     Coord maxTeta1,maxTeta2;
     float maxGain=0;
     int itr=0;
+
+
     while(itr <  MAX_NUMITERATION_FOR_DIVISION)
     {
         //printNode(parent);
@@ -330,26 +367,34 @@ void RandomDecisionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& pa
 
         float parentEntr = calculateEntropyOfVector(parentPixels);
         float infoGain = parentEntr - avgEntropyChild;
-        //qDebug() << "InfoGain" << infoGain ;
+       // qDebug() << "InfoGain" << infoGain ;
 
         // Non-improving epoch here !
         if(infoGain > max_InfoGain)
+        {
             max_InfoGain = infoGain;
+        }
         else if(infoGain < min_InfoGain)
+        {
             min_InfoGain = infoGain;
+        }
 
+        // Non-improving epoch :
         if(infoGain > maxGain){
             maxTeta1 = parent.teta1;
             maxTeta2 = parent.teta2;
             maxTaw   = parent.taw;
+            maxGain = infoGain;
+            itr = 0 ;
         }
+        else
+            itr++;
 
        left.clear();
        right.clear();
        generateTeta(parent.teta1);
        generateTeta(parent.teta2);
        parent.taw = generateTaw();
-       itr++;
     }
 
     parent.taw = maxTaw;
@@ -378,4 +423,22 @@ void RandomDecisionForest::printNode(Node& node){
              << "Q2{" << node.teta2.x << "," << node.teta2.y;
     printHistogram(node.hist);
     qDebug() << "}";
+}
+
+void RandomDecisionForest::printTree()
+{
+    qDebug() << "Size  : " << tree.size() ;
+    qDebug() << "Depth : " << this->depth ;
+    qDebug() << "Leaves: " << this->numOfLeaves;
+
+    for (vector<Node>::iterator it = tree.begin() ; it != tree.end(); ++it)
+    {
+        Node node = *it;
+        if(node.id != 0)
+        {
+            qDebug() << "Node" << node.id <<"is leaf: " << node.isLeaf;
+        }
+
+    }
+
 }
