@@ -44,7 +44,7 @@ void Reader::findImages(QString baseDir, QString query, vector<QString> &foundIm
         QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
     while (it.hasNext()){
         it.next();
-        QDirIterator itFile(baseDir+"/"+it.fileName(),QDir::Files);
+        QDirIterator itFile(baseDir+"/"+it.fileName(),QStringList()<<"*.jpg"<<"*.jpeg",QDir::Files);
         while(itFile.hasNext()){
             itFile.next();
             foundImages.push_back(itFile.filePath());

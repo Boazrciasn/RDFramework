@@ -17,7 +17,7 @@
 #include <time.h>       /* time */
 
 #define MAX_NUMITERATION_FOR_DIVISION 5
-#define PIXEL_CLOUD_SIZE 1000
+#define PIXELS_PER_IMAGE 20
 #define MIN_ENTROPY 0.05
 #define NUM_LABELS 23
 #define MAX_DEPTH 16
@@ -45,20 +45,20 @@ struct ImageInfo
 
 struct Pixel
 {
-  Coord position;
-  unsigned char intensity;
-  ImageInfo* imgInfo;
-  Pixel(Coord crd, unsigned char intnsty, ImageInfo* imgInf):
-      position(crd), intensity(intnsty),imgInfo(imgInf){}
+    Coord position;
+    unsigned char intensity;
+    ImageInfo* imgInfo;
+    Pixel(Coord crd, unsigned char intnsty, ImageInfo* imgInf):
+        position(crd), intensity(intnsty),imgInfo(imgInf){}
 };
 
 struct Node
 {
-  int taw;
-  Coord teta1, teta2;
-  bool isLeaf;
-  int id;
-  Mat hist;
+    int taw;
+    Coord teta1, teta2;
+    bool isLeaf;
+    int id;
+    Mat hist;
 };
 
 
@@ -90,7 +90,7 @@ public:
     }
 
     void train();
-    void constructTree(vector<Node>& m_tree, Node& root, vector<Pixel*>& pixels);
+    void constructTree(Node& root, vector<Pixel*>& pixels);
     void tuneParameters(vector<Pixel*>& parentPixels, Node& parent);
     int pixelCloudSize();
     void printHistogram(Mat& hist);
@@ -128,10 +128,11 @@ public:
 
     void setTrainPath(QString path);
     void setTestPath(QString path);
-
+    vector<cv::Mat> imagesVector;
 private:
     QString m_dir;
     vector<Pixel*> pixelCloud;
+
     int probe_distanceX, probe_distanceY;
     int numOfLetters = 0;
     int numOfLeaves = 0;

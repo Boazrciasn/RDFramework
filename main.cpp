@@ -13,35 +13,35 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-//    QString tempdir = "/Users/barisozcan/Documents/Development/ImageCLEF/AnnotationResults";
-//    RandomDecisionForest* rdf = new RandomDecisionForest(10,15);
-//    rdf->setTrainPath(tempdir);
-//    rdf->readTrainingImageFiles();
-//    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
-//    //rdf->printPixelCloud();
-//    rdf->train();
+        QString tempdir = "/Users/barisozcan/Documents/Development/ImageCLEF/AnnotationResults";
+        RandomDecisionForest* rdf = new RandomDecisionForest(10,15);
+        rdf->setTrainPath(tempdir);
+        rdf->readTrainingImageFiles();
+    //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
+    //    //rdf->printPixelCloud();
+    //    rdf->train();
 
 
-//   // rdf->printTree();
+    // rdf->printTree();
 
 
-//    vector<Pixel*> res;
-//    QString filename = tempdir + "/a/a_0.jpg";
-//    ImageInfo* img_inf = new ImageInfo('a',0);
-//    rdf->imageToPixels(res,filename,img_inf);
-//    if(rdf->test(res,'a'))
-//        qDebug() << "YEAYYYYY";
-//    else
-//        qDebug() << "COME ONNN";
+    //    vector<Pixel*> res;
+    //    QString filename = tempdir + "/a/a_0.jpg";
+    //    ImageInfo* img_inf = new ImageInfo('a',0);
+    //    rdf->imageToPixels(res,filename,img_inf);
+    //    if(rdf->test(res,'a'))
+    //        qDebug() << "YEAYYYYY";
+    //    else
+    //        qDebug() << "COME ONNN";
 
-//    vector<Pixel*> res2;
-//    filename = tempdir + "/b/b_10.jpg";
-//    img_inf = new ImageInfo('b',10);
-//    rdf->imageToPixels(res2,filename,img_inf);
-//    if(rdf->test(res,'b'))
-//        qDebug() << "YEAYYYYY";
-//    else
-//        qDebug() << "COME ONNN";
+    //    vector<Pixel*> res2;
+    //    filename = tempdir + "/b/b_10.jpg";
+    //    img_inf = new ImageInfo('b',10);
+    //    rdf->imageToPixels(res2,filename,img_inf);
+    //    if(rdf->test(res,'b'))
+    //        qDebug() << "YEAYYYYY";
+    //    else
+    //        qDebug() << "COME ONNN";
 
 
     QDesktopWidget dw;
@@ -49,6 +49,10 @@ int main(int argc, char *argv[]) {
     int y=dw.height()*0.9;
     w.setFixedSize(x,y);
 
+//    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
+//    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
+    cv::Mat img = rdf->imagesVector.at(0);
+    cv::imshow("test", img);
     w.show();
     return app.exec();
 }
