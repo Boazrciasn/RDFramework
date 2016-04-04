@@ -84,7 +84,7 @@ public:
     {
         for (auto px : parentPixels)
         {
-            auto img = getPixelImage(px);
+            auto img = imagesVector[px->imgInfo->sampleId];
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }

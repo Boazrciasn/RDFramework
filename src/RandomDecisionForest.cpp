@@ -34,17 +34,18 @@ void RandomDecisionForest::readTrainingImageFiles(){
         if(!fileName.contains("_"))
             continue;
 
-        //sample filenames a_0, a_11
-        QString letter = fileName.split("_")[0];
-        QString sampleId = fileName.split("_")[1];
-        int id = sampleId.toInt();
-        ImageInfo *img_inf = new ImageInfo(letter[0].toLatin1(),id);
+
 
         filePath += "/" + fileName + ".jpg";
         Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
         //pad image and save to vector
         cv::copyMakeBorder(image, image, probe_distanceY, probe_distanceY, probe_distanceX, probe_distanceX, BORDER_CONSTANT);
         imagesVector.push_back(image);
+
+        //sample image info : label : a , Id : index of in the image vector of the image.
+        QString letter = fileName.split("_")[0];
+        int sampleId = imagesVector.size()-1;
+        ImageInfo *img_inf = new ImageInfo(letter[0].toLatin1(),sampleId);
 
         // draw perImagePixel pixels from image
         // bootstrap, subsample
@@ -56,8 +57,6 @@ void RandomDecisionForest::readTrainingImageFiles(){
             auto *px = new Pixel(Coord(i,j),intensity,img_inf);
             pixelCloud.push_back(px);
         }
-
-
     }
     qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<numOfLetters <<"estimated size : "<< pixelCloudSize;
     fNames.clear();
@@ -133,7 +132,7 @@ float RandomDecisionForest::calculateEntropyOfVector(vector<Pixel*>& pixels)
     return calculateEntropy(hist);
 }
 
-// creates histogram out of a pixel vector
+// creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
 Mat RandomDecisionForest::createHistogram(vector<Pixel*>& pixels){
     Mat hist = Mat::zeros(1,NUM_LABELS,DataType<float>::type);
     for (vector<Pixel*>::iterator it = pixels.begin() ; it != pixels.end(); ++it)
@@ -251,7 +250,7 @@ Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
         return root;
     }
 
-    Mat img = getPixelImage(px);
+    Mat img = imagesVector[px->imgInfo->sampleId];
     int childId = root.id *2 ;
     //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
     if(!isLeft(px,root,img))
@@ -304,10 +303,10 @@ void RandomDecisionForest::constructTree( Node& root, vector<Pixel*>& pixels) {
     generateTeta(leftChildNode.teta1);
     generateTeta(leftChildNode.teta2);
     m_tree[leftChildNode.id-1] = leftChildNode;
-//    qDebug() << "Left Child :" <<leftChildNode.isLeaf  <<" ||  m_Tree  :"  << m_tree[leftChildNode.id-1].isLeaf;
+    //    qDebug() << "Left Child :" <<leftChildNode.isLeaf  <<" ||  m_Tree  :"  << m_tree[leftChildNode.id-1].isLeaf;
     constructTree(leftChildNode,left);
 
-//    qDebug() <<"Is" << leftChildNode.id << " is Leaf :" << leftChildNode.isLeaf;
+    //    qDebug() <<"Is" << leftChildNode.id << " is Leaf :" << leftChildNode.isLeaf;
 
     Node rightChildNode;
     rightChildNode.id = 2*root.id+1;
@@ -419,7 +418,7 @@ void RandomDecisionForest::printTree()
 
         if(node.isLeaf)
         {
-//                      qDebug() << "Leaf id :" << node.id <<"is leaf: " << node.isLeaf;
+            //                      qDebug() << "Leaf id :" << node.id <<"is leaf: " << node.isLeaf;
             ++count;
         }
 
