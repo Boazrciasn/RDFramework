@@ -76,7 +76,7 @@ class RandomDecisionForest{
 
 
 public:
-    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY)
+    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY) : m_tempTree(pow(2, MAX_DEPTH)-1)
     {
         probe_distanceX = probe_dstanceX;
         probe_distanceY = probe_dstanceY;
@@ -113,7 +113,7 @@ public:
     void printNode(Node& node);
     void printTree(RandomDecisionTree tree);
     cv::Mat getPixelImage(Pixel* px);
-    Node getLeafNode(Pixel*px, int nodeId);
+    Node getLeafNode(Pixel*px, int nodeId, Tree tree);
 
     inline int getMaxLikelihoodIndex(cv::Mat& hist)
     {
@@ -136,7 +136,7 @@ public:
         return letter-'a';
     }
     void imageToPixels(std::vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf);
-    bool test(std::vector<Pixel*>& letterPixels, char letter);
+    bool test(std::vector<Pixel*>& letterPixels, char letter, Tree tree);
     // Keep all images on memory
     std::vector<cv::Mat> imagesContainer;
     // Test and Train dirs :
@@ -159,7 +159,7 @@ private:
     std::vector<char> m_labels;
     int probe_distanceX, probe_distanceY;
     int m_numOfLetters = 0;
-    int numOfLeaves = 0;
+    int m_numOfLeaves ;
     int m_depth;
     float min_InfoGain;
     float max_InfoGain;

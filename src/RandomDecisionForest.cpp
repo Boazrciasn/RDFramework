@@ -6,16 +6,19 @@
 #include "include/RandomDecisionForest.h"
 #include "include/Reader.h"
 
+
+// HISTOGRAM MUST BE NORMALIZED
+// getLeafNode and Test  needs rework
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles(){
-    //    dir = "/home/mahiratmis/Desktop/AnnotationResults"; // Got make dir generic here.
+
     m_dir = m_trainpath;
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames);
     m_numOfLetters = fNames.size();
-
+    qDebug()<<"NO OF LETTERS : "<< m_numOfLetters;
     for (auto it = std::begin(fNames) ; it != std::end(fNames); ++it)
     {
         QString filePath = *it;
@@ -36,7 +39,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
         // store label of the image in m_labels vector
         m_labels.push_back(letter[0].toLatin1());
     }
-    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters;
+    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters<< "Images Vector Size : "<< imagesVector.size();
     fNames.clear();
 }
 
@@ -57,13 +60,15 @@ void RandomDecisionForest::subSample(){
         // bootstrap, subsample
         for(int k=0;k<PIXELS_PER_IMAGE; ++k)
         {
-            int i = (rand() % image.rows-2*probe_distanceY) + probe_distanceY;
-            int j = (rand() % image.cols-2*probe_distanceX) + probe_distanceX;
+            int i = (rand() % (image.rows-2*probe_distanceY)) + probe_distanceY;
+            int j = (rand() % (image.cols-2*probe_distanceX)) + probe_distanceX;
             auto intensity = image.at<uchar>(i,j);
             auto *px = new Pixel(Coord(i,j),intensity,img_inf);
             pixelCloud.push_back(px);
         }
     }
+//    qDebug()<<"pixel Cloud : " << pixelCloud.size();
+
 }
 
 //given the image path, fills the vector with in the pixels of the image
@@ -206,10 +211,12 @@ void RandomDecisionForest::trainTree()
     root.taw = generateTaw();
     generateTeta(root.teta1);
     generateTeta(root.teta2);
+    qDebug()<<"Temp Tree Size trainTree: "<< m_tempTree.size();
     m_tempTree[root.id-1] = root;
     m_depth=1;
+    m_numOfLeaves = 0 ;
     constructTree(root,pixelCloud);
-    qDebug() << "TREE CONSTRUCTED: LEAVES:" << numOfLeaves << " LETTER SAMPLES: " << m_numOfLetters;
+    qDebug() << "TREE CONSTRUCTED: LEAVES:" << m_numOfLeaves << " LETTER SAMPLES: " << m_numOfLetters;
 
 //    printTree();
 
@@ -217,12 +224,14 @@ void RandomDecisionForest::trainTree()
 }
 
 // checks if pixels of a letter belong to that letter
-bool RandomDecisionForest::test(std::vector<Pixel*>& letterPixels, char letter){
+bool RandomDecisionForest::test(std::vector<Pixel*>& letterPixels, char letter, Tree tree)
+{
     cv::Mat hist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
-    for (std::vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it){
+    for (std::vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it)
+    {
         Pixel* px = *it;
         //qDebug() << "TREE  " << tree.size();
-        Node leaf = getLeafNode(px, 0);
+        Node leaf = getLeafNode(px, 0, tree);
         int index = getMaxLikelihoodIndex(leaf.hist);
         hist.at<float>(0,index)++;
     }
@@ -249,9 +258,10 @@ void RandomDecisionForest::trainForest()
         RandomDecisionTree trainedTree;
         trainedTree.m_tree = m_tempTree;
         trainedTree.m_depth = m_depth;
-        trainedTree.m_numberofleaves = numOfLeaves;
+        trainedTree.m_numberofleaves = m_numOfLeaves;
         m_forest.push_back(trainedTree);
-        m_tempTree.clear();
+        m_tempTree = std::vector<Node> (m_tempTree.size());
+
     }
     qDebug()<< "Forest Size : " << m_forest.size();
 }
@@ -262,9 +272,10 @@ void RandomDecisionForest::trainForest()
 
 // starting from the node with nodeID
 // recursively find the leaf node the pixel belongs to
-Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
+// fix tree in recursive
+Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId, Tree tree){
 
-    Node root = m_tempTree[nodeId];
+    Node root = tree[nodeId];
     if(root.isLeaf) {
         // qDebug()<<"LEAF REACHED :"<<root.id;
         return root;
@@ -275,7 +286,7 @@ Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
     //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
     if(!isLeft(px,root,img))
         childId++;
-    return getLeafNode(px,childId-1);
+    return getLeafNode(px,childId-1, tree);
 }
 
 
@@ -285,37 +296,21 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
 
     float rootEntropy = calculateEntropyOfVector(pixels);
     int current_depth = log2(root.id) + 1;
-    //qDebug()<< " curr depth : " << current_depth << "root id :" << root.id;
     if(current_depth>m_depth)
         m_depth = current_depth;
-    //qDebug() << "Root ID : "<< root.id;
-
     //no more child construction
-
     if(MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH || pixels.size() <= MIN_LEAF_PIXELS ){
-        //qDebug() << "Leaf Reached";
         m_tempTree[root.id-1].isLeaf = true;
         m_tempTree[root.id-1].hist = createHistogram(pixels);
-//        qDebug() << "Leaf Id:" << root.id;
-        //printHistogram(root.hist);
-        numOfLeaves++;
+        m_numOfLeaves++;
         return;
     }
 
-    //qDebug() << "Tuning Parameters";
     tuneParameters(pixels, root);
-    //qDebug() << "Tuned Parameters";
-
     std::vector<Pixel*> left;
     std::vector<Pixel*> right;
-
-    //qDebug() << "Dividing Pixels";
     divide(pixels,left,right,root);
-    //qDebug() << "Left " << left.size() << "Right " << right.size();
-    //qDebug() << "Divided Pixels";
 
-    // qDebug() << "Tree Max İndex: " << tree.size();
-    // NEEDS FIX
     Node leftChildNode;
     leftChildNode.id = 2*root.id;
     leftChildNode.isLeaf = false;
@@ -323,10 +318,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     generateTeta(leftChildNode.teta1);
     generateTeta(leftChildNode.teta2);
     m_tempTree[leftChildNode.id-1] = leftChildNode;
-    //    qDebug() << "Left Child :" <<leftChildNode.isLeaf  <<" ||  m_Tree  :"  << m_tree[leftChildNode.id-1].isLeaf;
     constructTree(leftChildNode,left);
-
-    //    qDebug() <<"Is" << leftChildNode.id << " is Leaf :" << leftChildNode.isLeaf;
 
     Node rightChildNode;
     rightChildNode.id = 2*root.id+1;
@@ -335,11 +327,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     generateTeta(rightChildNode.teta1);
     generateTeta(rightChildNode.teta2);
     m_tempTree[rightChildNode.id-1] = rightChildNode;
-    //  qDebug() << "Right Child " << QString::number(tree[rightChildNode.id-1].id) << "Created LEAF :"<< tree[rightChildNode.id-1].isLeaf;
     constructTree(rightChildNode,right);
-
-
-
 
 }
 
@@ -438,12 +426,12 @@ void RandomDecisionForest::printTree(RandomDecisionTree tree)
 
         if(node.isLeaf)
         {
-            //                      qDebug() << "Leaf id :" << node.id <<"is leaf: " << node.isLeaf;
             ++count;
+            printHistogram(node.hist);
         }
 
 
     }
-    qDebug()<<"Number of leaves kept : " << count ;
+    qDebug()<< "Number of leaves : " << count ;
 
 }

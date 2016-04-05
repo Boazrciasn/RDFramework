@@ -13,13 +13,14 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-//        QString tempdir = "/Users/barisozcan/Documents/Development/ImageCLEF/AnnotationResults";
-    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
-        RandomDecisionForest* rdf = new RandomDecisionForest(10,15);
-        rdf->setNumberofTrees(3);
-        rdf->setTrainPath(tempdir);
-        rdf->readTrainingImageFiles();
-        rdf->trainForest();
+    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults";
+    //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
+    RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
+    rdf->setNumberofTrees(3);
+    rdf->setTrainPath(tempdir);
+    rdf->readTrainingImageFiles();
+    rdf->setNumberofTrees(4);
+    rdf->trainForest();
     //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
     //    //rdf->printPixelCloud();
     //    rdf->train();
@@ -46,7 +47,8 @@ int main(int argc, char *argv[]) {
     //    else
     //        qDebug() << "COME ONNN";
 
-
+    //rdf->printTree(rdf->m_forest[0]);
+    //rdf->printPixelCloud();
     QDesktopWidget dw;
     int x=dw.width()*0.3;
     int y=dw.height()*0.9;
@@ -54,8 +56,8 @@ int main(int argc, char *argv[]) {
 
 //    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
 //    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
-    cv::Mat img = rdf->imagesVector.at(0);
-    cv::imshow("test", img);
-    w.show();
+//    cv::Mat img = rdf->imagesVector.at(0);
+//    cv::imshow("test", img);
+//    w.show();
     return app.exec();
 }
