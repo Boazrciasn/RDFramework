@@ -70,6 +70,9 @@ public:
     {
         probe_distanceX = probe_dstanceX;
         probe_distanceY = probe_dstanceY;
+        srand (time(NULL));
+        min_InfoGain = 1;
+        max_InfoGain = -1;
     }
     void readTrainingImageFiles();
     void printPixelCloud();
@@ -141,7 +144,7 @@ private:
     QString m_dir;
 
     std::vector<Pixel*> pixelCloud;
-
+    std::vector<char> m_labels;
     int probe_distanceX, probe_distanceY;
     int m_numOfLetters = 0;
     int numOfLeaves = 0;

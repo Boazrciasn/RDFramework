@@ -9,22 +9,12 @@
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles(){
-    /* initialize random seed: */
-
-    srand (time(NULL));
-
-    min_InfoGain = 1;
-    max_InfoGain = -1;
-
-    m_dir = m_trainpath;
-
     //    dir = "/home/mahiratmis/Desktop/AnnotationResults"; // Got make dir generic here.
+    m_dir = m_trainpath;
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames);
     m_numOfLetters = fNames.size();
-
-    int pixelCloudSize = PIXELS_PER_IMAGE*m_numOfLetters;
 
     for (auto it = std::begin(fNames) ; it != std::end(fNames); ++it)
     {
@@ -43,8 +33,25 @@ void RandomDecisionForest::readTrainingImageFiles(){
 
         //sample image info : label : a , Id : index of in the image vector of the image.
         QString letter = fileName.split("_")[0];
-        int sampleId = imagesVector.size()-1;
-        ImageInfo *img_inf = new ImageInfo(letter[0].toLatin1(),sampleId);
+        // store label of the image in m_labels vector
+        m_labels.push_back(letter[0].toLatin1());
+    }
+    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters <<"estimated size : "<< pixelCloudSize;
+    fNames.clear();
+}
+
+void RandomDecisionForest::subSample(){
+
+    int pixelCloudSize = PIXELS_PER_IMAGE*m_numOfLetters;
+    int sampleId=0;
+
+    pixelCloud.clear();
+
+    for (auto it = std::begin(imagesVector) ; it != std::end(imagesVector); ++it)
+    {
+        auto image = *it;
+        auto label = m_labels[sampleId];
+        ImageInfo *img_inf = new ImageInfo(label,sampleId++);
 
         // draw perImagePixel pixels from image
         // bootstrap, subsample
@@ -57,8 +64,6 @@ void RandomDecisionForest::readTrainingImageFiles(){
             pixelCloud.push_back(px);
         }
     }
-    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters <<"estimated size : "<< pixelCloudSize;
-    fNames.clear();
 }
 
 //given the image path, fills the vector with in the pixels of the image
