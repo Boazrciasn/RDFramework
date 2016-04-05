@@ -74,7 +74,6 @@ public:
 
 class RandomDecisionForest{
 
-
 public:
     RandomDecisionForest(int probe_dstanceX,int probe_dstanceY)
     {
@@ -163,8 +162,6 @@ private:
     int m_depth;
     float min_InfoGain;
     float max_InfoGain;
-
-
 
     void subSample();
 };
