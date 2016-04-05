@@ -60,19 +60,31 @@ struct Node
     cv::Mat hist;
 };
 
-using RandomDecisionTree = std::vector<Node>;
+using Tree = std::vector<Node>;
+
+class RandomDecisionTree
+{
+
+public:
+    RandomDecisionTree() :  m_tree(pow(2, MAX_DEPTH)-1){}
+    int m_depth;
+    int m_numberofleaves;
+    Tree m_tree;
+};
 
 class RandomDecisionForest{
 
 
 public:
-    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY) : m_tree(pow(2, MAX_DEPTH)-1)
+    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY)
     {
         probe_distanceX = probe_dstanceX;
         probe_distanceY = probe_dstanceY;
         srand (time(NULL));
         min_InfoGain = 1;
         max_InfoGain = -1;
+
+
     }
     void readTrainingImageFiles();
     void printPixelCloud();
@@ -136,7 +148,7 @@ public:
     std::vector<cv::Mat> imagesVector;
     std::vector<RandomDecisionTree> m_forest;
     int m_no_of_trees;
-    RandomDecisionTree m_tree;
+    Tree m_tempTree;
     void setNumberofTrees(int no_of_trees){
         m_no_of_trees = no_of_trees;
     }
@@ -148,12 +160,13 @@ private:
     int probe_distanceX, probe_distanceY;
     int m_numOfLetters = 0;
     int numOfLeaves = 0;
-    int depth;
+    int m_depth;
     float min_InfoGain;
     float max_InfoGain;
 
 
-    void subSample(ImageInfo *img_inf, cv::Mat image);
+
+    void subSample();
 };
 
 #endif

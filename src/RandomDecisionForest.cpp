@@ -36,7 +36,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
         // store label of the image in m_labels vector
         m_labels.push_back(letter[0].toLatin1());
     }
-    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters <<"estimated size : "<< pixelCloudSize;
+    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters;
     fNames.clear();
 }
 
@@ -206,11 +206,12 @@ void RandomDecisionForest::trainTree()
     root.taw = generateTaw();
     generateTeta(root.teta1);
     generateTeta(root.teta2);
-    m_tree[root.id-1] = root;
-    depth=1;
+    m_tempTree[root.id-1] = root;
+    m_depth=1;
     constructTree(root,pixelCloud);
     qDebug() << "TREE CONSTRUCTED: LEAVES:" << numOfLeaves << " LETTER SAMPLES: " << m_numOfLetters;
-    printTree();
+
+//    printTree();
 
 
 }
@@ -245,8 +246,12 @@ void RandomDecisionForest::trainForest()
 {
     for (int i = 0; i < m_no_of_trees; ++i) {
         trainTree();
-        m_forest.push_back(m_tree);
-        m_tree.clear();
+        RandomDecisionTree trainedTree;
+        trainedTree.m_tree = m_tempTree;
+        trainedTree.m_depth = m_depth;
+        trainedTree.m_numberofleaves = numOfLeaves;
+        m_forest.push_back(trainedTree);
+        m_tempTree.clear();
     }
     qDebug()<< "Forest Size : " << m_forest.size();
 }
@@ -259,7 +264,7 @@ void RandomDecisionForest::trainForest()
 // recursively find the leaf node the pixel belongs to
 Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
 
-    Node root = m_tree[nodeId];
+    Node root = m_tempTree[nodeId];
     if(root.isLeaf) {
         // qDebug()<<"LEAF REACHED :"<<root.id;
         return root;
@@ -281,16 +286,16 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     float rootEntropy = calculateEntropyOfVector(pixels);
     int current_depth = log2(root.id) + 1;
     //qDebug()<< " curr depth : " << current_depth << "root id :" << root.id;
-    if(current_depth>depth)
-        depth = current_depth;
+    if(current_depth>m_depth)
+        m_depth = current_depth;
     //qDebug() << "Root ID : "<< root.id;
 
     //no more child construction
 
     if(MIN_ENTROPY > rootEntropy || current_depth >= MAX_DEPTH || pixels.size() <= MIN_LEAF_PIXELS ){
         //qDebug() << "Leaf Reached";
-        m_tree[root.id-1].isLeaf = true;
-        m_tree[root.id-1].hist = createHistogram(pixels);
+        m_tempTree[root.id-1].isLeaf = true;
+        m_tempTree[root.id-1].hist = createHistogram(pixels);
 //        qDebug() << "Leaf Id:" << root.id;
         //printHistogram(root.hist);
         numOfLeaves++;
@@ -317,7 +322,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     leftChildNode.taw = generateTaw();
     generateTeta(leftChildNode.teta1);
     generateTeta(leftChildNode.teta2);
-    m_tree[leftChildNode.id-1] = leftChildNode;
+    m_tempTree[leftChildNode.id-1] = leftChildNode;
     //    qDebug() << "Left Child :" <<leftChildNode.isLeaf  <<" ||  m_Tree  :"  << m_tree[leftChildNode.id-1].isLeaf;
     constructTree(leftChildNode,left);
 
@@ -329,7 +334,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     rightChildNode.taw = generateTaw();
     generateTeta(rightChildNode.teta1);
     generateTeta(rightChildNode.teta2);
-    m_tree[rightChildNode.id-1] = rightChildNode;
+    m_tempTree[rightChildNode.id-1] = rightChildNode;
     //  qDebug() << "Right Child " << QString::number(tree[rightChildNode.id-1].id) << "Created LEAF :"<< tree[rightChildNode.id-1].isLeaf;
     constructTree(rightChildNode,right);
 
@@ -421,13 +426,13 @@ void RandomDecisionForest::printNode(Node& node){
     qDebug() << "}";
 }
 
-void RandomDecisionForest::printTree()
+void RandomDecisionForest::printTree(RandomDecisionTree tree)
 {
-    qDebug() << "Size  : " << m_tree.size() ;
-    qDebug() << "Depth : " << this->depth ;
-    qDebug() << "Leaves: " << this->numOfLeaves;
+    qDebug() << "Size  : " << tree.m_tree.size() ;
+    qDebug() << "Depth : " << tree.m_depth;
+    qDebug() << "Leaves: " << tree.m_numberofleaves;
     int count = 0 ;
-    for (std::vector<Node>::iterator it = m_tree.begin() ; it != m_tree.end(); ++it)
+    for (auto it = std::begin(tree.m_tree) ; it != std::end(tree.m_tree); ++it)
     {
         Node node = *it;
 
