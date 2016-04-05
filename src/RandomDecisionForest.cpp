@@ -45,7 +45,6 @@ void RandomDecisionForest::readTrainingImageFiles(){
 
 void RandomDecisionForest::subSample(){
 
-    int pixelCloudSize = PIXELS_PER_IMAGE*m_numOfLetters;
     int sampleId=0;
 
     pixelCloud.clear();
