@@ -132,7 +132,10 @@ public:
     std::vector<cv::Mat> imagesVector;
     std::vector<RandomDecisionTree> m_forest;
     int m_no_of_trees;
-    std::vector<Node> m_tree;
+    RandomDecisionTree m_tree;
+    void setNumberofTrees(int no_of_trees){
+        m_no_of_trees = no_of_trees;
+    }
 private:
     QString m_dir;
 
@@ -146,6 +149,7 @@ private:
     float max_InfoGain;
 
 
+    void subSample(ImageInfo *img_inf, cv::Mat image);
 };
 
 #endif

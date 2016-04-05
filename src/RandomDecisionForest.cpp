@@ -194,6 +194,7 @@ cv::Mat RandomDecisionForest::getPixelImage(Pixel* px){
 // create the tree
 void RandomDecisionForest::trainTree()
 {
+    subSample();
     Node root;
     root.id = 1;
     root.isLeaf = false;
@@ -240,9 +241,7 @@ void RandomDecisionForest::trainForest()
     for (int i = 0; i < m_no_of_trees; ++i) {
 
         trainTree();
-
         m_forest.push_back(m_tree);
-
         m_tree.clear();
 
     }
