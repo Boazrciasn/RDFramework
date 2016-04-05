@@ -139,7 +139,7 @@ private:
     std::vector<Pixel*> pixelCloud;
 
     int probe_distanceX, probe_distanceY;
-    int numOfLetters = 0;
+    int m_numOfLetters = 0;
     int numOfLeaves = 0;
     int depth;
     float min_InfoGain;

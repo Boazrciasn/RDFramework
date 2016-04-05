@@ -22,9 +22,9 @@ void RandomDecisionForest::readTrainingImageFiles(){
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames);
-    numOfLetters = fNames.size();
+    m_numOfLetters = fNames.size();
 
-    int pixelCloudSize = PIXELS_PER_IMAGE*numOfLetters;
+    int pixelCloudSize = PIXELS_PER_IMAGE*m_numOfLetters;
 
     for (auto it = std::begin(fNames) ; it != std::end(fNames); ++it)
     {
@@ -50,14 +50,14 @@ void RandomDecisionForest::readTrainingImageFiles(){
         // bootstrap, subsample
         for(int k=0;k<PIXELS_PER_IMAGE; ++k)
         {
-            int i = rand() % image.rows;
-            int j = rand() % image.cols;
+            int i = (rand() % image.rows-2*probe_distanceY) + probe_distanceY;
+            int j = (rand() % image.cols-2*probe_distanceX) + probe_distanceX;
             auto intensity = image.at<uchar>(i,j);
             auto *px = new Pixel(Coord(i,j),intensity,img_inf);
             pixelCloud.push_back(px);
         }
     }
-    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<numOfLetters <<"estimated size : "<< pixelCloudSize;
+    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters <<"estimated size : "<< pixelCloudSize;
     fNames.clear();
 }
 
@@ -203,7 +203,7 @@ void RandomDecisionForest::trainTree()
     m_tree[root.id-1] = root;
     depth=1;
     constructTree(root,pixelCloud);
-    qDebug() << "TREE CONSTRUCTED: LEAVES:" << numOfLeaves << " LETTER SAMPLES: " << numOfLetters;
+    qDebug() << "TREE CONSTRUCTED: LEAVES:" << numOfLeaves << " LETTER SAMPLES: " << m_numOfLetters;
     printTree();
 
 
@@ -240,7 +240,9 @@ void RandomDecisionForest::trainForest()
     for (int i = 0; i < m_no_of_trees; ++i) {
 
         trainTree();
+
         m_forest.push_back(m_tree);
+
         m_tree.clear();
 
     }
