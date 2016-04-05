@@ -65,7 +65,7 @@ struct Node
 class RandomDecisionForest{
 
 public:
-    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY) : m_tree(pow(2, MAX_DEPTH)-1)
+    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY, int no_of_trees) : m_tree(pow(2, MAX_DEPTH)-1), m_no_of_trees(no_of_trees)
     {
         probe_distanceX = probe_dstanceX;
         probe_distanceY = probe_dstanceY;
@@ -128,7 +128,10 @@ public:
 
     void setTrainPath(QString path);
     void setTestPath(QString path);
+    void trainForest();
     vector<cv::Mat> imagesVector;
+    vector<vector<Node>> m_forest;
+    int m_no_of_trees;
 private:
     QString m_dir;
     vector<Pixel*> pixelCloud;

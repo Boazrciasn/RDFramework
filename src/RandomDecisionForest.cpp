@@ -236,6 +236,13 @@ void RandomDecisionForest::setTestPath(QString path)
     this->testpath = path;
 }
 
+void RandomDecisionForest::trainForest()
+{
+    for (int i = 0; i < m_no_of_trees; ++i) {
+//FIX
+    }
+}
+
 
 // return the index of the bin with maximum number of pixels
 
