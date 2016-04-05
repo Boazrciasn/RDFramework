@@ -13,10 +13,12 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-        QString tempdir = "/Users/barisozcan/Documents/Development/ImageCLEF/AnnotationResults";
-        RandomDecisionForest* rdf = new RandomDecisionForest(10,15);
+//        QString tempdir = "/Users/barisozcan/Documents/Development/ImageCLEF/AnnotationResults";
+    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
+        RandomDecisionForest* rdf = new RandomDecisionForest(10,15,3);
         rdf->setTrainPath(tempdir);
         rdf->readTrainingImageFiles();
+        rdf->trainForest();
     //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
     //    //rdf->printPixelCloud();
     //    rdf->train();

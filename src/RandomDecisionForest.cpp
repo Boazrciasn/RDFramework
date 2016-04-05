@@ -34,10 +34,9 @@ void RandomDecisionForest::readTrainingImageFiles(){
         if(!fileName.contains("_"))
             continue;
 
-
-
         filePath += "/" + fileName + ".jpg";
         Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+
         //pad image and save to vector
         cv::copyMakeBorder(image, image, probe_distanceY, probe_distanceY, probe_distanceX, probe_distanceX, BORDER_CONSTANT);
         imagesVector.push_back(image);
@@ -193,7 +192,7 @@ Mat RandomDecisionForest::getPixelImage(Pixel* px){
 }
 
 // create the tree
-void RandomDecisionForest::train()
+void RandomDecisionForest::trainTree()
 {
     Node root;
     root.id = 1;
@@ -239,8 +238,13 @@ void RandomDecisionForest::setTestPath(QString path)
 void RandomDecisionForest::trainForest()
 {
     for (int i = 0; i < m_no_of_trees; ++i) {
-//FIX
+
+        trainTree();
+        m_forest.push_back(m_tree);
+        m_tree.clear();
+
     }
+    qDebug()<< "Forest Size : " << m_forest.size();
 }
 
 
@@ -283,7 +287,7 @@ void RandomDecisionForest::constructTree( Node& root, vector<Pixel*>& pixels) {
         //qDebug() << "Leaf Reached";
         m_tree[root.id-1].isLeaf = true;
         m_tree[root.id-1].hist = createHistogram(pixels);
-        qDebug() << "Leaf Id:" << root.id;
+//        qDebug() << "Leaf Id:" << root.id;
         //printHistogram(root.hist);
         numOfLeaves++;
         return;

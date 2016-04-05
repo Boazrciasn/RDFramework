@@ -61,6 +61,7 @@ struct Node
     Mat hist;
 };
 
+using RandomDecisionTree = vector<Node>;
 
 class RandomDecisionForest{
 
@@ -89,7 +90,7 @@ public:
         }
     }
 
-    void train();
+    void trainTree();
     void constructTree(Node& root, vector<Pixel*>& pixels);
     void tuneParameters(vector<Pixel*>& parentPixels, Node& parent);
     int pixelCloudSize();
@@ -130,10 +131,12 @@ public:
     void setTestPath(QString path);
     void trainForest();
     vector<cv::Mat> imagesVector;
-    vector<vector<Node>> m_forest;
+    vector<RandomDecisionTree> m_forest;
     int m_no_of_trees;
+    vector<Node> m_tree;
 private:
     QString m_dir;
+
     vector<Pixel*> pixelCloud;
 
     int probe_distanceX, probe_distanceY;
@@ -142,7 +145,7 @@ private:
     int depth;
     float min_InfoGain;
     float max_InfoGain;
-    vector<Node> m_tree;
+
 
 };
 
