@@ -4,7 +4,7 @@
 #include "QApplication"
 #include<QDirIterator>
 
-void Reader::readFromTo(string filename, vector<QString> &imgName)
+void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
 {
     struct dirent *ent;
 
@@ -17,9 +17,9 @@ void Reader::readFromTo(string filename, vector<QString> &imgName)
         while((ent = readdir(m_dir)) != NULL)
         {
             // get filename and convert it to string
-            string str = (string)ent->d_name;
+            std::string str = (std::string)ent->d_name;
             size_t pos = str.find(".");
-            if (pos == string::npos || pos == 0)
+            if (pos == std::string::npos || pos == 0)
                 continue;
 
 //            cout<<str.substr(0,pos)<<endl;
@@ -33,11 +33,11 @@ void Reader::readFromTo(string filename, vector<QString> &imgName)
         closedir(m_dir);
     }
     else
-        cerr<<"Couldn't open directory!"<<endl;
+        std::cerr<<"Couldn't open directory!"<<std::endl;
 }
 
 
-void Reader::findImages(QString baseDir, QString query, vector<QString> &foundImages)
+void Reader::findImages(QString baseDir, QString query, std::vector<QString> &foundImages)
 {
     query = "*"+query+"*";
 

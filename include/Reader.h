@@ -14,13 +14,13 @@
 #include <iostream>
 
 
-using namespace cv;
-using namespace std;
+
+
 
 class Reader{
 public:
-    void readFromTo(string filename, vector<QString> &imgName);
-    void findImages(QString baseDir, QString query, vector<QString> &foundImages);
+    void readFromTo(std::string filename, std::vector<QString> &imgName);
+    void findImages(QString baseDir, QString query, std::vector<QString> &foundImages);
 private:
     DIR *m_dir;
 };

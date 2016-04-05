@@ -19,7 +19,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
     m_dir = m_trainpath;
 
     //    dir = "/home/mahiratmis/Desktop/AnnotationResults"; // Got make dir generic here.
-    vector<QString> fNames;
+    std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames);
     numOfLetters = fNames.size();
@@ -35,10 +35,10 @@ void RandomDecisionForest::readTrainingImageFiles(){
             continue;
 
         filePath += "/" + fileName + ".jpg";
-        Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+        cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
 
         //pad image and save to vector
-        cv::copyMakeBorder(image, image, probe_distanceY, probe_distanceY, probe_distanceX, probe_distanceX, BORDER_CONSTANT);
+        cv::copyMakeBorder(image, image, probe_distanceY, probe_distanceY, probe_distanceX, probe_distanceX, cv::BORDER_CONSTANT);
         imagesVector.push_back(image);
 
         //sample image info : label : a , Id : index of in the image vector of the image.
@@ -62,8 +62,8 @@ void RandomDecisionForest::readTrainingImageFiles(){
 }
 
 //given the image path, fills the vector with in the pixels of the image
-void RandomDecisionForest::imageToPixels(vector<Pixel*> &res, QString& filePath,ImageInfo* img_inf ){
-    Mat image = imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res, QString& filePath,ImageInfo* img_inf ){
+    cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
 
     for(int i =0; i<image.rows;i++)
     {
@@ -104,7 +104,7 @@ int RandomDecisionForest::generateTaw()
     return (rand() % 256) - 127;
 }
 
-float RandomDecisionForest::calculateEntropy(Mat& hist)
+float RandomDecisionForest::calculateEntropy(cv::Mat& hist)
 {
     float entr = 0;
     float totalSize=0;
@@ -125,16 +125,16 @@ float RandomDecisionForest::calculateEntropy(Mat& hist)
     return entr;
 }
 
-float RandomDecisionForest::calculateEntropyOfVector(vector<Pixel*>& pixels)
+float RandomDecisionForest::calculateEntropyOfVector(std::vector<Pixel*>& pixels)
 {
-    Mat hist = createHistogram(pixels);
+    cv::Mat hist = createHistogram(pixels);
     return calculateEntropy(hist);
 }
 
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
-Mat RandomDecisionForest::createHistogram(vector<Pixel*>& pixels){
-    Mat hist = Mat::zeros(1,NUM_LABELS,DataType<float>::type);
-    for (vector<Pixel*>::iterator it = pixels.begin() ; it != pixels.end(); ++it)
+cv::Mat RandomDecisionForest::createHistogram(std::vector<Pixel*>& pixels){
+    cv::Mat hist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
+    for (std::vector<Pixel*>::iterator it = pixels.begin() ; it != pixels.end(); ++it)
     {
         Pixel* px = *it;
         int index = letterIndex(px->imgInfo->label);
@@ -147,7 +147,7 @@ Mat RandomDecisionForest::createHistogram(vector<Pixel*>& pixels){
 
 
 // checks if a pixel will travel to the left of a given node
-bool RandomDecisionForest::isLeft(Pixel* p, Node&node, Mat& img)
+bool RandomDecisionForest::isLeft(Pixel* p, Node&node, cv::Mat& img)
 {
     int new_teta1X = node.teta1.x + p->position.x;
     int new_teta1Y = node.teta1.y + p->position.y;
@@ -184,11 +184,11 @@ bool RandomDecisionForest::isLeft(Pixel* p, Node&node, Mat& img)
 
 
 // returns the image the pixel belongs to
-Mat RandomDecisionForest::getPixelImage(Pixel* px){
+cv::Mat RandomDecisionForest::getPixelImage(Pixel* px){
     QString path = m_dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
             + QString::number(px->imgInfo->sampleId)  + ".jpg";
     //qDebug()<<"IMAGE :"<< path;
-    return imread(path.toStdString());
+    return cv::imread(path.toStdString());
 }
 
 // create the tree
@@ -210,9 +210,9 @@ void RandomDecisionForest::trainTree()
 }
 
 // checks if pixels of a letter belong to that letter
-bool RandomDecisionForest::test(vector<Pixel*>& letterPixels, char letter){
-    Mat hist = Mat::zeros(1,NUM_LABELS,DataType<float>::type);
-    for (vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it){
+bool RandomDecisionForest::test(std::vector<Pixel*>& letterPixels, char letter){
+    cv::Mat hist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
+    for (std::vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it){
         Pixel* px = *it;
         //qDebug() << "TREE  " << tree.size();
         Node leaf = getLeafNode(px, 0);
@@ -261,7 +261,7 @@ Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
         return root;
     }
 
-    Mat img = imagesVector[px->imgInfo->sampleId];
+    cv::Mat img = imagesVector[px->imgInfo->sampleId];
     int childId = root.id *2 ;
     //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
     if(!isLeft(px,root,img))
@@ -272,7 +272,7 @@ Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId){
 
 
 // create child nodes from nodes by tuning each node
-void RandomDecisionForest::constructTree( Node& root, vector<Pixel*>& pixels) {
+void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixels) {
 
     float rootEntropy = calculateEntropyOfVector(pixels);
     int current_depth = log2(root.id) + 1;
@@ -297,8 +297,8 @@ void RandomDecisionForest::constructTree( Node& root, vector<Pixel*>& pixels) {
     tuneParameters(pixels, root);
     //qDebug() << "Tuned Parameters";
 
-    vector<Pixel*> left;
-    vector<Pixel*> right;
+    std::vector<Pixel*> left;
+    std::vector<Pixel*> right;
 
     //qDebug() << "Dividing Pixels";
     divide(pixels,left,right,root);
@@ -335,10 +335,10 @@ void RandomDecisionForest::constructTree( Node& root, vector<Pixel*>& pixels) {
 }
 
 // find best teta and taw parameters for the given node
-void RandomDecisionForest::tuneParameters(vector<Pixel*>& parentPixels, Node& parent)
+void RandomDecisionForest::tuneParameters(std::vector<Pixel*>& parentPixels, Node& parent)
 {
-    vector<Pixel*> left;
-    vector<Pixel*> right;
+    std::vector<Pixel*> left;
+    std::vector<Pixel*> right;
     int maxTaw;
     Coord maxTeta1,maxTeta2;
     float maxGain=0;
@@ -399,7 +399,7 @@ int RandomDecisionForest::pixelCloudSize()
     return pixelCloud.size();
 }
 
-void RandomDecisionForest::printHistogram(Mat &hist)
+void RandomDecisionForest::printHistogram(cv::Mat &hist)
 {
     QString res = "HIST {";
     for(int i=0;i<hist.cols;i++)
@@ -423,7 +423,7 @@ void RandomDecisionForest::printTree()
     qDebug() << "Depth : " << this->depth ;
     qDebug() << "Leaves: " << this->numOfLeaves;
     int count = 0 ;
-    for (vector<Node>::iterator it = m_tree.begin() ; it != m_tree.end(); ++it)
+    for (std::vector<Node>::iterator it = m_tree.begin() ; it != m_tree.end(); ++it)
     {
         Node node = *it;
 

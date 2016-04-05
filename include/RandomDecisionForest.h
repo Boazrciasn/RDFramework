@@ -23,8 +23,7 @@
 #define MAX_DEPTH 16
 #define MIN_LEAF_PIXELS 10
 
-using namespace cv;
-using namespace std;
+
 
 
 struct Coord{
@@ -58,10 +57,10 @@ struct Node
     Coord teta1, teta2;
     bool isLeaf;
     int id;
-    Mat hist;
+    cv::Mat hist;
 };
 
-using RandomDecisionTree = vector<Node>;
+using RandomDecisionTree = std::vector<Node>;
 
 class RandomDecisionForest{
 
@@ -76,12 +75,12 @@ public:
     void printPixel(Pixel* px);
     void generateTeta(Coord& crd);
     int generateTaw();
-    float calculateEntropy(Mat& hist);
-    float calculateEntropyOfVector(vector<Pixel*>& pixels);
-    Mat createHistogram(vector<Pixel*>& pixels);
-    bool isLeft(Pixel* p, Node& node, Mat& img);
+    float calculateEntropy(cv::Mat& hist);
+    float calculateEntropyOfVector(std::vector<Pixel*>& pixels);
+    cv::Mat createHistogram(std::vector<Pixel*>& pixels);
+    bool isLeft(Pixel* p, Node& node, cv::Mat& img);
 
-    inline void divide(vector<Pixel*>& parentPixels, vector<Pixel*>& left, vector<Pixel*>& right, Node& parent)
+    inline void divide(std::vector<Pixel*>& parentPixels, std::vector<Pixel*>& left, std::vector<Pixel*>& right, Node& parent)
     {
         for (auto px : parentPixels)
         {
@@ -91,16 +90,16 @@ public:
     }
 
     void trainTree();
-    void constructTree(Node& root, vector<Pixel*>& pixels);
-    void tuneParameters(vector<Pixel*>& parentPixels, Node& parent);
+    void constructTree(Node& root, std::vector<Pixel*>& pixels);
+    void tuneParameters(std::vector<Pixel*>& parentPixels, Node& parent);
     int pixelCloudSize();
-    void printHistogram(Mat& hist);
+    void printHistogram(cv::Mat& hist);
     void printNode(Node& node);
     void printTree();
-    Mat getPixelImage(Pixel* px);
+    cv::Mat getPixelImage(Pixel* px);
     Node getLeafNode(Pixel*px, int nodeId);
 
-    inline int getMaxLikelihoodIndex(Mat& hist)
+    inline int getMaxLikelihoodIndex(cv::Mat& hist)
     {
         int max_val=-1;
         int max_index=0;
@@ -120,8 +119,8 @@ public:
     {
         return letter-'a';
     }
-    void imageToPixels(vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf);
-    bool test(vector<Pixel*>& letterPixels, char letter);
+    void imageToPixels(std::vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf);
+    bool test(std::vector<Pixel*>& letterPixels, char letter);
     // Keep all images on memory
     std::vector<cv::Mat> imagesContainer;
     // Test and Train dirs :
@@ -130,14 +129,14 @@ public:
     void setTrainPath(QString path);
     void setTestPath(QString path);
     void trainForest();
-    vector<cv::Mat> imagesVector;
-    vector<RandomDecisionTree> m_forest;
+    std::vector<cv::Mat> imagesVector;
+    std::vector<RandomDecisionTree> m_forest;
     int m_no_of_trees;
-    vector<Node> m_tree;
+    std::vector<Node> m_tree;
 private:
     QString m_dir;
 
-    vector<Pixel*> pixelCloud;
+    std::vector<Pixel*> pixelCloud;
 
     int probe_distanceX, probe_distanceY;
     int numOfLetters = 0;
