@@ -239,11 +239,9 @@ void RandomDecisionForest::setTestPath(QString path)
 void RandomDecisionForest::trainForest()
 {
     for (int i = 0; i < m_no_of_trees; ++i) {
-
         trainTree();
         m_forest.push_back(m_tree);
         m_tree.clear();
-
     }
     qDebug()<< "Forest Size : " << m_forest.size();
 }
