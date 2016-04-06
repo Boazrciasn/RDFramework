@@ -32,5 +32,5 @@
 .DS_Store
 *.excludes
 *.json
-*.txt.usr*
+*.txt.user*
 
