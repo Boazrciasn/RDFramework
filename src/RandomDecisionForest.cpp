@@ -7,7 +7,7 @@
 #include "include/Reader.h"
 
 
-// HISTOGRAM MUST BE NORMALIZED
+// histogram normalize ?
 // getLeafNode and Test  needs rework
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
@@ -63,6 +63,7 @@ void RandomDecisionForest::subSample(){
             int j = (rand() % (image.cols-2*probe_distanceX)) + probe_distanceX;
             auto intensity = image.at<uchar>(i,j);
             auto *px = new Pixel(Coord(i,j),intensity,img_inf);
+
             pixelCloud.push_back(px);
         }
     }
@@ -70,9 +71,8 @@ void RandomDecisionForest::subSample(){
 
 }
 
-//given the image path, fills the vector with in the pixels of the image
-void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res, QString& filePath,ImageInfo* img_inf ){
-    cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+//FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
+void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat &image ,ImageInfo* img_inf ){
 
     for(int i =0; i<image.rows;i++)
     {
@@ -92,7 +92,8 @@ void RandomDecisionForest::printPixelCloud()
         printPixel(pPixel);
 }
 
-void RandomDecisionForest::printPixel(Pixel* px){
+void RandomDecisionForest::printPixel(Pixel* px)
+{
     qDebug() << "Pixel{ Coor("    << px->position.x     << ","     << px->position.y
              << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
              << ") = "            << px->intensity << "}";
@@ -223,8 +224,13 @@ void RandomDecisionForest::trainTree()
 }
 
 // checks if pixels of a letter belong to that letter
-bool RandomDecisionForest::test(std::vector<Pixel*>& letterPixels, char letter, Tree tree)
+bool RandomDecisionForest::test(const cv::Mat& image, char letter, const Tree &tree)
 {
+    int dummy = 0 ;  // sample id dummy at the moment !s
+    ImageInfo* img_Info = new ImageInfo(letter, dummy);
+    std::vector<Pixel*> letterPixels;
+    imageToPixels(letterPixels, image, img_Info);
+
     cv::Mat hist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
     for (std::vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it)
     {
@@ -270,12 +276,14 @@ void RandomDecisionForest::trainForest()
 
 
 // starting from the node with nodeID
-// recursively find the leaf node the pixel belongs to
+// recursively find the leaf node of a pixel belongs to
 // fix tree in recursive
-Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId, Tree tree){
+Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId, const Tree &tree)
+{
 
     Node root = tree[nodeId];
-    if(root.isLeaf) {
+    if(root.isLeaf)
+    {
         // qDebug()<<"LEAF REACHED :"<<root.id;
         return root;
     }

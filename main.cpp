@@ -16,7 +16,8 @@ int main(int argc, char *argv[]) {
     QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults";
     //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
     RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
-    rdf->setNumberofTrees(3);
+    int no_of_trees = 3;
+    rdf->setNumberofTrees(no_of_trees);
     rdf->setTrainPath(tempdir);
     rdf->readTrainingImageFiles();
     rdf->setNumberofTrees(4);
@@ -49,15 +50,36 @@ int main(int argc, char *argv[]) {
 
     //rdf->printTree(rdf->m_forest[0]);
     //rdf->printPixelCloud();
+
+
+    // TEST :
+    auto test_px = rdf->pixelCloud[6000];
+    qDebug()<<"test pixel info : " << test_px->imgInfo->label;
+    auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[0].m_tree);
+    cv::Mat hist_total = cv::Mat::zeros(leaf.hist.size(),leaf.hist.type());
+    hist_total+= leaf.hist;
+    for (int i = 1; i < no_of_trees; ++i)
+    {
+        auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[i].m_tree);
+        hist_total+= leaf.hist;
+    }
+    rdf->printHistogram(hist_total);
+    rdf->printHistogram(leaf.hist);
+
+
+
+
+
+
     QDesktopWidget dw;
     int x=dw.width()*0.3;
     int y=dw.height()*0.9;
     w.setFixedSize(x,y);
 
-//    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
-//    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
-//    cv::Mat img = rdf->imagesVector.at(0);
-//    cv::imshow("test", img);
-//    w.show();
+    //    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
+    //    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
+    //    cv::Mat img = rdf->imagesVector.at(0);
+    //    cv::imshow("test", img);
+    //    w.show();
     return app.exec();
 }

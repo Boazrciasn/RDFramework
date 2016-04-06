@@ -112,7 +112,7 @@ public:
     void printNode(Node& node);
     void printTree(RandomDecisionTree tree);
     cv::Mat getPixelImage(Pixel* px);
-    Node getLeafNode(Pixel*px, int nodeId, Tree tree);
+    Node getLeafNode(Pixel*px, int nodeId, const Tree &tree);
 
     inline int getMaxLikelihoodIndex(cv::Mat& hist)
     {
@@ -134,8 +134,8 @@ public:
     {
         return letter-'a';
     }
-    void imageToPixels(std::vector<Pixel*>& res, QString& filePath,ImageInfo* img_inf);
-    bool test(std::vector<Pixel*>& letterPixels, char letter, Tree tree);
+    void imageToPixels(std::vector<Pixel*>& res, const cv::Mat &image,ImageInfo* img_inf);
+    bool test(const cv::Mat &image, char letter, const Tree &tree);
     // Keep all images on memory
     std::vector<cv::Mat> imagesContainer;
     // Test and Train dirs :
@@ -151,10 +151,11 @@ public:
     void setNumberofTrees(int no_of_trees){
         m_no_of_trees = no_of_trees;
     }
+    std::vector<Pixel*> pixelCloud;
 private:
     QString m_dir;
 
-    std::vector<Pixel*> pixelCloud;
+
     std::vector<char> m_labels;
     int probe_distanceX, probe_distanceY;
     int m_numOfLetters = 0;
