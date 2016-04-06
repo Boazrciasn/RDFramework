@@ -13,14 +13,17 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults";
-    //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
-    RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
-    rdf->setNumberofTrees(3);
-    rdf->setTrainPath(tempdir);
-    rdf->readTrainingImageFiles();
-    rdf->setNumberofTrees(4);
-    rdf->trainForest();
+    // Util::convertToOSRAndBlure usage
+//    Util::convertToOSRAndBlure("/home/vvglab/Desktop/ImageCLEF2016/AnnotationResults","/home/vvglab/Desktop/AnnotationResults",8);
+
+//    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults";
+//    //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
+//    RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
+//    rdf->setNumberofTrees(3);
+//    rdf->setTrainPath(tempdir);
+//    rdf->readTrainingImageFiles();
+//    rdf->setNumberofTrees(4);
+//    rdf->trainForest();
     //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
     //    //rdf->printPixelCloud();
     //    rdf->train();
@@ -59,5 +62,6 @@ int main(int argc, char *argv[]) {
 //    cv::Mat img = rdf->imagesVector.at(0);
 //    cv::imshow("test", img);
 //    w.show();
+    return 0;
     return app.exec();
 }

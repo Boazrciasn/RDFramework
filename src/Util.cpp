@@ -1,5 +1,6 @@
 #include "include/Util.h"
 #include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
 
 
 void deneme()
@@ -128,4 +129,63 @@ QString Util::fileNameWithoutPath(QString& filePath){
     filePath = filePath.mid(0,posLastSlash);
     return fname;
 }
+
+
+void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize){
+    QString folder;
+    QString file;
+    outDir += "_ksize_" + QString::number(ksize);
+    QDirIterator ittDir(srcDir, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+
+    while (ittDir.hasNext()){
+        ittDir.next();
+        folder = ittDir.fileName();
+        QDirIterator ittFile(srcDir + "/"+ folder,QStringList()<<"*.jpg"<<"*.jpeg",QDir::Files);
+
+        QDir dir_save(outDir + "/" + folder);
+        if (!dir_save.exists())
+        {
+            dir_save.mkpath(".");
+            if(!dir_save.exists())
+                 qDebug() << "ERROR : " << dir_save << " can not be created!" ;
+        }
+
+        while(ittFile.hasNext()){
+            ittFile.next();
+            file = ittFile.fileName();
+            cv::Mat img_bw = cv::imread(srcDir.toStdString() + "/" + folder.toStdString() + "/" + file.toStdString(), 0);
+            cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+            img_bw = 255 - img_bw;
+            cv::blur(img_bw,img_bw,cv::Size(ksize,ksize));
+
+            QImage saveQIM = Util::toQt(img_bw, QImage::Format_RGB888);
+            saveQIM.save(outDir + "/" + folder + "/" + file);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
