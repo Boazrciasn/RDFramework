@@ -16,12 +16,12 @@
 
 #include <time.h>       /* time */
 
-#define MAX_NUMITERATION_FOR_DIVISION 5
-#define PIXELS_PER_IMAGE 20
+#define MAX_NUMITERATION_FOR_DIVISION 10
+#define PIXELS_PER_IMAGE 50
 #define MIN_ENTROPY 0.05
-#define NUM_LABELS 23
+#define NUM_LABELS 26
 #define MAX_DEPTH 16
-#define MIN_LEAF_PIXELS 10
+#define MIN_LEAF_PIXELS 20
 
 
 

@@ -13,17 +13,15 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults";
+    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
     //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
     RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
-    int no_of_trees = 3;
+    int no_of_trees = 15;
     rdf->setNumberofTrees(no_of_trees);
     rdf->setTrainPath(tempdir);
     rdf->readTrainingImageFiles();
-    rdf->setNumberofTrees(4);
     rdf->trainForest();
-//    Util::convertToOSRAndBlure("/home/vvglab/Desktop/ImageCLEF2016/AnnotationResults","/home/vvglab/Desktop/AnnotationResults",8);
-    // Util::convertToOSRAndBlure usage
+   // Util::convertToOSRAndBlure(tempdir,tempdir,4);
 
 
     //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
@@ -57,7 +55,7 @@ int main(int argc, char *argv[]) {
 
 
     // TEST :
-    auto test_px = rdf->pixelCloud[6000];
+    auto test_px = rdf->pixelCloud[6001];
     qDebug()<<"test pixel info : " << test_px->imgInfo->label;
     auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[0].m_tree);
     cv::Mat hist_total = cv::Mat::zeros(leaf.hist.size(),leaf.hist.type());
@@ -80,19 +78,13 @@ int main(int argc, char *argv[]) {
     int y=dw.height()*0.9;
     w.setFixedSize(x,y);
 
-<<<<<<< HEAD
-    //    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
-    //    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
-    //    cv::Mat img = rdf->imagesVector.at(0);
-    //    cv::imshow("test", img);
-    //    w.show();
-=======
+
 //    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
 //    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
 //    cv::Mat img = rdf->imagesVector.at(0);
 //    cv::imshow("test", img);
 //    w.show();
     return 0;
->>>>>>> 3b2db0b798c0457b45700894f1436c3e3e4c0e7b
+
     return app.exec();
 }
