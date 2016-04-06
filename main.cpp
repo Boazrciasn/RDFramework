@@ -13,7 +13,8 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
+    //QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
+    QString tempdir = "/home/mahiratmis/Desktop/AnnotationResults";
     //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
     RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
     int no_of_trees = 15;
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
 
 
     // TEST :
-    auto test_px = rdf->pixelCloud[6001];
+    auto test_px = rdf->m_pixelCloud[6001];
     qDebug()<<"test pixel info : " << test_px->imgInfo->label;
     auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[0].m_tree);
     cv::Mat hist_total = cv::Mat::zeros(leaf.hist.size(),leaf.hist.type());

@@ -27,11 +27,11 @@
 
 
 struct Coord{
-    int x,y;
-    Coord(){x=0;y=0;}
-    Coord(int xpos, int ypos) :
-        x(xpos), y(ypos) {}
-    Coord(const Coord& crd) : x(crd.x), y(crd.x) { } // user-defined copy ctor
+    int m_x,m_y;
+    Coord(){m_x=0;m_y=0;}
+    Coord(int x, int y) :
+        m_x(x), m_y(y) {}
+    Coord(const Coord& crd) : m_x(crd.m_x), m_y(crd.m_x) {}
 };
 
 struct ImageInfo
@@ -75,16 +75,16 @@ public:
 class RandomDecisionForest{
 
 public:
+
     RandomDecisionForest(int probe_dstanceX,int probe_dstanceY) : m_tempTree(pow(2, MAX_DEPTH)-1)
     {
-        probe_distanceX = probe_dstanceX;
-        probe_distanceY = probe_dstanceY;
+        m_probe_distanceX = probe_dstanceX;
+        m_probe_distanceY = probe_dstanceY;
         srand (time(NULL));
         min_InfoGain = 1;
         max_InfoGain = -1;
-
-
     }
+
     void readTrainingImageFiles();
     void printPixelCloud();
     void printPixel(Pixel* px);
@@ -99,12 +99,23 @@ public:
     {
         for (auto px : parentPixels)
         {
-            auto img = imagesVector[px->imgInfo->sampleId];
+            auto img = m_imagesVector[px->imgInfo->sampleId];
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }
 
     void trainTree();
+    bool pixelSizesConsistent();
+
+    inline int getTotalNumberOfPixels(const cv::Mat& hist)
+    {
+        int totalSize =0;
+        int nCols = hist.cols;
+        for(int i=0; i<nCols; ++i)
+            totalSize += hist.at<float>(0, i);
+        return totalSize;
+    }
+
     void constructTree(Node& root, std::vector<Pixel*>& pixels);
     void tuneParameters(std::vector<Pixel*>& parentPixels, Node& parent);
     int pixelCloudSize();
@@ -114,11 +125,11 @@ public:
     cv::Mat getPixelImage(Pixel* px);
     Node getLeafNode(Pixel*px, int nodeId, const Tree &tree);
 
-    inline int getMaxLikelihoodIndex(cv::Mat& hist)
+    inline int getMaxLikelihoodIndex(const cv::Mat& hist)
     {
         int max_val=-1;
         int max_index=0;
-        for(int i=0;i<hist.cols;i++)
+        for(int i=0;i<hist.cols;++i)
         {
             if(hist.at<float>(0, i) > max_val)
             {
@@ -126,7 +137,6 @@ public:
                 max_index = i;
             }
         }
-
         return max_index;
     }
 
@@ -134,37 +144,39 @@ public:
     {
         return letter-'a';
     }
+
     void imageToPixels(std::vector<Pixel*>& res, const cv::Mat &image,ImageInfo* img_inf);
     bool test(const cv::Mat &image, char letter, const Tree &tree);
-    // Keep all images on memory
-    std::vector<cv::Mat> imagesContainer;
-    // Test and Train dirs :
-    QString testpath, m_trainpath;
-
     void setTrainPath(QString path);
     void setTestPath(QString path);
     void trainForest();
-    std::vector<cv::Mat> imagesVector;
-    std::vector<RandomDecisionTree> m_forest;
-    int m_no_of_trees;
-    Tree m_tempTree;
+
     void setNumberofTrees(int no_of_trees){
         m_no_of_trees = no_of_trees;
     }
-    std::vector<Pixel*> pixelCloud;
+
+    std::vector<cv::Mat> m_imagesVector;
+    std::vector<RandomDecisionTree> m_forest;
+    int m_no_of_trees;
+    Tree m_tempTree;
+    std::vector<Pixel*> m_pixelCloud;
+    // Keep all images on memory
+    std::vector<cv::Mat> m_imagesContainer;
+    // Test and Train dirs :
+    QString m_testpath, m_trainpath;
+
 private:
+
+    void subSample();
+
     QString m_dir;
-
-
     std::vector<char> m_labels;
-    int probe_distanceX, probe_distanceY;
+    int m_probe_distanceX, m_probe_distanceY;
     int m_numOfLetters = 0;
     int m_numOfLeaves ;
     int m_depth;
     float min_InfoGain;
     float max_InfoGain;
-
-    void subSample();
 };
 
 #endif
