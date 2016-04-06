@@ -33,4 +33,4 @@
 *.excludes
 *.json
 *.txt.user*
-
+*~
