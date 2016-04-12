@@ -13,8 +13,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
-    // Util::convertToOSRAndBlure usage
-//    Util::convertToOSRAndBlure("/home/vvglab/Desktop/ImageCLEF2016/AnnotationResults","/home/vvglab/Desktop/AnnotationResults",8);
+//    Util::convertToOSRAndBlure("/home/vvglab/Desktop/ImageCLEF2016/AnnotationResults","/home/vvglab/Desktop/AnnotationResults",4);
 
 //    QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults";
 //    //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
@@ -61,7 +60,7 @@ int main(int argc, char *argv[]) {
 //    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
 //    cv::Mat img = rdf->imagesVector.at(0);
 //    cv::imshow("test", img);
-//    w.show();
-    return 0;
+    w.show();
+//    return 0;
     return app.exec();
 }

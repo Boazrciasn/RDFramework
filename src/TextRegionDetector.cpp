@@ -28,12 +28,18 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 
 //    Util::plot(hist,parent);
 
+    // TODO: make generic
+    // Line detection threshold
+    float meanVal = cv::mean(hist)[0];
+    float lnThreshold = 0.50*meanVal;
+    qDebug() << "lnThreshold " << lnThreshold;
+
     // binarize
     QVector<int> y(range);
 
     for (int i=0; i < range; ++i)
     {
-        if (hist.at<float>(i) < 0.10)
+        if (hist.at<float>(i) < lnThreshold)
             y[i]  = 0;
         else
             y[i] = 1;
@@ -60,6 +66,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
         cv::minMaxLoc(hist,&minVal,&maxVal);
         hist = hist/maxVal;
 
+        // 1D average filter
         for (int i=10; i < range-10; ++i)
         {
             hist.at<float>(i) = cv::sum(hist(cv::Range(i-10,i+10),cv::Range::all()))[0]/20;
@@ -67,9 +74,15 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 
 //        Util::plot(hist,parent);
 
+        // TODO: make generic
+        // Line detection threshold
+        meanVal = cv::mean(hist)[0];
+        float wrdThreshold = 0.50*meanVal;
+//        qDebug() << "wrdThreshold " << wrdThreshold;
+
         for (int i=0; i < range; ++i)
         {
-            if (hist.at<float>(i) < 0.08 || i < leftMargin)
+            if (hist.at<float>(i) < wrdThreshold || i < leftMargin)
                 x[i]  = 0;
             else
                 x[i] = 1;

@@ -38,6 +38,7 @@ void MainWindow::display()
     qPainter.setBrush(Qt::NoBrush);
     qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
+    qDebug() << out.size();
     for (int i = 0; i < out.size(); i++) {
         qPainter.drawRect(out[i]);
     }
