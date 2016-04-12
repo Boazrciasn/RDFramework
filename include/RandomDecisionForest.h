@@ -53,7 +53,7 @@ struct Pixel
 
 struct Node
 {
-    int taw;
+    int tau;
     Coord teta1, teta2;
     bool isLeaf;
     int id;
@@ -86,10 +86,11 @@ public:
     }
 
     void readTrainingImageFiles();
+    void readTestImageFiles();
     void printPixelCloud();
     void printPixel(Pixel* px);
     void generateTeta(Coord& crd);
-    int generateTaw();
+    int generateTau();
     float calculateEntropy(cv::Mat& hist);
     float calculateEntropyOfVector(std::vector<Pixel*>& pixels);
     cv::Mat createHistogram(std::vector<Pixel*>& pixels);
@@ -99,7 +100,7 @@ public:
     {
         for (auto px : parentPixels)
         {
-            auto img = m_imagesVector[px->imgInfo->sampleId];
+            auto img = m_trainImagesVector[px->imgInfo->sampleId];
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }
@@ -115,6 +116,10 @@ public:
             totalSize += hist.at<float>(0, i);
         return totalSize;
     }
+
+    cv::Mat classify(int index);
+    void test();
+    bool test(const cv::Mat& image, char letter, const Tree &tree);
 
     void constructTree(Node& root, std::vector<Pixel*>& pixels);
     void tuneParameters(std::vector<Pixel*>& parentPixels, Node& parent);
@@ -146,7 +151,7 @@ public:
     }
 
     void imageToPixels(std::vector<Pixel*>& res, const cv::Mat &image,ImageInfo* img_inf);
-    bool test(const cv::Mat &image, char letter, const Tree &tree);
+
     void setTrainPath(QString path);
     void setTestPath(QString path);
     void trainForest();
@@ -155,7 +160,8 @@ public:
         m_no_of_trees = no_of_trees;
     }
 
-    std::vector<cv::Mat> m_imagesVector;
+    std::vector<cv::Mat> m_trainImagesVector;
+    std::vector<cv::Mat> m_testImagesVector;
     std::vector<RandomDecisionTree> m_forest;
     int m_no_of_trees;
     Tree m_tempTree;

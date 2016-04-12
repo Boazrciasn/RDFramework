@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
+   /*
     //QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
     QString tempdir = "/home/mahiratmis/Desktop/AnnotationResults";
     //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]) {
     rdf->printHistogram(leaf.hist);
 
 
-
+   */
 
 
 
@@ -84,8 +85,8 @@ int main(int argc, char *argv[]) {
 //    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
 //    cv::Mat img = rdf->imagesVector.at(0);
 //    cv::imshow("test", img);
-//    w.show();
-    return 0;
+    w.show();
+    //return 0;
 
     return app.exec();
 }
