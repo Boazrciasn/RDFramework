@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>412</width>
+    <width>420</width>
     <height>1043</height>
    </rect>
   </property>
@@ -200,8 +200,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>412</width>
-     <height>22</height>
+     <width>420</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -209,6 +209,7 @@
      <string>file</string>
     </property>
     <addaction name="actionAnnotation_Extractor"/>
+    <addaction name="actionRDF"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -219,11 +220,18 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionRDF"/>
+   <addaction name="actionAnnotation_Extractor"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAnnotation_Extractor">
    <property name="text">
     <string>Annotation Extractor</string>
+   </property>
+  </action>
+  <action name="actionRDF">
+   <property name="text">
+    <string>RDF</string>
    </property>
   </action>
  </widget>
