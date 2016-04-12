@@ -19,7 +19,7 @@
 #define MAX_NUMITERATION_FOR_DIVISION 10
 #define PIXELS_PER_IMAGE 50
 #define MIN_ENTROPY 0.05
-#define NUM_LABELS 26
+#define NUM_LABELS 26 // should make it generic according to training input
 #define MAX_DEPTH 16
 #define MIN_LEAF_PIXELS 20
 
@@ -84,6 +84,7 @@ public:
         max_InfoGain = -1;
 
 
+
     }
     void readTrainingImageFiles();
     void printPixelCloud();
@@ -140,7 +141,7 @@ public:
     std::vector<cv::Mat> imagesContainer;
     // Test and Train dirs :
     QString testpath, m_trainpath;
-
+    cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void setTrainPath(QString path);
     void setTestPath(QString path);
     void trainForest();
@@ -151,6 +152,7 @@ public:
     void setNumberofTrees(int no_of_trees){
         m_no_of_trees = no_of_trees;
     }
+
     std::vector<Pixel*> pixelCloud;
 private:
     QString m_dir;

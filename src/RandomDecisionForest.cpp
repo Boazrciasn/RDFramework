@@ -246,6 +246,30 @@ bool RandomDecisionForest::test(const cv::Mat& image, char letter, const Tree &t
     return(letterIndexPredicted==letterIndexOriginal);
 }
 
+cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage)
+{
+    cv::Mat color(InputImage.rows, InputImage.cols, CV_8UC1);
+    //create color code Mat accoridng to of each pixel.
+    for(int i =0; i<InputImage.rows;i++)
+    {
+        for(int j =0; j<InputImage.cols;j++)
+        {
+            auto label = labelImage.at<double>(i,j);
+            color.at<double>(i,j) = (label/NUM_LABELS)*255;
+        }
+    }
+    //create 3 channel image with 2 channels with same intensity values of cv::Mat color :
+    std::vector<cv::Mat> Image_channels(3);
+    Image_channels.at(0) = InputImage;
+    Image_channels.at(1) = color;
+    Image_channels.at(2) = color;
+    cv::Mat codedImage;
+
+    cv::merge(Image_channels,codedImage);
+
+    return codedImage;
+}
+
 void RandomDecisionForest::setTrainPath(QString path)
 {
     this->m_trainpath = path;
@@ -270,6 +294,8 @@ void RandomDecisionForest::trainForest()
     }
     qDebug()<< "Forest Size : " << m_forest.size();
 }
+
+
 
 
 // return the index of the bin with maximum number of pixels
