@@ -37,6 +37,7 @@ void RDFDialog::on_train_button_clicked()
     forest->setTrainPath(train_dir);
     forest->setNumberofTrees(nTrees);
     forest->readTrainingImageFiles();
+    forest->trainForest();
     ui->label_train->setText( ui->label_train->text() +  "\n Training images read");
 }
 

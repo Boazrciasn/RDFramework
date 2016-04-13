@@ -5,6 +5,7 @@
 
 #include "include/RandomDecisionForest.h"
 #include "include/Reader.h"
+#include <opencv2/highgui/highgui.hpp>
 
 
 // histogram normalize ?
@@ -269,6 +270,7 @@ cv::Mat RandomDecisionForest::classify(int index)
     {
         for(int c=m_probe_distanceX;c<n_cols-m_probe_distanceX; ++c)
         {
+           qDebug() << QString::number(r) << "," << QString::number(c) ;
             auto intensity = test_image.at<uchar>(r,c);
             auto *px = new Pixel(Coord(r,c),intensity,img_Info);
             cv::Mat probHist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
@@ -278,6 +280,8 @@ cv::Mat RandomDecisionForest::classify(int index)
                 Node leaf = getLeafNode(px, 0, tree.m_tree);
                 probHist += leaf.hist;
             }
+
+            printHistogram(probHist);
             auto label = getMaxLikelihoodIndex(probHist);
             res_image.at<uchar>(r,c) = label;
         }
@@ -288,9 +292,15 @@ cv::Mat RandomDecisionForest::classify(int index)
 void RandomDecisionForest::test()
 {
     int size = m_testImagesVector.size();
-    for(auto i=0; i<size; i++)
+    qDebug() << QString::number(size);
+    for(auto i=0; i<size; ++i)
     {
+        cv::Mat original  =  m_testImagesVector[i];
+        qDebug() << QString::number(i);
         cv::Mat prediction = classify(i);
+        qDebug() << QString::number(i) << "labeled";
+        //cv::imshow("Colored Image", colorCoder(prediction,original));
+        //cv::waitKey();
     }
 }
 
