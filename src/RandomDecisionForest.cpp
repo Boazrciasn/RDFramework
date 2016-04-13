@@ -182,38 +182,7 @@ cv::Mat RandomDecisionForest::createHistogram(std::vector<Pixel*>& pixels){
 
 
 // checks if a pixel will travel to the left of a given node
-bool RandomDecisionForest::isLeft(Pixel* p, Node&node, cv::Mat& img)
-{
-    int new_teta1X = node.teta1.m_x + p->position.m_x;
-    int new_teta1Y = node.teta1.m_y + p->position.m_y;
 
-    bool bIsOutOfRangeX = (new_teta1X > img.cols || new_teta1X < 0);
-    bool bIsOutOfRangeY = (new_teta1Y > img.rows || new_teta1Y < 0);
-
-    unsigned char intensity1=0;
-    if(!(bIsOutOfRangeX || bIsOutOfRangeY)){
-        intensity1 = img.at<uchar>(new_teta1X,new_teta1Y);
-    }
-
-    int new_teta2X = node.teta2.m_x + p->position.m_x ;
-    int new_teta2Y = node.teta2.m_y + p->position.m_y ;
-
-    bIsOutOfRangeX = (new_teta2X > img.cols || new_teta2X < 0);
-    bIsOutOfRangeY = (new_teta2Y > img.rows || new_teta2Y < 0);
-
-    unsigned char intensity2=0;
-    if(!(bIsOutOfRangeX || bIsOutOfRangeY)){
-        intensity2 = img.at<uchar>(new_teta2X,new_teta2Y);
-    }
-
-    //    qDebug() << "Img ("<< img.cols << "," << img.rows << ")";
-    //    qDebug() << "Q1 ("<< new_teta1X << "," << new_teta1Y << ")";
-    //    qDebug() << "Q2 ("<< new_teta2X << "," << new_teta2Y << ")";
-    //    qDebug() << "Pixels ("<< intensity1 << "," << intensity2 << ")";
-    //    qDebug() << "Taw ("<< node.taw << ")";
-
-    return ((intensity1- intensity2) <= node.tau);
-}
 
 // divide pixel vector into 2 parts according to the parameters of parent node
 
@@ -385,23 +354,7 @@ void RandomDecisionForest::trainForest()
 // starting from the node with nodeID
 // recursively find the leaf node of a pixel belongs to
 // fix tree in recursive
-Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId, const Tree &tree)
-{
 
-    Node root = tree[nodeId];
-    if(root.isLeaf)
-    {
-        // qDebug()<<"LEAF REACHED :"<<root.id;
-        return root;
-    }
-
-    cv::Mat img = m_testImagesVector[px->imgInfo->sampleId];
-    int childId = root.id *2 ;
-    //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
-    if(!isLeft(px,root,img))
-        childId++;
-    return getLeafNode(px,childId-1, tree);
-}
 
 
 

@@ -2,9 +2,17 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 
+SIGNALS S;
+
+SlotDeneme::SlotDeneme()
+{
+    QObject::connect(&S, SIGNAL(doIt()), this, SLOT(onDoIt()));
+}
 
 void deneme()
 {
+    emit S.doIt();
+
     cv::Mat_<float> A(3, 3);
     cv::Mat_<int> B(5, 5);
     A.setTo(0);
@@ -163,6 +171,7 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize){
         }
     }
 }
+
 
 
 

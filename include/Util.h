@@ -9,6 +9,33 @@
 
 #include <functional>
 
+class SIGNALS : public QObject
+{
+    Q_OBJECT
+
+signals:
+    void doIt();
+
+};
+
+
+class SlotDeneme : public QObject
+{
+    Q_OBJECT
+
+public slots:
+    void onDoIt()
+    {
+        int a=5;
+        ++a;
+    }
+
+public:
+    SlotDeneme();
+
+};
+
+
 template <typename T, typename FUNC>
 void doForAllPixels(cv::Mat_<T> &M, const FUNC &func)
 {
