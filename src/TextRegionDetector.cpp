@@ -9,6 +9,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 //    qDebug() << "Default: " << leftMargin << "  " << rightMargin;
     getRange(img_bw,leftMargin, rightMargin,parent);
     qDebug() << "Computed: " << leftMargin << "  " << rightMargin;
+    qDebug() << "Image size: " << img_bw.rows << "  " << img_bw.cols;
 
     // calculate histogram
     QVector<QRect> result;
@@ -30,10 +31,12 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 
     // binarize
     QVector<int> y(range);
+    float lineThreshold = 0.70*cv::mean(hist)[0];
+    qDebug() << "lineThreshold: " << lineThreshold;
 
     for (int i=0; i < range; ++i)
     {
-        if (hist.at<float>(i) < 0.10)
+        if (hist.at<float>(i) < lineThreshold)
             y[i]  = 0;
         else
             y[i] = 1;
@@ -42,12 +45,19 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
     QVector<int> line_y = extractCoordinateFrom(y);
     y.clear();
 
+    qDebug() << " line_y: " << line_y.size();
+
     // for each line
     range = rightMargin;
     QVector<int> x(range);
     QVector<int> line_x;
 
     for (int row = 0; row < line_y.size()-1; row+=2) {
+//    for (int row = 20; row < 21; row+=2) {
+        if(line_y[row+1] - line_y[row] < 10)
+            continue;
+//        qDebug() << row << " line: " << line_y[row] << " " << line_y[row+1];
+
         hist.release();
 
         for (int i=0; i < range; ++i)
@@ -60,22 +70,40 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
         cv::minMaxLoc(hist,&minVal,&maxVal);
         hist = hist/maxVal;
 
-        for (int i=10; i < range-10; ++i)
+        // TODO: WHat is 10? make it line specific as well
+        Util::plot(hist,parent);
+        int windSize = 20;
+
+
+
+
+
+
+
+
+
+        for (int i=windSize; i < range-windSize; ++i)
         {
-            hist.at<float>(i) = cv::sum(hist(cv::Range(i-10,i+10),cv::Range::all()))[0]/20;
+            hist.at<float>(i) = cv::sum(hist(cv::Range(i-windSize,i+windSize),cv::Range::all()))[0]/(2*windSize);
         }
 
-//        Util::plot(hist,parent);
+        Util::plot(hist,parent);
+
+        float wordThreshold = 0.50*cv::mean(hist)[0];
+//        qDebug() << "wordThreshold: " << wordThreshold;
+
 
         for (int i=0; i < range; ++i)
         {
-            if (hist.at<float>(i) < 0.08 || i < leftMargin)
+            if (hist.at<float>(i) < wordThreshold || i < leftMargin)
                 x[i]  = 0;
             else
                 x[i] = 1;
         }
 
         line_x = extractCoordinateFrom(x);
+//        qDebug() << row << " line_x: " << line_x.size();
+
         int w, h = line_y[row+1] - line_y[row];
 
         for (int i = 0; i < line_x.size(); i+=2) {
