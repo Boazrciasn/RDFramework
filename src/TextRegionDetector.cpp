@@ -8,6 +8,14 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
     int leftMargin = 0, rightMargin = img_bw.cols;
 //    qDebug() << "Default: " << leftMargin << "  " << rightMargin;
     getRange(img_bw,leftMargin, rightMargin,parent);
+
+//    leftMargin = leftMargin - 50;
+//    rightMargin = rightMargin + 50;
+//    if(leftMargin < 0)
+//        leftMargin = 0;
+//    if(rightMargin > img_bw.cols)
+//        rightMargin = img_bw.cols;
+
     qDebug() << "Computed: " << leftMargin << "  " << rightMargin;
     qDebug() << "Image size: " << img_bw.rows << "  " << img_bw.cols;
 
@@ -48,7 +56,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
     qDebug() << " line_y: " << line_y.size();
 
     // for each line
-    range = rightMargin;
+    range = rightMargin - leftMargin;
     QVector<int> x(range);
     QVector<int> line_x;
 
@@ -60,7 +68,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 
         hist.release();
 
-        for (int i=0; i < range; ++i)
+        for (int i=leftMargin; i < rightMargin; ++i)
         {
             int tmp = cv::sum(img_bw(cv::Range(line_y[row],line_y[row+1]),cv::Range(i,i+1)))[0];
             hist.push_back(tmp);
@@ -71,23 +79,22 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
         hist = hist/maxVal;
 
         // TODO: WHat is 10? make it line specific as well
-        Util::plot(hist,parent);
-        int windSize = 20;
+//        Util::plot(hist,parent);
+        int ksize = 51;
 
 
+//        cv::blur(hist,hist,cv::Size(ksize,ksize));
+//        cv::medianBlur(hist,hist,ksize);
+        cv::GaussianBlur(hist, hist, cv::Size(ksize,ksize),0, 0);
 
 
+//        for (int i=windSize; i < range-windSize; ++i)
+//        {
+////            hist.at<float>(i) = cv::sum(hist(cv::Range(i-windSize,i+windSize),cv::Range::all()))[0]/(2*windSize);
+////            hist.at<float>(i) = cv::medi(hist(cv::Range(i-windSize,i+windSize),cv::Range::all()))[0]/(2*windSize);
+//        }
 
-
-
-
-
-        for (int i=windSize; i < range-windSize; ++i)
-        {
-            hist.at<float>(i) = cv::sum(hist(cv::Range(i-windSize,i+windSize),cv::Range::all()))[0]/(2*windSize);
-        }
-
-        Util::plot(hist,parent);
+//        Util::plot(hist,parent);
 
         float wordThreshold = 0.50*cv::mean(hist)[0];
 //        qDebug() << "wordThreshold: " << wordThreshold;
@@ -108,7 +115,7 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 
         for (int i = 0; i < line_x.size(); i+=2) {
             w = line_x[i+1]-line_x[i];
-            result.push_back(QRect(line_x[i],line_y[row],w,h));
+            result.push_back(QRect(line_x[i] + leftMargin,line_y[row],w,h));
         }
 
         line_x.clear();
