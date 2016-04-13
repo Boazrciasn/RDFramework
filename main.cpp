@@ -13,16 +13,20 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     MainWindow w;
 
+   /*
     //QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
-//    QString tempdir = "/home/mahiratmis/Desktop/AnnotationResults";
-//    //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
-//    RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
-//    int no_of_trees = 15;
-//    rdf->setNumberofTrees(no_of_trees);
-//    rdf->setTrainPath(tempdir);
-//    rdf->readTrainingImageFiles();
-//    rdf->trainForest();
-   // Util::convertToOSRAndBlure(tempdir,tempdir,4);
+
+    QString tempdir = "/home/mahiratmis/Desktop/AnnotationResults";
+    //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
+    RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
+    int no_of_trees = 15;
+    rdf->setNumberofTrees(no_of_trees);
+    rdf->setTrainPath(tempdir);
+    rdf->readTrainingImageFiles();
+    rdf->trainForest();
+
+
+    // Util::convertToOSRAndBlure(tempdir,tempdir,4);
 
 
     //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
@@ -51,12 +55,30 @@ int main(int argc, char *argv[]) {
     //    else
     //        qDebug() << "COME ONNN";
 
-    //rdf->printTree(rdf->m_forest[0]);
+    rdf->printTree(rdf->m_forest[0]);
     //rdf->printPixelCloud();
 
 
     // TEST :
-//    auto test_px = rdf->m_pixelCloud[6001];
+
+    auto test_px = rdf->m_pixelCloud[6001];
+    qDebug()<<"test pixel info : " << test_px->imgInfo->label;
+    auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[0].m_tree);
+    cv::Mat hist_total = cv::Mat::zeros(leaf.hist.size(),leaf.hist.type());
+    hist_total+= leaf.hist;
+    for (int i = 1; i < no_of_trees; ++i)
+    {
+        auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[i].m_tree);
+        hist_total+= leaf.hist;
+    }
+    rdf->printHistogram(hist_total);
+    rdf->printHistogram(leaf.hist);
+
+
+   */
+
+
+//    auto test_px = rdf->pixelCloud[6001];
 //    qDebug()<<"test pixel info : " << test_px->imgInfo->label;
 //    auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[0].m_tree);
 //    cv::Mat hist_total = cv::Mat::zeros(leaf.hist.size(),leaf.hist.type());
@@ -65,13 +87,9 @@ int main(int argc, char *argv[]) {
 //    {
 //        auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[i].m_tree);
 //        hist_total+= leaf.hist;
+//        rdf->printHistogram(leaf.hist);
 //    }
 //    rdf->printHistogram(hist_total);
-//    rdf->printHistogram(leaf.hist);
-
-
-
-
 
 
     QDesktopWidget dw;
@@ -80,12 +98,25 @@ int main(int argc, char *argv[]) {
     w.setFixedSize(x,y);
 
 
-//    cv::Mat img = imread("/Users/barisozcan/Downloads/sample-1.jpg",IMREAD_GRAYSCALE);
-//    cv::copyMakeBorder( img, img, 20, 20, 20, 20,BORDER_CONSTANT );
+
 //    cv::Mat img = rdf->imagesVector.at(0);
-//    cv::imshow("test", img);
+
+//    cv::Mat img2 = cv::Mat::ones(img.rows,img.cols,img.type())*200;
+
+//    std::vector<cv::Mat> images(3);
+//    images.at(0) = img;
+//    images.at(1) = img2;
+//    images.at(2) = img2;
+
+//    cv::Mat codedImage;
+//    cv::merge(images,codedImage);
+
+//    cv::imshow("test", codedImage);
+//    qDebug()<<"Test image size :"<<codedImage.rows << "x" << img.cols;
+//    qDebug()<<"Test image channels : "<< codedImage.type();
+
     w.show();
-//    return 0;
+    //return 0;
 
     return app.exec();
 }
