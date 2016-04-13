@@ -39,6 +39,8 @@ void RDFDialog::on_train_button_clicked()
     forest->readTrainingImageFiles();
     forest->trainForest();
     ui->label_train->setText( ui->label_train->text() +  "\n Training images read");
+    forest->trainForest();
+    ui->label_train->setText(  "Forest Trained ! ");
 }
 
 void RDFDialog::on_test_button_clicked()
