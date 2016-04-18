@@ -5,9 +5,10 @@
 
 #include "include/RandomDecisionForest.h"
 #include "include/Reader.h"
+#include <opencv2/highgui/highgui.hpp>
 
 
-// HISTOGRAM MUST BE NORMALIZED
+// histogram normalize ?
 // getLeafNode and Test  needs rework
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
@@ -31,15 +32,40 @@ void RandomDecisionForest::readTrainingImageFiles(){
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
 
         //pad image and save to vector
-        cv::copyMakeBorder(image, image, probe_distanceY, probe_distanceY, probe_distanceX, probe_distanceX, cv::BORDER_CONSTANT);
-        imagesVector.push_back(image);
+        cv::copyMakeBorder(image, image, m_probe_distanceY, m_probe_distanceY, m_probe_distanceX, m_probe_distanceX, cv::BORDER_CONSTANT);
+        m_trainImagesVector.push_back(image);
 
         //sample image info : label : a , Id : index of in the image vector of the image.
         QString letter = fileName.split("_")[0];
         // store label of the image in m_labels vector
         m_labels.push_back(letter[0].toLatin1());
     }
-    qDebug()<<"No of IMAGES : " << imagesVector.size() << " NO of Fnames" <<m_numOfLetters<< "Images Vector Size : "<< imagesVector.size();
+    qDebug()<<"No of IMAGES : " << m_trainImagesVector.size() << " NO of Fnames" <<m_numOfLetters<< "Images Vector Size : "<< m_trainImagesVector.size();
+    fNames.clear();
+}
+
+void RandomDecisionForest::readTestImageFiles(){
+
+    m_dir = m_testpath;
+    std::vector<QString> fNames;
+    auto *reader = new Reader();
+    reader->findImages(m_dir, "", fNames);
+    for (auto filePath : fNames)
+    {
+        QString fileName = Util::fileNameWithoutPath(filePath);
+        qDebug() << fileName ;
+        //each directory contains lastsession.txt
+        if(!fileName.contains("_"))
+            continue;
+
+        filePath += "/" + fileName + ".jpg";
+        cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+
+        //pad image and save to vector
+        cv::copyMakeBorder(image, image, m_probe_distanceY, m_probe_distanceY, m_probe_distanceX, m_probe_distanceX, cv::BORDER_CONSTANT);
+        m_testImagesVector.push_back(image);
+    }
+    qDebug()<<"No of test IMAGES : " << m_testImagesVector.size();
     fNames.clear();
 }
 
@@ -47,9 +73,9 @@ void RandomDecisionForest::subSample(){
 
     int sampleId=0;
 
-    pixelCloud.clear();
+    m_pixelCloud.clear();
 
-    for (auto it = std::begin(imagesVector) ; it != std::end(imagesVector); ++it)
+    for (auto it = std::begin(m_trainImagesVector) ; it != std::end(m_trainImagesVector); ++it)
     {
         auto image = *it;
         auto label = m_labels[sampleId];
@@ -59,20 +85,20 @@ void RandomDecisionForest::subSample(){
         // bootstrap, subsample
         for(int k=0;k<PIXELS_PER_IMAGE; ++k)
         {
-            int i = (rand() % (image.rows-2*probe_distanceY)) + probe_distanceY;
-            int j = (rand() % (image.cols-2*probe_distanceX)) + probe_distanceX;
+            int i = (rand() % (image.rows-2*m_probe_distanceY)) + m_probe_distanceY;
+            int j = (rand() % (image.cols-2*m_probe_distanceX)) + m_probe_distanceX;
             auto intensity = image.at<uchar>(i,j);
             auto *px = new Pixel(Coord(i,j),intensity,img_inf);
-            pixelCloud.push_back(px);
+
+            m_pixelCloud.push_back(px);
         }
     }
 //    qDebug()<<"pixel Cloud : " << pixelCloud.size();
 
 }
 
-//given the image path, fills the vector with in the pixels of the image
-void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res, QString& filePath,ImageInfo* img_inf ){
-    cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+//FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
+void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat &image ,ImageInfo* img_inf ){
 
     for(int i =0; i<image.rows;i++)
     {
@@ -88,12 +114,13 @@ void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res, QString& file
 
 void RandomDecisionForest::printPixelCloud()
 {
-    for(auto pPixel : pixelCloud)
+    for(auto pPixel : m_pixelCloud)
         printPixel(pPixel);
 }
 
-void RandomDecisionForest::printPixel(Pixel* px){
-    qDebug() << "Pixel{ Coor("    << px->position.x     << ","     << px->position.y
+void RandomDecisionForest::printPixel(Pixel* px)
+{
+    qDebug() << "Pixel{ Coor("    << px->position.m_x     << ","     << px->position.m_y
              << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
              << ") = "            << px->intensity << "}";
 }
@@ -102,12 +129,12 @@ void RandomDecisionForest::printPixel(Pixel* px){
 void RandomDecisionForest::generateTeta(Coord& crd)
 {
     // random number between -probe_distance, probe_distance
-    crd.x = (rand() % (2*probe_distanceX)) - probe_distanceX;
-    crd.y = (rand() % (2*probe_distanceY)) - probe_distanceY;
+    crd.m_x = (rand() % (2*m_probe_distanceX)) - m_probe_distanceX;
+    crd.m_y = (rand() % (2*m_probe_distanceY)) - m_probe_distanceY;
 }
 
-//random taw value
-int RandomDecisionForest::generateTaw()
+//random tau value
+int RandomDecisionForest::generateTau()
 {
     // random number between -127, +128
     return (rand() % 256) - 127;
@@ -117,9 +144,8 @@ float RandomDecisionForest::calculateEntropy(cv::Mat& hist)
 {
     float entr = 0;
     float totalSize=0;
-
-
     int nCols = hist.cols;
+
     for(int i=0; i<nCols; ++i)
         totalSize += hist.at<float>(0, i);
 
@@ -153,45 +179,8 @@ cv::Mat RandomDecisionForest::createHistogram(std::vector<Pixel*>& pixels){
 }
 
 // given a letter returns its index on label histogram
-
-
 // checks if a pixel will travel to the left of a given node
-bool RandomDecisionForest::isLeft(Pixel* p, Node&node, cv::Mat& img)
-{
-    int new_teta1X = node.teta1.x + p->position.x;
-    int new_teta1Y = node.teta1.y + p->position.y;
-
-    bool bIsOutOfRangeX = (new_teta1X > img.cols || new_teta1X < 0);
-    bool bIsOutOfRangeY = (new_teta1Y > img.rows || new_teta1Y < 0);
-
-    unsigned char intensity1=0;
-    if(!(bIsOutOfRangeX || bIsOutOfRangeY)){
-        intensity1 = img.at<uchar>(new_teta1X,new_teta1Y);
-    }
-
-    int new_teta2X = node.teta2.x + p->position.x ;
-    int new_teta2Y = node.teta2.y + p->position.y ;
-
-    bIsOutOfRangeX = (new_teta2X > img.cols || new_teta2X < 0);
-    bIsOutOfRangeY = (new_teta2Y > img.rows || new_teta2Y < 0);
-
-    unsigned char intensity2=0;
-    if(!(bIsOutOfRangeX || bIsOutOfRangeY)){
-        intensity2 = img.at<uchar>(new_teta2X,new_teta2Y);
-    }
-
-    //    qDebug() << "Img ("<< img.cols << "," << img.rows << ")";
-    //    qDebug() << "Q1 ("<< new_teta1X << "," << new_teta1Y << ")";
-    //    qDebug() << "Q2 ("<< new_teta2X << "," << new_teta2Y << ")";
-    //    qDebug() << "Pixels ("<< intensity1 << "," << intensity2 << ")";
-    //    qDebug() << "Taw ("<< node.taw << ")";
-
-    return ((intensity1- intensity2) <= node.taw);
-}
-
 // divide pixel vector into 2 parts according to the parameters of parent node
-
-
 // returns the image the pixel belongs to
 cv::Mat RandomDecisionForest::getPixelImage(Pixel* px){
     QString path = m_dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
@@ -207,24 +196,85 @@ void RandomDecisionForest::trainTree()
     Node root;
     root.id = 1;
     root.isLeaf = false;
-    root.taw = generateTaw();
+    root.tau = generateTau();
     generateTeta(root.teta1);
     generateTeta(root.teta2);
     qDebug()<<"Temp Tree Size trainTree: "<< m_tempTree.size();
     m_tempTree[root.id-1] = root;
     m_depth=1;
     m_numOfLeaves = 0 ;
-    constructTree(root,pixelCloud);
+    constructTree(root,m_pixelCloud);
     qDebug() << "TREE CONSTRUCTED: LEAVES:" << m_numOfLeaves << " LETTER SAMPLES: " << m_numOfLetters;
+    qDebug() << "Pixel Sizes Are" << (pixelSizesConsistent() ? "Consistent" : "Not Consistent") ;
+}
 
-//    printTree();
+bool RandomDecisionForest::pixelSizesConsistent()
+{
+    auto nPixelsOnLeaves=0u;
+    for(Node node : m_tempTree)
+    {
+        if(node.isLeaf)
+            nPixelsOnLeaves += getTotalNumberOfPixels(node.hist);
+    }
+    return m_pixelCloud.size() == nPixelsOnLeaves;
+}
 
+//padded image index must be provided
+cv::Mat RandomDecisionForest::classify(int index)
+{
+    cv::Mat test_image = m_testImagesVector[index];
+    int n_rows=test_image.rows;
+    int n_cols=test_image.cols;
+    //typecheck
+    cv::Mat res_image = cv::Mat(n_rows-2*m_probe_distanceY, n_cols-2*m_probe_distanceX, test_image.type());
+    ImageInfo* img_Info = new ImageInfo(' ', index);
 
+    for(int r=m_probe_distanceY; r<n_rows-m_probe_distanceY; ++r)
+    {
+        for(int c=m_probe_distanceX; c<n_cols-m_probe_distanceX; ++c)
+        {
+           //qDebug() << QString::number(r) << "," << QString::number(c) ;
+            auto intensity = test_image.at<uchar>(r,c);
+            auto *px = new Pixel(Coord(r,c),intensity,img_Info);
+            cv::Mat probHist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
+
+            for(auto tree : m_forest)
+            {
+                Node leaf = getLeafNode(px, 0, tree.m_tree);
+                probHist += leaf.hist;
+            }
+            // Type check of label
+            //printHistogram(probHist);
+            auto label = getMaxLikelihoodIndex(probHist);
+            res_image.at<uchar>(r-m_probe_distanceY,c-m_probe_distanceX) = label;
+        }
+    }
+    return res_image;
+}
+
+void RandomDecisionForest::test()
+{
+    int size = m_testImagesVector.size();
+    qDebug() << QString::number(size);
+    for(auto i=0; i<size; ++i)
+    {
+        cv::Mat original = m_testImagesVector[i];
+        qDebug() << QString::number(i);
+        cv::Mat prediction = classify(i);
+        qDebug() << QString::number(i) << "labeled";
+        cv::imshow("Colored Image", colorCoder(prediction,original));
+        cv::waitKey();
+    }
 }
 
 // checks if pixels of a letter belong to that letter
-bool RandomDecisionForest::test(std::vector<Pixel*>& letterPixels, char letter, Tree tree)
+bool RandomDecisionForest::test(const cv::Mat& image, char letter, const Tree &tree)
 {
+    int dummy = 0 ;  // sample id dummy at the moment !s
+    ImageInfo* img_Info = new ImageInfo(letter, dummy);
+    std::vector<Pixel*> letterPixels;
+    imageToPixels(letterPixels, image, img_Info);
+
     cv::Mat hist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
     for (std::vector<Pixel*>::iterator it = letterPixels.begin() ; it != letterPixels.end(); ++it)
     {
@@ -240,6 +290,30 @@ bool RandomDecisionForest::test(std::vector<Pixel*>& letterPixels, char letter, 
     return(letterIndexPredicted==letterIndexOriginal);
 }
 
+cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage)
+{
+    cv::Mat color(InputImage.rows, InputImage.cols, CV_8UC1);
+    //create color code Mat accoridng to of each pixel.
+    for(int i =0; i<InputImage.rows;i++)
+    {
+        for(int j =0; j<InputImage.cols;j++)
+        {
+            auto label = labelImage.at<double>(i,j);
+            color.at<double>(i,j) = (label/NUM_LABELS)*255;
+        }
+    }
+    //create 3 channel image with 2 channels with same intensity values of cv::Mat color :
+    std::vector<cv::Mat> Image_channels(3);
+    Image_channels.at(0) = InputImage;
+    Image_channels.at(1) = color;
+    Image_channels.at(2) = color;
+    cv::Mat codedImage;
+
+    cv::merge(Image_channels,codedImage);
+
+    return codedImage;
+}
+
 void RandomDecisionForest::setTrainPath(QString path)
 {
     this->m_trainpath = path;
@@ -247,11 +321,12 @@ void RandomDecisionForest::setTrainPath(QString path)
 
 void RandomDecisionForest::setTestPath(QString path)
 {
-    this->testpath = path;
+    this->m_testpath = path;
 }
 
 void RandomDecisionForest::trainForest()
 {
+    qDebug()<<"no of trees : " << m_no_of_trees;
     for (int i = 0; i < m_no_of_trees; ++i) {
         trainTree();
         RandomDecisionTree trainedTree;
@@ -266,27 +341,15 @@ void RandomDecisionForest::trainForest()
 }
 
 
+
+
 // return the index of the bin with maximum number of pixels
 
 
 // starting from the node with nodeID
-// recursively find the leaf node the pixel belongs to
+// recursively find the leaf node of a pixel belongs to
 // fix tree in recursive
-Node RandomDecisionForest::getLeafNode(Pixel*px, int nodeId, Tree tree){
 
-    Node root = tree[nodeId];
-    if(root.isLeaf) {
-        // qDebug()<<"LEAF REACHED :"<<root.id;
-        return root;
-    }
-
-    cv::Mat img = imagesVector[px->imgInfo->sampleId];
-    int childId = root.id *2 ;
-    //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
-    if(!isLeft(px,root,img))
-        childId++;
-    return getLeafNode(px,childId-1, tree);
-}
 
 
 
@@ -313,7 +376,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     Node leftChildNode;
     leftChildNode.id = 2*root.id;
     leftChildNode.isLeaf = false;
-    leftChildNode.taw = generateTaw();
+    leftChildNode.tau = generateTau();
     generateTeta(leftChildNode.teta1);
     generateTeta(leftChildNode.teta2);
     m_tempTree[leftChildNode.id-1] = leftChildNode;
@@ -322,7 +385,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     Node rightChildNode;
     rightChildNode.id = 2*root.id+1;
     rightChildNode.isLeaf=false;
-    rightChildNode.taw = generateTaw();
+    rightChildNode.tau = generateTau();
     generateTeta(rightChildNode.teta1);
     generateTeta(rightChildNode.teta2);
     m_tempTree[rightChildNode.id-1] = rightChildNode;
@@ -371,7 +434,7 @@ void RandomDecisionForest::tuneParameters(std::vector<Pixel*>& parentPixels, Nod
         {
             maxTeta1 = parent.teta1;
             maxTeta2 = parent.teta2;
-            maxTaw   = parent.taw;
+            maxTaw   = parent.tau;
             maxGain = infoGain;
             itr = 0 ;
         }
@@ -382,17 +445,17 @@ void RandomDecisionForest::tuneParameters(std::vector<Pixel*>& parentPixels, Nod
         right.clear();
         generateTeta(parent.teta1);
         generateTeta(parent.teta2);
-        parent.taw = generateTaw();
+        parent.tau = generateTau();
     }
 
-    parent.taw = maxTaw;
+    parent.tau = maxTaw;
     parent.teta1 = maxTeta1;
     parent.teta2 = maxTeta2;
 }
 
 int RandomDecisionForest::pixelCloudSize()
 {
-    return pixelCloud.size();
+    return m_pixelCloud.size();
 }
 
 void RandomDecisionForest::printHistogram(cv::Mat &hist)
@@ -406,9 +469,9 @@ void RandomDecisionForest::printHistogram(cv::Mat &hist)
 void RandomDecisionForest::printNode(Node& node){
     QString res = "NODE {";
     qDebug() << "Id:"   << node.id
-             << "Taw: " << node.taw
-             << "Q1{" << node.teta1.x << "," << node.teta1.y
-             << "Q2{" << node.teta2.x << "," << node.teta2.y;
+             << "Taw: " << node.tau
+             << "Q1{" << node.teta1.m_x << "," << node.teta1.m_y
+             << "Q2{" << node.teta2.m_x << "," << node.teta2.m_y;
     printHistogram(node.hist);
     qDebug() << "}";
 }
@@ -419,17 +482,13 @@ void RandomDecisionForest::printTree(RandomDecisionTree tree)
     qDebug() << "Depth : " << tree.m_depth;
     qDebug() << "Leaves: " << tree.m_numberofleaves;
     int count = 0 ;
-    for (auto it = std::begin(tree.m_tree) ; it != std::end(tree.m_tree); ++it)
+    for (auto node : tree.m_tree)
     {
-        Node node = *it;
-
         if(node.isLeaf)
         {
             ++count;
             printHistogram(node.hist);
         }
-
-
     }
     qDebug()<< "Number of leaves : " << count ;
 

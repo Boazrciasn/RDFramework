@@ -8,7 +8,16 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
     int leftMargin = 0, rightMargin = img_bw.cols;
 //    qDebug() << "Default: " << leftMargin << "  " << rightMargin;
     getRange(img_bw,leftMargin, rightMargin,parent);
+
+//    leftMargin = leftMargin - 50;
+//    rightMargin = rightMargin + 50;
+//    if(leftMargin < 0)
+//        leftMargin = 0;
+//    if(rightMargin > img_bw.cols)
+//        rightMargin = img_bw.cols;
+
     qDebug() << "Computed: " << leftMargin << "  " << rightMargin;
+    qDebug() << "Image size: " << img_bw.rows << "  " << img_bw.cols;
 
     // calculate histogram
     QVector<QRect> result;
@@ -28,18 +37,14 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
 
 //    Util::plot(hist,parent);
 
-    // TODO: make generic
-    // Line detection threshold
-    float meanVal = cv::mean(hist)[0];
-    float lnThreshold = 0.50*meanVal;
-    qDebug() << "lnThreshold " << lnThreshold;
-
     // binarize
     QVector<int> y(range);
+    float lineThreshold = 0.70*cv::mean(hist)[0];
+    qDebug() << "lineThreshold: " << lineThreshold;
 
     for (int i=0; i < range; ++i)
     {
-        if (hist.at<float>(i) < lnThreshold)
+        if (hist.at<float>(i) < lineThreshold)
             y[i]  = 0;
         else
             y[i] = 1;
@@ -48,15 +53,22 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
     QVector<int> line_y = extractCoordinateFrom(y);
     y.clear();
 
+    qDebug() << " line_y: " << line_y.size();
+
     // for each line
-    range = rightMargin;
+    range = rightMargin - leftMargin;
     QVector<int> x(range);
     QVector<int> line_x;
 
     for (int row = 0; row < line_y.size()-1; row+=2) {
+//    for (int row = 20; row < 21; row+=2) {
+        if(line_y[row+1] - line_y[row] < 10)
+            continue;
+//        qDebug() << row << " line: " << line_y[row] << " " << line_y[row+1];
+
         hist.release();
 
-        for (int i=0; i < range; ++i)
+        for (int i=leftMargin; i < rightMargin; ++i)
         {
             int tmp = cv::sum(img_bw(cv::Range(line_y[row],line_y[row+1]),cv::Range(i,i+1)))[0];
             hist.push_back(tmp);
@@ -66,34 +78,44 @@ QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget 
         cv::minMaxLoc(hist,&minVal,&maxVal);
         hist = hist/maxVal;
 
-        // 1D average filter
-        for (int i=10; i < range-10; ++i)
-        {
-            hist.at<float>(i) = cv::sum(hist(cv::Range(i-10,i+10),cv::Range::all()))[0]/20;
-        }
+        // TODO: WHat is 10? make it line specific as well
+//        Util::plot(hist,parent);
+        int ksize = 51;
+
+
+//        cv::blur(hist,hist,cv::Size(ksize,ksize));
+//        cv::medianBlur(hist,hist,ksize);
+        cv::GaussianBlur(hist, hist, cv::Size(ksize,ksize),0, 0);
+
+
+//        for (int i=windSize; i < range-windSize; ++i)
+//        {
+////            hist.at<float>(i) = cv::sum(hist(cv::Range(i-windSize,i+windSize),cv::Range::all()))[0]/(2*windSize);
+////            hist.at<float>(i) = cv::medi(hist(cv::Range(i-windSize,i+windSize),cv::Range::all()))[0]/(2*windSize);
+//        }
 
 //        Util::plot(hist,parent);
 
-        // TODO: make generic
-        // Line detection threshold
-        meanVal = cv::mean(hist)[0];
-        float wrdThreshold = 0.50*meanVal;
-//        qDebug() << "wrdThreshold " << wrdThreshold;
+        float wordThreshold = 0.50*cv::mean(hist)[0];
+//        qDebug() << "wordThreshold: " << wordThreshold;
+
 
         for (int i=0; i < range; ++i)
         {
-            if (hist.at<float>(i) < wrdThreshold || i < leftMargin)
+            if (hist.at<float>(i) < wordThreshold || i < leftMargin)
                 x[i]  = 0;
             else
                 x[i] = 1;
         }
 
         line_x = extractCoordinateFrom(x);
+//        qDebug() << row << " line_x: " << line_x.size();
+
         int w, h = line_y[row+1] - line_y[row];
 
         for (int i = 0; i < line_x.size(); i+=2) {
             w = line_x[i+1]-line_x[i];
-            result.push_back(QRect(line_x[i],line_y[row],w,h));
+            result.push_back(QRect(line_x[i] + leftMargin,line_y[row],w,h));
         }
 
         line_x.clear();

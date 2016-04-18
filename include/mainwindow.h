@@ -35,6 +35,8 @@ private slots:
     void on_extractWords_clicked();
     void on_actionAnnotation_Extractor_triggered();
 
+    void on_actionRDF_triggered();
+
 private:
     void setLable();
 

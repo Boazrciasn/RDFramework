@@ -1,5 +1,7 @@
 #include "include/mainwindow.h"
 #include "include/annextractordialog.h"
+#include "include/rdfdialog.h"
+
 #include "include/TextRegionDetector.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
@@ -120,5 +122,11 @@ void MainWindow::on_extractWords_clicked()
 void MainWindow::on_actionAnnotation_Extractor_triggered()
 {
     AnnExtractorDialog *mDialog = new AnnExtractorDialog(this);
+    mDialog->exec();
+}
+
+void MainWindow::on_actionRDF_triggered()
+{
+    RDFDialog *mDialog = new RDFDialog(this);
     mDialog->exec();
 }
