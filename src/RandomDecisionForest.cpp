@@ -179,14 +179,8 @@ cv::Mat RandomDecisionForest::createHistogram(std::vector<Pixel*>& pixels){
 }
 
 // given a letter returns its index on label histogram
-
-
 // checks if a pixel will travel to the left of a given node
-
-
 // divide pixel vector into 2 parts according to the parameters of parent node
-
-
 // returns the image the pixel belongs to
 cv::Mat RandomDecisionForest::getPixelImage(Pixel* px){
     QString path = m_dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
@@ -212,7 +206,6 @@ void RandomDecisionForest::trainTree()
     constructTree(root,m_pixelCloud);
     qDebug() << "TREE CONSTRUCTED: LEAVES:" << m_numOfLeaves << " LETTER SAMPLES: " << m_numOfLetters;
     qDebug() << "Pixel Sizes Are" << (pixelSizesConsistent() ? "Consistent" : "Not Consistent") ;
-//  printTree();
 }
 
 bool RandomDecisionForest::pixelSizesConsistent()
@@ -223,7 +216,6 @@ bool RandomDecisionForest::pixelSizesConsistent()
         if(node.isLeaf)
             nPixelsOnLeaves += getTotalNumberOfPixels(node.hist);
     }
-
     return m_pixelCloud.size() == nPixelsOnLeaves;
 }
 
@@ -233,13 +225,15 @@ cv::Mat RandomDecisionForest::classify(int index)
     cv::Mat test_image = m_testImagesVector[index];
     int n_rows=test_image.rows;
     int n_cols=test_image.cols;
-    cv::Mat res_image = cv::Mat(n_rows, n_cols,test_image.type());
+    //typecheck
+    cv::Mat res_image = cv::Mat(n_rows-2*m_probe_distanceY, n_cols-2*m_probe_distanceX, test_image.type());
     ImageInfo* img_Info = new ImageInfo(' ', index);
-    for(int r=m_probe_distanceY;r<n_rows-m_probe_distanceY; ++r)
+
+    for(int r=m_probe_distanceY; r<n_rows-m_probe_distanceY; ++r)
     {
-        for(int c=m_probe_distanceX;c<n_cols-m_probe_distanceX; ++c)
+        for(int c=m_probe_distanceX; c<n_cols-m_probe_distanceX; ++c)
         {
-           qDebug() << QString::number(r) << "," << QString::number(c) ;
+           //qDebug() << QString::number(r) << "," << QString::number(c) ;
             auto intensity = test_image.at<uchar>(r,c);
             auto *px = new Pixel(Coord(r,c),intensity,img_Info);
             cv::Mat probHist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
@@ -249,10 +243,10 @@ cv::Mat RandomDecisionForest::classify(int index)
                 Node leaf = getLeafNode(px, 0, tree.m_tree);
                 probHist += leaf.hist;
             }
-
-            printHistogram(probHist);
+            // Type check of label
+            //printHistogram(probHist);
             auto label = getMaxLikelihoodIndex(probHist);
-            res_image.at<uchar>(r,c) = label;
+            res_image.at<uchar>(r-m_probe_distanceY,c-m_probe_distanceX) = label;
         }
     }
     return res_image;
@@ -264,12 +258,12 @@ void RandomDecisionForest::test()
     qDebug() << QString::number(size);
     for(auto i=0; i<size; ++i)
     {
-        cv::Mat original  =  m_testImagesVector[i];
+        cv::Mat original = m_testImagesVector[i];
         qDebug() << QString::number(i);
         cv::Mat prediction = classify(i);
         qDebug() << QString::number(i) << "labeled";
-        //cv::imshow("Colored Image", colorCoder(prediction,original));
-        //cv::waitKey();
+        cv::imshow("Colored Image", colorCoder(prediction,original));
+        cv::waitKey();
     }
 }
 
@@ -332,6 +326,7 @@ void RandomDecisionForest::setTestPath(QString path)
 
 void RandomDecisionForest::trainForest()
 {
+    qDebug()<<"no of trees : " << m_no_of_trees;
     for (int i = 0; i < m_no_of_trees; ++i) {
         trainTree();
         RandomDecisionTree trainedTree;

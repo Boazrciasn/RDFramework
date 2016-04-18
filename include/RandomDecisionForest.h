@@ -95,29 +95,17 @@ public:
     float calculateEntropy(cv::Mat& hist);
     float calculateEntropyOfVector(std::vector<Pixel*>& pixels);
     cv::Mat createHistogram(std::vector<Pixel*>& pixels);
+
     inline bool isLeft(Pixel* p, Node& node, cv::Mat& img)
     {
         int new_teta1X = node.teta1.m_x + p->position.m_x;
-        int new_teta1Y = node.teta1.m_y + p->position.m_y;
-
-        bool bIsOutOfRangeX = (new_teta1X > img.cols || new_teta1X < 0);
-        bool bIsOutOfRangeY = (new_teta1Y > img.rows || new_teta1Y < 0);
-
-        unsigned char intensity1=0;
-        if(!(bIsOutOfRangeX || bIsOutOfRangeY)){
-            intensity1 = img.at<uchar>(new_teta1X,new_teta1Y);
-        }
+        int new_teta1Y = node.teta1.m_y + p->position.m_y;                
+        unsigned char intensity1 = img.at<uchar>(new_teta1X,new_teta1Y);
 
         int new_teta2X = node.teta2.m_x + p->position.m_x ;
         int new_teta2Y = node.teta2.m_y + p->position.m_y ;
+        unsigned char intensity2 = img.at<uchar>(new_teta2X,new_teta2Y);
 
-        bIsOutOfRangeX = (new_teta2X > img.cols || new_teta2X < 0);
-        bIsOutOfRangeY = (new_teta2Y > img.rows || new_teta2Y < 0);
-
-        unsigned char intensity2=0;
-        if(!(bIsOutOfRangeX || bIsOutOfRangeY)){
-            intensity2 = img.at<uchar>(new_teta2X,new_teta2Y);
-        }
 
         //    qDebug() << "Img ("<< img.cols << "," << img.rows << ")";
         //    qDebug() << "Q1 ("<< new_teta1X << "," << new_teta1Y << ")";
@@ -168,7 +156,6 @@ public:
             // qDebug()<<"LEAF REACHED :"<<root.id;
             return root;
         }
-
         cv::Mat img = m_testImagesVector[px->imgInfo->sampleId];
         int childId = root.id *2 ;
         //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;

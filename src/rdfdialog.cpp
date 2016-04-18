@@ -16,13 +16,13 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::on_loadTrainData_button_clicked()
 {
-    train_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    train_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->label_train->setText(train_dir);
 }
 
 void RDFDialog::on_loadTestData_button_clicked()
 {
-    test_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    test_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->label_test->setText(test_dir);
 }
 
@@ -37,7 +37,6 @@ void RDFDialog::on_train_button_clicked()
     forest->setTrainPath(train_dir);
     forest->setNumberofTrees(nTrees);
     forest->readTrainingImageFiles();
-    forest->trainForest();
     ui->label_train->setText( ui->label_train->text() +  "\n Training images read");
     forest->trainForest();
     ui->label_train->setText(  "Forest Trained ! ");
