@@ -15,7 +15,6 @@ int main(int argc, char *argv[]) {
 
    /*
     //QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
-
     QString tempdir = "/home/mahiratmis/Desktop/AnnotationResults";
     //    QString tempdir = "/home/vvglab/Desktop/ImageCLEF/AnnotationResults";
     RandomDecisionForest* rdf = new RandomDecisionForest(5,5);
@@ -24,19 +23,11 @@ int main(int argc, char *argv[]) {
     rdf->setTrainPath(tempdir);
     rdf->readTrainingImageFiles();
     rdf->trainForest();
-
-
     // Util::convertToOSRAndBlure(tempdir,tempdir,4);
-
-
     //    qDebug() << " CloudSize = " << rdf->pixelCloudSize();
     //    //rdf->printPixelCloud();
     //    rdf->train();
-
-
     // rdf->printTree();
-
-
     //    vector<Pixel*> res;
     //    QString filename = tempdir + "/a/a_0.jpg";
     //    ImageInfo* img_inf = new ImageInfo('a',0);
@@ -45,7 +36,6 @@ int main(int argc, char *argv[]) {
     //        qDebug() << "YEAYYYYY";
     //    else
     //        qDebug() << "COME ONNN";
-
     //    vector<Pixel*> res2;
     //    filename = tempdir + "/b/b_10.jpg";
     //    img_inf = new ImageInfo('b',10);
@@ -54,13 +44,9 @@ int main(int argc, char *argv[]) {
     //        qDebug() << "YEAYYYYY";
     //    else
     //        qDebug() << "COME ONNN";
-
     rdf->printTree(rdf->m_forest[0]);
     //rdf->printPixelCloud();
-
-
     // TEST :
-
     auto test_px = rdf->m_pixelCloud[6001];
     qDebug()<<"test pixel info : " << test_px->imgInfo->label;
     auto leaf = rdf->getLeafNode(test_px, 0, rdf->m_forest[0].m_tree);
@@ -73,8 +59,6 @@ int main(int argc, char *argv[]) {
     }
     rdf->printHistogram(hist_total);
     rdf->printHistogram(leaf.hist);
-
-
    */
 
 

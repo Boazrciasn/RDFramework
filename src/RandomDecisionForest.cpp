@@ -53,7 +53,7 @@ void RandomDecisionForest::readTestImageFiles(){
     for (auto filePath : fNames)
     {
         QString fileName = Util::fileNameWithoutPath(filePath);
-        qDebug() << fileName ;
+        //qDebug() << fileName ;
         //each directory contains lastsession.txt
         if(!fileName.contains("_"))
             continue;
@@ -258,12 +258,13 @@ void RandomDecisionForest::test()
     qDebug() << QString::number(size);
     for(auto i=0; i<size; ++i)
     {
-        cv::Mat original = m_testImagesVector[i];
+        cv::Mat original = unpad(m_testImagesVector[i]);
         qDebug() << QString::number(i);
         cv::Mat prediction = classify(i);
         qDebug() << QString::number(i) << "labeled";
         //cv::imshow("Colored Image", colorCoder(prediction,original));
         //cv::waitKey();
+
     }
 }
 
