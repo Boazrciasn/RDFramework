@@ -98,8 +98,8 @@ void RandomDecisionForest::subSample(){
 }
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
-void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat &image ,ImageInfo* img_inf ){
-
+void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat &image ,ImageInfo* img_inf )
+{
     for(int i =0; i<image.rows;i++)
     {
         for(int j =0; j<image.cols;j++)
@@ -109,7 +109,6 @@ void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat 
             res.push_back(px);
         }
     }
-
 }
 
 void RandomDecisionForest::printPixelCloud()
@@ -233,20 +232,21 @@ cv::Mat RandomDecisionForest::classify(int index)
     {
         for(int c=m_probe_distanceX; c<n_cols-m_probe_distanceX; ++c)
         {
-           //qDebug() << QString::number(r) << "," << QString::number(c) ;
+            //qDebug() << QString::number(r) << "," << QString::number(c) ;
             auto intensity = test_image.at<uchar>(r,c);
             auto *px = new Pixel(Coord(r,c),intensity,img_Info);
             cv::Mat probHist = cv::Mat::zeros(1,NUM_LABELS,cv::DataType<float>::type);
 
-            for(auto tree : m_forest)
+            for(int i=0; i<m_forest.size(); i++)
             {
-                Node leaf = getLeafNode(px, 0, tree.m_tree);
+                Node leaf = getLeafNode(px, 0, m_forest[i].m_tree);
                 probHist += leaf.hist;
             }
             // Type check of label
             //printHistogram(probHist);
             auto label = getMaxLikelihoodIndex(probHist);
             res_image.at<uchar>(r-m_probe_distanceY,c-m_probe_distanceX) = label;
+            probHist.release();
         }
     }
     return res_image;
@@ -262,8 +262,8 @@ void RandomDecisionForest::test()
         qDebug() << QString::number(i);
         cv::Mat prediction = classify(i);
         qDebug() << QString::number(i) << "labeled";
-        cv::imshow("Colored Image", colorCoder(prediction,original));
-        cv::waitKey();
+        //cv::imshow("Colored Image", colorCoder(prediction,original));
+        //cv::waitKey();
     }
 }
 
