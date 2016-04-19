@@ -53,7 +53,7 @@ void RandomDecisionForest::readTestImageFiles(){
     for (auto filePath : fNames)
     {
         QString fileName = Util::fileNameWithoutPath(filePath);
-        qDebug() << fileName ;
+        //qDebug() << fileName ;
         //each directory contains lastsession.txt
         if(!fileName.contains("_"))
             continue;
@@ -247,6 +247,8 @@ cv::Mat RandomDecisionForest::classify(int index)
             //printHistogram(probHist);
             auto label = getMaxLikelihoodIndex(probHist);
             res_image.at<uchar>(r-m_probe_distanceY,c-m_probe_distanceX) = label;
+            //create hist
+
         }
     }
     return res_image;
@@ -258,12 +260,11 @@ void RandomDecisionForest::test()
     qDebug() << QString::number(size);
     for(auto i=0; i<size; ++i)
     {
-        cv::Mat original = m_testImagesVector[i];
+        cv::Mat original = unpad(m_testImagesVector[i]);
         qDebug() << QString::number(i);
         cv::Mat prediction = classify(i);
-        qDebug() << QString::number(i) << "labeled";
-        cv::imshow("Colored Image", colorCoder(prediction,original));
-        cv::waitKey();
+        std::cout<<" LABEL IMAGE  : \n" << prediction << std::endl;
+
     }
 }
 

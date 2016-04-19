@@ -137,6 +137,17 @@ public:
         return totalSize;
     }
 
+
+    inline cv::Mat unpad(cv::Mat img)
+    {
+        int width = img.cols-2*m_probe_distanceX, height = img.rows-2*m_probe_distanceY;
+        cv::Rect roi_rect = cv::Rect(m_probe_distanceX, m_probe_distanceY, width, height );
+        cv::Mat unpadded ;
+        img(roi_rect).copyTo(unpadded);
+        return unpadded;
+
+    }
+
     cv::Mat classify(int index);
     void test();
     bool test(const cv::Mat& image, char letter, const Tree &tree);
