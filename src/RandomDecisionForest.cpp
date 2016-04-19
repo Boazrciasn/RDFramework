@@ -46,6 +46,7 @@ void RandomDecisionForest::readTrainingImageFiles(){
 
 void RandomDecisionForest::readTestImageFiles(){
 
+    m_testImagesVector.clear();
     m_dir = m_testpath;
     std::vector<QString> fNames;
     auto *reader = new Reader();
@@ -249,6 +250,7 @@ cv::Mat RandomDecisionForest::classify(int index)
             probHist.release();
         }
     }
+
     return res_image;
 }
 
@@ -258,13 +260,19 @@ void RandomDecisionForest::test()
     qDebug() << QString::number(size);
     for(auto i=0; i<size; ++i)
     {
-        cv::Mat original = unpad(m_testImagesVector[i]);
-        qDebug() << QString::number(i);
-        cv::Mat prediction = classify(i);
-        qDebug() << QString::number(i) << "labeled";
-        //cv::imshow("Colored Image", colorCoder(prediction,original));
-        //cv::waitKey();
-
+        cv::Mat votes = cv::Mat::zeros(1, NUM_LABELS, CV_32FC1);
+//        cv::Mat original = unpad(m_testImagesVector[i]);
+        //qDebug() << QString::number(i);
+        //qDebug() << QString::number(i) << "labeled";
+//        cv::Mat colored_img = colorCoder(prediction,original);
+//        cv::imshow("Colored Image",colored_img );
+//        cv::waitKey();
+        cv::Mat label_image = classify(i);
+        getImageLabelVotes(label_image, votes);
+        std::cout<<votes<<std::endl;
+        int label = getMaxLikelihoodIndex(votes);
+        qDebug()<<" LABELED : "<< label;
+        votes.release();
     }
 }
 
@@ -304,6 +312,7 @@ cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Ma
         }
     }
     //create 3 channel image with 2 channels with same intensity values of cv::Mat color :
+
     std::vector<cv::Mat> Image_channels(3);
     Image_channels.at(0) = InputImage;
     Image_channels.at(1) = color;

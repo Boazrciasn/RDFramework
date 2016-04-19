@@ -195,6 +195,21 @@ public:
         return letter-'a';
     }
 
+    inline void getImageLabelVotes(const cv::Mat& label_image, cv::Mat& vote_vector)
+    {
+        if(vote_vector.cols != NUM_LABELS)
+        {
+            std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
+            return;
+        }
+        int rows = label_image.rows;
+        int cols = label_image.cols;
+        for (int i = 0; i < rows ; ++i)
+            for (int j = 0; j < cols; ++j)
+                ++vote_vector.at<float>(label_image.at<float>(i,j));
+    }
+
+
     void imageToPixels(std::vector<Pixel*>& res, const cv::Mat &image,ImageInfo* img_inf);
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void setTrainPath(QString path);
