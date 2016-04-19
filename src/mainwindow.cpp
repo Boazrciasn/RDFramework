@@ -26,7 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::display()
 {
     QString fileName = dir + "/" +this->fNames[fileIndex];
-    QImage image(fileName + ".jpg");
+//    QImage image(fileName + ".jpg");
+    QImage image(fileName + ".png");
 
     // Testing
     cv::Mat img_bw = Util::toCv(image,CV_8UC4);
@@ -35,7 +36,9 @@ void MainWindow::display()
     img_bw.convertTo(img_bw,CV_32FC1);
     img_bw = 255 - img_bw;
 
-    QVector<QRect> out = TextRegionDetector::detectRegions(img_bw,this);
+    QVector<QRect> out = TextRegionDetector::detectWordsFromLine(img_bw,this);
+
+//    QVector<QRect> out = TextRegionDetector::detectRegions(img_bw,this);
     QPainter qPainter(&image);
     qPainter.setBrush(Qt::NoBrush);
     qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));

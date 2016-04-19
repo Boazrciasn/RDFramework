@@ -2,6 +2,58 @@
 #include "include/Util.h"
 #include "iostream"
 
+
+QVector<QRect> TextRegionDetector::detectWordsFromLine(const cv::Mat &lineImg, QWidget *parent)
+{
+    QVector<QRect> result;
+    cv::Mat hist;
+//    cv::imshow("line Image", lineImg);
+
+    // calculate histogram
+    int range = lineImg.cols;
+    for (int i=0; i < range; ++i)
+        hist.push_back(cv::sum(lineImg.col(i))[0]);
+
+    // convert to CV_32FC1 and normalize
+    hist.convertTo(hist,CV_32FC1);
+    double minVal,maxVal;
+    cv::minMaxLoc(hist,&minVal,&maxVal);
+    hist = hist/maxVal;
+
+    // Gaussian filtering
+    int ksize = 33;
+    cv::GaussianBlur(hist, hist, cv::Size(ksize,ksize),0, 0);
+//    Util::plot(hist,parent);
+
+
+    // binarize
+    QVector<int> x(range);
+    float wordThreshold = 0.45*cv::mean(hist)[0];
+
+    for (int i=0; i < range; ++i)
+    {
+        if (hist.at<float>(i) < wordThreshold)
+            x[i]  = 0;
+        else
+            x[i] = 1;
+    }
+
+    QVector<int> line_x = extractCoordinateFrom(x);
+    int y_start = 5;
+    int h = lineImg.rows - 10;
+    int w;
+
+
+    for (int i = 0; i < line_x.size(); i+=2) {
+        w = line_x[i+1]-line_x[i];
+        result.push_back(QRect(line_x[i],y_start,w,h));
+    }
+
+    qDebug()<<"I am done " << result.size();
+//    cv::waitKey(0);
+    return result;
+}
+
 QVector<QRect> TextRegionDetector::detectRegions(const cv::Mat &img_bw, QWidget *parent)
 {
 
@@ -130,7 +182,7 @@ QVector<int> TextRegionDetector::extractCoordinateFrom(QVector<int> coord)
 {
     // look for tmp reagion to merge
     int range = coord.size();
-    int tmp = 7;
+    int tmp = 15;
     for (int i=tmp; i < range; ++i)
         if (coord[i] == 1)
             for (int j= i-tmp; j < i; ++j)
@@ -205,18 +257,17 @@ void TextRegionDetector::getRange(const cv::Mat &img_bw, int &leftMargin, int &r
     cv::minMaxLoc(region,&minVals,&maxVals);
     region = region/maxVals;
 
-    // average filter
-    for (int i=50; i < region.rows-50; ++i)
-        region.at<float>(i) = cv::sum(region(cv::Range(i-50,i+50),cv::Range::all()))[0]/100;
+    // filter
+    cv::GaussianBlur(region, region, cv::Size(41,41),0, 0);
 
+//    Util::plot(tmp,parent);
     // calculate mean
     meanVal = cv::mean(region(cv::Range(1000,1800),cv::Range::all()))[0];
-//    qDebug() << meanVal;
 
     // binarize
     for (int i=0; i < region.rows; ++i)
     {
-        if (region.at<float>(i) < meanVal*0.6 || region.at<float>(i) > meanVal*2)
+        if (region.at<float>(i) > meanVal*2)
             region.at<float>(i)  = 0;
         else
             region.at<float>(i) = 1;
