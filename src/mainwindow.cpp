@@ -5,6 +5,7 @@
 #include "include/TextRegionDetector.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QShortcut>
 
 
 
@@ -18,6 +19,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->IMG_button->setChecked(true);
     ui->Rectangle_button->setChecked(true);
     connect(ui->runButton, SIGNAL (clicked()), this, SLOT (update()));
+
+
+    // Shortcut to Random Desicion Forest Window
+    QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionRDF_triggered()));
 }
 
 // ****************************** //

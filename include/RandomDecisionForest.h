@@ -16,22 +16,15 @@
 
 #include <time.h>       /* time */
 
-#define MAX_NUMITERATION_FOR_DIVISION 10
-#define PIXELS_PER_IMAGE 50
 #define MIN_ENTROPY 0.05
-#define NUM_LABELS 26 // should make it generic according to training input
 #define MAX_DEPTH 16
-#define MIN_LEAF_PIXELS 20
-
-
-
 
 struct Coord{
-    int m_x,m_y;
-    Coord(){m_x=0;m_y=0;}
+    int m_r,m_c;
+    Coord(){m_r=0;m_c=0;}
     Coord(int x, int y) :
-        m_x(x), m_y(y) {}
-    Coord(const Coord& crd) : m_x(crd.m_x), m_y(crd.m_x) {}
+        m_r(x), m_c(y) {}
+    Coord(const Coord& crd) : m_r(crd.m_r), m_c(crd.m_r) {}
 };
 
 struct ImageInfo
@@ -92,26 +85,56 @@ public:
     void printPixel(Pixel* px);
     void generateTeta(Coord& crd);
     int generateTau();
-    float calculateEntropy(cv::Mat& hist);
-    float calculateEntropyOfVector(std::vector<Pixel*>& pixels);
-    cv::Mat createHistogram(std::vector<Pixel*>& pixels);
+
+    inline float calculateEntropy(cv::Mat& hist)
+    {
+        float entr = 0;
+        float totalSize=0;
+        int nCols = hist.cols;
+
+        for(int i=0; i<nCols; ++i)
+            totalSize += hist.at<float>(0, i);
+
+        for(int i=0; i<hist.cols; ++i)
+        {
+            float nPixelsAt = hist.at<float>(0, i);
+            if(nPixelsAt>0)
+            {
+                float probability = nPixelsAt/totalSize;
+                entr += probability*(log2(1.0f/probability));
+            }
+        }
+        //cout << "ENTROPY : " << entr;
+        return entr;
+    }
+
+    inline float calculateEntropyOfVector(std::vector<Pixel*>& pixels)
+    {
+        cv::Mat hist = createHistogram(pixels);
+        return calculateEntropy(hist);
+    }
+
+    // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
+    inline cv::Mat createHistogram(std::vector<Pixel*>& pixels){
+        cv::Mat hist = cv::Mat::zeros(1,m_labelCount,cv::DataType<float>::type);
+        for (std::vector<Pixel*>::iterator it = pixels.begin() ; it != pixels.end(); ++it)
+        {
+            Pixel* px = *it;
+            int index = letterIndex(px->imgInfo->label);
+            hist.at<float>(0,index)++;
+        }
+        return hist;
+    }
 
     inline bool isLeft(Pixel* p, Node& node, cv::Mat& img)
     {
-        int new_teta1X = node.teta1.m_x + p->position.m_x;
-        int new_teta1Y = node.teta1.m_y + p->position.m_y;                
-        unsigned char intensity1 = img.at<uchar>(new_teta1X,new_teta1Y);
+        int new_teta1R = node.teta1.m_r + p->position.m_r;
+        int new_teta1C = node.teta1.m_c + p->position.m_c;
+        int intensity1 = img.at<uchar>(new_teta1R,new_teta1C);
 
-        int new_teta2X = node.teta2.m_x + p->position.m_x ;
-        int new_teta2Y = node.teta2.m_y + p->position.m_y ;
-        unsigned char intensity2 = img.at<uchar>(new_teta2X,new_teta2Y);
-
-
-        //    qDebug() << "Img ("<< img.cols << "," << img.rows << ")";
-        //    qDebug() << "Q1 ("<< new_teta1X << "," << new_teta1Y << ")";
-        //    qDebug() << "Q2 ("<< new_teta2X << "," << new_teta2Y << ")";
-        //    qDebug() << "Pixels ("<< intensity1 << "," << intensity2 << ")";
-        //    qDebug() << "Taw ("<< node.taw << ")";
+        int new_teta2R = node.teta2.m_r + p->position.m_r ;
+        int new_teta2C = node.teta2.m_c + p->position.m_c ;
+        int intensity2 = img.at<uchar>(new_teta2R,new_teta2C);
 
         return ((intensity1- intensity2) <= node.tau);
     }
@@ -197,7 +220,7 @@ public:
 
     inline void getImageLabelVotes(const cv::Mat& label_image, cv::Mat& vote_vector)
     {
-        if(vote_vector.cols != NUM_LABELS)
+        if(vote_vector.cols != m_labelCount)
         {
             std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
             return;
@@ -206,7 +229,7 @@ public:
         int cols = label_image.cols;
         for (int i = 0; i < rows ; ++i)
             for (int j = 0; j < cols; ++j)
-                ++vote_vector.at<float>(label_image.at<float>(i,j));
+                ++vote_vector.at<float>(label_image.at<uchar>(i,j));
     }
 
 
@@ -219,6 +242,27 @@ public:
     void setNumberofTrees(int no_of_trees){
         m_no_of_trees = no_of_trees;
     }
+
+    void setNumberofLabels(int no_of_labels){
+        m_labelCount = no_of_labels;
+    }
+
+    void setMaxDepth(int max_depth){
+        m_maxDepth = max_depth;
+    }
+
+    void setMaxIterationForDivision(int max_iteration){
+        m_maxIterationForDivision = max_iteration;
+    }
+
+    void setMinimumLeafPixelCount(unsigned int min_leaf_pixel_count){
+        m_minLeafPixelCount = min_leaf_pixel_count;
+    }
+
+    void setPixelsPerImage(int pixel_per_image_count){
+        m_pixelsPerImage = pixel_per_image_count;
+    }
+
 
     std::vector<Pixel*> pixelCloud;
     std::vector<cv::Mat> m_trainImagesVector;
@@ -243,6 +287,12 @@ private:
     int m_depth;
     float min_InfoGain;
     float max_InfoGain;
+    int m_maxDepth;
+    int m_pixelsPerImage;
+    unsigned int m_minLeafPixelCount;
+    int m_labelCount;
+    int m_maxIterationForDivision;
+
 };
 
 #endif

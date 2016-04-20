@@ -44,7 +44,7 @@
     <rect>
      <x>10</x>
      <y>12</y>
-     <width>121</width>
+     <width>120</width>
      <height>17</height>
     </rect>
    </property>
@@ -101,7 +101,7 @@
     </rect>
    </property>
    <property name="value">
-    <number>5</number>
+    <number>30</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="spinBox_probY">
@@ -114,7 +114,7 @@
     </rect>
    </property>
    <property name="value">
-    <number>5</number>
+    <number>30</number>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
@@ -220,6 +220,110 @@
      <string>Test</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QLabel" name="label_PixelsPerImage">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>12</y>
+     <width>110</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pixels per Image</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_PixelsPerImage">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>10</y>
+     <width>48</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>60</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_MinLeafPixels">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>34</y>
+     <width>110</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Min Leaf Pixels</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_MinLeafPixels">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>33</y>
+     <width>48</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>20</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_LabelCount">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>81</y>
+     <width>110</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Label Count</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_MaxIteration">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>59</y>
+     <width>110</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Max Iteration</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_MaxIteration">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>57</y>
+     <width>48</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>15</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_LabelCount">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>80</y>
+     <width>48</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>26</number>
+   </property>
   </widget>
  </widget>
  <resources/>
