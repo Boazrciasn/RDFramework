@@ -28,6 +28,15 @@ void RDFDialog::on_loadTestData_button_clicked()
 
 void RDFDialog::on_train_button_clicked()
 {
+    if(train_dir == NULL)
+    {
+        QMessageBox* msgBox = new QMessageBox();
+        msgBox->setWindowTitle("Error");
+        msgBox->setText("You Should First Choose a Training Data Folder");
+        msgBox->show();
+        return;
+    }
+
     int probDistX = ui->spinBox_probX->value();
     int probDistY = ui->spinBox_probY->value();
     int nTrees = ui->spinBox_NTrees->value();
@@ -55,6 +64,25 @@ void RDFDialog::on_train_button_clicked()
 
 void RDFDialog::on_test_button_clicked()
 {
+
+    if(test_dir == NULL)
+    {
+        QMessageBox* msgBox = new QMessageBox();
+        msgBox->setWindowTitle("Error");
+        msgBox->setText("You Should First Choose a Test Data Folder");
+        msgBox->show();
+        return;
+    }
+
+    if(forest == NULL)
+    {
+        QMessageBox* msgBox = new QMessageBox();
+        msgBox->setWindowTitle("Error");
+        msgBox->setText("You Should First Train the Forest");
+        msgBox->show();
+        return;
+    }
+
     forest->setTestPath(test_dir);
     forest->readTestImageFiles();
     ui->label_test->setText(ui->label_test->text() +  "\n Test images read");

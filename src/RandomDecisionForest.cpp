@@ -219,7 +219,7 @@ void RandomDecisionForest::test()
     int size = m_testImagesVector.size();
     qDebug() << "Number of Test images:" << QString::number(size);
 
-    cv::Mat votes_result = cv::Mat::zeros(1, m_labelCount, CV_32FC1);
+    //cv::Mat votes_result = cv::Mat::zeros(1, m_labelCount, CV_32FC1);
     for(auto i=0; i<size; ++i)
     {
         cv::Mat votes = cv::Mat::zeros(1, m_labelCount, CV_32FC1);
@@ -234,12 +234,12 @@ void RandomDecisionForest::test()
         getImageLabelVotes(label_image, votes);
         std::cout<<votes<<std::endl;
         int label = getMaxLikelihoodIndex(votes);
-        qDebug()<<" LABELED : "<< label;
-        ++votes_result.at<float>(label);
+        qDebug()<<" LABELED : "<< char('a' + label);
+       // ++votes_result.at<float>(label);
         votes.release();
     }
 
-    qDebug()<<"RESULTING LABEL : "<< getMaxLikelihoodIndex(votes_result);
+    //qDebug()<<"RESULTING LABEL : "<< getMaxLikelihoodIndex(votes_result);
 
 }
 
