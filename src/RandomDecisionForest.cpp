@@ -119,31 +119,17 @@ void RandomDecisionForest::printPixelCloud()
 
 void RandomDecisionForest::printPixel(Pixel* px)
 {
-    qDebug() << "Pixel{ Coor("    << px->position.m_r     << ","     << px->position.m_c
+    qDebug() << "Pixel{ Coor("    << px->position.m_dy     << ","     << px->position.m_dx
              << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
              << ") = "            << px->intensity << "}";
-}
-
-//random teta value
-void RandomDecisionForest::generateTeta(Coord& crd)
-{
-    // random number between -probe_distance, probe_distance
-    crd.m_r = (rand() % (2*m_probe_distanceY)) - m_probe_distanceY;
-    crd.m_c = (rand() % (2*m_probe_distanceX)) - m_probe_distanceX;
-}
-
-//random tau value
-int RandomDecisionForest::generateTau()
-{
-    // random number between -127, +128
-    return (rand() % 256) - 127;
 }
 
 // given a letter returns its index on label histogram
 // checks if a pixel will travel to the left of a given node
 // divide pixel vector into 2 parts according to the parameters of parent node
 // returns the image the pixel belongs to
-cv::Mat RandomDecisionForest::getPixelImage(Pixel* px){
+cv::Mat RandomDecisionForest::getPixelImage(Pixel* px)
+{
     QString path = m_dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
             + QString::number(px->imgInfo->sampleId)  + ".jpg";
     //qDebug()<<"IMAGE :"<< path;
@@ -350,7 +336,7 @@ void RandomDecisionForest::constructTree( Node& root, std::vector<Pixel*>& pixel
     tuneParameters(pixels, root);
     std::vector<Pixel*> left;
     std::vector<Pixel*> right;
-    divide(pixels,left,right,root);
+    divide(pixels, left, right, root);
 
     Node leftChildNode;
     leftChildNode.id = 2*root.id;
@@ -384,7 +370,7 @@ void RandomDecisionForest::tuneParameters(std::vector<Pixel*>& parentPixels, Nod
     while(itr <  m_maxIterationForDivision)
     {
         //printNode(parent);
-        divide(parentPixels,left,right,parent);
+        divide(parentPixels, left, right, parent);
         //qDebug() << "Left " << left.size() << "Right " << right.size();
         float leftChildEntr  = calculateEntropyOfVector(left);
         //qDebug() << "EntLeft" << leftChildEntr ;
@@ -410,7 +396,9 @@ void RandomDecisionForest::tuneParameters(std::vector<Pixel*>& parentPixels, Nod
             itr = 0 ;
         }
         else
+        {
             ++itr;
+        }
 
         left.clear();
         right.clear();
@@ -441,8 +429,8 @@ void RandomDecisionForest::printNode(Node& node){
     QString res = "NODE {";
     qDebug() << "Id:"   << node.id
              << "Taw: " << node.tau
-             << "Q1{" << node.teta1.m_r << "," << node.teta1.m_c
-             << "Q2{" << node.teta2.m_r << "," << node.teta2.m_c;
+             << "Q1{" << node.teta1.m_dy << "," << node.teta1.m_dx
+             << "Q2{" << node.teta2.m_dy << "," << node.teta2.m_dx;
     printHistogram(node.hist);
     qDebug() << "}";
 }

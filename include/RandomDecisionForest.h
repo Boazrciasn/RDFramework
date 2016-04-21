@@ -19,12 +19,18 @@
 #define MIN_ENTROPY 0.05
 #define MAX_DEPTH 16
 
-struct Coord{
-    int m_r,m_c;
-    Coord(){m_r=0;m_c=0;}
-    Coord(int x, int y) :
-        m_r(x), m_c(y) {}
-    Coord(const Coord& crd) : m_r(crd.m_r), m_c(crd.m_r) {}
+struct Coord
+{
+    int m_dx;
+    int m_dy;
+
+    Coord() : Coord(0, 0)
+    {
+    }
+
+    Coord(int x, int y) : m_dx(x), m_dy(y)
+    {
+    }
 };
 
 struct ImageInfo
@@ -38,7 +44,7 @@ struct ImageInfo
 struct Pixel
 {
     Coord position;
-    unsigned char intensity;
+    quint8 intensity;
     ImageInfo* imgInfo;
     Pixel(Coord crd, unsigned char intnsty, ImageInfo* imgInf):
         position(crd), intensity(intnsty),imgInfo(imgInf){}
@@ -46,10 +52,10 @@ struct Pixel
 
 struct Node
 {
-    int tau;
+    qint16 tau;
     Coord teta1, teta2;
     bool isLeaf;
-    int id;
+    quint32 id;
     cv::Mat hist;
 };
 
@@ -83,8 +89,17 @@ public:
     void readTestImageFiles();
     void printPixelCloud();
     void printPixel(Pixel* px);
-    void generateTeta(Coord& crd);
-    int generateTau();
+    inline void generateTeta(Coord& crd)
+    {
+        // random number between -probe_distance, probe_distance
+        crd.m_dy = (rand() % (2*m_probe_distanceY)) - m_probe_distanceY;
+        crd.m_dx = (rand() % (2*m_probe_distanceX)) - m_probe_distanceX;
+    }
+    inline int generateTau()
+    {
+        // random number between -127, +128
+        return (rand() % 256) - 127;
+    }
 
     inline float calculateEntropy(cv::Mat& hist)
     {
@@ -95,13 +110,13 @@ public:
         for(int i=0; i<nCols; ++i)
             totalSize += hist.at<float>(0, i);
 
-        for(int i=0; i<hist.cols; ++i)
+        for(int i=0; i<nCols; ++i)
         {
             float nPixelsAt = hist.at<float>(0, i);
             if(nPixelsAt>0)
             {
                 float probability = nPixelsAt/totalSize;
-                entr += probability*(log2(1.0f/probability));
+                entr -= probability*(log(probability));
             }
         }
         //cout << "ENTROPY : " << entr;
@@ -116,27 +131,26 @@ public:
 
     // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
     inline cv::Mat createHistogram(std::vector<Pixel*>& pixels){
-        cv::Mat hist = cv::Mat::zeros(1,m_labelCount,cv::DataType<float>::type);
-        for (std::vector<Pixel*>::iterator it = pixels.begin() ; it != pixels.end(); ++it)
+        cv::Mat hist = cv::Mat::zeros(1, m_labelCount, cv::DataType<float>::type);
+        for (Pixel *px : pixels)
         {
-            Pixel* px = *it;
             int index = letterIndex(px->imgInfo->label);
-            hist.at<float>(0,index)++;
+            ++hist.at<float>(0, index);
         }
         return hist;
     }
 
     inline bool isLeft(Pixel* p, Node& node, cv::Mat& img)
     {
-        int new_teta1R = node.teta1.m_r + p->position.m_r;
-        int new_teta1C = node.teta1.m_c + p->position.m_c;
-        int intensity1 = img.at<uchar>(new_teta1R,new_teta1C);
+        qint16 new_teta1R = node.teta1.m_dy + p->position.m_dy;
+        qint16 new_teta1C = node.teta1.m_dx + p->position.m_dx;
+        qint16 intensity1 = img.at<uchar>(new_teta1R,new_teta1C);
 
-        int new_teta2R = node.teta2.m_r + p->position.m_r ;
-        int new_teta2C = node.teta2.m_c + p->position.m_c ;
-        int intensity2 = img.at<uchar>(new_teta2R,new_teta2C);
+        qint16 new_teta2R = node.teta2.m_dy + p->position.m_dy ;
+        qint16 new_teta2C = node.teta2.m_dx + p->position.m_dx ;
+        qint16 intensity2 = img.at<uchar>(new_teta2R,new_teta2C);
 
-        return ((intensity1- intensity2) <= node.tau);
+        return intensity1 - intensity2 <= node.tau;
     }
 
     inline void divide(std::vector<Pixel*>& parentPixels, std::vector<Pixel*>& left, std::vector<Pixel*>& right, Node& parent)
