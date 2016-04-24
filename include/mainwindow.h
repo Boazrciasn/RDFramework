@@ -37,6 +37,8 @@ private slots:
 
     void on_actionRDF_triggered();
 
+    void on_actionResizer_triggered();
+
 private:
     void setLable();
 

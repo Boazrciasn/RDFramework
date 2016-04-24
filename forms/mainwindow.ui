@@ -201,7 +201,7 @@
      <x>0</x>
      <y>0</y>
      <width>420</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -210,6 +210,7 @@
     </property>
     <addaction name="actionAnnotation_Extractor"/>
     <addaction name="actionRDF"/>
+    <addaction name="actionResizer"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -222,6 +223,7 @@
    </attribute>
    <addaction name="actionRDF"/>
    <addaction name="actionAnnotation_Extractor"/>
+   <addaction name="actionResizer"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAnnotation_Extractor">
@@ -232,6 +234,11 @@
   <action name="actionRDF">
    <property name="text">
     <string>RDF</string>
+   </property>
+  </action>
+  <action name="actionResizer">
+   <property name="text">
+    <string>Resizer</string>
    </property>
   </action>
  </widget>

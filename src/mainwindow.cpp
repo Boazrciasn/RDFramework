@@ -1,6 +1,7 @@
 #include "include/mainwindow.h"
 #include "include/annextractordialog.h"
 #include "include/rdfdialog.h"
+#include "include/resizeallimagesdialog.h"
 
 #include "include/TextRegionDetector.h"
 #include "ui_mainwindow.h"
@@ -22,8 +23,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // Shortcut to Random Desicion Forest Window
-    QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
     QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionRDF_triggered()));
+
+
+    shortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionResizer_triggered()));
 }
 
 // ****************************** //
@@ -137,5 +142,11 @@ void MainWindow::on_actionAnnotation_Extractor_triggered()
 void MainWindow::on_actionRDF_triggered()
 {
     RDFDialog *mDialog = new RDFDialog(this);
+    mDialog->exec();
+}
+
+void MainWindow::on_actionResizer_triggered()
+{
+    ResizeAllImagesDialog *mDialog = new ResizeAllImagesDialog(this);
     mDialog->exec();
 }

@@ -52,14 +52,18 @@ struct Pixel
 
 struct Node
 {
-    qint16 tau;
-    Coord teta1, teta2;
-    bool isLeaf;
-    quint32 id;
-    cv::Mat hist;
+    qint16 m_tau;
+    Coord m_teta1, m_teta2;
+    quint32 m_id;
+    bool m_isLeaf;
+    cv::Mat m_hist;
+    Node(quint32 id, bool isLeaf):
+        m_id(id), m_isLeaf(isLeaf)
+    {
+    }
 };
 
-using Tree = std::vector<Node>;
+using Tree = std::vector<Node*>;
 
 class RandomDecisionTree
 {
@@ -142,15 +146,15 @@ public:
 
     inline bool isLeft(Pixel* p, Node& node, cv::Mat& img)
     {
-        qint16 new_teta1R = node.teta1.m_dy + p->position.m_dy;
-        qint16 new_teta1C = node.teta1.m_dx + p->position.m_dx;
+        qint16 new_teta1R = node.m_teta1.m_dy + p->position.m_dy;
+        qint16 new_teta1C = node.m_teta1.m_dx + p->position.m_dx;
         qint16 intensity1 = img.at<uchar>(new_teta1R,new_teta1C);
 
-        qint16 new_teta2R = node.teta2.m_dy + p->position.m_dy ;
-        qint16 new_teta2C = node.teta2.m_dx + p->position.m_dx ;
+        qint16 new_teta2R = node.m_teta2.m_dy + p->position.m_dy ;
+        qint16 new_teta2C = node.m_teta2.m_dx + p->position.m_dx ;
         qint16 intensity2 = img.at<uchar>(new_teta2R,new_teta2C);
 
-        return intensity1 - intensity2 <= node.tau;
+        return intensity1 - intensity2 <= node.m_tau;
     }
 
     inline void divide(std::vector<Pixel*>& parentPixels, std::vector<Pixel*>& left, std::vector<Pixel*>& right, Node& parent)
@@ -196,18 +200,19 @@ public:
     void printNode(Node& node);
     void printTree(RandomDecisionTree tree);
     cv::Mat getPixelImage(Pixel* px);
-    inline Node getLeafNode(Pixel*px, int nodeId, const Tree &tree)
+    inline Node* getLeafNode(Pixel*px, int nodeId, const Tree &tree)
     {
-        Node root = tree[nodeId];
-        if(root.isLeaf)
+        Node* root = tree[nodeId];
+        assert( root != NULL);
+        if(root->m_isLeaf)
         {
             // qDebug()<<"LEAF REACHED :"<<root.id;
             return root;
         }
         cv::Mat img = m_testImagesVector[px->imgInfo->sampleId];
-        int childId = root.id *2 ;
+        int childId = root->m_id *2 ;
         //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
-        if(!isLeft(px,root,img))
+        if(!isLeft(px,*root,img))
             childId++;
         return getLeafNode(px,childId-1, tree);
     }
