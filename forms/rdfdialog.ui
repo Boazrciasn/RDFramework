@@ -155,17 +155,14 @@
      <string>Train</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_train">
+   <widget class="QTextBrowser" name="textBrowser_train">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>70</y>
-      <width>361</width>
-      <height>71</height>
+      <x>10</x>
+      <y>60</y>
+      <width>351</width>
+      <height>101</height>
      </rect>
-    </property>
-    <property name="text">
-     <string/>
     </property>
    </widget>
   </widget>
@@ -181,19 +178,6 @@
    <property name="title">
     <string>Test</string>
    </property>
-   <widget class="QLabel" name="label_test">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>70</y>
-      <width>361</width>
-      <height>91</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QPushButton" name="loadTestData_button">
     <property name="geometry">
      <rect>
@@ -218,6 +202,16 @@
     </property>
     <property name="text">
      <string>Test</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textBrowser_test">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>351</width>
+      <height>101</height>
+     </rect>
     </property>
    </widget>
   </widget>

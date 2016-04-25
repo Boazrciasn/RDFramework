@@ -148,6 +148,7 @@ void RandomDecisionForest::trainTree()
     m_depth=1;
     m_numOfLeaves = 0 ;
     constructTree(*root,m_pixelCloud);
+    emit this->treeConstructed();
     qDebug() << "TREE CONSTRUCTED: \n Leaf Count:" << m_numOfLeaves << ". " << m_numOfLetters<< "Samples Used";
     //qDebug() << "Pixel Sizes Are" << (pixelSizesConsistent() ? "Consistent" : "Not Consistent") ;
 }
@@ -170,30 +171,22 @@ cv::Mat RandomDecisionForest::classify(int index)
     int n_rows=test_image.rows;
     int n_cols=test_image.cols;
     //typecheck
-    qDebug() << "A";
     cv::Mat res_image = cv::Mat(n_rows-2*m_probe_distanceY, n_cols-2*m_probe_distanceX, test_image.type());
     ImageInfo* img_Info = new ImageInfo(' ', index);
-
-    qDebug() << "B";
 
     for(int r=m_probe_distanceY; r<n_rows-m_probe_distanceY; ++r)
     {
         for(int c=m_probe_distanceX; c<n_cols-m_probe_distanceX; ++c)
         {
-            //qDebug() << QString::number(r) << "," << QString::number(c) ;
             auto intensity = test_image.at<uchar>(r,c);
             auto *px = new Pixel(Coord(r,c),intensity,img_Info);
             cv::Mat probHist = cv::Mat::zeros(1,m_labelCount,cv::DataType<float>::type);
-            //qDebug() << "C";
             for(unsigned int i=0; i<m_forest.size(); ++i)
             {
-               // qDebug() << "D" << QString::number(i+1);
                 Node *leaf = getLeafNode(px, 0, m_forest[i].m_tree);
-               // qDebug() << "DD" << QString::number(i+1);
                 probHist += leaf->m_hist;
             }
             // Type check of label
-            //printHistogram(probHist);
             auto label = getMaxLikelihoodIndex(probHist);
             res_image.at<uchar>(r-m_probe_distanceY,c-m_probe_distanceX) = label;
             probHist.release();
@@ -208,7 +201,6 @@ void RandomDecisionForest::test()
     int size = m_testImagesVector.size();
     qDebug() << "Number of Test images:" << QString::number(size);
 
-    //cv::Mat votes_result = cv::Mat::zeros(1, m_labelCount, CV_32FC1);
     for(auto i=0; i<size; ++i)
     {
         cv::Mat votes = cv::Mat::zeros(1, m_labelCount, CV_32FC1);
@@ -218,19 +210,16 @@ void RandomDecisionForest::test()
 //        cv::Mat colored_img = colorCoder(prediction,original);
 //        cv::imshow("Colored Image",colored_img );
 //        cv::waitKey();
-        qDebug()<<"classfy : " << QString::number(i);
+        //qDebug()<<"classify : " << QString::number(i);
         cv::Mat label_image = classify(i);
-        qDebug()<<" gettin votes : ";
+        //qDebug()<<" gettin votes : ";
         getImageLabelVotes(label_image, votes);
         std::cout<<votes<<std::endl;
         int label = getMaxLikelihoodIndex(votes);
-        qDebug()<<" LABELED : "<< char('a' + label);
-       // ++votes_result.at<float>(label);
+        //qDebug()<<" LABELED : "<< char('a' + label);
+        emit this->classifiedImageAs(i+1,char('a' + label));
         votes.release();
     }
-
-    //qDebug()<<"RESULTING LABEL : "<< getMaxLikelihoodIndex(votes_result);
-
 }
 
 // checks if pixels of a letter belong to that letter

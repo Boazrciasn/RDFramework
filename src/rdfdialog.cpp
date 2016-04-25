@@ -6,7 +6,9 @@ RDFDialog::RDFDialog(QWidget *parent) :
     ui(new Ui::RDFDialog)
 {
     ui->setupUi(this);
-
+    m_forest = new RandomDecisionForest();
+    QObject::connect(m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
+    QObject::connect(m_forest, SIGNAL(classifiedImageAs(int,char)), this, SLOT(image_at_classified_as(int,char)));
 }
 
 RDFDialog::~RDFDialog()
@@ -16,19 +18,19 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::on_loadTrainData_button_clicked()
 {
-    train_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->label_train->setText(train_dir);
+    m_train_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->textBrowser_train->setText(m_train_dir);
 }
 
 void RDFDialog::on_loadTestData_button_clicked()
 {
-    test_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), train_dir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->label_test->setText(test_dir);
+    m_test_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), m_train_dir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->textBrowser_test->setText(m_test_dir);
 }
 
 void RDFDialog::on_train_button_clicked()
 {
-    if(train_dir == NULL)
+    if(m_train_dir == NULL)
     {
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -37,6 +39,7 @@ void RDFDialog::on_train_button_clicked()
         return;
     }
 
+    m_treeid = 0;
     int probDistX = ui->spinBox_probX->value();
     int probDistY = ui->spinBox_probY->value();
     int nTrees = ui->spinBox_NTrees->value();
@@ -46,26 +49,28 @@ void RDFDialog::on_train_button_clicked()
     int labelCount = ui->spinBox_LabelCount->value();
     int maxIteration = ui->spinBox_MaxIteration->value();
 
+    m_forest->setProbDistanceX(probDistX);
+    m_forest->setProbDistanceY(probDistY);
+    m_forest->setTrainPath(m_train_dir);
+    m_forest->setNumberofTrees(nTrees);
+    m_forest->setMaxDepth(maxDepth);
+    m_forest->setPixelsPerImage(pixelsperImage);
+    m_forest->setMinimumLeafPixelCount(minLeafPixels);
+    m_forest->setNumberofLabels(labelCount);
+    m_forest->setMaxIterationForDivision(maxIteration);
+    m_forest->readTrainingImageFiles();
+    ui->textBrowser_train->append("Training images read");
+    ui->textBrowser_train->repaint();
 
-
-    forest = new RandomDecisionForest(probDistX,probDistY);
-    forest->setTrainPath(train_dir);
-    forest->setNumberofTrees(nTrees);
-    forest->setMaxDepth(maxDepth);
-    forest->setPixelsPerImage(pixelsperImage);
-    forest->setMinimumLeafPixelCount(minLeafPixels);
-    forest->setNumberofLabels(labelCount);
-    forest->setMaxIterationForDivision(maxIteration);
-    forest->readTrainingImageFiles();
-    ui->label_train->setText( ui->label_train->text() +  "\n Training images read");
-    forest->trainForest();
-    ui->label_train->setText(  "Forest Trained ! ");
+    m_forest->trainForest();
+    ui->textBrowser_train->append(  "Forest Trained ! ");
+    ui->textBrowser_train->repaint();
 }
 
 void RDFDialog::on_test_button_clicked()
 {
 
-    if(test_dir == NULL)
+    if(m_test_dir == NULL)
     {
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -74,7 +79,7 @@ void RDFDialog::on_test_button_clicked()
         return;
     }
 
-    if(forest == NULL)
+    if(m_forest->m_tempTree.size()==0)
     {
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -83,8 +88,21 @@ void RDFDialog::on_test_button_clicked()
         return;
     }
 
-    forest->setTestPath(test_dir);
-    forest->readTestImageFiles();
-    ui->label_test->setText(ui->label_test->text() +  "\n Test images read");
-    forest->test();
+    m_forest->setTestPath(m_test_dir);
+    m_forest->readTestImageFiles();
+    ui->textBrowser_test->append("Test images read");
+    m_forest->test();
+}
+
+void RDFDialog::new_tree_constructed()
+{
+    ++m_treeid;
+    ui->textBrowser_train->append("Tree " + QString::number(m_treeid) + " constructed");
+    ui->textBrowser_train->repaint();
+}
+
+void RDFDialog::image_at_classified_as(int index, char label)
+{
+    ui->textBrowser_test->append("Image " + QString::number(index) + " is classified as " + label);
+    ui->textBrowser_test->repaint();
 }

@@ -11,6 +11,8 @@
 #include <QDirIterator>
 #include <include/Util.h>
 
+#include <QObject>
+
 #include <dirent.h>
 #include <iostream>
 
@@ -75,18 +77,20 @@ public:
     Tree m_tree;
 };
 
-class RandomDecisionForest{
+class RandomDecisionForest : public QObject
+{
+    Q_OBJECT
+
+signals:
+    void treeConstructed();
+    void classifiedImageAs(int image_no, char label);
 
 public:
-
-    RandomDecisionForest(int probe_dstanceX,int probe_dstanceY) : m_tempTree(pow(2, MAX_DEPTH)-1)
+    RandomDecisionForest() : m_tempTree(pow(2, MAX_DEPTH)-1)
     {
-        m_probe_distanceX = probe_dstanceX;
-        m_probe_distanceY = probe_dstanceY;
         srand (time(NULL));
         min_InfoGain = 1;
         max_InfoGain = -1;
-
     }
 
     void readTrainingImageFiles();
@@ -178,7 +182,6 @@ public:
         return totalSize;
     }
 
-
     inline cv::Mat unpad(cv::Mat img)
     {
         int width = img.cols-2*m_probe_distanceX, height = img.rows-2*m_probe_distanceY;
@@ -200,6 +203,7 @@ public:
     void printNode(Node& node);
     void printTree(RandomDecisionTree tree);
     cv::Mat getPixelImage(Pixel* px);
+
     inline Node* getLeafNode(Pixel*px, int nodeId, const Tree &tree)
     {
         Node* root = tree[nodeId];
@@ -251,7 +255,6 @@ public:
                 ++vote_vector.at<float>(label_image.at<uchar>(i,j));
     }
 
-
     void imageToPixels(std::vector<Pixel*>& res, const cv::Mat &image,ImageInfo* img_inf);
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void setTrainPath(QString path);
@@ -282,6 +285,13 @@ public:
         m_pixelsPerImage = pixel_per_image_count;
     }
 
+    void setProbDistanceX(int probe_distanceX ){
+        m_probe_distanceX = probe_distanceX;
+    }
+
+    void setProbDistanceY(int probe_distanceY ){
+        m_probe_distanceY = probe_distanceY;
+    }
 
     std::vector<Pixel*> pixelCloud;
     std::vector<cv::Mat> m_trainImagesVector;
@@ -294,8 +304,8 @@ public:
     std::vector<cv::Mat> m_imagesContainer;
     // Test and Train dirs :
     QString m_testpath, m_trainpath;
-private:
 
+private:
     void subSample();
 
     QString m_dir;
