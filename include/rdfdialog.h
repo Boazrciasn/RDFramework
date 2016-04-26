@@ -25,11 +25,9 @@ public slots:
     void image_at_classified_as(int index,char label);
 
 private:
+    RDFParams PARAMS;
     Ui::RDFDialog *ui;
-    QString m_train_dir;
-    QString m_test_dir;
     RandomDecisionForest *m_forest;
-
     qint16 m_treeid;
 };
 

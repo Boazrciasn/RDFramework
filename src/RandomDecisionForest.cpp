@@ -11,7 +11,7 @@
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles()
 {
-    m_dir = m_trainpath;
+    m_dir = m_params.trainDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames);
@@ -43,7 +43,7 @@ void RandomDecisionForest::readTrainingImageFiles()
 void RandomDecisionForest::readTestImageFiles()
 {
     m_DS.m_testImagesVector.clear();
-    m_dir = m_testpath;
+    m_dir = m_params.testDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames);
@@ -119,23 +119,17 @@ cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Ma
     return codedImage;
 }
 
-void RandomDecisionForest::setTrainPath(QString path)
-{
-    this->m_trainpath = path;
-}
-
-void RandomDecisionForest::setTestPath(QString path)
-{
-    this->m_testpath = path;
-}
 
 void RandomDecisionForest::trainForest()
 {
-    for (int i = 0; i < m_no_of_trees; ++i)
+    for (int i = 0; i < m_params.nTrees; ++i)
     {
         qDebug()<< "Tree number " << QString::number(i+1) << "is being trained" ;
         auto *trainedRDT = new RandomDecisionTree(this);
+        trainedRDT->setProbeDistanceX(m_params.probDistX);
+        trainedRDT->setProbeDistanceY(m_params.probDistY);
         trainedRDT->setMaxDepth(m_params.maxDepth);
+        trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
         qDebug()<< "Train..." ;
         trainedRDT->train();
         m_forest.push_back(trainedRDT);

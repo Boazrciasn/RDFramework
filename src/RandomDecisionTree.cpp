@@ -77,7 +77,7 @@ void RandomDecisionTree::subSample()
 }
 
 // find best teta and taw parameters for the given node
-void RandomDecisionTree::tuneParameters(std::vector<Pixel*>& parentPixels, Node& parent)
+void RandomDecisionTree::tuneParameters(PixelCloud& parentPixels, Node& parent)
 {
     std::vector<Pixel*> left;
     std::vector<Pixel*> right;
@@ -87,7 +87,7 @@ void RandomDecisionTree::tuneParameters(std::vector<Pixel*>& parentPixels, Node&
     int itr=0;
 
     auto nLabels = m_DF->m_params.labelCount;
-    while(itr < m_DF->m_params.maxIteration);
+    while(itr < m_DF->m_params.maxIteration)
     {
         //printNode(parent);
         divide(m_DF->m_DS, parentPixels, left, right, parent);

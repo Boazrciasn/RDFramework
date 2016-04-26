@@ -1,9 +1,10 @@
 #ifndef RDFPARAMS_H
 #define RDFPARAMS_H
 
-struct RDFParams
+struct  RDFParams
 {
     QString trainDir;
+    QString testDir;
     int probDistX;
     int probDistY;
     int nTrees;

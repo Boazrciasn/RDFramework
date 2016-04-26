@@ -22,31 +22,19 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::on_loadTrainData_button_clicked()
 {
-    m_train_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->textBrowser_train->setText(m_train_dir);
+    PARAMS.trainDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->textBrowser_train->setText(PARAMS.trainDir);
 }
 
 void RDFDialog::on_loadTestData_button_clicked()
 {
-    m_test_dir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), m_train_dir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->textBrowser_test->setText(m_test_dir);
+    PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->textBrowser_test->setText(PARAMS.testDir);
 }
 
 void RDFDialog::on_train_button_clicked()
 {
-    if(m_train_dir == NULL)
-    {
-        QMessageBox* msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Error");
-        msgBox->setText("You Should First Choose a Training Data Folder");
-        msgBox->show();
-        return;
-    }
 
-    m_treeid = 0;
-
-    RDFParams PARAMS;
-    PARAMS.trainDir = m_train_dir;
     PARAMS.probDistX = ui->spinBox_probX->value();
     PARAMS.probDistY = ui->spinBox_probY->value();
     PARAMS.nTrees = ui->spinBox_NTrees->value();
@@ -58,6 +46,18 @@ void RDFDialog::on_train_button_clicked()
 
     m_forest->setParams(PARAMS);
 
+
+    if(m_forest->params().trainDir == NULL)
+    {
+        QMessageBox* msgBox = new QMessageBox();
+        msgBox->setWindowTitle("Error");
+        msgBox->setText("You Should First Choose a Training Data Folder");
+        msgBox->show();
+        return;
+    }
+
+    m_treeid = 0;
+    m_forest->readTrainingImageFiles();
     ui->textBrowser_train->append("Training images read");
     ui->textBrowser_train->repaint();
 
@@ -69,7 +69,9 @@ void RDFDialog::on_train_button_clicked()
 void RDFDialog::on_test_button_clicked()
 {
 
-    if(m_test_dir == NULL)
+    m_forest->params().testDir = PARAMS.testDir;
+
+    if(m_forest->params().testDir == NULL)
     {
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -78,16 +80,7 @@ void RDFDialog::on_test_button_clicked()
         return;
     }
 
-//    if(m_forest->tempTree.size()==0)
-//    {
-//        QMessageBox* msgBox = new QMessageBox();
-//        msgBox->setWindowTitle("Error");
-//        msgBox->setText("You Should First Train the Forest");
-//        msgBox->show();
-//        return;
-//    }
 
-    m_forest->setTestPath(m_test_dir);
     m_forest->readTestImageFiles();
     ui->textBrowser_test->append("Test images read");
     m_forest->test();
