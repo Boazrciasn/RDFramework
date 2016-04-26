@@ -46,12 +46,12 @@ void RDFDialog::on_train_button_clicked()
     m_treeid = 0;
 
     RDFParams PARAMS;
-    PARAMS.m_train_dir = m_train_dir;
+    PARAMS.trainDir = m_train_dir;
     PARAMS.probDistX = ui->spinBox_probX->value();
     PARAMS.probDistY = ui->spinBox_probY->value();
     PARAMS.nTrees = ui->spinBox_NTrees->value();
     PARAMS.maxDepth = ui->spinBox_MaxDepth->value();
-    PARAMS.pixelsperImage = ui->spinBox_PixelsPerImage->value();
+    PARAMS.pixelsPerImage = ui->spinBox_PixelsPerImage->value();
     PARAMS.minLeafPixels = ui->spinBox_MinLeafPixels->value();
     PARAMS.labelCount = ui->spinBox_LabelCount->value();
     PARAMS.maxIteration = ui->spinBox_MaxIteration->value();

@@ -3,12 +3,12 @@
 
 struct RDFParams
 {
-    QString m_train_dir;
+    QString trainDir;
     int probDistX;
     int probDistY;
     int nTrees;
     int maxDepth;
-    int pixelsperImage;
+    int pixelsPerImage;
     int minLeafPixels;
     int labelCount;
     int maxIteration;
