@@ -1,5 +1,9 @@
+#include "precompiled.h"
+
+#include "include/RDFParams.h"
 #include "include/rdfdialog.h"
 #include "ui_rdfdialog.h"
+
 
 RDFDialog::RDFDialog(QWidget *parent) :
     QDialog(parent),
@@ -40,25 +44,20 @@ void RDFDialog::on_train_button_clicked()
     }
 
     m_treeid = 0;
-    int probDistX = ui->spinBox_probX->value();
-    int probDistY = ui->spinBox_probY->value();
-    int nTrees = ui->spinBox_NTrees->value();
-    int maxDepth = ui->spinBox_MaxDepth->value();
-    int pixelsperImage = ui->spinBox_PixelsPerImage->value();
-    int minLeafPixels = ui->spinBox_MinLeafPixels->value();
-    int labelCount = ui->spinBox_LabelCount->value();
-    int maxIteration = ui->spinBox_MaxIteration->value();
 
-    m_forest->setProbDistanceX(probDistX);
-    m_forest->setProbDistanceY(probDistY);
-    m_forest->setTrainPath(m_train_dir);
-    m_forest->setNumberofTrees(nTrees);
-    m_forest->setMaxDepth(maxDepth);
-    m_forest->setPixelsPerImage(pixelsperImage);
-    m_forest->setMinimumLeafPixelCount(minLeafPixels);
-    m_forest->setNumberofLabels(labelCount);
-    m_forest->setMaxIterationForDivision(maxIteration);
-    m_forest->readTrainingImageFiles();
+    RDFParams PARAMS;
+    PARAMS.m_train_dir = m_train_dir;
+    PARAMS.probDistX = ui->spinBox_probX->value();
+    PARAMS.probDistY = ui->spinBox_probY->value();
+    PARAMS.nTrees = ui->spinBox_NTrees->value();
+    PARAMS.maxDepth = ui->spinBox_MaxDepth->value();
+    PARAMS.pixelsperImage = ui->spinBox_PixelsPerImage->value();
+    PARAMS.minLeafPixels = ui->spinBox_MinLeafPixels->value();
+    PARAMS.labelCount = ui->spinBox_LabelCount->value();
+    PARAMS.maxIteration = ui->spinBox_MaxIteration->value();
+
+    m_forest->setParams(PARAMS);
+
     ui->textBrowser_train->append("Training images read");
     ui->textBrowser_train->repaint();
 
@@ -79,14 +78,14 @@ void RDFDialog::on_test_button_clicked()
         return;
     }
 
-    if(m_forest->m_tempTree.size()==0)
-    {
-        QMessageBox* msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Error");
-        msgBox->setText("You Should First Train the Forest");
-        msgBox->show();
-        return;
-    }
+//    if(m_forest->tempTree.size()==0)
+//    {
+//        QMessageBox* msgBox = new QMessageBox();
+//        msgBox->setWindowTitle("Error");
+//        msgBox->setText("You Should First Train the Forest");
+//        msgBox->show();
+//        return;
+//    }
 
     m_forest->setTestPath(m_test_dir);
     m_forest->readTestImageFiles();

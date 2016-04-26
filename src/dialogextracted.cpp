@@ -1,3 +1,5 @@
+#include "precompiled.h"
+
 #include "include/dialogextracted.h"
 #include "ui_dialogextracted.h"
 

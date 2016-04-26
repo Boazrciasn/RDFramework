@@ -1,10 +1,7 @@
-#include "include/mainwindow.h"
-#include "QApplication"
-#include <QDesktopWidget>
-#include "include/Reader.h"
-#include "QDebug"
-#include "vector"
+#include "src/precompiled.h"
 
+#include "include/mainwindow.h"
+#include "include/Reader.h"
 #include "include/RandomDecisionForest.h"
 
 

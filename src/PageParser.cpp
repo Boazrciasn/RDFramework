@@ -1,17 +1,7 @@
+#include "precompiled.h"
+
 #include "include/PageParser.h"
 #include "include/Util.h"
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
-#include <QtXml/QDomElement>
-#include <QtXml/QDomDocument>
-#include <QtXml/QDomNode>
-#include <QDebug>
-#include <QDir>
-#include <QPainter>
-#include <QChar>
 
 void PageParser::readFromTo(QString filename, vector<QString> &words, vector<QString> &coords)
 {

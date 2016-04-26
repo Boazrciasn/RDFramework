@@ -1,3 +1,5 @@
+#include "precompiled.h"
+
 #include "include/histogramdialog.h"
 #include "ui_histogramdialog.h"
 

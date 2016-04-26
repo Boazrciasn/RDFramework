@@ -1,9 +1,9 @@
+#include "precompiled.h"
+
 #include "include/mydialog.h"
 #include "ui_mydialog.h"
-#include <QDebug>
 
 #include "Util.h"
-#include <opencv2/imgproc/imgproc.hpp>
 
 MyDialog::MyDialog(QWidget *parent) :
     QDialog(parent),

@@ -1,3 +1,5 @@
+#include "precompiled.h"
+
 #include "include/annextractordialog.h"
 #include "ui_annextractordialog.h"
 

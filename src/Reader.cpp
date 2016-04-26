@@ -1,8 +1,6 @@
+#include "precompiled.h"
+
 #include "include/Reader.h"
-#include <QDir>
-#include<QDebug>
-#include "QApplication"
-#include<QDirIterator>
 
 void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
 {

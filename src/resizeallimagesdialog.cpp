@@ -1,11 +1,10 @@
+#include "precompiled.h"
+
 #include "include/resizeallimagesdialog.h"
 #include "ui_resizeallimagesdialog.h"
 
 #include "include/Reader.h"
-#include <opencv2/imgproc.hpp>
 
-#include <QFileDialog>
-#include <QMessageBox>
 
 ResizeAllImagesDialog::ResizeAllImagesDialog(QWidget *parent) :
     QDialog(parent),
@@ -47,6 +46,6 @@ void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
     {
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
         cv::resize(image,image,size);
-        cv::imwrite(filePath.toStdString(), image);
+//        cv::imwrite(filePath.toStdString(), image);
     }
 }

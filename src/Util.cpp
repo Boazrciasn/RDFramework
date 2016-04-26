@@ -1,6 +1,8 @@
-#include "include/Util.h"
-#include <opencv2/imgproc/imgproc.hpp>
+#include "precompiled.h"
+
 #include <iostream>
+
+#include "include/Util.h"
 
 SIGNALS S;
 

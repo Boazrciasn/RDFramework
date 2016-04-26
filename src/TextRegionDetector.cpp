@@ -1,6 +1,9 @@
+#include "precompiled.h"
+
+#include <iostream>
+
 #include "include/TextRegionDetector.h"
 #include "include/Util.h"
-#include "iostream"
 
 
 QVector<QRect> TextRegionDetector::detectWordsFromLine(const cv::Mat &lineImg, QWidget *parent)
