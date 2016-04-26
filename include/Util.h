@@ -160,6 +160,7 @@ public:
     static void plot(const cv::Mat &hist,QWidget *parent);
     static QString fileNameWithoutPath(QString& filePath);
     static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
+    static void calcWidthHightStat(QString srcDir);
 };
 
 #endif

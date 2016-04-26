@@ -174,6 +174,55 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize){
     }
 }
 
+void Util::calcWidthHightStat(QString srcDir){
+    float w_avrg, h_avrg;
+    int count;
+
+    QString folder;
+    QString file;
+    QDirIterator ittDir(srcDir, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+
+    QFile outLog(srcDir + "/AverageWidthHight.txt");
+    outLog.open(QIODevice::WriteOnly);
+
+    while (ittDir.hasNext()){
+        ittDir.next();
+        folder = ittDir.fileName();
+        QDirIterator ittFile(srcDir + "/"+ folder,QStringList()<<"*.jpg"<<"*.jpeg",QDir::Files);
+
+        w_avrg = h_avrg = 0;
+        count = 0;
+
+        while(ittFile.hasNext()){
+            ittFile.next();
+            file = ittFile.fileName();
+            cv::Mat img_bw = cv::imread(srcDir.toStdString() + "/" + folder.toStdString() + "/" + file.toStdString(), 0);
+
+            w_avrg += img_bw.cols;
+            h_avrg += img_bw.rows;
+            ++count;
+            img_bw.release();
+        }
+
+        w_avrg /= count;
+        h_avrg /= count;
+
+        outLog.write(folder.toStdString().c_str());
+        outLog.write(" ");
+        outLog.write(QByteArray::number((int)(w_avrg + 0.5f)));
+        outLog.write(" ");
+        outLog.write(QByteArray::number((int)(h_avrg + 0.5f)));
+        outLog.write("\n");
+
+//        QFile textFile(srcDir + "/" + folder + "/" + folder + ".txt");
+//        textFile.open(QIODevice::WriteOnly);
+//        textFile.write(QByteArray::number(w_avrg));
+//        textFile.write(" ");
+//        textFile.write(QByteArray::number(h_avrg));
+//        textFile.close();
+    }
+    outLog.close();
+}
 
 
 
