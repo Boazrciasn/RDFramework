@@ -44,6 +44,8 @@ public:
 
 
 private:
+    double m_accuracy;
+    std::vector<QString> classify_res;
     RDFParams m_params;
 
     QString m_dir;
@@ -53,6 +55,7 @@ private:
 signals:
     void classifiedImageAs(int image_no, char label);
     void treeConstructed();
+    void resultPercentage(double accuracy);
 
 };
 

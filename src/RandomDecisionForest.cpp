@@ -172,9 +172,12 @@ void RandomDecisionForest::test()
         getImageLabelVotes(label_image, votes);
         std::cout<<votes<<std::endl;
         int label = getMaxLikelihoodIndex(votes);
-        //qDebug()<<" LABELED : "<< char('a' + label);
-        emit classifiedImageAs(i+1, char('a' + label));
+        char predicted_label = char('a' + label);
+        classify_res.push_back(QString(predicted_label));
+        emit classifiedImageAs(i+1, predicted_label);
         votes.release();
     }
+    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
+    emit resultPercentage(m_accuracy);
 }
 

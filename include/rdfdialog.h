@@ -23,6 +23,7 @@ public slots:
     void on_test_button_clicked();
     void new_tree_constructed();
     void image_at_classified_as(int index,char label);
+    void resultPercetange(double accuracy);
 
 private:
     RDFParams PARAMS;

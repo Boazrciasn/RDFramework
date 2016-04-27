@@ -4,16 +4,10 @@
 
 #include "include/Util.h"
 
-SIGNALS S;
-
-SlotDeneme::SlotDeneme()
-{
-    QObject::connect(&S, SIGNAL(doIt()), this, SLOT(onDoIt()));
-}
 
 void deneme()
 {
-    emit S.doIt();
+
 
     cv::Mat_<float> A(3, 3);
     cv::Mat_<int> B(5, 5);
@@ -27,6 +21,17 @@ void deneme()
     doForAllPixels<int>(B, [](int pixval) {
         return pixval * 5;
     });
+}
+
+double Util::calculateAccuracy(const std::vector<QString> &groundtruth, const std::vector<QString> &results)
+{
+    auto nSize = groundtruth.size();
+    int count = 0;
+    for ( auto i = 0; i < nSize; ++i ) {
+        if (groundtruth[i] == results[i])
+            ++count;
+    }
+    return 100*((double)count)/nSize;
 }
 
 cv::Mat Util::toCv(const QImage &image , int cv_type)

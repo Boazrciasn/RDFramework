@@ -4,31 +4,6 @@
 #include "include/histogramdialog.h"
 #include "include/PixelCloud.h"
 
-class SIGNALS : public QObject
-{
-    Q_OBJECT
-
-signals:
-    void doIt();
-
-};
-
-
-class SlotDeneme : public QObject
-{
-    Q_OBJECT
-
-public slots:
-    void onDoIt()
-    {
-        int a=5;
-        ++a;
-    }
-
-public:
-    SlotDeneme();
-
-};
 
 inline int letterIndex(char letter)
 {
@@ -156,6 +131,7 @@ void doForAllPixels(cv::Mat_<T> &M, const FUNC &func)
 class Util
 {
 public:
+    static double calculateAccuracy(const std::vector<QString> &groundtruth, const std::vector<QString> &results);
     static cv::Mat toCv(const QImage &image, int cv_type);
     static QImage toQt(const cv::Mat &src, QImage::Format format);
     static QString cleanNumberAndPunctuation(QString toClean);

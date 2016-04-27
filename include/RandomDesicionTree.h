@@ -99,7 +99,6 @@ public:
     }
 
     bool isPixelSizeConsistent();
-
     void toString();
 
 private:

@@ -13,6 +13,7 @@ RDFDialog::RDFDialog(QWidget *parent) :
     m_forest = new RandomDecisionForest();
     QObject::connect(m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
     QObject::connect(m_forest, SIGNAL(classifiedImageAs(int,char)), this, SLOT(image_at_classified_as(int,char)));
+    QObject::connect(m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
 }
 
 RDFDialog::~RDFDialog()
@@ -97,5 +98,12 @@ void RDFDialog::new_tree_constructed()
 void RDFDialog::image_at_classified_as(int index, char label)
 {
     ui->textBrowser_test->append("Image " + QString::number(index) + " is classified as " + label);
+    ui->textBrowser_test->repaint();
+}
+
+void RDFDialog::resultPercetange(double accuracy)
+{
+    std::cout<<"gotcha!";
+    ui->textBrowser_test->append(" Classification Accuracy : " + QString::number(accuracy)+"%");
     ui->textBrowser_test->repaint();
 }
