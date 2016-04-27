@@ -141,7 +141,7 @@ cv::Mat RandomDecisionForest::classify(int index)
             auto nForest = m_forest.size();
             for(unsigned int i=0; i<nForest; ++i)
             {
-                Node *leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
+                node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
                 probHist += leaf->m_hist;
             }
             // Type check of label

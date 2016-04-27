@@ -25,7 +25,8 @@ struct Node
 };
 
 
-using TreeNodes = std::vector<Node*>;
+using node_ptr = std::shared_ptr<Node>;
+using TreeNodes = std::vector<node_ptr>;
 
 struct DataSet
 {
@@ -82,9 +83,9 @@ public:
         return intensity1 - intensity2 <= node.m_tau;
     }
 
-    inline Node* getLeafNode(const DataSet &DS, pixel_ptr px, int nodeId)
+    inline node_ptr getLeafNode(const DataSet &DS, pixel_ptr px, int nodeId)
     {
-        Node* root = m_nodes[nodeId];
+        node_ptr root = m_nodes[nodeId];
         assert( root != NULL);
         if(root->m_isLeaf)
         {

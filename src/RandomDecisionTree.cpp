@@ -5,7 +5,7 @@
 void RandomDecisionTree::train()
 {
     subSample();
-    Node *root = new Node(1, false);
+    node_ptr root(new Node(1, false));
     root->m_tau = generateTau();
     generateTeta(root->m_teta1, m_probe_distanceX, m_probe_distanceY);
     generateTeta(root->m_teta2, m_probe_distanceX, m_probe_distanceY);
@@ -39,14 +39,14 @@ void RandomDecisionTree::constructTree( Node& cur_node, PixelCloud& pixels)
     divide(m_DF->m_DS, pixels, left, right, cur_node);
 
 
-    Node *leftChildNode = new Node(2*cur_node.m_id,false);
+    node_ptr leftChildNode(new Node(2*cur_node.m_id,false));
     leftChildNode->m_tau = generateTau();
     generateTeta(leftChildNode->m_teta1, m_probe_distanceX, m_probe_distanceY);
     generateTeta(leftChildNode->m_teta2, m_probe_distanceX, m_probe_distanceY);
     m_nodes[leftChildNode->m_id-1] = leftChildNode;
     constructTree(*leftChildNode,left);
 
-    Node *rightChildNode = new Node(2*cur_node.m_id+1, false);
+    node_ptr rightChildNode(new Node(2*cur_node.m_id+1, false));
     rightChildNode->m_tau = generateTau();
     generateTeta(rightChildNode->m_teta1, m_probe_distanceX, m_probe_distanceY);
     generateTeta(rightChildNode->m_teta2, m_probe_distanceX, m_probe_distanceY);
@@ -136,7 +136,7 @@ void RandomDecisionTree::tuneParameters(PixelCloud& parentPixels, Node& parent)
 bool RandomDecisionTree::isPixelSizeConsistent()
 {
     auto nPixelsOnLeaves=0u;
-    for(Node *node : m_nodes)
+    for(node_ptr node : m_nodes)
         if(node->m_isLeaf)
             nPixelsOnLeaves += getTotalNumberOfPixels(node->m_hist);
 
@@ -149,7 +149,7 @@ void RandomDecisionTree::toString()
     qDebug() << "Depth : " << m_depth;
     qDebug() << "Leaves: " << m_numOfLeaves;
     int count = 0 ;
-    for (auto *node : m_nodes)
+    for (node_ptr node : m_nodes)
     {
         if(node->m_isLeaf)
         {
