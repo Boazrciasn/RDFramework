@@ -41,7 +41,7 @@ inline cv::Mat createHistogram(PixelCloud& pixels, int labelCount)
     cv::Mat hist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
     for (Pixel *px : pixels)
     {
-        int index = letterIndex(px->imgInfo->label);
+        int index = letterIndex(px->imgInfo->label.at(0).toLatin1());
         ++hist.at<float>(0, index);
     }
     return hist;
@@ -162,7 +162,7 @@ public:
     static void plot(const cv::Mat &hist,QWidget *parent);
     static QString fileNameWithoutPath(QString& filePath);
     static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
-    static void calcWidthHightStat(QString srcDir);
+    static void calcWidthHeightStat(QString srcDir);
 };
 
 #endif

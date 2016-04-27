@@ -19,7 +19,7 @@ struct ImageInfo
 {
     QString label;
     int sampleId;
-    ImageInfo(QString lbl, int smplId) :
+    ImageInfo(const QString &lbl, int smplId) :
         label(lbl), sampleId(smplId){}
 };
 

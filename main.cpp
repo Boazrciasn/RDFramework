@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 //    qDebug()<<"Test image size :"<<codedImage.rows << "x" << img.cols;
 //    qDebug()<<"Test image channels : "<< codedImage.type();
 
-//    Util::calcWidthHightStat("/home/vvglab/Desktop/AnnotationResults");
+//    Util::calcWidthHeightStat("/home/vvglab/Desktop/AnnotationResults");
 
     w.show();
     //return 0;

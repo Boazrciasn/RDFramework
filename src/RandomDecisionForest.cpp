@@ -129,7 +129,7 @@ cv::Mat RandomDecisionForest::classify(int index)
     int n_cols=test_image.cols;
     //typecheck
     cv::Mat res_image = cv::Mat(n_rows-2*m_params.probDistY, n_cols-2*m_params.probDistX, test_image.type());
-    ImageInfo* img_Info = new ImageInfo(' ', index);
+    ImageInfo* img_Info = new ImageInfo(" ", index);
 
     for(int r=m_params.probDistY; r<n_rows-m_params.probDistY; ++r)
     {

@@ -128,7 +128,8 @@ void Util::plot(const cv::Mat &hist, QWidget *parent)
     histDialog->plot(hist);
 }
 
-QString Util::fileNameWithoutPath(QString& filePath){
+QString Util::fileNameWithoutPath(QString& filePath)
+{
     int posLastDot = filePath.lastIndexOf(".",-1);
     int posLastSlash= filePath.lastIndexOf("/",-1);
     QString fname = filePath.mid(posLastSlash+1,posLastDot-posLastSlash-1);
@@ -136,12 +137,12 @@ QString Util::fileNameWithoutPath(QString& filePath){
     return fname;
 }
 
-
-void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize){
+void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
+{
     QString folder;
     QString file;
     outDir += "_ksize_" + QString::number(ksize);
-    QDirIterator ittDir(srcDir, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+    QDirIterator ittDir(srcDir, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive);
 
     while (ittDir.hasNext()){
         ittDir.next();
@@ -153,10 +154,11 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize){
         {
             dir_save.mkpath(".");
             if(!dir_save.exists())
-                 qDebug() << "ERROR : " << dir_save << " can not be created!" ;
+                 qDebug() << "ERROR : " << dir_save << " can not be created!";
         }
 
-        while(ittFile.hasNext()){
+        while(ittFile.hasNext())
+        {
             ittFile.next();
             file = ittFile.fileName();
             cv::Mat img_bw = cv::imread(srcDir.toStdString() + "/" + folder.toStdString() + "/" + file.toStdString(), 0);
@@ -170,7 +172,7 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize){
     }
 }
 
-void Util::calcWidthHightStat(QString srcDir){
+void Util::calcWidthHeightStat(QString srcDir){
     float w_avrg, h_avrg;
     int count;
 
@@ -178,7 +180,7 @@ void Util::calcWidthHightStat(QString srcDir){
     QString file;
     QDirIterator ittDir(srcDir, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
 
-    QFile outLog(srcDir + "/AverageWidthHight.txt");
+    QFile outLog(srcDir + "/AverageWidthHeight.txt");
     outLog.open(QIODevice::WriteOnly);
 
     while (ittDir.hasNext()){
