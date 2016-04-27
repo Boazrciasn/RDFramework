@@ -61,7 +61,7 @@ void RandomDecisionTree::subSample()
     for(auto &image : m_DF->m_DS.m_trainImagesVector)
     {
         auto label = m_DF->m_DS.m_trainlabels[sampleId];
-        ImageInfo *img_inf = new ImageInfo(label, ++sampleId);
+        ImageInfo *img_inf = new ImageInfo(label, sampleId++);
 
         // draw perImagePixel pixels from image
         // bootstrap, subsample
