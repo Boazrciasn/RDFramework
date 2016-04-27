@@ -34,8 +34,8 @@ void RandomDecisionTree::constructTree( Node& cur_node, PixelCloud& pixels)
     }
 
     tuneParameters(pixels, cur_node);
-    std::vector<Pixel*> left;
-    std::vector<Pixel*> right;
+    std::vector<pixel_ptr> left;
+    std::vector<pixel_ptr> right;
     divide(m_DF->m_DS, pixels, left, right, cur_node);
 
 
@@ -61,7 +61,7 @@ void RandomDecisionTree::subSample()
     for(auto &image : m_DF->m_DS.m_trainImagesVector)
     {
         auto label = m_DF->m_DS.m_trainlabels[sampleId];
-        ImageInfo *img_inf = new ImageInfo(label, sampleId++);
+        imageinfo_ptr img_inf(new ImageInfo(label, sampleId++));
 
         // draw perImagePixel pixels from image
         // bootstrap, subsample
@@ -70,7 +70,7 @@ void RandomDecisionTree::subSample()
             int i = (rand() % (image.rows-2*m_probe_distanceY)) + m_probe_distanceY;
             int j = (rand() % (image.cols-2*m_probe_distanceX)) + m_probe_distanceX;
             auto intensity = image.at<uchar>(i,j);
-            auto *px = new Pixel(Coord(i,j),intensity,img_inf);
+            pixel_ptr px(new Pixel(Coord(i,j),intensity,img_inf));
             m_pixelCloud.push_back(px);
         }
     }
@@ -79,8 +79,8 @@ void RandomDecisionTree::subSample()
 // find best teta and taw parameters for the given node
 void RandomDecisionTree::tuneParameters(PixelCloud& parentPixels, Node& parent)
 {
-    std::vector<Pixel*> left;
-    std::vector<Pixel*> right;
+    std::vector<pixel_ptr> left;
+    std::vector<pixel_ptr> right;
     int maxTau;
     Coord maxTeta1,maxTeta2;
     float maxGain=0;
@@ -166,7 +166,7 @@ void RandomDecisionTree::printPixelCloud()
         printPixel(pPixel);
 }
 
-void RandomDecisionTree::printPixel(Pixel* px)
+void RandomDecisionTree::printPixel(pixel_ptr px)
 {
     qDebug() << "Pixel{ Coor("    << px->position.m_dy     << ","     << px->position.m_dx
              << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId

@@ -1,6 +1,8 @@
 #ifndef PIXELCLOUD_H
 #define PIXELCLOUD_H
 
+#include <memory>
+
 struct Coord
 {
     int m_dx;
@@ -23,15 +25,18 @@ struct ImageInfo
         label(lbl), sampleId(smplId){}
 };
 
+using imageinfo_ptr = std::shared_ptr<ImageInfo>;
+
 struct Pixel
 {
     Coord position;
     quint8 intensity;
-    ImageInfo* imgInfo;
-    Pixel(Coord crd, unsigned char intnsty, ImageInfo* imgInf):
+    imageinfo_ptr imgInfo;
+    Pixel(Coord crd, unsigned char intnsty, imageinfo_ptr imgInf):
         position(crd), intensity(intnsty),imgInfo(imgInf){}
 };
 
-using PixelCloud = std::vector<Pixel*>;
+using pixel_ptr = std::shared_ptr<Pixel>;
+using PixelCloud = std::vector<pixel_ptr>;
 
 #endif // PIXELCLOUD_H

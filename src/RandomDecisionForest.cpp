@@ -51,14 +51,14 @@ void RandomDecisionForest::readTestImageFiles()
 }
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
-void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat &image ,ImageInfo* img_inf )
+void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,const cv::Mat &image ,imageinfo_ptr img_inf )
 {
     for(int i =0; i<image.rows;i++)
     {
         for(int j =0; j<image.cols;j++)
         {
             auto intensity = image.at<uchar>(i,j);
-            Pixel* px = new Pixel(Coord(i,j),intensity,img_inf);
+            pixel_ptr px(new Pixel(Coord(i,j),intensity,img_inf));
             res.push_back(px);
         }
     }
@@ -70,7 +70,7 @@ void RandomDecisionForest::imageToPixels(std::vector<Pixel*> &res,const cv::Mat 
 // checks if a pixel will travel to the left of a given node
 // divide pixel vector into 2 parts according to the parameters of parent node
 // returns the image the pixel belongs to
-cv::Mat RandomDecisionForest::getPixelImage(Pixel* px)
+cv::Mat RandomDecisionForest::getPixelImage(pixel_ptr px)
 {
     QString path = m_dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
             + QString::number(px->imgInfo->sampleId)  + ".jpg";
@@ -129,14 +129,14 @@ cv::Mat RandomDecisionForest::classify(int index)
     int n_cols=test_image.cols;
     //typecheck
     cv::Mat res_image = cv::Mat(n_rows-2*m_params.probDistY, n_cols-2*m_params.probDistX, test_image.type());
-    ImageInfo* img_Info = new ImageInfo(" ", index);
+    imageinfo_ptr img_Info(new ImageInfo(" ", index));
 
     for(int r=m_params.probDistY; r<n_rows-m_params.probDistY; ++r)
     {
         for(int c=m_params.probDistX; c<n_cols-m_params.probDistX; ++c)
         {
             auto intensity = test_image.at<uchar>(r,c);
-            auto *px = new Pixel(Coord(r,c),intensity,img_Info);
+            pixel_ptr px(new Pixel(Coord(r,c),intensity,img_Info));
             cv::Mat probHist = cv::Mat::zeros(1, m_params.labelCount, cv::DataType<float>::type);
             auto nForest = m_forest.size();
             for(unsigned int i=0; i<nForest; ++i)

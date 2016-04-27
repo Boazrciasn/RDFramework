@@ -14,7 +14,7 @@ inline int letterIndex(char letter)
 inline cv::Mat createHistogram(PixelCloud& pixels, int labelCount)
 {
     cv::Mat hist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
-    for (Pixel *px : pixels)
+    for (pixel_ptr px : pixels)
     {
         int index = letterIndex(px->imgInfo->label.at(0).toLatin1());
         ++hist.at<float>(0, index);

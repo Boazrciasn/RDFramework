@@ -24,6 +24,7 @@ struct Node
     }
 };
 
+
 using TreeNodes = std::vector<Node*>;
 
 struct DataSet
@@ -66,9 +67,9 @@ public:
 
     inline void setMinimumLeafPixelCount(unsigned int min_leaf_pixel_count) { m_minLeafPixelCount = min_leaf_pixel_count; }
 
-    void tuneParameters(std::vector<Pixel*>& parentPixels, Node& parent);
+    void tuneParameters(std::vector<pixel_ptr>& parentPixels, Node& parent);
 
-    inline bool isLeft(Pixel* p, Node& node, cv::Mat& img)
+    inline bool isLeft(pixel_ptr p, Node& node, cv::Mat& img)
     {
         qint16 new_teta1R = node.m_teta1.m_dy + p->position.m_dy;
         qint16 new_teta1C = node.m_teta1.m_dx + p->position.m_dx;
@@ -81,7 +82,7 @@ public:
         return intensity1 - intensity2 <= node.m_tau;
     }
 
-    inline Node* getLeafNode(const DataSet &DS, Pixel*px, int nodeId)
+    inline Node* getLeafNode(const DataSet &DS, pixel_ptr px, int nodeId)
     {
         Node* root = m_nodes[nodeId];
         assert( root != NULL);
@@ -107,7 +108,7 @@ private:
 
     void subSample();
 
-    inline void divide(const DataSet& DS, const PixelCloud& parentPixels, std::vector<Pixel*>& left, std::vector<Pixel*>& right, Node& parent)
+    inline void divide(const DataSet& DS, const PixelCloud& parentPixels, std::vector<pixel_ptr>& left, std::vector<pixel_ptr>& right, Node& parent)
     {
         for (auto px : parentPixels)
         {
@@ -117,7 +118,7 @@ private:
     }
 
     void printPixelCloud();
-    void printPixel(Pixel* px);
+    void printPixel(pixel_ptr px);
     void printNode(Node& node);
 };
 
