@@ -30,6 +30,9 @@ struct DataSet
 {
     std::vector<cv::Mat> m_trainImagesVector;
     std::vector<cv::Mat> m_testImagesVector;
+    std::vector<QString> m_testlabels;
+    std::vector<QString> m_trainlabels;
+
 };
 
 class RandomDecisionForest;

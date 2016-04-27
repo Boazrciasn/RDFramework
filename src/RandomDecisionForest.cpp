@@ -14,27 +14,16 @@ void RandomDecisionForest::readTrainingImageFiles()
     m_dir = m_params.trainDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();
-    reader->findImages(m_dir, "", fNames);
+    reader->findImages(m_dir, "", fNames, m_DS.m_trainlabels);
     m_numOfLetters = fNames.size();
     qDebug()<<"NO OF LETTERS : "<< m_numOfLetters;
+
     for (auto filePath : fNames)
     {
-        QString fileName = Util::fileNameWithoutPath(filePath);
-        //each directory contains lastsession.txt
-        if(!fileName.contains("_"))
-            continue;
-
-        filePath += "/" + fileName + ".jpg";
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-
         //pad image and save to vector
         cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY, m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
         m_DS.m_trainImagesVector.push_back(image);
-
-        //sample image info : label : a , Id : index of in the image vector of the image.
-        QString letter = fileName.split("_")[0];
-        // store label of the image in m_labels vector
-        m_labels.push_back(letter[0].toLatin1());
     }
     qDebug()<<"No of IMAGES : " << m_DS.m_trainImagesVector.size() << " NO of Fnames" <<m_numOfLetters<< "Images Vector Size : "<< m_DS.m_trainImagesVector.size();
     fNames.clear();
@@ -46,24 +35,19 @@ void RandomDecisionForest::readTestImageFiles()
     m_dir = m_params.testDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();
-    reader->findImages(m_dir, "", fNames);
+    reader->findImages(m_dir, "", fNames, m_DS.m_testlabels);
+
     for (auto filePath : fNames)
     {
-        QString fileName = Util::fileNameWithoutPath(filePath);
-        //qDebug() << fileName ;
-        //each directory contains lastsession.txt
-        if(!fileName.contains("_"))
-            continue;
-
-        filePath += "/" + fileName + ".jpg";
+        //TODO: reads file with only
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-
         //pad image and save to vector
         cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY, m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
         m_DS.m_testImagesVector.push_back(image);
     }
     qDebug()<<"No of test IMAGES : " << m_DS.m_testImagesVector.size();
     fNames.clear();
+
 }
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
@@ -136,3 +120,61 @@ void RandomDecisionForest::trainForest()
     }
     qDebug()<< "Forest Size : " << m_forest.size();
 }
+
+//padded image index must be provided
+cv::Mat RandomDecisionForest::classify(int index)
+{
+    cv::Mat test_image = m_DS.m_testImagesVector[index];
+    int n_rows=test_image.rows;
+    int n_cols=test_image.cols;
+    //typecheck
+    cv::Mat res_image = cv::Mat(n_rows-2*m_params.probDistY, n_cols-2*m_params.probDistX, test_image.type());
+    ImageInfo* img_Info = new ImageInfo(' ', index);
+
+    for(int r=m_params.probDistY; r<n_rows-m_params.probDistY; ++r)
+    {
+        for(int c=m_params.probDistX; c<n_cols-m_params.probDistX; ++c)
+        {
+            auto intensity = test_image.at<uchar>(r,c);
+            auto *px = new Pixel(Coord(r,c),intensity,img_Info);
+            cv::Mat probHist = cv::Mat::zeros(1, m_params.labelCount, cv::DataType<float>::type);
+            auto nForest = m_forest.size();
+            for(unsigned int i=0; i<nForest; ++i)
+            {
+                Node *leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
+                probHist += leaf->m_hist;
+            }
+            // Type check of label
+            auto label = getMaxLikelihoodIndex(probHist);
+            res_image.at<uchar>(r-m_params.probDistY,c-m_params.probDistX) = label;
+            probHist.release();
+        }
+    }
+
+    return res_image;
+}
+
+void RandomDecisionForest::test()
+{
+    int size = m_DS.m_testImagesVector.size();
+    qDebug() << "Number of Test images:" << QString::number(size);
+
+    for(auto i=0; i<size; ++i)
+    {
+        cv::Mat votes = cv::Mat::zeros(1, m_params.labelCount, CV_32FC1);
+        cv::Mat label_image = classify(i);
+
+        if(votes.cols != m_params.labelCount)
+        {
+            std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
+            return;
+        }
+        getImageLabelVotes(label_image, votes);
+        std::cout<<votes<<std::endl;
+        int label = getMaxLikelihoodIndex(votes);
+        //qDebug()<<" LABELED : "<< char('a' + label);
+        emit classifiedImageAs(i+1, char('a' + label));
+        votes.release();
+    }
+}
+

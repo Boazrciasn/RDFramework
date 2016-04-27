@@ -17,9 +17,9 @@ struct Coord
 
 struct ImageInfo
 {
-    char label;
+    QString label;
     int sampleId;
-    ImageInfo(char lbl, int smplId) :
+    ImageInfo(QString lbl, int smplId) :
         label(lbl), sampleId(smplId){}
 };
 

@@ -97,12 +97,8 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     }
 
     toReturn = toClean.mid(i,j-i+1);
-
-    //FIXME: got to refactor the code here sorry for bold coding.
     i = 0;
     j=toReturn.length();
-
-
     //check if the word starts or ends with a number or a whole number
     bool isNumber;
     toReturn.toInt(&isNumber);
@@ -223,6 +219,7 @@ void Util::calcWidthHightStat(QString srcDir){
     }
     outLog.close();
 }
+
 
 
 

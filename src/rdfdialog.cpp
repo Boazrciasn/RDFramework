@@ -56,6 +56,7 @@ void RDFDialog::on_train_button_clicked()
         return;
     }
 
+    Util::calcWidthHightStat(m_forest->params().trainDir);
     m_treeid = 0;
     m_forest->readTrainingImageFiles();
     ui->textBrowser_train->append("Training images read");

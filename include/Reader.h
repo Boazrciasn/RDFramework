@@ -20,6 +20,7 @@
 class Reader{
 public:
     void readFromTo(std::string filename, std::vector<QString> &imgName);
+    void findImages(QString baseDir, QString query, std::vector<QString> &foundImages, std::vector<QString> &labels);
     void findImages(QString baseDir, QString query, std::vector<QString> &foundImages);
 private:
     DIR *m_dir;

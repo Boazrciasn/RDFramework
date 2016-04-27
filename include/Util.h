@@ -121,6 +121,8 @@ inline void getImageLabelVotes(const cv::Mat& label_image, cv::Mat& vote_vector)
             ++vote_vector.at<float>(label_image.at<uchar>(i,j));
 }
 
+
+
 inline void printHistogram(cv::Mat &hist)
 {
     QString res = "HIST {";

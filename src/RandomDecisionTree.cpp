@@ -60,8 +60,8 @@ void RandomDecisionTree::subSample()
     int sampleId=0;
     for(auto &image : m_DF->m_DS.m_trainImagesVector)
     {
-        auto label = m_DF->m_labels[sampleId];
-        ImageInfo *img_inf = new ImageInfo(label, sampleId++);
+        auto label = m_DF->m_DS.m_trainlabels[sampleId];
+        ImageInfo *img_inf = new ImageInfo(label, ++sampleId);
 
         // draw perImagePixel pixels from image
         // bootstrap, subsample
@@ -130,71 +130,6 @@ void RandomDecisionTree::tuneParameters(PixelCloud& parentPixels, Node& parent)
     parent.m_tau = maxTau;
     parent.m_teta1 = maxTeta1;
     parent.m_teta2 = maxTeta2;
-}
-
-//padded image index must be provided
-cv::Mat RandomDecisionForest::classify(int index)
-{
-    cv::Mat test_image = m_DS.m_testImagesVector[index];
-    int n_rows=test_image.rows;
-    int n_cols=test_image.cols;
-    //typecheck
-    cv::Mat res_image = cv::Mat(n_rows-2*m_params.probDistY, n_cols-2*m_params.probDistX, test_image.type());
-    ImageInfo* img_Info = new ImageInfo(' ', index);
-
-    for(int r=m_params.probDistY; r<n_rows-m_params.probDistY; ++r)
-    {
-        for(int c=m_params.probDistX; c<n_cols-m_params.probDistX; ++c)
-        {
-            auto intensity = test_image.at<uchar>(r,c);
-            auto *px = new Pixel(Coord(r,c),intensity,img_Info);
-            cv::Mat probHist = cv::Mat::zeros(1, m_params.labelCount, cv::DataType<float>::type);
-            auto nForest = m_forest.size();
-            for(unsigned int i=0; i<nForest; ++i)
-            {
-                Node *leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
-                probHist += leaf->m_hist;
-            }
-            // Type check of label
-            auto label = getMaxLikelihoodIndex(probHist);
-            res_image.at<uchar>(r-m_params.probDistY,c-m_params.probDistX) = label;
-            probHist.release();
-        }
-    }
-
-    return res_image;
-}
-
-void RandomDecisionForest::test()
-{
-    int size = m_DS.m_testImagesVector.size();
-    qDebug() << "Number of Test images:" << QString::number(size);
-
-    for(auto i=0; i<size; ++i)
-    {
-        cv::Mat votes = cv::Mat::zeros(1, m_params.labelCount, CV_32FC1);
-//        cv::Mat original = unpad(m_testImagesVector[i]);
-        //qDebug() << QString::number(i);
-        //qDebug() << QString::number(i) << "labeled";
-//        cv::Mat colored_img = colorCoder(prediction,original);
-//        cv::imshow("Colored Image",colored_img );
-//        cv::waitKey();
-        //qDebug()<<"classify : " << QString::number(i);
-        cv::Mat label_image = classify(i);
-        //qDebug()<<" gettin votes : ";
-
-        if(votes.cols != m_params.labelCount)
-        {
-            std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
-            return;
-        }
-        getImageLabelVotes(label_image, votes);
-        std::cout<<votes<<std::endl;
-        int label = getMaxLikelihoodIndex(votes);
-        //qDebug()<<" LABELED : "<< char('a' + label);
-        emit classifiedImageAs(i+1, char('a' + label));
-        votes.release();
-    }
 }
 
 

@@ -42,11 +42,12 @@ public:
     std::vector<cv::Mat> m_imagesContainer;
 
 
+
 private:
     RDFParams m_params;
 
     QString m_dir;
-    std::vector<char> m_labels;
+
     int m_numOfLetters = 0;
 
 signals:

@@ -46,6 +46,6 @@ void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
     {
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
         cv::resize(image,image,size);
-//        cv::imwrite(filePath.toStdString(), image);
+        cv::imwrite(filePath.toStdString(), image);
     }
 }
