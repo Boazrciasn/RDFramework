@@ -27,7 +27,8 @@ void AnnExtractorDialog::mousePressEvent(QMouseEvent *event)
     if (rubberBand->isEnabled())
         rubberBand->hide();
 
-    if(ui->imageLabel->underMouse()){
+    if(ui->imageLabel->underMouse())
+    {
         myPoint = event->pos();
         rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
         rubberBand->show();
@@ -75,7 +76,8 @@ void AnnExtractorDialog::on_browse_button_clicked()
 {
     QString searchChar = ui->search_char->text();
 
-    if (searchChar.size() != 1){
+    if (searchChar.size() != 1)
+    {
         QMessageBox::information(this, tr("Image Viewer"),
                                  tr("Please check your input parameters!"));
         return;
@@ -97,7 +99,8 @@ void AnnExtractorDialog::on_browse_button_clicked()
     this->saveDir = dir.mid(0,posLastSlash) + "/AnnotationResults/" + ui->search_char->text();
 
     QFile textFileRead(this->saveDir + "/lastSession.txt");
-    if (textFileRead.exists()) {
+    if (textFileRead.exists())
+    {
         textFileRead.open(QIODevice::ReadOnly);
         QString str = textFileRead.readLine();
         QStringList strList = str.split("#");
@@ -105,9 +108,9 @@ void AnnExtractorDialog::on_browse_button_clicked()
         fileIndex = ((QString)strList[1]).toInt() + 1;
 
         ui->counter_label->setText(QString::number(savedFileCounter));
-
         qDebug() << savedFileCounter << " - " << fileIndex;
-    }else {
+    }else
+    {
         fileIndex = 0;
         savedFileCounter = 0;
     }
@@ -127,7 +130,6 @@ void AnnExtractorDialog::on_browse_button_clicked()
 
     ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
     ui->imageLabel->repaint();
-
 
     QDir dir_save(saveDir);
     if (!dir_save.exists())
@@ -217,8 +219,6 @@ void AnnExtractorDialog::on_next_button_clicked()
         return;
     }
     QImage image(fNames[fileIndex]);
-
-
     QPixmap pixmap = QPixmap::fromImage(image);
     QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());

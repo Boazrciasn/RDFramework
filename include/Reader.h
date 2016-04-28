@@ -13,10 +13,6 @@
 #include <dirent.h>
 #include <iostream>
 
-
-
-
-
 class Reader{
 public:
     void readFromTo(std::string filename, std::vector<QString> &imgName);

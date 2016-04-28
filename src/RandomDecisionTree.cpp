@@ -62,13 +62,15 @@ void RandomDecisionTree::subSample()
     {
         auto label = m_DF->m_DS.m_trainlabels[sampleId];
         imageinfo_ptr img_inf(new ImageInfo(label, sampleId++));
+        int nRows = image.rows;
+        int nCols = image.cols;
 
         // draw perImagePixel pixels from image
         // bootstrap, subsample
         for(int k=0; k<m_DF->m_params.pixelsPerImage; ++k)
         {
-            int i = (rand() % (image.rows-2*m_probe_distanceY)) + m_probe_distanceY;
-            int j = (rand() % (image.cols-2*m_probe_distanceX)) + m_probe_distanceX;
+            int i = (rand() % (nRows-2*m_probe_distanceY)) + m_probe_distanceY;
+            int j = (rand() % (nCols-2*m_probe_distanceX)) + m_probe_distanceX;
             auto intensity = image.at<uchar>(i,j);
             pixel_ptr px(new Pixel(Coord(i,j),intensity,img_inf));
             m_pixelCloud.push_back(px);

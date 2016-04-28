@@ -26,11 +26,8 @@ public:
 
 private slots:
     void on_browse_button_clicked();
-
     void on_save_button_clicked();
-
     void on_previous_button_clicked();
-
     void on_next_button_clicked();
 
 private:

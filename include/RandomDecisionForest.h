@@ -41,15 +41,11 @@ public:
     // Keep all images on memory
     std::vector<cv::Mat> m_imagesContainer;
 
-
-
 private:
     double m_accuracy;
     std::vector<QString> classify_res;
     RDFParams m_params;
-
     QString m_dir;
-
     int m_numOfLetters = 0;
 
 signals:

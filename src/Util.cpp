@@ -7,8 +7,6 @@
 
 void deneme()
 {
-
-
     cv::Mat_<float> A(3, 3);
     cv::Mat_<int> B(5, 5);
     A.setTo(0);
@@ -25,9 +23,9 @@ void deneme()
 
 double Util::calculateAccuracy(const std::vector<QString> &groundtruth, const std::vector<QString> &results)
 {
-    auto nSize = groundtruth.size();
+    int nSize = groundtruth.size();
     int count = 0;
-    for ( auto i = 0; i < nSize; ++i ) {
+    for (int i = 0; i < nSize; ++i ) {
         if (groundtruth[i] == results[i])
             ++count;
     }
@@ -116,12 +114,11 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
         return toReturn.toLower();
     }
 */
-    if (toReturn[i].isDigit() || toReturn[j].isDigit() ) {
-
+    if (toReturn[i].isDigit() || toReturn[j].isDigit() )
+    {
         toReturn ="Numbers/" +toReturn;
         return toReturn;
     }
-
 
     return toReturn.toLower();
 }
@@ -149,7 +146,8 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
     outDir += "_ksize_" + QString::number(ksize);
     QDirIterator ittDir(srcDir, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive);
 
-    while (ittDir.hasNext()){
+    while (ittDir.hasNext())
+    {
         ittDir.next();
         folder = ittDir.fileName();
         QDirIterator ittFile(srcDir + "/"+ folder,QStringList()<<"*.jpg"<<"*.jpeg",QDir::Files);
@@ -188,7 +186,8 @@ void Util::calcWidthHeightStat(QString srcDir){
     QFile outLog(srcDir + "/AverageWidthHeight.txt");
     outLog.open(QIODevice::WriteOnly);
 
-    while (ittDir.hasNext()){
+    while (ittDir.hasNext())
+    {
         ittDir.next();
         folder = ittDir.fileName();
         QDirIterator ittFile(srcDir + "/"+ folder,QStringList()<<"*.jpg"<<"*.jpeg",QDir::Files);
@@ -196,7 +195,8 @@ void Util::calcWidthHeightStat(QString srcDir){
         w_avrg = h_avrg = 0;
         count = 0;
 
-        while(ittFile.hasNext()){
+        while(ittFile.hasNext())
+        {
             ittFile.next();
             file = ittFile.fileName();
             cv::Mat img_bw = cv::imread(srcDir.toStdString() + "/" + folder.toStdString() + "/" + file.toStdString(), 0);
@@ -226,30 +226,3 @@ void Util::calcWidthHeightStat(QString srcDir){
     }
     outLog.close();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

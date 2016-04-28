@@ -53,9 +53,11 @@ void RandomDecisionForest::readTestImageFiles()
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
 void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,const cv::Mat &image ,imageinfo_ptr img_inf )
 {
-    for(int i =0; i<image.rows;i++)
+    int nRows = image.rows;
+    int nCols = image.cols;
+    for(int i =0; i<nRows; ++i)
     {
-        for(int j =0; j<image.cols;j++)
+        for(int j =0; j<nCols; ++j)
         {
             auto intensity = image.at<uchar>(i,j);
             pixel_ptr px(new Pixel(Coord(i,j),intensity,img_inf));
@@ -63,8 +65,6 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,const cv::M
         }
     }
 }
-
-
 
 // given a letter returns its index on label histogram
 // checks if a pixel will travel to the left of a given node
@@ -80,14 +80,19 @@ cv::Mat RandomDecisionForest::getPixelImage(pixel_ptr px)
 
 cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage)
 {
-    cv::Mat color(InputImage.rows, InputImage.cols, CV_8UC1);
+    int nRows = InputImage.rows;
+    int nCols = InputImage.cols;
+    int labelCount = m_params.labelCount;
+
+    cv::Mat color(nRows, nCols, CV_8UC1);
+
     //create color code Mat accoridng to of each pixel.
-    for(int i =0; i<InputImage.rows;i++)
+    for(int i =0; i<nRows; ++i)
     {
-        for(int j =0; j<InputImage.cols;j++)
+        for(int j =0; j<nCols; ++j)
         {
             auto label = labelImage.at<double>(i,j);
-            color.at<double>(i,j) = (label/m_params.labelCount)*255;
+            color.at<double>(i,j) = (label/labelCount)*255;
         }
     }
     //create 3 channel image with 2 channels with same intensity values of cv::Mat color :
@@ -97,7 +102,6 @@ cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Ma
     Image_channels.at(1) = color;
     Image_channels.at(2) = color;
     cv::Mat codedImage;
-
     cv::merge(Image_channels,codedImage);
 
     return codedImage;
@@ -125,19 +129,27 @@ void RandomDecisionForest::trainForest()
 cv::Mat RandomDecisionForest::classify(int index)
 {
     cv::Mat test_image = m_DS.m_testImagesVector[index];
-    int n_rows=test_image.rows;
-    int n_cols=test_image.cols;
+    int nRows=test_image.rows;
+    int nCols=test_image.cols;
+
+    int probDistY  = m_params.probDistY;
+    int probDistX  = m_params.probDistX;
+    int labelCount = m_params.labelCount;
+
     //typecheck
-    cv::Mat res_image = cv::Mat(n_rows-2*m_params.probDistY, n_cols-2*m_params.probDistX, test_image.type());
+    cv::Mat res_image = cv::Mat(nRows-2*probDistY, nCols-2*probDistX, test_image.type());
     imageinfo_ptr img_Info(new ImageInfo(" ", index));
 
-    for(int r=m_params.probDistY; r<n_rows-m_params.probDistY; ++r)
+    nRows -= probDistY;
+    nCols -= probDistX;
+
+    for(int r=probDistY; r<nRows; ++r)
     {
-        for(int c=m_params.probDistX; c<n_cols-m_params.probDistX; ++c)
+        for(int c=probDistX; c<nCols; ++c)
         {
             auto intensity = test_image.at<uchar>(r,c);
             pixel_ptr px(new Pixel(Coord(r,c),intensity,img_Info));
-            cv::Mat probHist = cv::Mat::zeros(1, m_params.labelCount, cv::DataType<float>::type);
+            cv::Mat probHist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
             auto nForest = m_forest.size();
             for(unsigned int i=0; i<nForest; ++i)
             {
@@ -146,7 +158,7 @@ cv::Mat RandomDecisionForest::classify(int index)
             }
             // Type check of label
             auto label = getMaxLikelihoodIndex(probHist);
-            res_image.at<uchar>(r-m_params.probDistY,c-m_params.probDistX) = label;
+            res_image.at<uchar>(r-probDistY,c-probDistX) = label;
             probHist.release();
         }
     }

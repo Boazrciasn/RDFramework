@@ -4,7 +4,6 @@
 #include "include/histogramdialog.h"
 #include "include/PixelCloud.h"
 
-
 inline int letterIndex(char letter)
 {
     return letter-'a';
@@ -76,7 +75,8 @@ inline int getMaxLikelihoodIndex(const cv::Mat& hist)
 {
     int max_val=-1;
     int max_index=0;
-    for(int i=0;i<hist.cols;++i)
+    int nCols = hist.cols;
+    for(int i=0; i<nCols; ++i)
     {
         if(hist.at<float>(0, i) > max_val)
         {
@@ -89,10 +89,10 @@ inline int getMaxLikelihoodIndex(const cv::Mat& hist)
 
 inline void getImageLabelVotes(const cv::Mat& label_image, cv::Mat& vote_vector)
 {
-    int rows = label_image.rows;
-    int cols = label_image.cols;
-    for (int i = 0; i < rows ; ++i)
-        for (int j = 0; j < cols; ++j)
+    int nRows = label_image.rows;
+    int nCols = label_image.cols;
+    for (int i = 0; i<nRows ; ++i)
+        for (int j = 0; j<nCols; ++j)
             ++vote_vector.at<float>(label_image.at<uchar>(i,j));
 }
 
@@ -101,8 +101,14 @@ inline void getImageLabelVotes(const cv::Mat& label_image, cv::Mat& vote_vector)
 inline void printHistogram(cv::Mat &hist)
 {
     QString res = "HIST {";
-    for(int i=0;i<hist.cols;i++)
-        res += " " + QString::number( hist.at<float>(0,i));
+    int nCols = hist.cols;
+    int nRows = hist.rows;
+    for(int i=0; i<nRows; ++i)
+    {
+        for(int j=0; j<nCols; ++j)
+            res += " " + QString::number(hist.at<float>(i,j));
+        res += "\n";
+    }
     qDebug() << res << "}";
 }
 

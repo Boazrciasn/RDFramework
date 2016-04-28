@@ -4,11 +4,54 @@
 #include "include/Reader.h"
 #include "include/RandomDecisionForest.h"
 
-
 int main(int argc, char *argv[]) {
 
     QApplication app(argc, argv);
     MainWindow w;
+
+
+    /*  TEST SERIALIZER SAVE
+    cv::Mat hist = cv::Mat::zeros(5, 25, cv::DataType<float>::type);
+    int nRows = hist.rows;
+    int nCols = hist.cols;
+    for(int i=0; i<nRows; ++i)
+    {
+        auto *pRow = (float *)hist.ptr(i);
+        for(int j=0; j<nCols; ++j, ++pRow)
+            *pRow = j+i;
+    }
+
+    Node nd(3,true);
+    nd.m_hist = hist;
+    nd.m_tau = 5;
+    nd.m_teta1 = Coor(5,8);
+    nd.m_teta2 = Coor(7,9);
+
+    std::ofstream file("file.bin", std::ios::binary);
+    cereal::BinaryOutputArchive ar(file);
+    ar(nd);
+    */
+
+    /*     TEST SERIALIZER LOAD
+
+  Node mnd;
+        {
+            std::ifstream file("file.bin", std::ios::binary);
+            cereal::BinaryInputArchive ar(file);
+            ar(mnd);
+        }
+
+        qDebug() << QString::number(mnd.m_id)
+                 << "-" << mnd.m_isLeaf
+                 << "-" << QString::number(mnd.m_tau)
+                 << "-(" << QString::number(mnd.m_teta1.m_dx)
+                 << "-" << QString::number(mnd.m_teta1.m_dy) << ")-"
+                 << "-(" << QString::number(mnd.m_teta2.m_dx)
+                 << "-" << mnd.m_teta2.m_dy << ")" ;
+       printHist(mnd.m_hist);
+
+    */
+
 
    /*
     //QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";

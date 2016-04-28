@@ -33,9 +33,6 @@ void MyDialog::setFNames(std::vector<QString> &fNames, QString dir)
     QString fileName = this->dir + "/" + this->fNames[this->fileIndex] + ".jpg";
     QImage image(fileName);
 
-
-
-
 //    // Compute Histogram
 //    QCustomPlot * customPlot = ui->plot_widget;
 //    cv::Mat im_gray, img_bw, hist;
@@ -59,7 +56,6 @@ void MyDialog::setFNames(std::vector<QString> &fNames, QString dir)
 //    // set axes ranges, so we see all data:
 //    customPlot->xAxis->setRange(-1, 1);
 //    customPlot->yAxis->setRange(0, 1);
-
 
     ui->label->setPixmap(QPixmap::fromImage(image));
 }

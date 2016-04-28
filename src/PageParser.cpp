@@ -35,7 +35,8 @@ void PageParser::getElements(QDomElement root, QString tagname, QString attribut
 {
     QDomNodeList items = root.elementsByTagName(tagname);
 
-    for(int i = 0; i < items.count(); i++)
+    int count = items.count();
+    for(int i = 0; i <count ; ++i)
     {
         QDomNode itemnode = items.at(i);
 
@@ -72,8 +73,8 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
     qDebug() << "Scanning " << (filename + ".jpg");
     qDebug() << "Number of words :" << words.size();
     qDebug() << "Number of words :" << coordinates.size();
-
-    for(unsigned int j=0;j<words.size();j++)
+    int size = words.size();
+    for(int j=0; j<size; ++j)
     {
         //each word represents a directory name
         QString word   = saveDir + "/" + words[j];
@@ -89,7 +90,8 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
         QString coordsStr =coordinates[j];
         QStringList coords = coordsStr.split(" ");
         QPolygon poly;
-        for(int i=0; i< coords.count(); i++)
+        int count = coords.count();
+        for(int i=0; i<count; ++i)
         {
             QString pointStr = coords[i];
             QStringList pointCoords = pointStr.split(",");

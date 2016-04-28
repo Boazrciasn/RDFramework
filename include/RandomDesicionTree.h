@@ -5,6 +5,10 @@
 #include <iostream>
 #include <time.h>
 
+#include <cereal/archives/binary.hpp>
+#include <include/matcerealisation.hpp>
+#include <fstream>
+
 #include "include/Util.h"
 #include "include/PixelCloud.h"
 #include "include/RDFParams.h"
@@ -18,11 +22,24 @@ struct Node
     quint32 m_id;
     bool m_isLeaf;
     cv::Mat m_hist;
-    Node(quint32 id, bool isLeaf):
-        m_id(id), m_isLeaf(isLeaf)
+
+    Node() : Node(0,false)
     {
     }
+
+    Node(quint32 id, bool isLeaf): m_id(id), m_isLeaf(isLeaf)
+    {
+    }
+
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+      archive( m_tau, m_teta1, m_teta2, m_id, m_isLeaf, m_hist);
+    }
 };
+
+
+
 
 
 using node_ptr = std::shared_ptr<Node>;
@@ -34,7 +51,6 @@ struct DataSet
     std::vector<cv::Mat> m_testImagesVector;
     std::vector<QString> m_testlabels;
     std::vector<QString> m_trainlabels;
-
 };
 
 class RandomDecisionForest;
@@ -51,11 +67,24 @@ public:
     int m_numOfLeaves;
     int m_maxDepth;
     int m_probe_distanceX, m_probe_distanceY;
-
     TreeNodes m_nodes;
 
     void train();
     void constructTree(Node& root, PixelCloud &pixels);
+
+    inline void saveNode(const Node& n)
+    {
+        std::ofstream file("file.bin", std::ios::binary);
+        cereal::BinaryOutputArchive ar(file);
+        ar(n);
+    }
+
+    inline void loadNode(Node& n)
+    {
+        std::ifstream file("file.bin", std::ios::binary);
+        cereal::BinaryInputArchive ar(file);
+        ar(n);
+    }
 
     inline void setMaxDepth(int max_depth)
     {

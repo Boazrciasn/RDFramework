@@ -21,11 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Rectangle_button->setChecked(true);
     connect(ui->runButton, SIGNAL (clicked()), this, SLOT (update()));
 
-
     // Shortcut to Random Desicion Forest Window
     QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
     QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionRDF_triggered()));
-
 
     shortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
     QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionResizer_triggered()));
@@ -55,11 +53,11 @@ void MainWindow::display()
     qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin));
 
     qDebug() << out.size();
-    for (int i = 0; i < out.size(); i++) {
+    for (int i = 0; i < out.size(); i++)
+    {
         qPainter.drawRect(out[i]);
     }
     image.save("out.jpg");
-
 
     QPixmap pixmap = QPixmap::fromImage(image);
     QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -120,14 +118,15 @@ void MainWindow::on_extractWords_clicked()
     QString saveDir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     pageParser = new PageParser();
 
-    for (int i = 0; i < (int)this->fNames.size(); i++) {
+    int size = (int)this->fNames.size();
+    for (int i = 0; i <size ; ++i)
+    {
         QString fileName = dir + "/" +this->fNames[i];
         pageParser->readFromTo(fileName,this->words,this->coords);
         pageParser->cropPolygons(fileName, saveDir,this->words,this->coords);
         this->words.clear();
         this->coords.clear();
     }
-
 
     delete pageParser;
     pageParser = NULL;
