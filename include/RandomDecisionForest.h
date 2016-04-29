@@ -42,6 +42,7 @@ public:
     std::vector<cv::Mat> m_imagesContainer;
 
 private:
+    void createLetterConfidenceMatrix(const cv::Mat &labelImg, cv::Mat &confidenceMat);
     double m_accuracy;
     std::vector<QString> classify_res;
     RDFParams m_params;

@@ -166,6 +166,24 @@ cv::Mat RandomDecisionForest::classify(int index)
     return res_image;
 }
 
+//TODO : assumed confidenceMat is a double zero matrix and allocated according to the image and labelnumber (labelnumber x ImageSize)
+void RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &labelImg, cv::Mat &confidenceMat)
+{
+    int nRows = labelImg.rows;
+    int nCols = labelImg.cols;
+
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; ++j)
+        {
+            int label = labelImg.at<uchar>(i,j);
+            confidenceMat.at<double>(label,j)++;
+        }
+    }
+    cv::divide((double)nRows,confidenceMat,confidenceMat);
+}
+
+
 void RandomDecisionForest::test()
 {
     int size = m_DS.m_testImagesVector.size();
