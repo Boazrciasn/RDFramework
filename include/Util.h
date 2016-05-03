@@ -49,18 +49,6 @@ inline float calculateEntropyOfVector(PixelCloud& pixels, int labelCount)
     return calculateEntropy(hist);
 }
 
-inline void generateTeta(Coord& crd, int probe_x, int probe_y)
-{
-    // random number between -probe_distance, probe_distance
-    crd.m_dy = (rand() % (2*probe_y)) - probe_y;
-    crd.m_dx = (rand() % (2*probe_x)) - probe_x;
-}
-
-inline int generateTau()
-{
-    // random number between -127, +128
-    return (rand() % 256) - 127;
-}
 
 inline int getTotalNumberOfPixels(const cv::Mat& hist)
 {

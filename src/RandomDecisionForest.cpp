@@ -158,7 +158,7 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
             }
             int col_index = c*labelCount;
             placeHistogram(layeredHist, probHist, r, col_index);
-            probHist.release();
+            //probHist.release();
         }
     }
 

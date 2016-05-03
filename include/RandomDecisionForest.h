@@ -3,7 +3,6 @@
 
 #include "include/RandomDesicionTree.h"
 
-
 class RandomDecisionForest : public QObject
 {
     Q_OBJECT
@@ -13,7 +12,8 @@ class RandomDecisionForest : public QObject
 public:
     RandomDecisionForest()
     {
-        srand(time(NULL));
+       srand(time(NULL));
+       m_begin = rdfclock::now();
     }
 
     ~RandomDecisionForest()
@@ -46,6 +46,7 @@ public:
     }
 
 private:
+    rdfclock::time_point m_begin;
     QWidget* m_parent;
     void placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row, int pos_col);
     cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist);
