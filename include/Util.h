@@ -59,15 +59,6 @@ inline void generateTeta(Coord& crd, int probe_x, int probe_y)
 inline int generateTau()
 {
     // random number between -127, +128
-
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
-//    std::uniform_int_distribution<> dis(1, 6);
-
-//    for (int n=0; n<10; ++n)
-//        std::cout << dis(gen) << ' ';
-//    std::cout << '\n';
-
     return (rand() % 256) - 127;
 }
 
@@ -80,16 +71,16 @@ inline int getTotalNumberOfPixels(const cv::Mat& hist)
     return totalSize;
 }
 
-inline int getMaxLikelihoodIndex(const cv::Mat& hist)
+inline int getMaxLikelihoodIndex(const QVector<float>& hist)
 {
-    float max_val=-1;
+    int max_val=-1;
     int max_index=0;
-    int nCols = hist.cols;
+    int nCols = hist.size();
     for(int i=0; i<nCols; ++i)
     {
-        if(hist.at<float>(0, i) > max_val)
+        if(hist[i] > max_val)
         {
-            max_val = hist.at<float>(0, i);
+            max_val = hist[i];
             max_index = i;
         }
     }
@@ -100,9 +91,9 @@ inline void getImageLabelVotes(const cv::Mat& label_image, QVector<float>& vote_
 {
     int nRows = label_image.rows;
     int nCols = label_image.cols;
-    for (int i = 0; i<nRows; ++i)
+    for (int i = 0; i<nRows ; ++i)
         for (int j = 0; j<nCols; ++j)
-            ++vote_vector[label_image.at<quint8>(i, j)];
+            ++vote_vector[label_image.at<uchar>(i,j)];
 }
 
 
@@ -154,6 +145,7 @@ public:
     static QString fileNameWithoutPath(QString& filePath);
     static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
     static void calcWidthHeightStat(QString srcDir);
+    static void normalizeMatCols(cv::Mat &mat);
 };
 
 #endif

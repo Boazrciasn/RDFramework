@@ -126,7 +126,7 @@ void RandomDecisionForest::trainForest()
 }
 
 //padded image index must be provided
-cv::Mat RandomDecisionForest::classify(cv::Mat test_image)
+cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
 {
     int nRows=test_image.rows;
     int nCols=test_image.cols;
@@ -136,15 +136,16 @@ cv::Mat RandomDecisionForest::classify(cv::Mat test_image)
     int labelCount = m_params.labelCount;
 
     //typecheck
-    cv::Mat res_image = cv::Mat(nRows-2*probDistY, nCols-2*probDistX, test_image.type());
+    cv::Mat layeredHist = cv::Mat(nRows-2*probDistY, (nCols-2*probDistX)*labelCount, test_image.type());
+
     imageinfo_ptr img_Info(new ImageInfo(" ", index));
 
-    nRows -= probDistY;
-    nCols -= probDistX;
+    int rangeRows = nRows - probDistY;
+    int rangeCols = nCols - probDistX;
 
-    for(int r=probDistY; r<nRows; ++r)
+    for(int r=probDistY; r<rangeRows; ++r)
     {
-        for(int c=probDistX; c<nCols; ++c)
+        for(int c=probDistX; c<rangeCols; ++c)
         {
             auto intensity = test_image.at<uchar>(r,c);
             pixel_ptr px(new Pixel(Coord(r,c),intensity,img_Info));
@@ -155,57 +156,77 @@ cv::Mat RandomDecisionForest::classify(cv::Mat test_image)
                 node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
                 probHist += leaf->m_hist;
             }
-            // Type check of label
-            auto label = getMaxLikelihoodIndex(probHist);
-            res_image.at<uchar>(r-probDistY,c-probDistX) = label;
+            int col_index = c*labelCount;
+            placeHistogram(layeredHist, probHist, r, col_index);
             probHist.release();
         }
     }
 
-    return res_image;
+    return layeredHist;
 }
 
-//TODO : assumed confidenceMat is a double zero matrix and allocated according to the image and labelnumber (labelnumber x ImageSize)
-void RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &labelImg, cv::Mat &confidenceMat)
+void RandomDecisionForest::placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row, int pos_col)
 {
-    int nRows = labelImg.rows;
-    int nCols = labelImg.cols;
+    auto range = pos_col+m_params.labelCount;
 
-    for (int i = 0; i < nRows; ++i)
+    for (int i = pos_col; i < range ; ++i)
     {
-        for (int j = 0; j < nCols; ++j)
-        {
-            int label = labelImg.at<uchar>(i,j);
-            confidenceMat.at<double>(label,j)++;
-        }
+        output.at<float>(pos_row,i) = pixelHist.at<float>(i-pos_col);
     }
-    cv::divide((double)nRows,confidenceMat,confidenceMat);
+}
+
+// confidenceMat : labelcount x imgrow
+cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layeredHist)
+{
+    int labelcount = m_params.labelCount;
+    int layered_Cols = layeredHist.cols;
+    int confmat_cols = layered_Cols/labelcount;
+
+    cv::Mat confidenceMat(labelcount, confmat_cols, CV_32FC1);
+    int i_row;
+    int i_col;
+
+    for (int i = 0; i < layered_Cols; ++i)
+    {
+        i_row = i%labelcount;
+        i_col = i/labelcount;
+        confidenceMat.at<float>(i_row, i_col) = cv::sum(layeredHist.col(i))[0];
+    }
+
+    Util::normalizeMatCols(confidenceMat);
+//    Util::plot(confidenceMat.row(0),m_parent);
+//    Util::plot(confidenceMat.row(1),m_parent);
+//    Util::plot(confidenceMat.row(2),m_parent);
+    std::cout<<"DIREK MATI VEREBILIRIZ : \n" << cv::sum(confidenceMat.col(0))[0] << std::endl;
+    return confidenceMat;
 }
 
 
 void RandomDecisionForest::test()
 {
-    int imgSize = m_DS.m_testImagesVector.size();
-    qDebug() << "Number of Test images:" << QString::number(imgSize);
+    int nImages = m_DS.m_testImagesVector.size();
+    qDebug() << "Number of Test images:" << QString::number(nImages);
 
-    for(auto i=0; i<imgSize; ++i)
+    for(auto i=0; i<nImages; ++i)
     {
-        QVector<float> votes(m_params.labelCount);
-        cv::Mat label_image = classify(m_DS.m_testImagesVector[i]);
+        cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i);
+        cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage);
 
-        if(votes.cols != m_params.labelCount)
-        {
-            std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
-            return;
-        }
 
-        getImageLabelVotes(label_image, votes);
-        std::cout<<votes<<std::endl;
-        int label = getMaxLikelihoodIndex(votes);
-        char predicted_label = char('a' + label);
-        classify_res.push_back(QString(predicted_label));
-        emit classifiedImageAs(i+1, predicted_label);
-        votes.release();
+
+//        QVector<float> votes(m_params.labelCount);
+//        if(votes.size() != m_params.labelCount)
+//        {
+//            std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
+//            return;
+//        }
+
+//        getImageLabelVotes(layeredImage, votes);
+//        int label = getMaxLikelihoodIndex(votes);
+//        char predicted_label = char('a' + label);
+//        classify_res.push_back(QString(predicted_label));
+//        emit classifiedImageAs(i+1, predicted_label);
+//        votes.clear();
     }
     m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
     emit resultPercentage(m_accuracy);

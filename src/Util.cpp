@@ -223,6 +223,17 @@ void Util::calcWidthHeightStat(QString srcDir){
 //        textFile.write(" ");
 //        textFile.write(QByteArray::number(h_avrg));
 //        textFile.close();
+
     }
     outLog.close();
+}
+
+void Util::normalizeMatCols(cv::Mat &mat)
+{
+    int nCols = mat.cols;
+
+    for (int i = 0; i < nCols; ++i)
+    {
+        mat.col(i) = mat.col(i)/cv::sum(mat.col(i))[0];
+    }
 }

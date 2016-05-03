@@ -33,16 +33,22 @@ public:
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void trainForest();
     void test();
-    cv::Mat classify(cv::Mat test_image);
+    cv::Mat getLayeredHist(cv::Mat test_image, int index);
     RDFParams &params() { return m_params; }
     void setParams(const RDFParams &params) { m_params = params; }
     DataSet m_DS;
     std::vector<RandomDecisionTree *> m_forest;
     // Keep all images on memory
     std::vector<cv::Mat> m_imagesContainer;
+    inline void setParentWidget(QWidget* parent_widget)
+    {
+        m_parent = parent_widget;
+    }
 
 private:
-    void createLetterConfidenceMatrix(const cv::Mat &labelImg, cv::Mat &confidenceMat);
+    QWidget* m_parent;
+    void placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row, int pos_col);
+    cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist);
     double m_accuracy;
     std::vector<QString> classify_res;
     RDFParams m_params;

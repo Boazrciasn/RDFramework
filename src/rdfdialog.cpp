@@ -71,6 +71,7 @@ void RDFDialog::on_train_button_clicked()
 void RDFDialog::on_test_button_clicked()
 {
 
+    m_forest->setParent((QWidget*)parent());
     m_forest->params().testDir = PARAMS.testDir;
 
     if(m_forest->params().testDir == NULL)
@@ -81,6 +82,7 @@ void RDFDialog::on_test_button_clicked()
         msgBox->show();
         return;
     }
+
 
 
     m_forest->readTestImageFiles();
