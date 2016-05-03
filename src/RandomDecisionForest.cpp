@@ -126,9 +126,8 @@ void RandomDecisionForest::trainForest()
 }
 
 //padded image index must be provided
-cv::Mat RandomDecisionForest::classify(int index)
+cv::Mat RandomDecisionForest::classify(cv::Mat test_image)
 {
-    cv::Mat test_image = m_DS.m_testImagesVector[index];
     int nRows=test_image.rows;
     int nCols=test_image.cols;
 
@@ -186,19 +185,20 @@ void RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &labelImg,
 
 void RandomDecisionForest::test()
 {
-    int size = m_DS.m_testImagesVector.size();
-    qDebug() << "Number of Test images:" << QString::number(size);
+    int imgSize = m_DS.m_testImagesVector.size();
+    qDebug() << "Number of Test images:" << QString::number(imgSize);
 
-    for(auto i=0; i<size; ++i)
+    for(auto i=0; i<imgSize; ++i)
     {
-        cv::Mat votes = cv::Mat::zeros(1, m_params.labelCount, CV_32FC1);
-        cv::Mat label_image = classify(i);
+        QVector<float> votes(m_params.labelCount);
+        cv::Mat label_image = classify(m_DS.m_testImagesVector[i]);
 
         if(votes.cols != m_params.labelCount)
         {
             std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
             return;
         }
+
         getImageLabelVotes(label_image, votes);
         std::cout<<votes<<std::endl;
         int label = getMaxLikelihoodIndex(votes);

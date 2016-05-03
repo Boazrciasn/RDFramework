@@ -59,6 +59,15 @@ inline void generateTeta(Coord& crd, int probe_x, int probe_y)
 inline int generateTau()
 {
     // random number between -127, +128
+
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_int_distribution<> dis(1, 6);
+
+//    for (int n=0; n<10; ++n)
+//        std::cout << dis(gen) << ' ';
+//    std::cout << '\n';
+
     return (rand() % 256) - 127;
 }
 
@@ -73,7 +82,7 @@ inline int getTotalNumberOfPixels(const cv::Mat& hist)
 
 inline int getMaxLikelihoodIndex(const cv::Mat& hist)
 {
-    int max_val=-1;
+    float max_val=-1;
     int max_index=0;
     int nCols = hist.cols;
     for(int i=0; i<nCols; ++i)
@@ -87,13 +96,13 @@ inline int getMaxLikelihoodIndex(const cv::Mat& hist)
     return max_index;
 }
 
-inline void getImageLabelVotes(const cv::Mat& label_image, cv::Mat& vote_vector)
+inline void getImageLabelVotes(const cv::Mat& label_image, QVector<float>& vote_vector)
 {
     int nRows = label_image.rows;
     int nCols = label_image.cols;
-    for (int i = 0; i<nRows ; ++i)
+    for (int i = 0; i<nRows; ++i)
         for (int j = 0; j<nCols; ++j)
-            ++vote_vector.at<float>(label_image.at<uchar>(i,j));
+            ++vote_vector[label_image.at<quint8>(i, j)];
 }
 
 

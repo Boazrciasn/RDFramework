@@ -33,7 +33,7 @@ public:
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void trainForest();
     void test();
-    cv::Mat classify(int index);
+    cv::Mat classify(cv::Mat test_image);
     RDFParams &params() { return m_params; }
     void setParams(const RDFParams &params) { m_params = params; }
     DataSet m_DS;
