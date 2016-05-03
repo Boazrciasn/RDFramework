@@ -71,7 +71,11 @@ void RDFDialog::on_train_button_clicked()
 void RDFDialog::on_test_button_clicked()
 {
 
+<<<<<<< Updated upstream
     m_forest->setParent(parentWidget());
+=======
+//    m_forest->setParent((QWidget*)parent());
+>>>>>>> Stashed changes
     m_forest->params().testDir = PARAMS.testDir;
 
     if(m_forest->params().testDir == NULL)
