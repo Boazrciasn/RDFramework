@@ -30,6 +30,7 @@ private:
     Ui::RDFDialog *ui;
     RandomDecisionForest *m_forest;
     qint16 m_treeid;
+
 };
 
 #endif // RDFDIALOG_H

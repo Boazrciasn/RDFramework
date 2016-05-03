@@ -8,7 +8,8 @@
 #include <cereal/archives/binary.hpp>
 #include <include/matcerealisation.hpp>
 #include <fstream>
-#include <chrono>
+//#include <chrono>
+//#include <random>
 
 #include "include/Util.h"
 #include "include/PixelCloud.h"
@@ -42,7 +43,7 @@ struct Node
 
 using node_ptr = std::shared_ptr<Node>;
 using TreeNodes = std::vector<node_ptr>;
-using rdfclock =  std::chrono::high_resolution_clock;
+//using rdfclock =  std::chrono::high_resolution_clock;
 
 struct DataSet
 {
@@ -164,7 +165,7 @@ public:
 private:
     quint32 m_minLeafPixelCount;
     PixelCloud m_pixelCloud;
-    std::mt19937 *generator;
+//    std::mt19937 *generator;
 
     void subSample();
 

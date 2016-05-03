@@ -11,6 +11,7 @@ RDFDialog::RDFDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     m_forest = new RandomDecisionForest();
+    m_forest->setParentWidget(parent);
     QObject::connect(m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
     QObject::connect(m_forest, SIGNAL(classifiedImageAs(int,char)), this, SLOT(image_at_classified_as(int,char)));
     QObject::connect(m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
@@ -71,7 +72,7 @@ void RDFDialog::on_train_button_clicked()
 void RDFDialog::on_test_button_clicked()
 {
 
-    m_forest->setParent(parentWidget());
+
     m_forest->params().testDir = PARAMS.testDir;
 
     if(m_forest->params().testDir == NULL)

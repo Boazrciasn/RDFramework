@@ -195,9 +195,9 @@ cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layere
 
     Util::normalizeMatCols(confidenceMat);
 //    Util::plot(confidenceMat.row(0),m_parent);
-//    Util::plot(confidenceMat.row(1),m_parent);
-//    Util::plot(confidenceMat.row(2),m_parent);
-    std::cout<<"DIREK MATI VEREBILIRIZ : \n" << cv::sum(confidenceMat.col(0))[0] << std::endl;
+//   Util::plot(confidenceMat.row(1),m_parent);
+//   Util::plot(confidenceMat.row(2),m_parent);
+
     return confidenceMat;
 }
 
@@ -212,6 +212,7 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage);
 
+        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << cv::sum(confidenceMat.col(0))[0] << std::endl;
 
 
 //        QVector<float> votes(m_params.labelCount);
@@ -228,7 +229,7 @@ void RandomDecisionForest::test()
 //        emit classifiedImageAs(i+1, predicted_label);
 //        votes.clear();
     }
-    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
-    emit resultPercentage(m_accuracy);
+//    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
+//    emit resultPercentage(m_accuracy);
 }
 

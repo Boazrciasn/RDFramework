@@ -13,7 +13,7 @@ public:
     RandomDecisionForest()
     {
        srand(time(NULL));
-       m_begin = rdfclock::now();
+//       m_begin = rdfclock::now();
     }
 
     ~RandomDecisionForest()
@@ -40,14 +40,15 @@ public:
     std::vector<RandomDecisionTree *> m_forest;
     // Keep all images on memory
     std::vector<cv::Mat> m_imagesContainer;
-    inline void setParentWidget(QWidget* parent_widget)
+    inline void setParentWidget(QWidget *parent_widget)
     {
         m_parent = parent_widget;
     }
+    QWidget* m_parent;
 
 private:
-    rdfclock::time_point m_begin;
-    QWidget* m_parent;
+//    rdfclock::time_point m_begin;
+
     void placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row, int pos_col);
     cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist);
     double m_accuracy;
