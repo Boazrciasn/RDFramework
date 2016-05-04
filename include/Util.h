@@ -15,7 +15,7 @@ inline cv::Mat createHistogram(PixelCloud& pixels, int labelCount)
     cv::Mat hist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
     for (pixel_ptr px : pixels)
     {
-        int index = letterIndex(px->imgInfo->label.at(0).toLatin1());
+        int index = letterIndex(px->imgInfo->m_label.at(0).toLatin1());
         ++hist.at<float>(0, index);
     }
     return hist;
@@ -95,7 +95,8 @@ inline void printHistogram(cv::Mat &hist)
     {
         for(int j=0; j<nCols; ++j)
             res += " " + QString::number(hist.at<float>(i,j));
-        res += "\n";
+        if(i!=nRows-1)
+            res += "\n";
     }
     qDebug() << res << "}";
 }

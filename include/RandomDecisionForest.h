@@ -36,8 +36,8 @@ public:
         std::ofstream file("file.bin", std::ios::binary);
         cereal::BinaryOutputArchive ar(file);
         ar(*this);
+        file.flush();
         file.close();
-
     }
 
     inline void loadForest()

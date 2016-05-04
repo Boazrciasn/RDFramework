@@ -190,7 +190,7 @@ void RandomDecisionTree::printPixelCloud()
 void RandomDecisionTree::printPixel(pixel_ptr px)
 {
     qDebug() << "Pixel{ Coor("    << px->position.m_dy     << ","     << px->position.m_dx
-             << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
+             << ") Label("        << px->imgInfo->m_label << ") Id(" << px->imgInfo->m_sampleId
              << ") = "            << px->intensity << "}";
 }
 

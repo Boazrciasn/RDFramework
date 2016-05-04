@@ -29,14 +29,18 @@ struct Coord
 
 struct ImageInfo
 {
-    QString label;
-    int sampleId;
+    QString m_label;
+    int m_sampleId;
 
     ImageInfo() : ImageInfo("", 0)
     {
     }
 
-    ImageInfo(const QString &lbl, int smplId) : label(lbl), sampleId(smplId)
+    ImageInfo(const QString &lbl, int smplId) : m_label(lbl), m_sampleId(smplId)
+    {
+    }
+
+    ImageInfo(const ImageInfo& ii) : m_label(ii.m_label), m_sampleId(ii.m_sampleId)
     {
     }
 };
@@ -50,6 +54,10 @@ struct Pixel
     imageinfo_ptr imgInfo;
 
     Pixel(Coord crd, unsigned char intnsty, imageinfo_ptr imgInf): position(crd), intensity(intnsty),imgInfo(imgInf)
+    {
+    }
+
+    Pixel(const Pixel& px): position(px.position), intensity(px.intensity),imgInfo(px.imgInfo)
     {
     }
 };

@@ -78,7 +78,7 @@ public:
     template<class Archive>
     void serialize(Archive & archive)
     {
-      archive( m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+        archive( m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 
     void train();
@@ -163,7 +163,7 @@ public:
             // qDebug()<<"LEAF REACHED :"<<root.id;
             return root;
         }
-        cv::Mat img = DS.m_testImagesVector[px->imgInfo->sampleId];
+        cv::Mat img = DS.m_testImagesVector[px->imgInfo->m_sampleId];
         int childId = root->m_id *2 ;
         //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
         if(!isLeft(px,*root,img))
@@ -221,7 +221,7 @@ private:
     {
         for (auto px : parentPixels)
         {
-            auto img = DS.m_trainImagesVector[px->imgInfo->sampleId];
+            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }

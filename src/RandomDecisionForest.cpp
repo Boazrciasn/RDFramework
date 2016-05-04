@@ -72,8 +72,8 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,const cv::M
 // returns the image the pixel belongs to
 cv::Mat RandomDecisionForest::getPixelImage(pixel_ptr px)
 {
-    QString path = m_dir + "/"+ px->imgInfo->label + "/" + px->imgInfo->label + "_"
-            + QString::number(px->imgInfo->sampleId)  + ".jpg";
+    QString path = m_dir + "/"+ px->imgInfo->m_label + "/" + px->imgInfo->m_label + "_"
+            + QString::number(px->imgInfo->m_sampleId)  + ".jpg";
     //qDebug()<<"IMAGE :"<< path;
     return cv::imread(path.toStdString());
 }

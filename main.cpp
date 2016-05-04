@@ -122,6 +122,7 @@ int main(int argc, char *argv[]) {
     int xx=dw.width()*0.3;
     int yy=dw.height()*0.9;
     w.setFixedSize(xx,yy);
+    w.show();
 
 
 
