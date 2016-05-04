@@ -123,11 +123,11 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     return toReturn.toLower();
 }
 
-void Util::plot(const cv::Mat &hist, QWidget *parent)
+void Util::plot(const cv::Mat &hist, QWidget *parent, const QString title)
 {
     HistogramDialog *histDialog = new HistogramDialog(parent);
     histDialog->show();
-    histDialog->plot(hist);
+    histDialog->plot(hist,title);
 }
 
 QString Util::fileNameWithoutPath(QString& filePath)

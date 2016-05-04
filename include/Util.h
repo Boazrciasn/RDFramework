@@ -129,7 +129,7 @@ public:
     static cv::Mat toCv(const QImage &image, int cv_type);
     static QImage toQt(const cv::Mat &src, QImage::Format format);
     static QString cleanNumberAndPunctuation(QString toClean);
-    static void plot(const cv::Mat &hist,QWidget *parent);
+    static void plot(const cv::Mat &hist,QWidget *parent,const QString title);
     static QString fileNameWithoutPath(QString& filePath);
     static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
     static void calcWidthHeightStat(QString srcDir);
