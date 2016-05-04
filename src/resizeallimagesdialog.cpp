@@ -40,12 +40,17 @@ void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
 
     int width = ui->spinBox_width->value();
     int height = ui->spinBox_height->value();
-    cv::Size size(width,height);
 
     for(auto filePath : fNames)
     {
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+        if(ui->radiobutton_width->isChecked())
+            width = image.cols;
+        if(ui->radiobutton_height->isChecked())
+            height = image.rows;
+        cv::Size size(width,height);
         cv::resize(image,image,size);
-        cv::imwrite(filePath.toStdString(), image);
+        cv::imwrite(filePath.toStdString(), image);        
     }
+    qDebug() << " Resizing Done" ;
 }
