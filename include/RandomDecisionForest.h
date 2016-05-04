@@ -1,7 +1,7 @@
 #ifndef CPV_RANDOM_DECISION_FOREST
 #define CPV_RANDOM_DECISION_FOREST
 
-#include "include/RandomDesicionTree.h"
+#include "include/RandomDecisionTree.h"
 
 class RandomDecisionForest : public QObject
 {
@@ -45,6 +45,7 @@ public:
         m_parent = parent_widget;
     }
     QWidget* m_parent;
+
 
 private:
 //    rdfclock::time_point m_begin;

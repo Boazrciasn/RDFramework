@@ -22,21 +22,20 @@ RDFDialog::~RDFDialog()
     delete ui;
 }
 
-void RDFDialog::on_loadTrainData_button_clicked()
+void RDFDialog::onTrainingBrowse()
 {
     PARAMS.trainDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_train->setText(PARAMS.trainDir);
 }
 
-void RDFDialog::on_loadTestData_button_clicked()
+void RDFDialog::onTestBrowse()
 {
     PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
 
-void RDFDialog::on_train_button_clicked()
+void RDFDialog::onTrain()
 {
-
     PARAMS.probDistX = ui->spinBox_probX->value();
     PARAMS.probDistY = ui->spinBox_probY->value();
     PARAMS.nTrees = ui->spinBox_NTrees->value();
@@ -48,10 +47,9 @@ void RDFDialog::on_train_button_clicked()
 
     m_forest->setParams(PARAMS);
 
-
-    if(m_forest->params().trainDir == NULL)
+    if(m_forest->params().trainDir.isEmpty())
     {
-        QMessageBox* msgBox = new QMessageBox();
+        auto *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
         msgBox->setText("You Should First Choose a Training Data Folder");
         msgBox->show();
@@ -69,13 +67,13 @@ void RDFDialog::on_train_button_clicked()
     ui->textBrowser_train->repaint();
 }
 
-void RDFDialog::on_test_button_clicked()
+void RDFDialog::onTest()
 {
 
 
     m_forest->params().testDir = PARAMS.testDir;
 
-    if(m_forest->params().testDir == NULL)
+    if(m_forest->params().testDir.isEmpty())
     {
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
