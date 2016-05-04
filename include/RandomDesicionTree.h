@@ -8,8 +8,8 @@
 #include <cereal/archives/binary.hpp>
 #include <include/matcerealisation.hpp>
 #include <fstream>
-//#include <chrono>
-//#include <random>
+#include <chrono>
+#include <random>
 
 #include "include/Util.h"
 #include "include/PixelCloud.h"
@@ -43,7 +43,7 @@ struct Node
 
 using node_ptr = std::shared_ptr<Node>;
 using TreeNodes = std::vector<node_ptr>;
-//using rdfclock =  std::chrono::high_resolution_clock;
+using rdfclock =  std::chrono::high_resolution_clock;
 
 struct DataSet
 {
@@ -62,11 +62,11 @@ class RandomDecisionTree : public QObject
 public:
     RandomDecisionTree(RandomDecisionForest *DF) : m_DF(DF)
     {
-//        rdfclock::time_point beginning = rdfclock::now();
-//        rdfclock::duration d = rdfclock::now()-beginning;
-//        std::random_device rd;
-//        generator = new std::mt19937(rd());
-        //generator = new std::mt19937(d.count());
+        rdfclock::time_point beginning = rdfclock::now();
+        rdfclock::duration d = rdfclock::now()-beginning;
+        std::random_device rd;
+        generator = new std::mt19937(rd());
+        generator = new std::mt19937(d.count());
     }
 
     RandomDecisionForest *m_DF;
@@ -83,22 +83,22 @@ public:
     {
         // random number between -probe_distance, probe_distance
 
-//        std::uniform_int_distribution<> dis(0, 2*probe_y); //[]
-//        crd.m_dy = dis(generator) - probe_y ;
+        std::uniform_int_distribution<> dis(0, 2*probe_y); //[]
+        crd.m_dy = dis(*generator) - probe_y ;
 
-//        std::uniform_int_distribution<> dis(0, 2*probe_x); //[]
-//        crd.m_dx = dis(generator) - probe_x ;
+        std::uniform_int_distribution<> dis2(0, 2*probe_x); //[]
+        crd.m_dx = dis2(*generator) - probe_x ;
 
-        crd.m_dy = (rand() % (2*probe_y)) - probe_y;
-        crd.m_dx = (rand() % (2*probe_x)) - probe_x;
+//        crd.m_dy = (rand() % (2*probe_y)) - probe_y;
+//        crd.m_dx = (rand() % (2*probe_x)) - probe_x;
     }
 
     inline int generateTau()
     {
         // random number between -127, +128
-//        std::uniform_int_distribution<> dis(0, 255); //[]
-//        return dis(generator) - 127 ;
-        return (rand() % 256) - 127;
+        std::uniform_int_distribution<> dis(0, 255); //[]
+        return dis(*generator) - 127 ;
+//        return (rand() % 256) - 127;
     }
 
 
@@ -165,7 +165,7 @@ public:
 private:
     quint32 m_minLeafPixelCount;
     PixelCloud m_pixelCloud;
-//    std::mt19937 *generator;
+    std::mt19937 *generator;
 
     void subSample();
 
