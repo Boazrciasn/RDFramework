@@ -216,7 +216,7 @@ void RandomDecisionForest::test()
 
         std::cout<<"DIREK MATI VEREBILIRIZ : \n" << confidenceMat.t() << std::endl;
 
-        Util::plot(confidenceMat.row(23),m_parent,"x");
+//        Util::plot(confidenceMat.row(23),m_parent,"x");
 //        Util::plot(confidenceMat.row(24),m_parent,"y");
 //        Util::plot(confidenceMat.row(25),m_parent,"z");
 

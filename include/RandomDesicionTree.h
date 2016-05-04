@@ -8,8 +8,8 @@
 #include <cereal/archives/binary.hpp>
 #include <include/matcerealisation.hpp>
 #include <fstream>
-//#include <chrono>
-//#include <random>
+#include <chrono>
+#include <random>
 
 #include "include/Util.h"
 #include "include/PixelCloud.h"
@@ -43,7 +43,7 @@ struct Node
 
 using node_ptr = std::shared_ptr<Node>;
 using TreeNodes = std::vector<node_ptr>;
-//using rdfclock =  std::chrono::high_resolution_clock;
+using rdfclock =  std::chrono::high_resolution_clock;
 
 struct DataSet
 {
@@ -64,8 +64,10 @@ public:
     {
 //        rdfclock::time_point beginning = rdfclock::now();
 //        rdfclock::duration d = rdfclock::now()-beginning;
-//        std::random_device rd;
-//        generator = new std::mt19937(rd());
+        std::random_device rd;
+        generator = std::mt19937(rd());
+        m_disProbTau = std::uniform_int_distribution<>(-127, 128);
+
         //generator = new std::mt19937(d.count());
     }
 
@@ -82,23 +84,22 @@ public:
     inline void generateTeta(Coord& crd, int probe_x, int probe_y)
     {
         // random number between -probe_distance, probe_distance
+        //std::uniform_int_distribution<> dis(-probe_y, probe_y); //[]
+        crd.m_dy = m_disProbY(generator);
 
-//        std::uniform_int_distribution<> dis(0, 2*probe_y); //[]
-//        crd.m_dy = dis(generator) - probe_y ;
+        //std::uniform_int_distribution<> dis2(-probe_x, probe_x); //[]
+        crd.m_dx = m_disProbX(generator) ;
 
-//        std::uniform_int_distribution<> dis(0, 2*probe_x); //[]
-//        crd.m_dx = dis(generator) - probe_x ;
-
-        crd.m_dy = (rand() % (2*probe_y)) - probe_y;
-        crd.m_dx = (rand() % (2*probe_x)) - probe_x;
+//        crd.m_dy = (rand() % (2*probe_y)) - probe_y;
+//        crd.m_dx = (rand() % (2*probe_x)) - probe_x;
     }
 
     inline int generateTau()
     {
         // random number between -127, +128
-//        std::uniform_int_distribution<> dis(0, 255); //[]
-//        return dis(generator) - 127 ;
-        return (rand() % 256) - 127;
+        //std::uniform_int_distribution<> dis(-127, 128); //[]
+        return m_disProbTau(generator);
+//        return (rand() % 256) - 127;
     }
 
 
@@ -122,8 +123,16 @@ public:
         m_nodes.resize((1 << m_maxDepth)-1);
     }
 
-    inline void setProbeDistanceX(int probe_distanceX ) { m_probe_distanceX = probe_distanceX; }
-    inline void setProbeDistanceY(int probe_distanceY ) { m_probe_distanceY = probe_distanceY; }
+    inline void setProbeDistanceX(int probe_distanceX )
+    {
+        m_probe_distanceX = probe_distanceX;
+        m_disProbX   = std::uniform_int_distribution<>(-m_probe_distanceX, m_probe_distanceX);
+    }
+    inline void setProbeDistanceY(int probe_distanceY )
+    {
+        m_probe_distanceY = probe_distanceY;
+        m_disProbY   = std::uniform_int_distribution<>(-m_probe_distanceY, m_probe_distanceY);
+    }
 
     inline void setMinimumLeafPixelCount(unsigned int min_leaf_pixel_count) { m_minLeafPixelCount = min_leaf_pixel_count; }
 
@@ -165,7 +174,10 @@ public:
 private:
     quint32 m_minLeafPixelCount;
     PixelCloud m_pixelCloud;
-//    std::mt19937 *generator;
+    std::mt19937 generator;
+    std::uniform_int_distribution<> m_disProbY;
+    std::uniform_int_distribution<> m_disProbX;
+    std::uniform_int_distribution<> m_disProbTau;
 
     void subSample();
 
