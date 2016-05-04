@@ -234,10 +234,9 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
 
-//        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << confidenceMat.t() << std::endl;
-
-        Util::plot(confidenceMat.row(0), m_parent, "a");
-        Util::plot(confidenceMat.row(1), m_parent, "b");
+//        Util::plot(confidenceMat.row(0), m_parent, "a");
+//        Util::plot(confidenceMat.row(1), m_parent, "b");
+//        Util::plot(confidenceMat.row(2), m_parent, "c");
 
     }
 //    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
