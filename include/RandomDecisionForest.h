@@ -1,7 +1,7 @@
 #ifndef CPV_RANDOM_DECISION_FOREST
 #define CPV_RANDOM_DECISION_FOREST
 
-#include "include/RandomDesicionTree.h"
+#include "include/RandomDecisionTree.h"
 
 class RandomDecisionForest : public QObject
 {
@@ -51,6 +51,7 @@ public:
     {
       archive( m_params, m_dir, m_numOfLetters);
     }
+
 
 private:
 //    rdfclock::time_point m_begin;

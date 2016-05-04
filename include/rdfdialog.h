@@ -17,10 +17,10 @@ public:
     ~RDFDialog();
 
 public slots:
-    void on_loadTrainData_button_clicked();
-    void on_loadTestData_button_clicked();
-    void on_train_button_clicked();
-    void on_test_button_clicked();
+    void onTrainingBrowse();
+    void onTestBrowse();
+    void onTrain();
+    void onTest();
     void new_tree_constructed();
     void image_at_classified_as(int index,char label);
     void resultPercetange(double accuracy);

@@ -67,16 +67,8 @@ class RandomDecisionTree : public QObject
     Q_OBJECT
 
 public:
-    RandomDecisionTree(rdf_ptr DF) : m_DF(DF)
-    {
-//        rdfclock::time_point beginning = rdfclock::now();
-//        rdfclock::duration d = rdfclock::now()-beginning;
-        std::random_device rd;
-        generator = std::mt19937(rd());
-        m_disProbTau = std::uniform_int_distribution<>(-127, 128);
 
-        //generator = new std::mt19937(d.count());
-    }
+    RandomDecisionTree(rdf_ptr DF);
 
     rdf_ptr m_DF;
     int m_depth;
