@@ -13,6 +13,13 @@ struct  RDFParams
     int minLeafPixels;
     int labelCount;
     int maxIteration;
+
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+      archive(trainDir, testDir, probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels, labelCount, maxIteration);
+    }
+
 };
 
 #endif // RDFPARAMS_H

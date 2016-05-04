@@ -46,6 +46,12 @@ public:
     }
     QWidget* m_parent;
 
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+      archive( m_params, m_dir, m_numOfLetters);
+    }
+
 private:
 //    rdfclock::time_point m_begin;
 

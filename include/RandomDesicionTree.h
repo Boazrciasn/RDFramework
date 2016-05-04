@@ -6,7 +6,14 @@
 #include <time.h>
 
 #include <cereal/archives/binary.hpp>
-#include <include/matcerealisation.hpp>
+#include <cereal/types/memory.hpp>
+
+#include <cereal/types/vector.hpp>
+
+
+#include "include/matcerealisation.hpp"
+
+
 #include <fstream>
 #include <chrono>
 #include <random>
@@ -40,11 +47,6 @@ struct Node
     }
 };
 
-
-using node_ptr = std::shared_ptr<Node>;
-using TreeNodes = std::vector<node_ptr>;
-using rdfclock =  std::chrono::high_resolution_clock;
-
 struct DataSet
 {
     std::vector<cv::Mat> m_trainImagesVector;
@@ -55,12 +57,17 @@ struct DataSet
 
 class RandomDecisionForest;
 
+using node_ptr  = std::shared_ptr<Node>;
+using TreeNodes = std::vector<node_ptr>;
+using rdfclock  = std::chrono::high_resolution_clock;
+using rdf_ptr   = std::shared_ptr<RandomDecisionForest>;
+
 class RandomDecisionTree : public QObject
 {
     Q_OBJECT
 
 public:
-    RandomDecisionTree(RandomDecisionForest *DF) : m_DF(DF)
+    RandomDecisionTree(rdf_ptr DF) : m_DF(DF)
     {
 //        rdfclock::time_point beginning = rdfclock::now();
 //        rdfclock::duration d = rdfclock::now()-beginning;
@@ -71,12 +78,19 @@ public:
         //generator = new std::mt19937(d.count());
     }
 
-    RandomDecisionForest *m_DF;
+    rdf_ptr m_DF;
     int m_depth;
     int m_numOfLeaves;
     int m_maxDepth;
     int m_probe_distanceX, m_probe_distanceY;
+    quint32 m_minLeafPixelCount;
     TreeNodes m_nodes;
+
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+      archive( m_DF, m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+    }
 
     void train();
     void constructTree(Node& root, PixelCloud &pixels);
@@ -168,11 +182,42 @@ public:
         return getLeafNode(DS, px,childId-1);
     }
 
+    inline void saveTree(){
+
+
+
+        std::ofstream file("file.bin", std::ios::binary);
+        cereal::BinaryOutputArchive ar(file);
+        ar(m_nodes);
+
+        TreeNodes loadedVec;
+
+
+        /*     TEST SERIALIZER LOAD
+
+      Node mnd;
+            {
+                std::ifstream file("file.bin", std::ios::binary);
+                cereal::BinaryInputArchive ar(file);
+                ar(mnd);
+            }
+
+            qDebug() << QString::number(mnd.m_id)
+                     << "-" << mnd.m_isLeaf
+                     << "-" << QString::number(mnd.m_tau)
+                     << "-(" << QString::number(mnd.m_teta1.m_dx)
+                     << "-" << QString::number(mnd.m_teta1.m_dy) << ")-"
+                     << "-(" << QString::number(mnd.m_teta2.m_dx)
+                     << "-" << mnd.m_teta2.m_dy << ")" ;
+           printHist(mnd.m_hist);
+
+        */
+    }
+
     bool isPixelSizeConsistent();
     void toString();
 
 private:
-    quint32 m_minLeafPixelCount;
     PixelCloud m_pixelCloud;
     std::mt19937 generator;
     std::uniform_int_distribution<> m_disProbY;
