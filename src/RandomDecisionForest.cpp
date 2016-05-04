@@ -147,18 +147,26 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
     {
         for(int c=probDistX; c<rangeCols; ++c)
         {
-            auto intensity = test_image.at<uchar>(r,c);
-            pixel_ptr px(new Pixel(Coord(r,c),intensity,img_Info));
+            int col_index = (c-probDistX)*labelCount;
             cv::Mat probHist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
-            auto nForest = m_forest.size();
-            for(unsigned int i=0; i<nForest; ++i)
+            auto intensity = test_image.at<uchar>(r,c);
+
+            if (intensity == 0)
             {
-                node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
-                probHist += leaf->m_hist;
+                placeHistogram(layeredHist, probHist, r-probDistY, col_index);
             }
 
-            int col_index = (c-probDistX)*labelCount;
-            placeHistogram(layeredHist, probHist, r-probDistY, col_index);
+            else
+            {
+                pixel_ptr px(new Pixel(Coord(r,c),intensity,img_Info));
+                auto nForest = m_forest.size();
+                for(unsigned int i=0; i<nForest; ++i)
+                {
+                    node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
+                    probHist += leaf->m_hist;
+                }
+                placeHistogram(layeredHist, probHist, r-probDistY, col_index);
+            }
         }
     }
 
