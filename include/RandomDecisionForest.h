@@ -36,6 +36,8 @@ public:
         std::ofstream file("file.bin", std::ios::binary);
         cereal::BinaryOutputArchive ar(file);
         ar(*this);
+        file.close();
+
     }
 
     inline void loadForest()
@@ -43,6 +45,7 @@ public:
         std::ifstream file("file.bin", std::ios::binary);
         cereal::BinaryInputArchive ar(file);
         ar(*this);
+        file.close();
     }
 
     void readTrainingImageFiles();

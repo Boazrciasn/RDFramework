@@ -52,6 +52,8 @@ int main(int argc, char *argv[]) {
 
     */
 
+//     QString tempdir = "/Users/barisozcan/Documents/AnnotationResults";
+//     Util::convertToOSRAndBlure(tempdir,tempdir,11);
 
    /*
     //QString tempdir = "/Users/barisozcan/Documents/Development/AnnotationResults_ksize_4";
