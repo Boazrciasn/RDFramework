@@ -127,14 +127,16 @@ void RandomDecisionForest::trainForest()
 }
 
 //padded image index must be provided
-cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
+cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index, QVector<quint32> &fgPxNumberPerCol)
 {
+
     int nRows=test_image.rows;
     int nCols=test_image.cols;
-
     int probDistY  = m_params.probDistY;
     int probDistX  = m_params.probDistX;
     int labelCount = m_params.labelCount;
+
+    fgPxNumberPerCol = QVector<quint32>(nCols);
 
     //typecheck
     cv::Mat layeredHist = cv::Mat(nRows-2*probDistY, (nCols-2*probDistX)*labelCount, CV_32FC1);
@@ -144,11 +146,13 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
     int rangeRows = nRows - probDistY;
     int rangeCols = nCols - probDistX;
 
-    for(int r=probDistY; r<rangeRows; ++r)
+    for(int c=probDistX; c<rangeCols; ++c)
     {
-        for(int c=probDistX; c<rangeCols; ++c)
+        int col_index = (c-probDistX)*labelCount;
+        int fgPxCount = 0;
+        for(int r=probDistY; r<rangeRows; ++r)
         {
-            int col_index = (c-probDistX)*labelCount;
+
             cv::Mat probHist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
             auto intensity = test_image.at<uchar>(r,c);
 
@@ -159,16 +163,25 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
 
             else
             {
+                ++fgPxCount;
                 pixel_ptr px(new Pixel(Coord(r,c),intensity,img_Info));
                 auto nForest = m_forest.size();
                 for(unsigned int i=0; i<nForest; ++i)
                 {
                     node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
                     probHist += leaf->m_hist;
+
                 }
+                //Normalize the Histrograms
+                float sum = cv::sum(probHist)[0];
+                if( sum != 0 )
+                    probHist /= sum;
                 placeHistogram(layeredHist, probHist, r-probDistY, col_index);
+                std::cout<<"Vector :  "<< probHist<<std::endl;
+
             }
         }
+        fgPxNumberPerCol[col_index/labelCount] = fgPxCount;
     }
 
     return layeredHist;
@@ -204,10 +217,7 @@ cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layere
 
     Util::normalizeMatCols(confidenceMat);
 //    Util::plot(confidenceMat.row(0),m_parent);
-//   Util::plot(confidenceMat.row(1),m_parent);
-//   Util::plot(confidenceMat.row(2),m_parent);
-//    Util::plot(confidenceMat.row(1),m_parent);
-//    Util::plot(confidenceMat.row(2),m_parent);
+
 
     return confidenceMat;
 }
@@ -220,10 +230,11 @@ void RandomDecisionForest::test()
 
     for(auto i=0; i<nImages; ++i)
     {
-        cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i);
+        QVector<quint32> fgPxNumberPerCol;
+        cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage);
 
-        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << confidenceMat.t() << std::endl;
+//        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << confidenceMat.t() << std::endl;
 
         Util::plot(confidenceMat.row(23), m_parent, "x");
         Util::plot(confidenceMat.row(24), m_parent, "y");

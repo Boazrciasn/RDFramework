@@ -34,7 +34,7 @@ public:
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void trainForest();
     void test();
-    cv::Mat getLayeredHist(cv::Mat test_image, int index);
+    cv::Mat getLayeredHist(cv::Mat test_image, int index, QVector<quint32> &fgPxNumberPerCol);
     RDFParams &params() { return m_params; }
     void setParams(const RDFParams &params) { m_params = params; }
     DataSet m_DS;
