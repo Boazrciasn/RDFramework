@@ -177,7 +177,7 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index, QVec
                 if( sum != 0 )
                     probHist /= sum;
                 placeHistogram(layeredHist, probHist, r-probDistY, col_index);
-                std::cout<<"Vector :  "<< probHist<<std::endl;
+
 
             }
         }
@@ -197,8 +197,8 @@ void RandomDecisionForest::placeHistogram(cv::Mat &output, const cv::Mat &pixelH
     }
 }
 
-// confidenceMat : labelcount x imgrow
-cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layeredHist)
+// confidenceMat : LabelCount x testImage.rows : each row displays likelooh for each column of a label.
+cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layeredHist, const QVector<quint32> &fgPxNumberPerCol)
 {
     int labelcount = m_params.labelCount;
     int layered_Cols = layeredHist.cols;
@@ -215,7 +215,7 @@ cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layere
         confidenceMat.at<float>(i_row, i_col) = cv::sum(layeredHist.col(i))[0];
     }
 
-    Util::normalizeMatCols(confidenceMat);
+    Util::averageLHofCol(confidenceMat,fgPxNumberPerCol);
 //    Util::plot(confidenceMat.row(0),m_parent);
 
 
@@ -232,27 +232,13 @@ void RandomDecisionForest::test()
     {
         QVector<quint32> fgPxNumberPerCol;
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
-        cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage);
+        cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
 
 //        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << confidenceMat.t() << std::endl;
 
-        Util::plot(confidenceMat.row(23), m_parent, "x");
-        Util::plot(confidenceMat.row(24), m_parent, "y");
-        Util::plot(confidenceMat.row(25), m_parent, "z");
+        Util::plot(confidenceMat.row(0), m_parent, "a");
+        Util::plot(confidenceMat.row(1), m_parent, "b");
 
-//        QVector<float> votes(m_params.labelCount);
-//        if(votes.size() != m_params.labelCount)
-//        {
-//            std::cerr<<"Assertion Failed BRO!  Number of labels mismatch"<< std::endl;
-//            return;
-//        }
-
-//        getImageLabelVotes(layeredImage, votes);
-//        int label = getMaxLikelihoodIndex(votes);
-//        char predicted_label = char('a' + label);
-//        classify_res.push_back(QString(predicted_label));
-//        emit classifiedImageAs(i+1, predicted_label);
-//        votes.clear();
     }
 //    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
 //    emit resultPercentage(m_accuracy);

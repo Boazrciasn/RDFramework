@@ -228,12 +228,12 @@ void Util::calcWidthHeightStat(QString srcDir){
     outLog.close();
 }
 
-void Util::normalizeMatCols(cv::Mat &mat)
+void Util::averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol)
 {
     int nCols = mat.cols;
 
     for (int i = 0; i < nCols; ++i)
     {
-        mat.col(i) = mat.col(i)/cv::sum(mat.col(i))[0];
+        mat.col(i) = mat.col(i)/fgNumberCol[i];
     }
 }
