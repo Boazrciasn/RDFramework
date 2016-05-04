@@ -215,7 +215,7 @@ void Util::calcWidthHeightStat(QString srcDir){
         outLog.write(QByteArray::number((int)(w_avrg + 0.5f)));
         outLog.write(" ");
         outLog.write(QByteArray::number((int)(h_avrg + 0.5f)));
-        outLog.write("\n");
+        outLog.write(" \n");
 
 //        QFile textFile(srcDir + "/" + folder + "/" + folder + ".txt");
 //        textFile.open(QIODevice::WriteOnly);
@@ -236,4 +236,47 @@ void Util::averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol)
     {
         mat.col(i) = mat.col(i)/fgNumberCol[i];
     }
+}
+
+void Util::getWordWithConfidance(const cv::Mat &layeredHist, int nLabel, QString &word, float &conf)
+{
+    // store average width and hight
+    QVector<int> avgWidth(nLabel);
+    QVector<int> avgHight(nLabel);
+    int index;
+
+    // source file for average values
+    QString avg = "./AverageWidthHeight.txt";
+    QFile input(avg);
+
+    if(!input.open(QIODevice::ReadOnly))
+        std::cout<<"Util::getWordWithConfidance failed to open file! \n";
+
+    // extract values
+    do {
+        QString str = input.readLine();
+        QStringList myStringList = str.split(' ');
+        index = str[0].unicode()%97;
+        avgWidth[index] = myStringList[1].toInt();
+        avgHight[index] = myStringList[2].toInt();;
+
+        // make odd number
+        if(avgWidth[index]%2 == 0)
+            avgWidth[index]++;
+        if(avgHight[index]%2 == 0)
+            avgHight[index]++;
+    }while(input.canReadLine());
+    input.close();
+    //    for (int i = 0; i < nLabel; ++i)
+    //        qDebug() << avgWidth[i] << " " << avgHight[i];
+
+    // filter each label with corresponding filter
+    int ksize;
+    for (int i = 0; i < nLabel; ++i) {
+        cv::Mat hist = layeredHist.row(i);
+        ksize = avgWidth[i];
+        cv::blur(hist, hist, cv::Size(ksize,ksize));
+        layeredHist.row(i) = hist;
+    }
+
 }

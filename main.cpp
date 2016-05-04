@@ -141,8 +141,13 @@ int main(int argc, char *argv[]) {
 
 //    Util::calcWidthHeightStat("/home/vvglab/Desktop/AnnotationResults");
 
-    w.show();
+//    w.show();
     //return 0;
+
+//    cv::Mat mat = cv::Mat::ones(10,10,CV_32FC1);
+//    QString word;
+//    float conf;
+//    Util::getWordWithConfidance(mat, 26, word, conf);
 
     return app.exec();
 }
