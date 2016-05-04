@@ -58,7 +58,7 @@ private:
 //    rdfclock::time_point m_begin;
 
     void placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row, int pos_col);
-    cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist);
+    cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist, const QVector<quint32> &fgPxNumberPerCol);
     double m_accuracy;
     std::vector<QString> classify_res;
     RDFParams m_params;

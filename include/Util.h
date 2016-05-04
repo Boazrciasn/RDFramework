@@ -133,7 +133,7 @@ public:
     static QString fileNameWithoutPath(QString& filePath);
     static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
     static void calcWidthHeightStat(QString srcDir);
-    static void normalizeMatCols(cv::Mat &mat);
+    static void averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol);
 };
 
 #endif
