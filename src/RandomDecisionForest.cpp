@@ -136,7 +136,7 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
     int labelCount = m_params.labelCount;
 
     //typecheck
-    cv::Mat layeredHist = cv::Mat(nRows-2*probDistY, (nCols-2*probDistX)*labelCount, test_image.type());
+    cv::Mat layeredHist = cv::Mat(nRows-2*probDistY, (nCols-2*probDistX)*labelCount, CV_32FC1);
 
     imageinfo_ptr img_Info(new ImageInfo(" ", index));
 
@@ -156,9 +156,9 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index)
                 node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
                 probHist += leaf->m_hist;
             }
-            int col_index = c*labelCount;
-            placeHistogram(layeredHist, probHist, r, col_index);
-            //probHist.release();
+
+            int col_index = (c-probDistX)*labelCount;
+            placeHistogram(layeredHist, probHist, r-probDistY, col_index);
         }
     }
 
@@ -197,6 +197,8 @@ cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layere
 //    Util::plot(confidenceMat.row(0),m_parent);
 //   Util::plot(confidenceMat.row(1),m_parent);
 //   Util::plot(confidenceMat.row(2),m_parent);
+//    Util::plot(confidenceMat.row(1),m_parent);
+//    Util::plot(confidenceMat.row(2),m_parent);
 
     return confidenceMat;
 }
