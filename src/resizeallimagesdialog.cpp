@@ -50,7 +50,7 @@ void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
             height = image.rows;
         cv::Size size(width,height);
         cv::resize(image,image,size);
-//        cv::imwrite(filePath.toStdString(), image);
+        cv::imwrite(filePath.toStdString(), image);
     }
     qDebug() << " Resizing Done" ;
 }

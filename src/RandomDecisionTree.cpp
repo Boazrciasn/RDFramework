@@ -77,12 +77,19 @@ void RandomDecisionTree::subSample()
         int nCols = image.cols;
 
         // draw perImagePixel pixels from image
-        // bootstrap, subsample
+        // bootstrap, subsample, Only foreground pixels
         for(int k=0; k<m_DF->m_params.pixelsPerImage; ++k)
         {
-            int i = (rand() % (nRows-2*m_probe_distanceY)) + m_probe_distanceY;
-            int j = (rand() % (nCols-2*m_probe_distanceX)) + m_probe_distanceX;
-            auto intensity = image.at<uchar>(i,j);
+            int i;
+            int j;
+            quint8 intensity = 0 ;
+            while(intensity == 0)
+            {
+                i = (rand() % (nRows-2*m_probe_distanceY)) + m_probe_distanceY;
+                j = (rand() % (nCols-2*m_probe_distanceX)) + m_probe_distanceX;
+                intensity = image.at<uchar>(i,j);
+            }
+
             pixel_ptr px(new Pixel(Coord(i,j),intensity,img_inf));
             m_pixelCloud.push_back(px);
         }
