@@ -17,7 +17,7 @@ struct  RDFParams
     template<class Archive>
     void serialize(Archive & archive)
     {
-      archive(trainDir, testDir, probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels, labelCount, maxIteration);
+      archive(probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels, labelCount, maxIteration);
     }
 
 };

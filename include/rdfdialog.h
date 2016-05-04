@@ -28,7 +28,7 @@ public slots:
 private:
     RDFParams PARAMS;
     Ui::RDFDialog *ui;
-    RandomDecisionForest *m_forest;
+    rdf_ptr m_forest;
     qint16 m_treeid;
 
 };

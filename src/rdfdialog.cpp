@@ -10,11 +10,11 @@ RDFDialog::RDFDialog(QWidget *parent) :
     ui(new Ui::RDFDialog)
 {
     ui->setupUi(this);
-    m_forest = new RandomDecisionForest();
+    m_forest = rdf_ptr(new RandomDecisionForest());
     m_forest->setParentWidget(parent);
-    QObject::connect(m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
-    QObject::connect(m_forest, SIGNAL(classifiedImageAs(int,char)), this, SLOT(image_at_classified_as(int,char)));
-    QObject::connect(m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
+    QObject::connect(m_forest.get(), SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
+    QObject::connect(m_forest.get(), SIGNAL(classifiedImageAs(int,char)), this, SLOT(image_at_classified_as(int,char)));
+    QObject::connect(m_forest.get(), SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
 }
 
 RDFDialog::~RDFDialog()
@@ -24,6 +24,11 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::onTrainingBrowse()
 {
+
+   // m_forest->loadForest();
+   // m_forest->printForest();
+   // qDebug() << "FOREST PRINTED" ;
+
     PARAMS.trainDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_train->setText(PARAMS.trainDir);
 }
@@ -64,13 +69,16 @@ void RDFDialog::onTrain()
 
     m_forest->trainForest();
     ui->textBrowser_train->append(  "Forest Trained ! ");
+
+    m_forest->saveForest();
+    m_forest->printForest();
+    qDebug() << "FOREST PRINTED" ;
+
     ui->textBrowser_train->repaint();
 }
 
 void RDFDialog::onTest()
 {
-
-
     m_forest->params().testDir = PARAMS.testDir;
 
     if(m_forest->params().testDir.isEmpty())
@@ -81,8 +89,6 @@ void RDFDialog::onTest()
         msgBox->show();
         return;
     }
-
-
 
     m_forest->readTestImageFiles();
     ui->textBrowser_test->append("Test images read");

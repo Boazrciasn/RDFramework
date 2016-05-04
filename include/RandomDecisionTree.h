@@ -4,23 +4,19 @@
 #include <dirent.h>
 #include <iostream>
 #include <time.h>
-
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/memory.hpp>
-
-#include <cereal/types/vector.hpp>
-
-
-#include "include/matcerealisation.hpp"
-
-
 #include <fstream>
 #include <chrono>
 #include <random>
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
+
 #include "include/Util.h"
 #include "include/PixelCloud.h"
 #include "include/RDFParams.h"
+#include "include/matcerealisation.hpp"
 
 #define MIN_ENTROPY 0.05
 
@@ -62,6 +58,7 @@ using TreeNodes = std::vector<node_ptr>;
 using rdfclock  = std::chrono::high_resolution_clock;
 using rdf_ptr   = std::shared_ptr<RandomDecisionForest>;
 
+
 class RandomDecisionTree : public QObject
 {
     Q_OBJECT
@@ -81,7 +78,7 @@ public:
     template<class Archive>
     void serialize(Archive & archive)
     {
-      archive( m_DF, m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+      archive( m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 
     void train();
@@ -109,19 +106,19 @@ public:
     }
 
 
-    inline void saveNode(const Node& n)
-    {
-        std::ofstream file("file.bin", std::ios::binary);
-        cereal::BinaryOutputArchive ar(file);
-        ar(n);
-    }
+//    inline void saveNode(const Node& n)
+//    {
+//        std::ofstream file("file.bin", std::ios::binary);
+//        cereal::BinaryOutputArchive ar(file);
+//        ar(n);
+//    }
 
-    inline void loadNode(Node& n)
-    {
-        std::ifstream file("file.bin", std::ios::binary);
-        cereal::BinaryInputArchive ar(file);
-        ar(n);
-    }
+//    inline void loadNode(Node& n)
+//    {
+//        std::ifstream file("file.bin", std::ios::binary);
+//        cereal::BinaryInputArchive ar(file);
+//        ar(n);
+//    }
 
     inline void setMaxDepth(int max_depth)
     {
@@ -205,6 +202,7 @@ public:
 
     bool isPixelSizeConsistent();
     void toString();
+    void printTree();
 
 private:
     PixelCloud m_pixelCloud;
@@ -218,6 +216,7 @@ private:
     void printPixel(pixel_ptr px);
     void printNode(Node& node);
 
+
     inline void divide(const DataSet& DS, const PixelCloud& parentPixels, std::vector<pixel_ptr>& left, std::vector<pixel_ptr>& right, Node& parent)
     {
         for (auto px : parentPixels)
@@ -228,6 +227,6 @@ private:
     }
 };
 
-using rdt_ptr   = std::shared_ptr<RandomDecisionTree>;
+using rdt_ptr = std::shared_ptr<RandomDecisionTree>;
 
 #endif // RANDOMDESICIONTREE_H

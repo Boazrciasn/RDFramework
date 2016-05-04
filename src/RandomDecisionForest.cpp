@@ -120,7 +120,7 @@ void RandomDecisionForest::trainForest()
         trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
         qDebug()<< "Train..." ;
         trainedRDT->train();
-        trainedRDT->saveTree();
+        //trainedRDT->saveTree();
         m_forest.push_back(trainedRDT);
     }
     qDebug()<< "Forest Size : " << m_forest.size();

@@ -12,16 +12,37 @@ class RandomDecisionForest : public QObject
 public:
     RandomDecisionForest()
     {
-       srand(time(NULL));
-       //       m_begin = rdfclock::now();
+        srand(time(NULL));
+        //       m_begin = rdfclock::now();
     }
 
     ~RandomDecisionForest()
     {
-//TODO
-//        for(auto *DT : m_forest)
-//            delete DT;
         m_forest.clear();
+    }
+
+//    template<class Archive>
+//    void serialize(Archive & archive)
+//    {
+//        archive(m_params);
+//        for(rdt_ptr rdt : m_forest)
+//        {
+//            archive(rdt);
+//        }
+//    }
+
+    inline void saveForest()
+    {
+        std::ofstream file("file.bin", std::ios::binary);
+        cereal::BinaryOutputArchive ar(file);
+        ar(*this);
+    }
+
+    inline void loadForest()
+    {
+        std::ifstream file("file.bin", std::ios::binary);
+        cereal::BinaryInputArchive ar(file);
+        ar(*this);
     }
 
     void readTrainingImageFiles();
@@ -45,14 +66,16 @@ public:
     {
         m_parent = parent_widget;
     }
-    QWidget* m_parent;
 
-    template<class Archive>
-    void serialize(Archive & archive)
-    {
-      archive( m_params, m_dir, m_numOfLetters);
+    inline void printForest(){
+        qDebug() << "FOREST {";
+        for(rdt_ptr tree : m_forest)
+            tree->printTree();
+        qDebug() << "}";
     }
 
+    QWidget* m_parent;
+    RDFParams m_params;
 
 private:
 //    rdfclock::time_point m_begin;
@@ -61,7 +84,7 @@ private:
     cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist);
     double m_accuracy;
     std::vector<QString> classify_res;
-    RDFParams m_params;
+
     QString m_dir;
     int m_numOfLetters = 0;
 
@@ -71,5 +94,33 @@ signals:
     void resultPercentage(double accuracy);
 
 };
+
+template<class Archive>
+void save(Archive &archive,
+          RandomDecisionForest const & rdf)
+{
+  archive( rdf.m_params );
+
+  for(auto rdtPtr : rdf.m_forest){
+    archive(*rdtPtr);
+  }
+}
+
+template<class Archive>
+void load(Archive &archive,
+          RandomDecisionForest &rdf)
+{
+  archive( rdf.m_params );
+
+  auto size = rdf.m_params.nTrees;
+  rdf.m_forest.resize(size);
+
+  for(auto i =0; i<size; ++i){
+
+      rdt_ptr rdt(new RandomDecisionTree(rdf_ptr(&rdf)));
+      archive(*rdt);
+      rdf.m_forest[i] = rdt;
+  }
+}
 
 #endif

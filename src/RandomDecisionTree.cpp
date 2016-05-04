@@ -1,6 +1,7 @@
 #include "include/RandomDecisionTree.h"
 #include "include/RandomDecisionForest.h"
 
+
 // create the tree
 RandomDecisionTree::RandomDecisionTree(rdf_ptr DF) : m_DF(DF)
 {
@@ -192,6 +193,14 @@ void RandomDecisionTree::printPixel(pixel_ptr px)
              << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
              << ") = "            << px->intensity << "}";
 }
+
+void RandomDecisionTree::printTree(){
+    qDebug() << "TREE {";
+    for(auto node : m_nodes)
+        printNode(*node);
+    qDebug() << "}";
+}
+
 
 void RandomDecisionTree::printNode(Node& node){
     QString res = "NODE {";
