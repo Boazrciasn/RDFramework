@@ -176,14 +176,11 @@ public:
 
     inline void saveTree(){
 
-
-
         std::ofstream file("file.bin", std::ios::binary);
         cereal::BinaryOutputArchive ar(file);
         ar(m_nodes);
 
         TreeNodes loadedVec;
-
 
         /*     TEST SERIALIZER LOAD
 
@@ -217,6 +214,9 @@ private:
     std::uniform_int_distribution<> m_disProbTau;
 
     void subSample();
+    void printPixelCloud();
+    void printPixel(pixel_ptr px);
+    void printNode(Node& node);
 
     inline void divide(const DataSet& DS, const PixelCloud& parentPixels, std::vector<pixel_ptr>& left, std::vector<pixel_ptr>& right, Node& parent)
     {
@@ -226,10 +226,8 @@ private:
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }
-
-    void printPixelCloud();
-    void printPixel(pixel_ptr px);
-    void printNode(Node& node);
 };
+
+using rdt_ptr   = std::shared_ptr<RandomDecisionTree>;
 
 #endif // RANDOMDESICIONTREE_H

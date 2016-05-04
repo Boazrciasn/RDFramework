@@ -113,7 +113,7 @@ void RandomDecisionForest::trainForest()
     for (int i = 0; i < m_params.nTrees; ++i)
     {
         qDebug()<< "Tree number " << QString::number(i+1) << "is being trained" ;
-        auto *trainedRDT = new RandomDecisionTree(rdf_ptr(this));
+        rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
         trainedRDT->setProbeDistanceX(m_params.probDistX);
         trainedRDT->setProbeDistanceY(m_params.probDistY);
         trainedRDT->setMaxDepth(m_params.maxDepth);

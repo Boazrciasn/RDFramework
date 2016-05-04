@@ -13,13 +13,14 @@ public:
     RandomDecisionForest()
     {
        srand(time(NULL));
-//       m_begin = rdfclock::now();
+       //       m_begin = rdfclock::now();
     }
 
     ~RandomDecisionForest()
     {
-        for(auto *DT : m_forest)
-            delete DT;
+//TODO
+//        for(auto *DT : m_forest)
+//            delete DT;
         m_forest.clear();
     }
 
@@ -37,7 +38,7 @@ public:
     RDFParams &params() { return m_params; }
     void setParams(const RDFParams &params) { m_params = params; }
     DataSet m_DS;
-    std::vector<RandomDecisionTree *> m_forest;
+    std::vector<rdt_ptr> m_forest;
     // Keep all images on memory
     std::vector<cv::Mat> m_imagesContainer;
     inline void setParentWidget(QWidget *parent_widget)
