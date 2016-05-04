@@ -214,8 +214,11 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage);
 
-        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << cv::sum(confidenceMat.col(0))[0] << std::endl;
+        std::cout<<"DIREK MATI VEREBILIRIZ : \n" << confidenceMat.t() << std::endl;
 
+        Util::plot(confidenceMat.row(23),m_parent,"x");
+//        Util::plot(confidenceMat.row(24),m_parent,"y");
+//        Util::plot(confidenceMat.row(25),m_parent,"z");
 
 //        QVector<float> votes(m_params.labelCount);
 //        if(votes.size() != m_params.labelCount)

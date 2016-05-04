@@ -15,7 +15,7 @@ class HistogramDialog : public QDialog
 
 public:
     explicit HistogramDialog(QWidget *parent = 0);
-    void plot(const cv::Mat &hist);
+    void plot(const cv::Mat &hist, const QString title);
     ~HistogramDialog();
 private:
     Ui::HistogramDialog *ui;
