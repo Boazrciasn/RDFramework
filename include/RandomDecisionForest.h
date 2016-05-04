@@ -13,7 +13,7 @@ public:
     RandomDecisionForest()
     {
        srand(time(NULL));
-       m_begin = rdfclock::now();
+//       m_begin = rdfclock::now();
     }
 
     ~RandomDecisionForest()
@@ -47,7 +47,7 @@ public:
     QWidget* m_parent;
 
 private:
-    rdfclock::time_point m_begin;
+//    rdfclock::time_point m_begin;
 
     void placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row, int pos_col);
     cv::Mat createLetterConfidenceMatrix(const cv::Mat &layeredHist);
