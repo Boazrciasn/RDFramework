@@ -25,9 +25,7 @@ RDFDialog::~RDFDialog()
 void RDFDialog::onTrainingBrowse()
 {
 
-   // m_forest->loadForest();
-   // m_forest->printForest();
-   // qDebug() << "FOREST PRINTED" ;
+
 
     PARAMS.trainDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_train->setText(PARAMS.trainDir);
@@ -35,6 +33,10 @@ void RDFDialog::onTrainingBrowse()
 
 void RDFDialog::onTestBrowse()
 {
+    m_forest->loadForest();
+    m_forest->printForest();
+    qDebug() << "LOAD FOREST PRINTED" ;
+
     PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
@@ -72,7 +74,7 @@ void RDFDialog::onTrain()
 
     m_forest->saveForest();
     m_forest->printForest();
-    qDebug() << "FOREST PRINTED" ;
+    qDebug() << "SAVED FOREST PRINTED" ;
 
     ui->textBrowser_train->repaint();
 }

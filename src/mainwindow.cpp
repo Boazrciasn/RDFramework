@@ -73,6 +73,7 @@ void MainWindow::display()
 
 MainWindow::~MainWindow()
 {
+    std::cout<<" im out dude "<< std::endl;
     delete ui;
 }
 

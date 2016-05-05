@@ -190,24 +190,27 @@ void RandomDecisionTree::printPixelCloud()
 void RandomDecisionTree::printPixel(pixel_ptr px)
 {
     qDebug() << "Pixel{ Coor("    << px->position.m_dy     << ","     << px->position.m_dx
-             << ") Label("        << px->imgInfo->label << ") Id(" << px->imgInfo->sampleId
+             << ") Label("        << px->imgInfo->m_label << ") Id(" << px->imgInfo->m_sampleId
              << ") = "            << px->intensity << "}";
 }
 
 void RandomDecisionTree::printTree(){
     qDebug() << "TREE {";
     for(auto node : m_nodes)
-        printNode(*node);
+    {
+        if(node != nullptr)
+            printNode(*node);
+    }
     qDebug() << "}";
 }
 
 
 void RandomDecisionTree::printNode(Node& node){
-    QString res = "NODE {";
-    qDebug() << "Id:"   << node.m_id
-             << "Taw: " << node.m_tau
-             << "Q1{" << node.m_teta1.m_dy << "," << node.m_teta1.m_dx
-             << "Q2{" << node.m_teta2.m_dy << "," << node.m_teta2.m_dx;
+    qDebug() <<"NODE {"
+             << " Id:"   << node.m_id
+             << " Tau: " << node.m_tau
+             << " Q1 {" << node.m_teta1.m_dy << "," << node.m_teta1.m_dx << "}"
+             << " Q2 {" << node.m_teta2.m_dy << "," << node.m_teta2.m_dx << "}";
     printHistogram(node.m_hist);
     qDebug() << "}";
 }
