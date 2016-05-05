@@ -238,7 +238,7 @@ void Util::averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol)
     }
 }
 
-void Util::getWordWithConfidance(const cv::Mat &layeredHist, int nLabel, QString &word, float &conf)
+void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word, float &conf)
 {
     // store average width and hight
     QVector<int> avgWidth(nLabel);
@@ -270,6 +270,12 @@ void Util::getWordWithConfidance(const cv::Mat &layeredHist, int nLabel, QString
     //    for (int i = 0; i < nLabel; ++i)
     //        qDebug() << avgWidth[i] << " " << avgHight[i];
 
+
+    // find peaks
+    cv::Mat peaks = cv::Mat::zeros(layeredHist.rows,layeredHist.cols,layeredHist.type());
+    bool isIncreasing = true;
+    int cols = peaks.cols;
+
     // filter each label with corresponding filter
     int ksize;
     for (int i = 0; i < nLabel; ++i) {
@@ -277,6 +283,20 @@ void Util::getWordWithConfidance(const cv::Mat &layeredHist, int nLabel, QString
         ksize = avgWidth[i];
         cv::blur(hist, hist, cv::Size(ksize,ksize));
         layeredHist.row(i) = hist;
+
+        // find peaks
+        for (int j = 1; j < cols-1; ++j) {
+            if(isIncreasing && (hist.at<float>(j)-hist.at<float>(j-1)) < 0)
+            {
+                peaks.at<float>(i,j) = hist.at<float>(j);
+                isIncreasing = !isIncreasing;
+            }
+            else if(!isIncreasing && (hist.at<float>(j)-hist.at<float>(j-1)) > 0)
+            {
+                isIncreasing = !isIncreasing;
+            }
+        }
     }
 
+    std::cout << peaks.t() << std::endl;
 }
