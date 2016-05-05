@@ -141,13 +141,19 @@ int main(int argc, char *argv[]) {
 
 //    Util::calcWidthHeightStat("/home/vvglab/Desktop/AnnotationResults");
 
-//    w.show();
+    w.show();
     //return 0;
 
-//    cv::Mat mat = cv::Mat::ones(10,10,CV_32FC1);
+//    cv::Mat mat = cv::Mat::ones(1,100,CV_32FC1);
+//    for (int i = 0; i < 100; ++i) {
+//        mat.at<float>(0,i) = (i%10)/10.0f;
+//    }
+
+//    Util::plot(mat,w.parentWidget(),"before");
+
 //    QString word;
 //    float conf;
 //    Util::getWordWithConfidance(mat, 26, word, conf);
-
+//    Util::plot(mat,w.parentWidget(),"after");
     return app.exec();
 }
