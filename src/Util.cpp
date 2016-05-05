@@ -258,7 +258,7 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
         QStringList myStringList = str.split(' ');
         index = str[0].unicode()%97;
         avgWidth[index] = myStringList[1].toInt();
-        avgHight[index] = myStringList[2].toInt();;
+        avgHight[index] = myStringList[2].toInt();
 
         // make odd number
         if(avgWidth[index]%2 == 0)
@@ -281,7 +281,7 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     for (int i = 0; i < nLabel; ++i) {
         cv::Mat hist = layeredHist.row(i);
         ksize = avgWidth[i];
-        cv::blur(hist, hist, cv::Size(ksize,ksize));
+        cv::GaussianBlur(hist, hist, cv::Size(ksize,1),0,0,cv::BORDER_CONSTANT);
         layeredHist.row(i) = hist;
 
         // find peaks
@@ -298,5 +298,9 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
         }
     }
 
+//    std::cout << "Kernel: " << avgWidth[23] << std::endl;
     std::cout << peaks.t() << std::endl;
+//    std::cout << std::endl;
+//    std::cout << layeredHist.row(23) << std::endl;
+
 }
