@@ -24,19 +24,12 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::onTrainingBrowse()
 {
-
-
-
     PARAMS.trainDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_train->setText(PARAMS.trainDir);
 }
 
 void RDFDialog::onTestBrowse()
 {
-    m_forest->loadForest();
-    m_forest->printForest();
-    qDebug() << "LOAD FOREST PRINTED" ;
-
     PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
@@ -71,10 +64,6 @@ void RDFDialog::onTrain()
 
     m_forest->trainForest();
     ui->textBrowser_train->append(  "Forest Trained ! ");
-
-    m_forest->saveForest();
-    m_forest->printForest();
-    qDebug() << "SAVED FOREST PRINTED" ;
 
     ui->textBrowser_train->repaint();
 }
@@ -115,4 +104,35 @@ void RDFDialog::resultPercetange(double accuracy)
     std::cout<<"gotcha!";
     ui->textBrowser_test->append(" Classification Accuracy : " + QString::number(accuracy)+"%");
     ui->textBrowser_test->repaint();
+}
+
+void RDFDialog::onLoad()
+{
+    QString selfilter = tr("BINARY (*.bin *.txt)");
+    //QString fname = QFileDialog::getExistingDirectory(this,tr("Load Forest Directory"), QDir::currentPath(), QFileDialog::AnyFile);
+
+    QString fname = QFileDialog::getOpenFileName(
+            this,
+            tr("Load Forest Directory"),
+            QDir::currentPath(),
+            tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)" ),
+            &selfilter
+    );
+
+
+    m_forest->loadForest(fname);
+
+//    m_forest->printForest();
+    qDebug() << "LOAD FOREST PRINTED" ;
+}
+
+void RDFDialog::onSave()
+{
+    QString dirname = QFileDialog::getExistingDirectory(this,tr("Open Save Directory"), PARAMS.trainDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString fname = "nT_" +QString::number(m_forest->params().nTrees) + "_D_" + QString::number(m_forest->params().maxDepth)
+                          +"_nTImg_" + QString::number(m_forest->m_imagesContainer.size())
+                          +"_nPxPI_" + QString::number(m_forest->params().pixelsPerImage)
+                          +".bin";
+    m_forest->saveForest(dirname + "/" + fname);
+    qDebug() << "SAVED FOREST PRINTED" ;
 }

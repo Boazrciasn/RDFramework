@@ -25,6 +25,10 @@ public slots:
     void image_at_classified_as(int index,char label);
     void resultPercetange(double accuracy);
 
+private slots:
+    void onLoad();
+    void onSave();
+
 private:
     RDFParams PARAMS;
     Ui::RDFDialog *ui;

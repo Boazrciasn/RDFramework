@@ -30,16 +30,22 @@ struct Node
 
     Node() : Node(0,false)
     {
+
     }
 
     Node(quint32 id, bool isLeaf): m_id(id), m_isLeaf(isLeaf)
     {
+        m_hist = cv::Mat::zeros(1,1,CV_32FC1);
     }
 
     template<class Archive>
     void serialize(Archive & archive)
     {
       archive( m_tau, m_teta1, m_teta2, m_id, m_isLeaf, m_hist);
+    }
+
+    ~Node()
+    {
     }
 };
 
@@ -49,6 +55,10 @@ struct DataSet
     std::vector<cv::Mat> m_testImagesVector;
     std::vector<QString> m_testlabels;
     std::vector<QString> m_trainlabels;
+
+    ~DataSet()
+    {
+    }
 };
 
 class RandomDecisionForest;
@@ -65,9 +75,15 @@ class RandomDecisionTree : public QObject
 
 public:
 
-    RandomDecisionTree(rdf_ptr DF);
+    ~RandomDecisionTree()
+    {
+    }
 
-    rdf_ptr m_DF;
+    RandomDecisionTree(rdf_ptr DF);
+    RandomDecisionTree(RandomDecisionForest* DF);
+
+    rdf_ptr m_sDF;
+    RandomDecisionForest* m_DF;
     int m_depth;
     int m_numOfLeaves;
     int m_maxDepth;
@@ -75,55 +91,33 @@ public:
     quint32 m_minLeafPixelCount;
     TreeNodes m_nodes;
 
+    void train();
+    void constructTree(Node& root, PixelCloud &pixels);
+
     template<class Archive>
     void serialize(Archive & archive)
     {
-        archive( m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+      archive( m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX, m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
-
-    void train();
-    void constructTree(Node& root, PixelCloud &pixels);
 
     inline void generateTeta(Coord& crd, int probe_x, int probe_y)
     {
         // random number between -probe_distance, probe_distance
-        //std::uniform_int_distribution<> dis(-probe_y, probe_y); //[]
         crd.m_dy = m_disProbY(generator);
-
-        //std::uniform_int_distribution<> dis2(-probe_x, probe_x); //[]
         crd.m_dx = m_disProbX(generator) ;
-
-//        crd.m_dy = (rand() % (2*probe_y)) - probe_y;
-//        crd.m_dx = (rand() % (2*probe_x)) - probe_x;
     }
 
     inline int generateTau()
     {
         // random number between -127, +128
-        //std::uniform_int_distribution<> dis(-127, 128); //[]
         return m_disProbTau(generator);
-//        return (rand() % 256) - 127;
     }
-
-
-//    inline void saveNode(const Node& n)
-//    {
-//        std::ofstream file("file.bin", std::ios::binary);
-//        cereal::BinaryOutputArchive ar(file);
-//        ar(n);
-//    }
-
-//    inline void loadNode(Node& n)
-//    {
-//        std::ifstream file("file.bin", std::ios::binary);
-//        cereal::BinaryInputArchive ar(file);
-//        ar(n);
-//    }
 
     inline void setMaxDepth(int max_depth)
     {
         m_maxDepth = max_depth;
-        m_nodes.resize((1 << m_maxDepth)-1);
+        auto size = (1 << m_maxDepth)-1 ;
+        m_nodes.resize(size);
     }
 
     inline void setProbeDistanceX(int probe_distanceX )
@@ -169,35 +163,6 @@ public:
         if(!isLeft(px,*root,img))
             ++childId;
         return getLeafNode(DS, px,childId-1);
-    }
-
-    inline void saveTree(){
-
-        std::ofstream file("file.bin", std::ios::binary);
-        cereal::BinaryOutputArchive ar(file);
-        ar(m_nodes);
-
-        TreeNodes loadedVec;
-
-        /*     TEST SERIALIZER LOAD
-
-      Node mnd;
-            {
-                std::ifstream file("file.bin", std::ios::binary);
-                cereal::BinaryInputArchive ar(file);
-                ar(mnd);
-            }
-
-            qDebug() << QString::number(mnd.m_id)
-                     << "-" << mnd.m_isLeaf
-                     << "-" << QString::number(mnd.m_tau)
-                     << "-(" << QString::number(mnd.m_teta1.m_dx)
-                     << "-" << QString::number(mnd.m_teta1.m_dy) << ")-"
-                     << "-(" << QString::number(mnd.m_teta2.m_dx)
-                     << "-" << mnd.m_teta2.m_dy << ")" ;
-           printHist(mnd.m_hist);
-
-        */
     }
 
     bool isPixelSizeConsistent();

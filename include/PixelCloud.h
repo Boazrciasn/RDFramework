@@ -20,6 +20,10 @@ struct Coord
     {
     }
 
+    ~Coord()
+    {
+    }
+
     template<class Archive>
     void serialize(Archive & archive)
     {
@@ -43,6 +47,10 @@ struct ImageInfo
     ImageInfo(const ImageInfo& ii) : m_label(ii.m_label), m_sampleId(ii.m_sampleId)
     {
     }
+
+    ~ImageInfo()
+    {
+    }
 };
 
 using imageinfo_ptr = std::shared_ptr<ImageInfo>;
@@ -58,6 +66,10 @@ struct Pixel
     }
 
     Pixel(const Pixel& px): position(px.position), intensity(px.intensity),imgInfo(px.imgInfo)
+    {
+    }
+
+    ~Pixel()
     {
     }
 };

@@ -20,6 +20,10 @@ struct  RDFParams
       archive(probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels, labelCount, maxIteration);
     }
 
+    ~RDFParams()
+    {
+    }
+
 };
 
 #endif // RDFPARAMS_H

@@ -3,7 +3,18 @@
 
 
 // create the tree
-RandomDecisionTree::RandomDecisionTree(rdf_ptr DF) : m_DF(DF)
+RandomDecisionTree::RandomDecisionTree(rdf_ptr DF) : m_sDF(DF)
+{
+    //        rdfclock::time_point beginning = rdfclock::now();
+    //        rdfclock::duration d = rdfclock::now()-beginning;
+    std::random_device rd;
+    generator = std::mt19937(rd());
+    m_disProbTau = std::uniform_int_distribution<>(-127, 128);
+
+    //generator = new std::mt19937(d.count());
+}
+
+RandomDecisionTree::RandomDecisionTree(RandomDecisionForest* DF) : m_DF(DF)
 {
     //        rdfclock::time_point beginning = rdfclock::now();
     //        rdfclock::duration d = rdfclock::now()-beginning;
@@ -141,8 +152,8 @@ void RandomDecisionTree::tuneParameters(PixelCloud& parentPixels, Node& parent)
             ++itr;
         }
 
-        left.clear();
-        right.clear();
+        //left.clear();
+        //right.clear();
         generateTeta(parent.m_teta1, m_probe_distanceX, m_probe_distanceY);
         generateTeta(parent.m_teta2, m_probe_distanceX, m_probe_distanceY);
         parent.m_tau = generateTau();

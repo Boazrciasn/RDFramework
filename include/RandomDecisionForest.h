@@ -18,7 +18,7 @@ public:
 
     ~RandomDecisionForest()
     {
-        m_forest.clear();
+        //m_forest.clear();
     }
 
 //    template<class Archive>
@@ -31,18 +31,18 @@ public:
 //        }
 //    }
 
-    inline void saveForest()
+    inline void saveForest(QString fname)
     {
-        std::ofstream file("file.bin", std::ios::binary);
+        std::ofstream file(fname.toStdString(), std::ios::binary);
         cereal::BinaryOutputArchive ar(file);
         ar(*this);
         file.flush();
         file.close();
     }
 
-    inline void loadForest()
+    inline void loadForest(QString fname)
     {
-        std::ifstream file("file.bin", std::ios::binary);
+        std::ifstream file(fname.toStdString(), std::ios::binary);
         cereal::BinaryInputArchive ar(file);
         ar(*this);
         file.close();
@@ -120,7 +120,7 @@ void load(Archive &archive,
 
   for(auto i =0; i<size; ++i){
 
-      rdt_ptr rdt(new RandomDecisionTree(rdf_ptr(&rdf)));
+      rdt_ptr rdt(new RandomDecisionTree(&rdf));
       archive(*rdt);
       rdf.m_forest[i] = rdt;
   }

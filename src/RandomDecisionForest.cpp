@@ -47,7 +47,6 @@ void RandomDecisionForest::readTestImageFiles()
     }
     qDebug()<<"No of test IMAGES : " << m_DS.m_testImagesVector.size();
     fNames.clear();
-
 }
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
@@ -113,7 +112,8 @@ void RandomDecisionForest::trainForest()
     for (int i = 0; i < m_params.nTrees; ++i)
     {
         qDebug()<< "Tree number " << QString::number(i+1) << "is being trained" ;
-        rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
+        //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
+        rdt_ptr trainedRDT(new RandomDecisionTree(this));
         trainedRDT->setProbeDistanceX(m_params.probDistX);
         trainedRDT->setProbeDistanceY(m_params.probDistY);
         trainedRDT->setMaxDepth(m_params.maxDepth);
@@ -234,7 +234,7 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
 
-//        Util::plot(confidenceMat.row(0), m_parent, "a");
+        Util::plot(confidenceMat.row(4), m_parent, "e");
 //        Util::plot(confidenceMat.row(1), m_parent, "b");
 //        Util::plot(confidenceMat.row(2), m_parent, "c");
 
