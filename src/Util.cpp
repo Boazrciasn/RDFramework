@@ -252,7 +252,10 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     if(!input.open(QIODevice::ReadOnly))
         std::cout<<"Util::getWordWithConfidance failed to open file! \n";
 
-    // extract values
+
+    /*************************************/
+    /*********** extract values **********/
+    /*************************************/
     do {
         QString str = input.readLine();
         QStringList myStringList = str.split(' ');
@@ -270,8 +273,10 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     //    for (int i = 0; i < nLabel; ++i)
     //        qDebug() << avgWidth[i] << " " << avgHight[i];
 
+    /*************************************/
+    /*********** extract peaks ***********/
+    /*************************************/
 
-    // find peaks
     cv::Mat peaks = cv::Mat::zeros(layeredHist.rows,layeredHist.cols,layeredHist.type());
     bool isIncreasing = true;
     int cols = peaks.cols;
@@ -299,8 +304,120 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     }
 
 //    std::cout << "Kernel: " << avgWidth[23] << std::endl;
-    std::cout << peaks.t() << std::endl;
+//    std::cout << peaks.t() << std::endl;
 //    std::cout << std::endl;
 //    std::cout << layeredHist.row(23) << std::endl;
 
+    /*************************************/
+    /************ extract word ***********/
+    /*************************************/
+    QVector<int> label(cols);
+    QVector<float> accuracy(cols);
+
+//    int maxIdx;
+//    float max;
+//    for (int i = 0; i < cols; ++i) {
+//        maxIdx = 0;
+//        max = layeredHist.at<float>(0,i);
+//        for (int j = 1; j < nLabel; ++j) {
+//            if(max < layeredHist.at<float>(j,i))
+//            {
+//                maxIdx = j;
+//                max = layeredHist.at<float>(maxIdx,i);
+//            }
+//        }
+
+//        label[i] = maxIdx;
+//        accuracy[i] = max;
+//    }
+
+    int maxIdx;
+    float max;
+    for (int i = 0; i < cols; ++i) {
+        maxIdx = 0;
+        max = peaks.at<float>(0,i);
+        for (int j = 1; j < nLabel; ++j) {
+            if(max < peaks.at<float>(j,i))
+            {
+                maxIdx = j;
+                max = peaks.at<float>(maxIdx,i);
+            }
+        }
+
+        if(max == 0)
+        {
+            max = 0;
+            maxIdx = -1;
+        }
+        label[i] = maxIdx;
+        accuracy[i] = max;
+    }
+
+    qDebug()<<label;
+    qDebug()<<accuracy;
+
+    word = "";
+    for (int i = 0; i < cols; ++i) {
+        if(label[i] < 0)
+            continue;
+
+        // see is it greater that others or not
+        bool isLabel = true;
+        for (int j = 0; j < nLabel; ++j) {
+            if(j == label[i])
+                continue;
+
+            if(layeredHist.at<float>(j,i) > accuracy[i])
+                isLabel = false;
+        }
+
+        if(isLabel)
+            word += QString::number(label[i]) + " ";
+    }
+
+    qDebug() << "Word extracted: " << word;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
