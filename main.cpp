@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
 //    saveQIM.save("/home/neko/Desktop/word/testWord.jpg");
 
 
+
     QApplication app(argc, argv);
     MainWindow w;
 
