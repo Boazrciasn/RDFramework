@@ -31,6 +31,7 @@ public:
 //        }
 //    }
 
+
     inline void saveForest(QString fname)
     {
         std::ofstream file(fname.toStdString(), std::ios::binary);
@@ -47,6 +48,8 @@ public:
         ar(*this);
         file.close();
     }
+
+    void readAndIdentifyWords();
 
     void readTrainingImageFiles();
     void readTestImageFiles();

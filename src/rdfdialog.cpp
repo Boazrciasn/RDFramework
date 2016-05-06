@@ -71,6 +71,7 @@ void RDFDialog::onTrain()
 void RDFDialog::onTest()
 {
     m_forest->params().testDir = PARAMS.testDir;
+    //m_forest->readAndIdentifyWords();
 
     if(m_forest->params().testDir.isEmpty())
     {

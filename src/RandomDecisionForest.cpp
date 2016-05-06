@@ -3,6 +3,7 @@
 #include "include/RandomDecisionForest.h"
 #include "include/Reader.h"
 #include "include/Util.h"
+#include "include/TextRegionDetector.h"
 
 
 // histogram normalize ?
@@ -48,6 +49,156 @@ void RandomDecisionForest::readTestImageFiles()
     qDebug()<<"No of test IMAGES : " << m_DS.m_testImagesVector.size();
     fNames.clear();
 }
+
+void RandomDecisionForest::readAndIdentifyWords()
+{
+    m_dir = m_params.testDir;
+    std::vector<QString> fNames;
+    auto *reader = new Reader();
+    reader->findImages(m_dir, "", fNames, m_DS.m_testlabels);
+
+
+    // source file for average values
+    QString lineOffsetFile = "./combined.txt";
+    QFile input(lineOffsetFile);
+    if(!input.open(QIODevice::ReadOnly))
+        std::cout<<"RandomDecisionForest::readAndIdentifyWords failed to open file! \n";
+
+    QString formattedOutputFile = "./formatted_output.txt";
+    QFile output(formattedOutputFile);
+    if(!output.open(QIODevice::WriteOnly))
+        std::cout<<"RandomDecisionForest::readAndIdentifyWords failed to open file! \n";
+
+    auto lineNo=0;
+    for (auto filePath : fNames)
+    {
+        //read offset line
+        QString offsetLine = input.readLine();
+        QStringList myStringList = offsetLine.split(' ');
+        int offsetX = myStringList[2].split('+')[1].toInt();
+        int offsetY = myStringList[3].split('+')[1].toInt();
+
+        //TODO UPDATE CODE ITS FUCKED UP
+        m_DS.m_testImagesVector.clear();
+        cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+
+        // Call word extractor
+        QVector<QRect> wordsRoi = TextRegionDetector::detectWordsFromLine(image, m_parent);
+
+        //pad image and save to vector
+        cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY, m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
+        m_DS.m_testImagesVector.push_back(image);
+
+        //Note: index 0 because there is only one image at each step
+        QVector<quint32> fgPxNumberPerCol;
+        cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[0], 0, fgPxNumberPerCol);
+
+        for(QRect wordRoi : wordsRoi)
+        {
+            cv::Rect layeredWordRoi = cv::Rect(wordRoi.x(), wordRoi.y(), wordRoi.width()*m_params.labelCount, wordRoi.height());
+
+            // Crop layered words from layared image using extracted rects
+            cv::Mat layeredWordRoiMat =  layeredImage(layeredWordRoi);
+            cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredWordRoiMat, fgPxNumberPerCol);
+
+            //Nekruz baba top sende
+//            Util::plot(confidenceMat.row(23), m_parent, "x");
+            QString wordDetected="baris";
+            float conf = 0;
+            //Util::getWordWithConfidance(confidenceMat,26,wordDetected,conf);
+//            Util::plot(confidenceMat.row(23), m_parent, "x");
+
+            //save obtained result
+            output.write(wordDetected.toStdString().c_str());
+            output.write(" " + QByteArray::number(conf));
+            output.write(" " + QByteArray::number(++lineNo));
+            output.write(":" + QByteArray::number(wordRoi.width()));
+            output.write("X" + QByteArray::number(wordRoi.height()));
+            output.write("+" + QByteArray::number(offsetX+wordRoi.x()));
+            output.write("+" + QByteArray::number(offsetY+wordRoi.y()));
+            output.write("\n");
+        }
+    }
+
+    output.close();
+    input.close();
+    fNames.clear();
+}
+
+
+void RandomDecisionForest::searchWords(QString query, int queryId)
+{
+
+
+    // source file for average values
+    QString formattedInputFile = "./formatted_output.txt";
+    QFile input(formattedInputFile);
+    if(!input.open(QIODevice::ReadOnly))
+        std::cout<<"RandomDecisionForest::searchWords failed to open file! \n";
+
+    QString endResultFile = "./end_result.txt";
+    QFile output(endResultFile);
+    if(!output.open(QIODevice::WriteOnly))
+        std::cout<<"RandomDecisionForest::searchWords failed to open file! \n";
+
+
+    QStringList queryList = query.split(' ');
+
+    //lineid, linecontent
+    QMultiHash<int,QString> hash;
+
+    auto segmentNo=1;
+    while (!input.atEnd())
+    {
+        QString offsetLine="";
+        int lineid;
+        int segmentEnd = segmentNo+5;
+        do
+        {
+            //read offset line
+            offsetLine = input.readLine();
+            QStringList myStringList = offsetLine.split(' ');
+            lineid = myStringList[2].split(':')[0].toInt();
+            QString word = myStringList[0];
+            if(lineid <= segmentEnd)
+                hash.insert(lineid,offsetLine);
+        }while(lineid <= segmentEnd && !input.atEnd());
+
+        //TODO make ordered.
+        //check for matches
+        for(QString search : queryList)
+        {
+            for(int line_id=segmentNo; line_id<=segmentEnd; ++line_id)
+            {
+                QHash<QString, int>::const_iterator i = hash.find(line_id);
+                while (i != hash.end() && i.key() == line_id)
+                {
+                    QString details = i.value();
+                    QStringList myStringList = details.split(' ');
+                    QString word = myStringList[0];
+                    if(word == search)
+                    {
+                        QString conf_bbox = myStringList[1] +" "+ myStringList[2];
+
+                        output.write(QByteArray::number(queryId));
+                        output.write(" " + QByteArray::number(segmentNo));
+                        output.write(" " + conf_bbox.toStdString().c_str());
+                    }
+                    ++i;
+                }
+            }
+        }
+
+        hash.remove(segmentNo++);
+        hash.insert(lineid,offsetLine);
+    }
+
+    hash.clear();
+    output.close();
+    input.close();
+    fNames.clear();
+}
+
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
 void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,const cv::Mat &image ,imageinfo_ptr img_inf )
@@ -216,7 +367,7 @@ cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layere
     }
 
     Util::averageLHofCol(confidenceMat,fgPxNumberPerCol);
-//    Util::plot(confidenceMat.row(0),m_parent);
+    //    Util::plot(confidenceMat.row(0),m_parent);
 
 
     return confidenceMat;
@@ -234,16 +385,16 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
 
-        Util::plot(confidenceMat.row(23), m_parent, "x");
-        QString test = "Hello";
-        float acc = 0;
-        Util::getWordWithConfidance(confidenceMat,26,test,acc);
-        Util::plot(confidenceMat.row(23), m_parent, "x");
 //        Util::plot(confidenceMat.row(23), m_parent, "x");
-//        Util::plot(confidenceMat.row(24), m_parent, "y");
-//        Util::plot(confidenceMat.row(25), m_parent, "z");
+//        QString test = "Hello";
+//        float acc = 0;
+//        Util::getWordWithConfidance(confidenceMat,26,test,acc);
+//        Util::plot(confidenceMat.row(23), m_parent, "x");
+        //        Util::plot(confidenceMat.row(23), m_parent, "x");
+        //        Util::plot(confidenceMat.row(24), m_parent, "y");
+        //        Util::plot(confidenceMat.row(25), m_parent, "z");
     }
-//    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
-//    emit resultPercentage(m_accuracy);
+    //    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
+    //    emit resultPercentage(m_accuracy);
 }
 
