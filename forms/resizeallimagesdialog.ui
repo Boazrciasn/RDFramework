@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>198</height>
+    <width>504</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QPushButton" name="pushButton_browse">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>10</y>
      <width>131</width>
      <height>27</height>
@@ -31,7 +31,7 @@
     <rect>
      <x>20</x>
      <y>60</y>
-     <width>351</width>
+     <width>311</width>
      <height>80</height>
     </rect>
    </property>
@@ -136,7 +136,106 @@
     <string>Resize All</string>
    </property>
   </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>200</y>
+     <width>291</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Otsu Threshold and Gaussian Blur</string>
+   </property>
+   <widget class="QLabel" name="label_kernelSize">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Kernel Size</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBox_kernelSize">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>30</y>
+      <width>48</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_SaveDir">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>30</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save Directory</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_Create">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>80</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Create</string>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton_SaveDir</sender>
+   <signal>clicked()</signal>
+   <receiver>ResizeAllImagesDialog</receiver>
+   <slot>selectSaveDir()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>179</x>
+     <y>244</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>288</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_Create</sender>
+   <signal>clicked()</signal>
+   <receiver>ResizeAllImagesDialog</receiver>
+   <slot>create()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>64</x>
+     <y>273</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>148</x>
+     <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>selectSaveDir()</slot>
+  <slot>create()</slot>
+ </slots>
 </ui>

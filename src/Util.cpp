@@ -173,6 +173,12 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
             ittFile.next();
             file = ittFile.fileName();
             cv::Mat img_bw = cv::imread(srcDir.toStdString() + "/" + folder.toStdString() + "/" + file.toStdString(), 0);
+
+            //TODO : adaptive threshold test :
+
+//            int rows = img_bw.rows;
+//            int blockSize = (rows/3)*2-1;
+//            cv::adaptiveThreshold(img_bw, img_bw, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY, blockSize, 2);
             cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
             img_bw = 255 - img_bw;
             cv::blur(img_bw,img_bw,cv::Size(ksize,ksize));

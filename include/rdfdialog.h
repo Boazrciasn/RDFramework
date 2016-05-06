@@ -2,6 +2,7 @@
 #define RDFDIALOG_H
 
 #include <QDialog>
+
 #include "RandomDecisionForest.h"
 
 namespace Ui {

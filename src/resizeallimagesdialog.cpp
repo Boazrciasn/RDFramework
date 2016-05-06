@@ -20,12 +20,17 @@ ResizeAllImagesDialog::~ResizeAllImagesDialog()
 
 void ResizeAllImagesDialog::on_pushButton_browse_clicked()
 {
-    dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_browseDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+}
+
+void ResizeAllImagesDialog::selectSaveDir()
+{
+    m_saveDir = QFileDialog::getExistingDirectory(this,tr("Select Save Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 }
 
 void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
 {
-    if(dir == NULL)
+    if(m_browseDir == NULL)
     {
         QMessageBox* msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -36,7 +41,7 @@ void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
 
     std::vector<QString> fNames;
     auto *reader = new Reader();
-    reader->findImages(dir, "", fNames);
+    reader->findImages(m_browseDir, "", fNames);
 
     int width = ui->spinBox_width->value();
     int height = ui->spinBox_height->value();
@@ -50,7 +55,12 @@ void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
             height = image.rows;
         cv::Size size(width,height);
         cv::resize(image,image,size);
-        cv::imwrite(filePath.toStdString(), image);
+//        cv::imwrite(filePath.toStdString(), image);
     }
     qDebug() << " Resizing Done" ;
+}
+
+void ResizeAllImagesDialog::create()
+{
+    Util::convertToOSRAndBlure(m_browseDir, m_saveDir, ui->spinBox_kernelSize->value());
 }
