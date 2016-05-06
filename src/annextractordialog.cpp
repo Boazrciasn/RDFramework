@@ -8,36 +8,41 @@ AnnExtractorDialog::AnnExtractorDialog(QWidget *parent) :
     ui(new Ui::AnnExtractorDialog)
 {
     ui->setupUi(this);
-    rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+    m_rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     ui->imageLabel->setScaledContents(true);
 }
 
 AnnExtractorDialog::~AnnExtractorDialog()
 {
     delete ui;
+    if(m_saveFile->isOpen())
+    {
+        writeHeader();
+        m_saveFile->close();
+    }
 }
 
 void AnnExtractorDialog::mouseMoveEvent(QMouseEvent *event)
 {
-    rubberBand->setGeometry(QRect(myPoint, event->pos()).normalized());
+    m_rubberBand->setGeometry(QRect(m_Point, event->pos()).normalized());
 }
 
 void AnnExtractorDialog::mousePressEvent(QMouseEvent *event)
 {
-    if (rubberBand->isEnabled())
-        rubberBand->hide();
+    if (m_rubberBand->isEnabled())
+        m_rubberBand->hide();
 
     if(ui->imageLabel->underMouse())
     {
-        myPoint = event->pos();
-        rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-        rubberBand->show();
+        m_Point = event->pos();
+        m_rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+        m_rubberBand->show();
     }
 }
 
 void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
 {
-    QPoint a = mapToGlobal(myPoint);
+    QPoint a = mapToGlobal(m_Point);
     QPoint b = event->globalPos();
 
     a = ui->imageLabel->mapFromGlobal(a);
@@ -51,16 +56,15 @@ void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
     a = QPoint(int(a.x() * sx),int(a.y() * sy));
     b = QPoint(int(b.x() * sx),int(b.y() * sy));
 
-    QRect myRect(a, b);
-
-    ui->width_height_label->setText(" W: " + QString::number(myRect.width()) +
-                                    " H: " + QString::number(myRect.height()));
+    m_rect = QRect(a, b);
+    ui->width_height_label->setText(" W: " + QString::number(m_rect.width()) +
+                                    " H: " + QString::number(m_rect.height()));
 
 //    QPixmap OriginalPix(*ui->imageLabel->pixmap());
 
     QImage newImage;
     newImage = OriginalPix.toImage();
-    this->copyImage = newImage.copy(myRect);
+    this->copyImage = newImage.copy(m_rect);
     ui->preview_label->setPixmap(QPixmap::fromImage(this->copyImage));
     ui->preview_label->repaint();
 //    ui->imageLabel->setPixmap(QPixmap::fromImage(copyImage));
@@ -74,151 +78,205 @@ void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
 
 void AnnExtractorDialog::on_browse_button_clicked()
 {
+    if(!isBrowseble())
+        return;
+
+    if(!loadFiles())
+        return;
+
+    createSaveDir();
+    createSaveFile();
+    display();
+}
+
+bool AnnExtractorDialog::isBrowseble()
+{
     QString searchChar = ui->search_char->text();
 
     if (searchChar.size() != 1)
     {
         QMessageBox::information(this, tr("Image Viewer"),
                                  tr("Please check your input parameters!"));
-        return;
+        return false;
     }
 
-    dir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    fNames.clear();
-    reader.findImages(dir,searchChar,fNames);
+    return true;
+}
 
-    if(fNames.size() == 0)
+bool AnnExtractorDialog::loadFiles()
+{
+    m_Loaddir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_fNames.clear();
+    m_reader.findImages(m_Loaddir,"*",m_fNames);
+
+    if(m_fNames.size() == 0)
     {
         QMessageBox::information(this, tr("Reader"),
                                  tr("loading failed!"));
-        return;
+        return false;
     }
+    return true;
+}
 
-    // Add save dir
-    int posLastSlash = dir.lastIndexOf("/",-1);
-    this->saveDir = dir.mid(0,posLastSlash) + "/AnnotationResults/" + ui->search_char->text();
+void AnnExtractorDialog::createSaveDir()
+{
+    int posLastSlash = m_Loaddir.lastIndexOf("/",-1);
+    this->m_saveDir = m_Loaddir.mid(0,posLastSlash) + "/AnnotationResults/" + ui->search_char->text();
 
-    QFile textFileRead(this->saveDir + "/lastSession.txt");
-    if (textFileRead.exists())
-    {
-        textFileRead.open(QIODevice::ReadOnly);
-        QString str = textFileRead.readLine();
-        QStringList strList = str.split("#");
-        savedFileCounter = ((QString)strList[0]).toInt();
-        fileIndex = ((QString)strList[1]).toInt() + 1;
-
-        ui->counter_label->setText(QString::number(savedFileCounter));
-        qDebug() << savedFileCounter << " - " << fileIndex;
-    }else
-    {
-        fileIndex = 0;
-        savedFileCounter = 0;
-    }
-
-    QImage image(fNames[fileIndex]);
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-    QPixmap pixmap = QPixmap::fromImage(image);
-    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    scaledImage.setDevicePixelRatio(devicePixelRatio());
-    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
-    ui->imageLabel->setScaledContents(true);
-    ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
-    ui->imageLabel->setPixmap(*newScaledPixmap);
-    QString fname =  fNames[fileIndex];
-    posLastSlash = fname.lastIndexOf("/",-1);
-    int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
-
-    ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
-    ui->imageLabel->repaint();
-
-    QDir dir_save(saveDir);
+    QDir dir_save(m_saveDir);
     if (!dir_save.exists())
     {
         dir_save.mkpath(".");
         if(!dir_save.exists())
              qDebug() << "ERROR : " << dir_save << " can not be created!" ;
     }
+}
 
-//    savedFileCounter = 0;   // initial value
+void AnnExtractorDialog::createSaveFile()
+{
+    m_saveFile = new QFile(this->m_saveDir + "/" + ui->search_char->text() + "_lastSession.txt");
+    bool fileExists = m_saveFile->exists();
+    m_saveFile->open(QIODevice::ReadWrite);
 
+    if (fileExists)
+    {
+        loadHeader();
+    }
+    else
+    {
+        // set initial values and create header
+        m_avgWidth = 0;
+        m_avgHight = 0;
+        m_fileIndex = 0;
+        m_sampleCount = 0;
+        writeHeader();
+    }
 
-//    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
-//    QString searchChar = ui->search_char->text();
+    m_saveFile->close();
+    m_saveFile->open(QIODevice::WriteOnly | QIODevice::Append);
+}
 
-//    if (searchChar.size() != 1){
-//        QMessageBox::information(this, tr("Image Viewer"),
-//                                 tr("Please check your input parameters!"));
-//        return;
-//    }
+void AnnExtractorDialog::loadHeader()
+{
+    int count = 0;
+    QString str;
+    do
+    {
+        str =  m_saveFile->readLine();
+        count++;
 
+        switch (count) {
+        case 1:
+            m_avgWidth = str.split(" ")[0].toInt();
+            break;
+        case 2:
+            m_avgHight = str.split(" ")[0].toInt();
+            break;
+        case 3:
+            m_sampleCount = str.split(" ")[0].toInt();
+            break;
+        case 4:
+            m_fileIndex = str.split(" ")[0].toInt();
+            break;
+        default:
+            std::cout<< str.split(" ")[0].toStdString() << std::endl;
+            break;
+        }
+    }while(m_saveFile->canReadLine() && (count < FILE_HEADER));
 
-//    if (!fileName.isEmpty()) {
-//        QImage image(fileName);
+    ui->counter_label->setText(QString::number(m_sampleCount));
+}
 
-//        if (image.isNull()) {
-//            QMessageBox::information(this, tr("Image Viewer"),
-//                                     tr("Cannot load %1.").arg(fileName));
-//            return;
-//        }
+void AnnExtractorDialog::writeHeader()
+{
+    m_saveFile->seek(0);
+    m_saveFile->write(QByteArray::number(m_avgWidth));
+    m_saveFile->write(" \n");
+    m_saveFile->write(QByteArray::number(m_avgHight));
+    m_saveFile->write(" \n");
+    m_saveFile->write(QByteArray::number(m_sampleCount));
+    m_saveFile->write(" \n");
+    m_saveFile->write(QByteArray::number(m_fileIndex));
+    m_saveFile->write(" \n");
+    m_saveFile->write(ui->search_char->text().toUtf8());
+    m_saveFile->write(" \n");
+    m_saveFile->flush();
+}
 
-//        ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-//        ui->imageLabel->repaint();
-//    }
+void AnnExtractorDialog::writeEntry()
+{
+    m_saveFile->write(m_imgDisplayed.toUtf8());
+    m_saveFile->write(" ");
+    m_saveFile->write(QByteArray::number(m_rect.width()));
+    m_saveFile->write(" ");
+    m_saveFile->write(QByteArray::number(m_rect.height()));
+    m_saveFile->write(" ");
+    m_saveFile->write(QByteArray::number(m_rect.x()));
+    m_saveFile->write(" ");
+    m_saveFile->write(QByteArray::number(m_rect.y()));
+    m_saveFile->write(" \n");
+    m_saveFile->flush();
+}
+
+void AnnExtractorDialog::updateValues()
+{
+    m_avgWidth = (m_avgWidth*m_sampleCount + m_rect.width())/(m_sampleCount+1);
+    m_avgHight = (m_avgHight*m_sampleCount + m_rect.height())/(m_sampleCount+1);
+    m_sampleCount++;
+    ui->counter_label->setText(QString::number(m_sampleCount));
+}
+
+bool AnnExtractorDialog::saveImage()
+{
+    QString file = this->m_saveDir + "/" + ui->search_char->text() + "_" + QString::number(m_sampleCount) + ".jpg";
+    if(!this->copyImage.save(file))
+    {
+        QMessageBox::information(this, tr("SAVE FAILED"),
+                                 tr("Unable to save."));
+        return false;
+    }
+    return true;
 }
 
 void AnnExtractorDialog::on_save_button_clicked()
 {
-    rubberBand->hide();
+    m_rubberBand->hide();
+    if(!saveImage())
+        return;
 
-    QString file = this->saveDir + "/" + ui->search_char->text() + "_" + QString::number(savedFileCounter) + ".jpg";
-    if(!this->copyImage.save(file))
-        QMessageBox::information(this, tr("SAVE FAILED"),
-                                 tr("Unable to save."));
-    savedFileCounter++;
-    ui->counter_label->setText(QString::number(savedFileCounter));
+    writeEntry();
+    updateValues();
 
-    QFile textFile(this->saveDir + "/lastSession.txt");
-    textFile.open(QIODevice::WriteOnly);
-    textFile.write(QByteArray::number(savedFileCounter));
-    textFile.write("#");
-    textFile.write(QByteArray::number(fileIndex));
-    textFile.close();
+    std::cout << "save success!" << std::endl;
 }
 
 void AnnExtractorDialog::on_previous_button_clicked()
 {
-    fileIndex--;
-    if (fileIndex < 0)
+    m_fileIndex--;
+    if (m_fileIndex < 0)
     {
-        fileIndex++;
+        m_fileIndex++;
         return;
     }
-    QImage image(fNames[fileIndex]);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    scaledImage.setDevicePixelRatio(devicePixelRatio());
-    QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
-    ui->imageLabel->setScaledContents(true);
-    ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
-    ui->imageLabel->setPixmap(*newScaledPixmap);
 
-    QString fname =  fNames[fileIndex];
-    int posLastSlash = fname.lastIndexOf("/",-1);
-    int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
-
-    ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
-    ui->imageLabel->repaint();
+    display();
 }
 
 void AnnExtractorDialog::on_next_button_clicked()
 {
-    fileIndex++;
-    if (fileIndex >= (int)this->fNames.size())
+    m_fileIndex++;
+    if (m_fileIndex >= (int)this->m_fNames.size())
     {
-        fileIndex--;
+        m_fileIndex--;
         return;
     }
-    QImage image(fNames[fileIndex]);
+
+    display();
+}
+
+void AnnExtractorDialog::display()
+{
+    QImage image(m_fNames[m_fileIndex]);
     QPixmap pixmap = QPixmap::fromImage(image);
     QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());
@@ -226,10 +284,13 @@ void AnnExtractorDialog::on_next_button_clicked()
     ui->imageLabel->setScaledContents(true);
     ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
     ui->imageLabel->setPixmap(*newScaledPixmap);
-    QString fname =  fNames[fileIndex];
-    int posLastSlash = fname.lastIndexOf("/",-1);
-    int posPrevSlash = fname.lastIndexOf("/",-(fname.length() - posLastSlash +1));
 
-    ui->out_info_label->setText(fname.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1));
+
+    m_imgDisplayed =  m_fNames[m_fileIndex];
+    int posLastSlash = m_imgDisplayed.lastIndexOf("/",-1);
+//    int posPrevSlash = m_imgDisplayed.lastIndexOf("/",-(m_imgDisplayed.length() - posLastSlash +1));
+    int posPrevSlash = m_imgDisplayed.length() - 1;
+    m_imgDisplayed = m_imgDisplayed.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1);
+    ui->out_info_label->setText(m_imgDisplayed);
     ui->imageLabel->repaint();
 }

@@ -7,19 +7,44 @@
 int main(int argc, char *argv[]) {
 
 
-//    //    Util::calcWidthHeightStat("/home/vvglab/Desktop/AnnotationResults");
-//    QString tempdir = "/home/neko/Desktop/word";
-////    Util::convertToOSRAndBlure(tempdir,tempdir,11);
+//    QString file = "/home/neko/Desktop/lastSession.txt";
+//    QFile  *m_saveFile = new QFile(file);
+//    bool fileExists = m_saveFile->exists();
+//    m_saveFile->open(QIODevice::ReadWrite);
 
-//    int ksize = 11;
-//    cv::Mat img_bw = cv::imread("/home/neko/Desktop/word/testWord.png", 0);
-//    cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-//    img_bw = 255 - img_bw;
-//    cv::blur(img_bw,img_bw,cv::Size(ksize,ksize));
+//    if (fileExists)
+//    {
+//        // Read header and set values
+//        qDebug()<<"file does not exist! " << fileExists;
+//        int c = 0;
+//        do
+//        {
+//            qDebug()<< m_saveFile->readLine();
+//            c++;
+//        }while(m_saveFile->canReadLine() & (c < 4));
 
-//    QImage saveQIM = Util::toQt(img_bw, QImage::Format_RGB888);
-//    saveQIM.save("/home/neko/Desktop/word/testWord.jpg");
+//        m_saveFile->write("Testing");
+//        m_saveFile->write(" \n");
+//    }
+//    else
+//    {
+//        qDebug()<<"open success!";
+//        // set initial values and create header
+//        int m_avgWidth = 1;
+//        int m_avgHight = 2;
+//        int m_sampleCount = 100;
 
+//        m_saveFile->write(QByteArray::number(m_avgWidth));
+//        m_saveFile->write(" \n");
+//        m_saveFile->write(QByteArray::number(m_avgHight));
+//        m_saveFile->write(" \n");
+//        m_saveFile->write(QByteArray::number(m_sampleCount));
+//        m_saveFile->write(" \n");
+//        m_saveFile->write(file.toUtf8());
+//        m_saveFile->write(" \n");
+//    }
+
+//    m_saveFile->close();
 
 
     QApplication app(argc, argv);

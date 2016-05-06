@@ -9,6 +9,8 @@
 #include "include/Reader.h"
 #include <QDialog>
 
+#define FILE_HEADER 5
+
 namespace Ui {
 class AnnExtractorDialog;
 }
@@ -31,16 +33,32 @@ private slots:
     void on_next_button_clicked();
 
 private:
+    bool isBrowseble();
+    bool loadFiles();
+    void createSaveDir();
+    void createSaveFile();
+    void display();
+
     Ui::AnnExtractorDialog *ui;
-    Reader reader;
+    Reader m_reader;
     QImage copyImage;
-    QString dir;
-    QString saveDir;
-    QPoint myPoint;
-    QRubberBand *rubberBand;
-    std::vector<QString> fNames;     // file names are stored
-    int fileIndex;              // index of file being viewed
-    int savedFileCounter;
+    QString m_imgDisplayed;
+    QRect m_rect;
+    QString m_Loaddir;
+    QString m_saveDir;
+    QPoint m_Point;
+    QRubberBand *m_rubberBand;
+    std::vector<QString> m_fNames;     // file names are stored
+    int m_fileIndex;              // index of file being viewed
+    int m_sampleCount;
+    int m_avgWidth;
+    int m_avgHight;
+    QFile *m_saveFile;
+    void writeEntry();
+    void updateValues();
+    bool saveImage();
+    void writeHeader();
+    void loadHeader();
 };
 
 #endif // ANNEXTRACTORDIALOG_H
