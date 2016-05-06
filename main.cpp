@@ -20,9 +20,7 @@ int main(int argc, char *argv[]) {
 //    QImage saveQIM = Util::toQt(img_bw, QImage::Format_RGB888);
 //    saveQIM.save("/home/neko/Desktop/word/testWord.jpg");
 
-<<<<<<< Updated upstream
-=======
-    */
+
 
 //     QString tempdir = "/Users/barisozcan/Documents/AnnotationResults";
 //     Util::convertToOSRAndBlure(tempdir,tempdir,11);
@@ -88,7 +86,7 @@ int main(int argc, char *argv[]) {
 //        rdf->printHistogram(leaf.hist);
 //    }
 //    rdf->printHistogram(hist_total);
->>>>>>> Stashed changes
+
 
     QApplication app(argc, argv);
     MainWindow w;
