@@ -40,7 +40,7 @@ void RandomDecisionTree::train()
 }
 
 // create child nodes from nodes by tuning each node
-void RandomDecisionTree::constructTree( Node& cur_node, PixelCloud& pixels)
+void RandomDecisionTree::constructTree( Node &cur_node, PixelCloud &pixels)
 {
     //float rootEntropy = calculateEntropyOfVector(pixels);
     int current_depth = log2(cur_node.m_id) + 1;
@@ -81,6 +81,44 @@ void RandomDecisionTree::constructTree( Node& cur_node, PixelCloud& pixels)
 void RandomDecisionTree::subSample()
 {
     int sampleId=0;
+    std::vector<QString> trainingTextFiles;
+
+
+    Reader::readTextFiles(m_DF->m_params.trainAnnotationsDir, trainingTextFiles);
+
+
+    for(auto fname : trainingTextFiles)
+    {
+        QFile currAnnotateFile(fname);
+        if(!currAnnotateFile.open(QIODevice::ReadOnly))
+            std::cout<<"RandomDecisionForest::readAndIdentifyWords failed to open file! \n";
+        while(!currAnnotateFile.atEnd())
+        {
+            QString line = currAnnotateFile.readLine();
+            QStringList currImage = line.split(' ');
+            int currLineId = currImage[0].split('.')[0].toInt();
+
+            if (!m_DF->m_DS.m_TrainHashTable.contains(currLineId))
+            {
+              QString imageFullPath  = m_DF->m_dir + "/" + currImage[0];
+              cv::Mat image = cv::imread(imageFullPath.toStdString(),CV_LOAD_IMAGE_GRAYSCALE);
+              cv::copyMakeBorder(image, image, m_DF->m_params.probDistY, m_DF->m_params.probDistY, m_DF->m_params.probDistX, m_DF->m_params.probDistX, cv::BORDER_CONSTANT);
+              m_DF->m_DS.m_TrainHashTable.insert(currLineId, image);
+
+            }
+            else
+            {
+
+            }
+
+
+
+        }
+    }
+
+
+
+
     for(auto &image : m_DF->m_DS.m_trainImagesVector)
     {
         auto label = m_DF->m_DS.m_trainlabels[sampleId];

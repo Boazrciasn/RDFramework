@@ -4,6 +4,14 @@
 
 #include "include/Util.h"
 
+#include "omp.h"
+
+
+void openmp_deneme()
+{
+//    quint32 nThreads = std::thread::hardware_concurrency();
+//    int nThreads = omp_get_max_threads();
+}
 
 void deneme()
 {

@@ -24,13 +24,13 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::onTrainingBrowse()
 {
-    PARAMS.trainDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    ui->textBrowser_train->setText(PARAMS.trainDir);
+    PARAMS.trainImagesDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->textBrowser_train->setText(PARAMS.trainImagesDir);
 }
 
 void RDFDialog::onTestBrowse()
 {
-    PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainImagesDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
 
@@ -47,7 +47,7 @@ void RDFDialog::onTrain()
 
     m_forest->setParams(PARAMS);
 
-    if(m_forest->params().trainDir.isEmpty())
+    if(m_forest->params().trainImagesDir.isEmpty())
     {
         auto *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -56,7 +56,7 @@ void RDFDialog::onTrain()
         return;
     }
 
-    Util::calcWidthHeightStat(m_forest->params().trainDir);
+    Util::calcWidthHeightStat(m_forest->params().trainImagesDir);
     m_treeid = 0;
     m_forest->readTrainingImageFiles();
     ui->textBrowser_train->append("Training images read");
@@ -129,7 +129,7 @@ void RDFDialog::onLoad()
 
 void RDFDialog::onSave()
 {
-    QString dirname = QFileDialog::getExistingDirectory(this,tr("Open Save Directory"), PARAMS.trainDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString dirname = QFileDialog::getExistingDirectory(this,tr("Open Save Directory"), PARAMS.trainImagesDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     QString fname = "nT_" +QString::number(m_forest->params().nTrees) + "_D_" + QString::number(m_forest->params().maxDepth)
                           +"_nTImg_" + QString::number(m_forest->m_imagesContainer.size())
                           +"_nPxPI_" + QString::number(m_forest->params().pixelsPerImage)

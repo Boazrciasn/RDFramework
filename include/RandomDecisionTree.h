@@ -17,6 +17,7 @@
 #include "include/PixelCloud.h"
 #include "include/RDFParams.h"
 #include "include/matcerealisation.hpp"
+#include "include/Reader.h"
 
 #define MIN_ENTROPY 0.05
 
@@ -51,6 +52,9 @@ struct Node
 
 struct DataSet
 {
+
+    QHash<int,cv::Mat> m_TrainHashTable;
+
     std::vector<cv::Mat> m_trainImagesVector;
     std::vector<cv::Mat> m_testImagesVector;
     std::vector<QString> m_testlabels;
@@ -186,7 +190,10 @@ private:
     {
         for (auto px : parentPixels)
         {
-            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
+
+
+//            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
+            auto img = DS.m_TrainHashTable.value(px->imgInfo->m_sampleId);
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }

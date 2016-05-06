@@ -3,7 +3,8 @@
 
 struct  RDFParams
 {
-    QString trainDir;
+    QString trainImagesDir;
+    QString trainAnnotationsDir;
     QString testDir;
     int probDistX;
     int probDistY;

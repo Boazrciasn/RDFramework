@@ -5,6 +5,7 @@
 #include "include/Reader.h"
 #include "include/Util.h"
 #include "include/TextRegionDetector.h"
+//#include <omp.h>
 
 
 // histogram normalize ?
@@ -13,7 +14,8 @@
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles()
 {
-    m_dir = m_params.trainDir;
+
+    m_dir = m_params.trainImagesDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames, m_DS.m_trainlabels);
@@ -259,29 +261,40 @@ cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Ma
 
 void RandomDecisionForest::trainForest()
 {
-    clock_t start;
     double cpu_time;
+#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
-        start = clock();
+        clock_t start = clock();
+#pragma omp critical (DEBUG)
+        {
         qDebug()<< "Tree number " << QString::number(i+1) << "is being trained" ;
+        }
+
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
         rdt_ptr trainedRDT(new RandomDecisionTree(this));
         trainedRDT->setProbeDistanceX(m_params.probDistX);
         trainedRDT->setProbeDistanceY(m_params.probDistY);
         trainedRDT->setMaxDepth(m_params.maxDepth);
         trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
-        qDebug()<< "Train..." ;
+
+#pragma omp critical (DEBUG)
+        {
+        qDebug() << "Train..." ;
+        }
+
         trainedRDT->train();
         //trainedRDT->saveTree();
-        m_forest.push_back(trainedRDT);
 
         cpu_time = static_cast<double>(clock()-start)/CLOCKS_PER_SEC;
 
-        qDebug()<< " Train time of the current Tree : "<< cpu_time;
-
-
+#pragma omp critical (PUSH_FOREST)
+        {
+        m_forest.push_back(trainedRDT);
+        qDebug() << " Train time of the current Tree : "<< cpu_time;
+        }
     }
+
     qDebug()<< "Forest Size : " << m_forest.size();
 }
 
