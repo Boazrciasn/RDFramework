@@ -4,7 +4,7 @@ set(project_name "ImageCLEF")
 # set the project name
 project("${project_name}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -fopenmp")
 SET(CMAKE_PREFIX_PATH : "/usr/local/Cellar/qt5/5.5.1_2")
 
 # OpenCV package

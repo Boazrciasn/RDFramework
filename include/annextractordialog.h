@@ -46,6 +46,7 @@ private:
     QRect m_rect;
     QString m_Loaddir;
     QString m_saveDir;
+    QString m_searchChar;
     QPoint m_Point;
     QRubberBand *m_rubberBand;
     std::vector<QString> m_fNames;     // file names are stored

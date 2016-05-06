@@ -16,10 +16,8 @@ AnnExtractorDialog::~AnnExtractorDialog()
 {
     delete ui;
     if(m_saveFile->isOpen())
-    {
-        writeHeader();
         m_saveFile->close();
-    }
+    writeHeader();
 }
 
 void AnnExtractorDialog::mouseMoveEvent(QMouseEvent *event)
@@ -91,9 +89,9 @@ void AnnExtractorDialog::on_browse_button_clicked()
 
 bool AnnExtractorDialog::isBrowseble()
 {
-    QString searchChar = ui->search_char->text();
+    m_searchChar = ui->search_char->text();
 
-    if (searchChar.size() != 1)
+    if (m_searchChar.size() != 1)
     {
         QMessageBox::information(this, tr("Image Viewer"),
                                  tr("Please check your input parameters!"));
@@ -121,7 +119,7 @@ bool AnnExtractorDialog::loadFiles()
 void AnnExtractorDialog::createSaveDir()
 {
     int posLastSlash = m_Loaddir.lastIndexOf("/",-1);
-    this->m_saveDir = m_Loaddir.mid(0,posLastSlash) + "/AnnotationResults/" + ui->search_char->text();
+    this->m_saveDir = m_Loaddir.mid(0,posLastSlash) + "/AnnotationResults2/" + ui->search_char->text();
 
     QDir dir_save(m_saveDir);
     if (!dir_save.exists())
@@ -136,7 +134,6 @@ void AnnExtractorDialog::createSaveFile()
 {
     m_saveFile = new QFile(this->m_saveDir + "/" + ui->search_char->text() + "_lastSession.txt");
     bool fileExists = m_saveFile->exists();
-    m_saveFile->open(QIODevice::ReadWrite);
 
     if (fileExists)
     {
@@ -152,12 +149,12 @@ void AnnExtractorDialog::createSaveFile()
         writeHeader();
     }
 
-    m_saveFile->close();
     m_saveFile->open(QIODevice::WriteOnly | QIODevice::Append);
 }
 
 void AnnExtractorDialog::loadHeader()
 {
+    m_saveFile->open(QIODevice::ReadOnly);
     int count = 0;
     QString str;
     do
@@ -185,22 +182,34 @@ void AnnExtractorDialog::loadHeader()
     }while(m_saveFile->canReadLine() && (count < FILE_HEADER));
 
     ui->counter_label->setText(QString::number(m_sampleCount));
+    m_saveFile->flush();
+    m_saveFile->close();
 }
 
 void AnnExtractorDialog::writeHeader()
 {
-    m_saveFile->seek(0);
-    m_saveFile->write(QByteArray::number(m_avgWidth));
-    m_saveFile->write(" \n");
-    m_saveFile->write(QByteArray::number(m_avgHight));
-    m_saveFile->write(" \n");
-    m_saveFile->write(QByteArray::number(m_sampleCount));
-    m_saveFile->write(" \n");
-    m_saveFile->write(QByteArray::number(m_fileIndex));
-    m_saveFile->write(" \n");
-    m_saveFile->write(ui->search_char->text().toUtf8());
-    m_saveFile->write(" \n");
-    m_saveFile->flush();
+    if(m_saveFile->open(QIODevice::ReadWrite | QIODevice::Text))
+    {
+        QString s;
+        QTextStream t(m_saveFile);
+
+        s += QString::number(m_avgWidth) + "\n";
+        s += QString::number(m_avgHight) + "\n";
+        s += QString::number(m_sampleCount) + "\n";
+        s += QString::number(m_fileIndex) + "\n";
+        s += m_searchChar + "\n";
+        int ctr=0;
+        while(!t.atEnd())
+        {
+            QString line = t.readLine();
+            if(++ctr>5)
+                s.append(line + "\n");
+        }
+        m_saveFile->resize(0);
+        t << s;
+        m_saveFile->flush();
+        m_saveFile->close();
+    }
 }
 
 void AnnExtractorDialog::writeEntry()
@@ -282,14 +291,14 @@ void AnnExtractorDialog::display()
     scaledImage.setDevicePixelRatio(devicePixelRatio());
     QPixmap* newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
     ui->imageLabel->setScaledContents(true);
-    ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
+    //ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
     ui->imageLabel->setPixmap(*newScaledPixmap);
 
 
     m_imgDisplayed =  m_fNames[m_fileIndex];
-    int posLastSlash = m_imgDisplayed.lastIndexOf("/",-1);
+    int posPrevSlash = m_imgDisplayed.lastIndexOf("/",-1);
 //    int posPrevSlash = m_imgDisplayed.lastIndexOf("/",-(m_imgDisplayed.length() - posLastSlash +1));
-    int posPrevSlash = m_imgDisplayed.length() - 1;
+    int posLastSlash = m_imgDisplayed.length();
     m_imgDisplayed = m_imgDisplayed.mid(posPrevSlash+1,posLastSlash-posPrevSlash-1);
     ui->out_info_label->setText(m_imgDisplayed);
     ui->imageLabel->repaint();

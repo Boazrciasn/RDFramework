@@ -80,12 +80,11 @@ void RandomDecisionTree::constructTree( Node &cur_node, PixelCloud &pixels)
 
 void RandomDecisionTree::subSample()
 {
+    //TODO Fix subfolders
     int sampleId=0;
     std::vector<QString> trainingTextFiles;
 
-
     Reader::readTextFiles(m_DF->m_params.trainAnnotationsDir, trainingTextFiles);
-
 
     for(auto fname : trainingTextFiles)
     {
@@ -151,7 +150,7 @@ void RandomDecisionTree::tuneParameters(PixelCloud& parentPixels, Node& parent)
 {
     std::vector<pixel_ptr> left;
     std::vector<pixel_ptr> right;
-    int maxTau;
+    int maxTau=-250;
     Coord maxTeta1,maxTeta2;
     float maxGain=0;
     int itr=0;

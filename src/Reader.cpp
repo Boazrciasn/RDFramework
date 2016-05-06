@@ -7,7 +7,8 @@ void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
     struct dirent *ent;
 
     // check for valid directory
-    if ((m_dir = opendir(filename.c_str())) != NULL) {
+    if ((m_dir = opendir(filename.c_str())) != NULL)
+    {
 
         QString prev = "abdd";
 
@@ -20,10 +21,11 @@ void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
             if (pos == std::string::npos || pos == 0)
                 continue;
 
-//            cout<<str.substr(0,pos)<<endl;
+            //            cout<<str.substr(0,pos)<<endl;
             QString file = QString::fromStdString(str.substr(0,pos));
 
-            if(prev != file){
+            if(prev != file)
+            {
                 imgName.push_back(file);
                 prev = file;
             }
@@ -39,11 +41,13 @@ void Reader::findImages(QString baseDir, QString query, std::vector<QString> &fo
 {
     query = "*"+query+"*";
 
-        QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
-    while (it.hasNext()){
+    QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+    while (it.hasNext())
+    {
         it.next();
         QDirIterator itFile(baseDir+"/"+it.fileName(),QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files);
-        while(itFile.hasNext()){
+        while(itFile.hasNext())
+        {
             itFile.next();
             foundImages.push_back(itFile.filePath());
             labels.push_back(it.fileName());
@@ -56,11 +60,13 @@ void Reader::findImages(QString baseDir, QString query, std::vector<QString> &fo
 {
     query = "*"+query+"*";
 
-        QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
-    while (it.hasNext()){
+    QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+    while (it.hasNext())
+    {
         it.next();
         QDirIterator itFile(baseDir+"/"+it.fileName(),QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files);
-        while(itFile.hasNext()){
+        while(itFile.hasNext())
+        {
             itFile.next();
             foundImages.push_back(itFile.filePath());
         }
@@ -69,23 +75,32 @@ void Reader::findImages(QString baseDir, QString query, std::vector<QString> &fo
 }
 
 void Reader::readTextFiles(QString baseDir, QString query, std::vector<QString> &foundText)
-{
-    QDirIterator itFile(baseDir, QStringList()<<(query + ".txt"), QDir::Files);
-    while(itFile.hasNext())
+{    
+    QDirIterator it(baseDir,QStringList()<<query, QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+    while (it.hasNext())
     {
-        itFile.next();
-        foundText.push_back(itFile.filePath());
+        it.next();
+        QDirIterator itFile(baseDir+"/"+it.fileName(),QStringList()<<"*.txt",QDir::Files);
+        while(itFile.hasNext())
+        {
+            itFile.next();
+            foundText.push_back(itFile.filePath());
+        }
     }
 }
 
 
 void Reader::readTextFiles(QString baseDir, std::vector<QString> &foundText)
 {
-
-    QDirIterator itFile(baseDir, QStringList()<<"*.txt", QDir::Files);
-    while(itFile.hasNext())
+    QDirIterator it(baseDir,QStringList()<<"*", QDir::Dirs | QDir::NoDotAndDotDot |QDir::CaseSensitive) ;
+    while (it.hasNext())
     {
-        itFile.next();
-        foundText.push_back(itFile.filePath());
+        it.next();
+        QDirIterator itFile(baseDir+"/"+it.fileName(),QStringList()<<"*.txt",QDir::Files);
+        while(itFile.hasNext())
+        {
+            itFile.next();
+            foundText.push_back(itFile.filePath());
+        }
     }
 }

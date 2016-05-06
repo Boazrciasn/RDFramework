@@ -262,14 +262,14 @@ cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Ma
 void RandomDecisionForest::trainForest()
 {
     double cpu_time;
-#pragma omp parallel for num_threads(8)
+//#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
         clock_t start = clock();
-#pragma omp critical (DEBUG)
-        {
+//#pragma omp critical (DEBUG)
+//        {
         qDebug()<< "Tree number " << QString::number(i+1) << "is being trained" ;
-        }
+//        }
 
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
         rdt_ptr trainedRDT(new RandomDecisionTree(this));
@@ -278,21 +278,21 @@ void RandomDecisionForest::trainForest()
         trainedRDT->setMaxDepth(m_params.maxDepth);
         trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
 
-#pragma omp critical (DEBUG)
-        {
+//#pragma omp critical (DEBUG)
+//        {
         qDebug() << "Train..." ;
-        }
+//        }
 
         trainedRDT->train();
         //trainedRDT->saveTree();
 
         cpu_time = static_cast<double>(clock()-start)/CLOCKS_PER_SEC;
 
-#pragma omp critical (PUSH_FOREST)
-        {
+//#pragma omp critical (PUSH_FOREST)
+//        {
         m_forest.push_back(trainedRDT);
         qDebug() << " Train time of the current Tree : "<< cpu_time;
-        }
+//        }
     }
 
     qDebug()<< "Forest Size : " << m_forest.size();
