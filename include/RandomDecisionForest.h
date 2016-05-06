@@ -39,6 +39,8 @@ public:
         ar(*this);
         file.flush();
         file.close();
+        file.close();
+
     }
 
     inline void loadForest(QString fname)

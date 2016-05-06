@@ -1,4 +1,5 @@
 #include "precompiled.h"
+#include <ctime>
 
 #include "include/RandomDecisionForest.h"
 #include "include/Reader.h"
@@ -258,8 +259,11 @@ cv::Mat RandomDecisionForest::colorCoder(const cv::Mat &labelImage, const cv::Ma
 
 void RandomDecisionForest::trainForest()
 {
+    clock_t start;
+    double cpu_time;
     for (int i = 0; i < m_params.nTrees; ++i)
     {
+        start = clock();
         qDebug()<< "Tree number " << QString::number(i+1) << "is being trained" ;
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
         rdt_ptr trainedRDT(new RandomDecisionTree(this));
@@ -271,6 +275,12 @@ void RandomDecisionForest::trainForest()
         trainedRDT->train();
         //trainedRDT->saveTree();
         m_forest.push_back(trainedRDT);
+
+        cpu_time = static_cast<double>(clock()-start)/CLOCKS_PER_SEC;
+
+        qDebug()<< " Train time of the current Tree : "<< cpu_time;
+
+
     }
     qDebug()<< "Forest Size : " << m_forest.size();
 }
