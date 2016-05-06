@@ -80,10 +80,10 @@ public:
     }
 
     RandomDecisionTree(rdf_ptr DF);
-    RandomDecisionTree(RandomDecisionForest* DF);
+    RandomDecisionTree(RandomDecisionForest *DF);
 
     rdf_ptr m_sDF;
-    RandomDecisionForest* m_DF;
+    RandomDecisionForest *m_DF;
     int m_depth;
     int m_numOfLeaves;
     int m_maxDepth;

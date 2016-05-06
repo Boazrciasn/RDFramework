@@ -30,6 +30,9 @@ void RDFDialog::onTrainingBrowse()
 
 void RDFDialog::onTestBrowse()
 {
+    m_forest->loadForest();
+    qDebug() << "LOAD FOREST PRINTED" ;
+
     PARAMS.testDir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), PARAMS.trainDir,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
