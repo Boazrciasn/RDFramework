@@ -50,6 +50,7 @@ public:
     }
 
     void readAndIdentifyWords();
+    void searchWords(QString query, int queryId);
 
     void readTrainingImageFiles();
     void readTestImageFiles();

@@ -150,7 +150,7 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
     {
         ittDir.next();
         folder = ittDir.fileName();
-        QDirIterator ittFile(srcDir + "/"+ folder,QStringList()<<"*.jpg"<<"*.jpeg",QDir::Files);
+        QDirIterator ittFile(srcDir + "/"+ folder,QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files);
 
         QDir dir_save(outDir + "/" + folder);
         if (!dir_save.exists())
@@ -252,11 +252,14 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     if(!input.open(QIODevice::ReadOnly))
         std::cout<<"Util::getWordWithConfidance failed to open file! \n";
 
-    // extract values
+
+    /*************************************/
+    /*********** extract values **********/
+    /*************************************/
     do {
         QString str = input.readLine();
         QStringList myStringList = str.split(' ');
-        index = str[0].unicode()%97;
+        index = str[0].unicode()%'a';
         avgWidth[index] = myStringList[1].toInt();
         avgHight[index] = myStringList[2].toInt();
 
@@ -270,8 +273,10 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     //    for (int i = 0; i < nLabel; ++i)
     //        qDebug() << avgWidth[i] << " " << avgHight[i];
 
+    /*************************************/
+    /*********** extract peaks ***********/
+    /*************************************/
 
-    // find peaks
     cv::Mat peaks = cv::Mat::zeros(layeredHist.rows,layeredHist.cols,layeredHist.type());
     bool isIncreasing = true;
     int cols = peaks.cols;
@@ -299,8 +304,142 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
     }
 
 //    std::cout << "Kernel: " << avgWidth[23] << std::endl;
-    std::cout << peaks.t() << std::endl;
+//    std::cout << peaks.t() << std::endl;
 //    std::cout << std::endl;
 //    std::cout << layeredHist.row(23) << std::endl;
 
+    /*************************************/
+    /************ extract word ***********/
+    /*************************************/
+    QVector<int> label(cols);
+    QVector<float> accuracy(cols);
+
+//    int maxIdx;
+//    float max;
+//    for (int i = 0; i < cols; ++i) {
+//        maxIdx = 0;
+//        max = layeredHist.at<float>(0,i);
+//        for (int j = 1; j < nLabel; ++j) {
+//            if(max < layeredHist.at<float>(j,i))
+//            {
+//                maxIdx = j;
+//                max = layeredHist.at<float>(maxIdx,i);
+//            }
+//        }
+
+//        label[i] = maxIdx;
+//        accuracy[i] = max;
+//    }
+
+    /*************************************/
+    /************ expand peaks ***********/
+    /*************************************/
+
+    cv::Mat peaksRow;
+    int winBw;
+
+    for (int i = 0; i < nLabel; ++i) {
+        peaksRow = peaks.row(i);
+        winBw = avgWidth[i]/2;
+
+        for (int j = 0; j < cols; ++j) {
+            // if peak expand
+            if(peaksRow.at<float>(j) > 0)
+            {
+                for (int k = 0; k < cols; ++k) {
+                    if(std::abs(k-j) <= winBw && (peaks.at<float>(i,k) < peaks.at<float>(i,j))){
+                        peaks.at<float>(i,k) = peaks.at<float>(i,j);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    int maxIdx;
+    float max;
+    for (int i = 0; i < cols; ++i) {
+        maxIdx = 0;
+        max = peaks.at<float>(0,i);
+        for (int j = 1; j < nLabel; ++j) {
+            if(max < peaks.at<float>(j,i))
+            {
+                maxIdx = j;
+                max = peaks.at<float>(maxIdx,i);
+            }
+        }
+
+        if(max == 0)
+        {
+            max = 0;
+            maxIdx = -1;
+        }
+        label[i] = maxIdx;
+        accuracy[i] = max;
+    }
+
+
+//    qDebug()<<label;
+
+//    qDebug()<<accuracy;
+
+    word = "";
+    for (int i = 0; i < cols; ++i) {
+        if(label[i] < 0)
+            continue;
+
+        // see is it greater that others or not
+        bool isLabel = true;
+        for (int j = 0; j < nLabel; ++j) {
+            if(j == label[i])
+                continue;
+
+            if(layeredHist.at<float>(j,i) > accuracy[i])
+                isLabel = false;
+        }
+
+        if(isLabel)
+            word += QString((char)(label[i]+'a'));
+    }
+
+
+    /*  2nd method */
+
+    word = "";
+    conf = 0;
+    int lbl = -2;
+    int wind;
+    int lblCount = 0;
+    float acc = 0;
+    for (int i = 0; i < cols; ++i) {
+        if(label[i] != lbl)
+        {
+            if(lblCount > wind/3)
+            {
+                word += QString((char)(lbl+'a'));
+                conf += acc/lblCount;
+            }
+            lblCount=0;
+            acc = 0;
+        }
+
+        if(label[i] < 0)
+            continue;
+
+        lbl = label[i];
+        wind = avgWidth[lbl];
+        lblCount++;
+        acc += layeredHist.at<float>(lbl,i);
+    }
+
+    if(lblCount > wind/3)
+    {
+        word += QString((char)(lbl+'a'));
+        conf += acc/lblCount;
+    }
+
+    conf /= word.length();
+
+//    qDebug() << "Word extracted: " << word;
 }

@@ -8,7 +8,7 @@
 class TextRegionDetector{
 public:
     static QVector<QRect> detectRegions(const cv::Mat &img_bw, QWidget *parent);
-    static QVector<QRect> detectWordsFromLine(const cv::Mat &lineImg, QWidget *parent);
+    static QVector<QRect> detectWordsFromLine(cv::Mat &lineImg, QWidget *parent);
 private:
     static QVector<int> extractCoordinateFrom(QVector<int> y);
     static void getRange(const cv::Mat &img_bw, int &leftMargin, int &rightMargin, QWidget *parent);

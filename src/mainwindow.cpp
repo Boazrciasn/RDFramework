@@ -41,9 +41,9 @@ void MainWindow::display()
     // Testing
     cv::Mat img_bw = Util::toCv(image,CV_8UC4);
     cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
-    cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    img_bw.convertTo(img_bw,CV_32FC1);
-    img_bw = 255 - img_bw;
+//    cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+//    img_bw.convertTo(img_bw,CV_32FC1);
+//    img_bw = 255 - img_bw;
 
     QVector<QRect> out = TextRegionDetector::detectWordsFromLine(img_bw,this);
 

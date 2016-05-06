@@ -102,11 +102,11 @@ void RandomDecisionForest::readAndIdentifyWords()
             cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredWordRoiMat, fgPxNumberPerCol);
 
             //Nekruz baba top sende
-//            Util::plot(confidenceMat.row(23), m_parent, "x");
+            //            Util::plot(confidenceMat.row(23), m_parent, "x");
             QString wordDetected="baris";
             float conf = 0;
             //Util::getWordWithConfidance(confidenceMat,26,wordDetected,conf);
-//            Util::plot(confidenceMat.row(23), m_parent, "x");
+            //            Util::plot(confidenceMat.row(23), m_parent, "x");
 
             //save obtained result
             output.write(wordDetected.toStdString().c_str());
@@ -170,7 +170,7 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
         {
             for(int line_id=segmentNo; line_id<=segmentEnd; ++line_id)
             {
-                QHash<QString, int>::const_iterator i = hash.find(line_id);
+                QMultiHash<int, QString>::const_iterator i = hash.find(line_id);
                 while (i != hash.end() && i.key() == line_id)
                 {
                     QString details = i.value();
@@ -178,11 +178,10 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
                     QString word = myStringList[0];
                     if(word == search)
                     {
-                        QString conf_bbox = myStringList[1] +" "+ myStringList[2];
-
+                        QString conf_bbox = " " + myStringList[1] + " " + myStringList[2];
                         output.write(QByteArray::number(queryId));
                         output.write(" " + QByteArray::number(segmentNo));
-                        output.write(" " + conf_bbox.toStdString().c_str());
+                        output.write(conf_bbox.toStdString().c_str());
                     }
                     ++i;
                 }
@@ -196,7 +195,6 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
     hash.clear();
     output.close();
     input.close();
-    fNames.clear();
 }
 
 
@@ -385,14 +383,12 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
 
-//        Util::plot(confidenceMat.row(23), m_parent, "x");
-//        QString test = "Hello";
-//        float acc = 0;
-//        Util::getWordWithConfidance(confidenceMat,26,test,acc);
-//        Util::plot(confidenceMat.row(23), m_parent, "x");
-        //        Util::plot(confidenceMat.row(23), m_parent, "x");
-        //        Util::plot(confidenceMat.row(24), m_parent, "y");
-        //        Util::plot(confidenceMat.row(25), m_parent, "z");
+        //        std::cout<<confidenceMat.row(0)<<std::endl;
+        QString word = "Hello";
+        float conf = 0;
+        //        Util::plot(confidenceMat.row('n'-'a'), m_parent, "n");
+        Util::getWordWithConfidance(confidenceMat,26,word,conf);
+        qDebug() << "Word extracted & conf: " << word << "  " << 100*conf;
     }
     //    m_accuracy = Util::calculateAccuracy(m_DS.m_testlabels, classify_res);
     //    emit resultPercentage(m_accuracy);
