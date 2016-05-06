@@ -6,8 +6,12 @@
 #include "include/Util.h"
 
 
-QVector<QRect> TextRegionDetector::detectWordsFromLine(const cv::Mat &lineImg, QWidget *parent)
+QVector<QRect> TextRegionDetector::detectWordsFromLine(cv::Mat &lineImg, QWidget *parent)
 {
+    cv::threshold(lineImg, lineImg, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    lineImg.convertTo(lineImg,CV_32FC1);
+    lineImg = 255 - lineImg;
+
     QVector<QRect> result;
     cv::Mat hist;
 //    cv::imshow("line Image", lineImg);
@@ -25,7 +29,7 @@ QVector<QRect> TextRegionDetector::detectWordsFromLine(const cv::Mat &lineImg, Q
 
     // Gaussian filtering
     int ksize = 33;
-    cv::GaussianBlur(hist, hist, cv::Size(ksize,ksize),0, 0);
+    cv::GaussianBlur(hist, hist, cv::Size(ksize,ksize),0, 0,cv::BORDER_CONSTANT);
 //    Util::plot(hist,parent);
 
 

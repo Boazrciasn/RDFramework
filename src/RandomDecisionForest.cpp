@@ -234,11 +234,16 @@ void RandomDecisionForest::test()
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i, fgPxNumberPerCol);
         cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
 
-        QString test = "Hello";
-        float acc = 0;
-        Util::getWordWithConfidance(confidenceMat,26,test,acc);
-//        Util::plot(confidenceMat.row(23), m_parent, "x");
-//        Util::plot(confidenceMat.row(23), m_parent, "x");
+//        std::cout<<confidenceMat.row(0)<<std::endl;
+
+        QString word = "Hello";
+        float conf = 0;
+
+//        Util::plot(confidenceMat.row('n'-'a'), m_parent, "n");
+        Util::getWordWithConfidance(confidenceMat,26,word,conf);
+        qDebug() << "Word extracted & conf: " << word << "  " << 100*conf;
+//        Util::plot(confidenceMat.row('n'-'a'), m_parent, "n");
+
 //        Util::plot(confidenceMat.row(24), m_parent, "y");
 //        Util::plot(confidenceMat.row(25), m_parent, "z");
     }
