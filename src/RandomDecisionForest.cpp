@@ -5,7 +5,7 @@
 #include "include/Reader.h"
 #include "include/Util.h"
 #include "include/TextRegionDetector.h"
-#include <omp.h>
+//#include <omp.h>
 
 
 // histogram normalize ?
@@ -15,7 +15,7 @@
 void RandomDecisionForest::readTrainingImageFiles()
 {
 
-    m_dir = m_params.trainDir;
+    m_dir = m_params.trainImagesDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames, m_DS.m_trainlabels);

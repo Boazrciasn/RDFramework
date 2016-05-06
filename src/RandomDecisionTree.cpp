@@ -100,9 +100,9 @@ void RandomDecisionTree::subSample()
 
             if (!m_DF->m_DS.m_TrainHashTable.contains(currLineId))
             {
-              QString imageFullPath  = m_dir + "/" + currImage[0];
+              QString imageFullPath  = m_DF->m_dir + "/" + currImage[0];
               cv::Mat image = cv::imread(imageFullPath.toStdString(),CV_LOAD_IMAGE_GRAYSCALE);
-              cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY, m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
+              cv::copyMakeBorder(image, image, m_DF->m_params.probDistY, m_DF->m_params.probDistY, m_DF->m_params.probDistX, m_DF->m_params.probDistX, cv::BORDER_CONSTANT);
               m_DF->m_DS.m_TrainHashTable.insert(currLineId, image);
 
             }
