@@ -139,31 +139,6 @@ void AnnExtractorDialog::on_browse_button_clicked()
              qDebug() << "ERROR : " << dir_save << " can not be created!" ;
     }
 
-//    savedFileCounter = 0;   // initial value
-
-
-//    fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
-//    QString searchChar = ui->search_char->text();
-
-//    if (searchChar.size() != 1){
-//        QMessageBox::information(this, tr("Image Viewer"),
-//                                 tr("Please check your input parameters!"));
-//        return;
-//    }
-
-
-//    if (!fileName.isEmpty()) {
-//        QImage image(fileName);
-
-//        if (image.isNull()) {
-//            QMessageBox::information(this, tr("Image Viewer"),
-//                                     tr("Cannot load %1.").arg(fileName));
-//            return;
-//        }
-
-//        ui->imageLabel->setPixmap(QPixmap::fromImage(image));
-//        ui->imageLabel->repaint();
-//    }
 }
 
 void AnnExtractorDialog::on_save_button_clicked()

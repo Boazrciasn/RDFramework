@@ -2,6 +2,8 @@
 #define CPV_RANDOM_DECISION_FOREST
 
 #include "include/RandomDecisionTree.h"
+#include "include/Util.h"
+#include "include/TextRegionDetector.h"
 
 class RandomDecisionForest : public QObject
 {

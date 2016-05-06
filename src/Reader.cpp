@@ -67,3 +67,25 @@ void Reader::findImages(QString baseDir, QString query, std::vector<QString> &fo
 
     }
 }
+
+void Reader::readTextFiles(QString baseDir, QString query, std::vector<QString> &foundText)
+{
+    QDirIterator itFile(baseDir, QStringList()<<(query + ".txt"), QDir::Files);
+    while(itFile.hasNext())
+    {
+        itFile.next();
+        foundText.push_back(itFile.filePath());
+    }
+}
+
+
+void Reader::readTextFiles(QString baseDir, std::vector<QString> &foundText)
+{
+
+    QDirIterator itFile(baseDir, QStringList()<<"*.txt", QDir::Files);
+    while(itFile.hasNext())
+    {
+        itFile.next();
+        foundText.push_back(itFile.filePath());
+    }
+}

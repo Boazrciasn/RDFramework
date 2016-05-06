@@ -14,6 +14,7 @@
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles()
 {
+
     m_dir = m_params.trainDir;
     std::vector<QString> fNames;
     auto *reader = new Reader();

@@ -29,6 +29,7 @@ private slots:
     void on_save_button_clicked();
     void on_previous_button_clicked();
     void on_next_button_clicked();
+    void saveRoi();
 
 private:
     Ui::AnnExtractorDialog *ui;
