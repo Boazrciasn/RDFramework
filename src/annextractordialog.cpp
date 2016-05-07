@@ -2,6 +2,7 @@
 
 #include "include/annextractordialog.h"
 #include "ui_annextractordialog.h"
+#include "include/Util.h"
 
 AnnExtractorDialog::AnnExtractorDialog(QWidget *parent) :
     QDialog(parent),
@@ -285,7 +286,8 @@ void AnnExtractorDialog::on_next_button_clicked()
 
 void AnnExtractorDialog::display()
 {
-    QImage image(m_fNames[m_fileIndex]);
+    cv::Mat input = cv::imread(m_fNames[m_fileIndex].toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+    QImage image = Util::toQt(input,QImage::Format_RGB888);
     QPixmap pixmap = QPixmap::fromImage(image);
     QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());
@@ -293,7 +295,6 @@ void AnnExtractorDialog::display()
     ui->imageLabel->setScaledContents(true);
     //ui->imageLabel->resize(ui->imageLabel->pixmap()->size());
     ui->imageLabel->setPixmap(*newScaledPixmap);
-
 
     m_imgDisplayed =  m_fNames[m_fileIndex];
     int posPrevSlash = m_imgDisplayed.lastIndexOf("/",-1);
