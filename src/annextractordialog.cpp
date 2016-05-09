@@ -16,8 +16,6 @@ AnnExtractorDialog::AnnExtractorDialog(QWidget *parent) :
 AnnExtractorDialog::~AnnExtractorDialog()
 {
     delete ui;
-    if(m_saveFile->isOpen())
-        m_saveFile->close();
     writeHeader();
 }
 
@@ -77,20 +75,53 @@ void AnnExtractorDialog::mouseReleaseEvent(QMouseEvent *event)
 
 void AnnExtractorDialog::on_browse_button_clicked()
 {
-    if(!isBrowseble())
-        return;
 
-    if(!loadFiles())
-        return;
+    if(m_sampleCount!=0)
+    {
+        if (m_searchChar != ui->search_char->text())
+        {
+            int ret  = QMessageBox::warning(this, tr("Annotation Extraction"), tr(("You are swtiching between LABELS! \n Do you want to save extracted " + m_searchChar+ " label samples?").toStdString().c_str()),
+                                                    QMessageBox::Save | QMessageBox::Cancel, QMessageBox::Save);
+            switch (ret) {
+            case QMessageBox::Save:
+                writeHeader();
+                qDebug()<<"SAVED";
+                m_searchChar = ui->search_char->text();
+                if(!isBrowseble() || !loadFiles())
+                    return;
+                createSaveDir();
+                createSaveFile();
+                display();
+                break;
+            case QMessageBox::Cancel:
+            default:
+                qDebug()<<"GFY SIR or MADAM!";
+                ui->search_char->text() = m_searchChar;
+                break;
 
-    createSaveDir();
-    createSaveFile();
-    display();
+
+            }
+        }
+        else
+        {
+          return;
+        }
+    }
+    else
+    {
+        m_searchChar = ui->search_char->text();
+        if(!isBrowseble() || !loadFiles())
+            return;
+        createSaveDir();
+        createSaveFile();
+        display();
+    }
+
 }
 
+//TODO unnecessarry check
 bool AnnExtractorDialog::isBrowseble()
 {
-    m_searchChar = ui->search_char->text();
 
     if (m_searchChar.size() != 1)
     {
@@ -104,9 +135,9 @@ bool AnnExtractorDialog::isBrowseble()
 
 bool AnnExtractorDialog::loadFiles()
 {
-    m_Loaddir = QFileDialog::getExistingDirectory(this,tr("Open Image Direrctory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_Loaddir = QFileDialog::getExistingDirectory(this,tr("Open Image Directory"), QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     m_fNames.clear();
-    m_reader.findImages(m_Loaddir,"*",m_fNames);
+    m_reader.findImages(m_Loaddir, m_searchChar, m_fNames);
 
     if(m_fNames.size() == 0)
     {
@@ -120,7 +151,7 @@ bool AnnExtractorDialog::loadFiles()
 void AnnExtractorDialog::createSaveDir()
 {
     int posLastSlash = m_Loaddir.lastIndexOf("/",-1);
-    this->m_saveDir = m_Loaddir.mid(0,posLastSlash) + "/AnnotationResults2/" + ui->search_char->text();
+    m_saveDir = m_Loaddir.mid(0,posLastSlash) + "/AnnotationResults2/" + m_searchChar;
 
     QDir dir_save(m_saveDir);
     if (!dir_save.exists())
@@ -133,15 +164,17 @@ void AnnExtractorDialog::createSaveDir()
 
 void AnnExtractorDialog::createSaveFile()
 {
-    m_saveFile = new QFile(this->m_saveDir + "/" + ui->search_char->text() + "_lastSession.txt");
+    m_saveFile = new QFile(m_saveDir + "/" + m_searchChar + "_lastSession.txt");
     bool fileExists = m_saveFile->exists();
 
     if (fileExists)
     {
         loadHeader();
+
     }
     else
     {
+
         // set initial values and create header
         m_avgWidth = 0;
         m_avgHight = 0;
@@ -150,12 +183,12 @@ void AnnExtractorDialog::createSaveFile()
         writeHeader();
     }
 
-    m_saveFile->open(QIODevice::WriteOnly | QIODevice::Append);
+
 }
 
 void AnnExtractorDialog::loadHeader()
 {
-    m_saveFile->open(QIODevice::ReadOnly);
+    m_saveFile->open(QIODevice::ReadWrite);
     int count = 0;
     QString str;
     do
@@ -189,8 +222,8 @@ void AnnExtractorDialog::loadHeader()
 
 void AnnExtractorDialog::writeHeader()
 {
-    if(m_saveFile->open(QIODevice::ReadWrite | QIODevice::Text))
-    {
+
+        m_saveFile->open(QIODevice::ReadWrite | QIODevice::Text);
         QString s;
         QTextStream t(m_saveFile);
 
@@ -210,11 +243,11 @@ void AnnExtractorDialog::writeHeader()
         t << s;
         m_saveFile->flush();
         m_saveFile->close();
-    }
 }
 
 void AnnExtractorDialog::writeEntry()
 {
+    m_saveFile->open(QIODevice::Append);
     m_saveFile->write(m_imgDisplayed.toUtf8());
     m_saveFile->write(" ");
     m_saveFile->write(QByteArray::number(m_rect.width()));
@@ -226,6 +259,7 @@ void AnnExtractorDialog::writeEntry()
     m_saveFile->write(QByteArray::number(m_rect.y()));
     m_saveFile->write(" \n");
     m_saveFile->flush();
+    m_saveFile->close();
 }
 
 void AnnExtractorDialog::updateValues()
@@ -238,7 +272,7 @@ void AnnExtractorDialog::updateValues()
 
 bool AnnExtractorDialog::saveImage()
 {
-    QString file = this->m_saveDir + "/" + ui->search_char->text() + "_" + QString::number(m_sampleCount) + ".jpg";
+    QString file = m_saveDir + "/" + ui->search_char->text() + "_" + QString::number(m_sampleCount) + ".jpg";
     if(!this->copyImage.save(file))
     {
         QMessageBox::information(this, tr("SAVE FAILED"),
