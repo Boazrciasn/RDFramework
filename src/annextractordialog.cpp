@@ -11,6 +11,7 @@ AnnExtractorDialog::AnnExtractorDialog(QWidget *parent) :
     ui->setupUi(this);
     m_rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     ui->imageLabel->setScaledContents(true);
+    m_sampleCount=0;
 }
 
 AnnExtractorDialog::~AnnExtractorDialog()
