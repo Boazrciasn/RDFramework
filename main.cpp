@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
 
 //    m_saveFile->close();
 
-
     QApplication app(argc, argv);
     MainWindow w;
 
