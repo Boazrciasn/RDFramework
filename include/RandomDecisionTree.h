@@ -27,7 +27,7 @@ struct Node
     Coord m_teta1, m_teta2;
     quint32 m_id;
     bool m_isLeaf;
-    cv::Mat m_hist;
+    cv::Mat_<float> m_hist;
 
     Node() : Node(0,false)
     {
@@ -36,7 +36,8 @@ struct Node
 
     Node(quint32 id, bool isLeaf): m_id(id), m_isLeaf(isLeaf)
     {
-        m_hist = cv::Mat::zeros(1,1,CV_32FC1);
+        m_hist.create(1, 1);
+        m_hist.setTo(0);
     }
 
     template<class Archive>

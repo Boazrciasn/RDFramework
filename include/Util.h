@@ -4,6 +4,32 @@
 #include "include/histogramdialog.h"
 #include "include/PixelCloud.h"
 
+template <typename T, typename FUNC>
+void doForAllPixels(const cv::Mat_<T> &M, const FUNC &func)
+{
+    int nRows = M.rows;
+    int nCols = M.cols;
+    for(int i=0; i<nRows; ++i)
+    {
+        auto *pRow = (T *)M.ptr(i);
+        for(int j=0; j<nCols; ++j, ++pRow)
+            func(*pRow, i, j);
+    }
+}
+
+template <typename T, typename FUNC>
+void setForAllPixels(cv::Mat_<T> &M, const FUNC &func)
+{
+    int nRows = M.rows;
+    int nCols = M.cols;
+    for(int i=0; i<nRows; ++i)
+    {
+        auto *pRow = (T *)M.ptr(i);
+        for(int j=0; j<nCols; ++j, ++pRow)
+            *pRow = func(*pRow, i, j);
+    }
+}
+
 inline int letterIndex(char letter)
 {
     return letter-'a';
@@ -75,29 +101,41 @@ inline int getMaxLikelihoodIndex(const QVector<float>& hist)
     return max_index;
 }
 
-inline void getImageLabelVotes(const cv::Mat& label_image, QVector<float>& vote_vector)
+inline void getImageLabelVotes(const cv::Mat_<uchar>& label_image, QVector<float>& vote_vector)
 {
-    int nRows = label_image.rows;
-    int nCols = label_image.cols;
-    for (int i = 0; i<nRows ; ++i)
-        for (int j = 0; j<nCols; ++j)
-            ++vote_vector[label_image.at<uchar>(i,j)];
+    doForAllPixels(label_image, [&](uchar value, int, int) {
+        ++vote_vector[value];
+    });
+
+//    int nRows = label_image.rows;
+//    int nCols = label_image.cols;
+//    for (int i = 0; i<nRows ; ++i)
+//        for (int j = 0; j<nCols; ++j)
+//            ++vote_vector[label_image(i,j)];
 }
 
 
 
-inline void printHistogram(cv::Mat &hist)
+inline void printHistogram(cv::Mat_<float> &hist)
 {
     QString res = "HIST {";
-    int nCols = hist.cols;
+
     int nRows = hist.rows;
-    for(int i=0; i<nRows; ++i)
-    {
-        for(int j=0; j<nCols; ++j)
-            res += " " + QString::number(hist.at<float>(i,j));
+    doForAllPixels(hist, [&](float value, int i, int j) {
+        res += " " + QString::number(value);
         if(i!=nRows-1)
             res += "\n";
-    }
+    });
+
+//    int nCols = hist.cols;
+//    int nRows = hist.rows;
+//    for(int i=0; i<nRows; ++i)
+//    {
+//        for(int j=0; j<nCols; ++j)
+//            res += " " + QString::number(hist.at<float>(i,j));
+//        if(i!=nRows-1)
+//            res += "\n";
+//    }
     qDebug() << res << "}";
 }
 
@@ -108,19 +146,6 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
     cv::Mat unpadded;
     img(cv::Rect(probe_x, probe_y, width, height)).copyTo(unpadded);
     return unpadded;
-}
-
-template <typename T, typename FUNC>
-void doForAllPixels(cv::Mat_<T> &M, const FUNC &func)
-{
-    int nRows = M.rows;
-    int nCols = M.cols;
-    for(int i=0; i<nRows; ++i)
-    {
-        auto *pRow = (T *)M.ptr(i);
-        for(int j=0; j<nCols; ++j, ++pRow)
-            *pRow = func(*pRow);
-    }
 }
 
 class Util

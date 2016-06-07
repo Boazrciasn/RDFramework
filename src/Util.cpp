@@ -20,11 +20,11 @@ void deneme()
     A.setTo(0);
     B.setTo(10);
 
-    doForAllPixels<float>(A, [](float pixval) {
+    doForAllPixels<float>(A, [](float pixval, int i, int j) {
         return pixval + 1;
     });
 
-    doForAllPixels<int>(B, [](int pixval) {
+    doForAllPixels<int>(B, [](int pixval, int i, int j) {
         return pixval * 5;
     });
 }
@@ -279,9 +279,9 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel, QString &word
 
         // make odd number
         if(avgWidth[index]%2 == 0)
-            avgWidth[index]++;
+            ++avgWidth[index];
         if(avgHight[index]%2 == 0)
-            avgHight[index]++;
+            ++avgHight[index];
     }while(input.canReadLine());
     input.close();
     //    for (int i = 0; i < nLabel; ++i)
