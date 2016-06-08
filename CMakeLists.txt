@@ -13,6 +13,8 @@ FIND_PACKAGE(OpenCV 3 REQUIRED)
 #add OpenCV directories
 include_directories(${OpenCV_INCLUDE_DIRS} include/)
 
+INCLUDE_DIRECTORIES(qcustomplot/)
+
 # Qt5 package
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 find_package(Qt5Xml REQUIRED)
@@ -27,8 +29,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file(GLOB SOURCES main.cpp src/* qcustomplot/qcustomplot.cpp cereal/*)
 file(GLOB HEADERS include/* qcustomplot/qcustomplot.h cereal/*)
 
-#set(HEADERS include/mainwindow.h include/Reader.h include/mydialog.h include/PageParser.h include/Util.h include/annextractordialog.h include/dialogextracted.h include/RandomDesicionForest.h)
-#set(SOURCES main.cpp src/mainwindow.cpp src/Reader.cpp src/mydialog.cpp src/PageParser.cpp src/Util.cpp src/annextractordialog.cpp src/dialogextracted.cpp src/RandomDesicionForest.cpp)
 # Create Qt MOC files
 QT5_WRAP_UI(UISrcs forms/mainwindow.ui forms/mydialog.ui forms/annextractordialog.ui forms/dialogextracted.ui forms/histogramdialog.ui forms/rdfdialog.ui forms/resizeallimagesdialog.ui)
 
