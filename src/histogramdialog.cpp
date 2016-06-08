@@ -15,26 +15,27 @@ HistogramDialog::~HistogramDialog()
     delete ui;
 }
 
-void HistogramDialog::plot(const cv::Mat &hist,const QString title)
+void HistogramDialog::plot(const cv::Mat &hist, const QString title)
 {
     // Compute Histogram
-    QCustomPlot * customPlot = ui->plot_widget;
+    QCustomPlot *customPlot = ui->plot_widget;
     setWindowTitle(title);
     // binarize
-//    int range = hist.rows;
-
+    //    int range = hist.rows;
     cv::Mat tmp;
-    hist.convertTo(tmp,CV_32FC1);
+    hist.convertTo(tmp, CV_32FC1);
     // binarize
     int range;
+
     if(hist.rows < 2)
         range = hist.cols;
+
     else
         range = hist.rows;
 
     QVector<double> x(range), y(range);
 
-    for (int i=0; i < range; ++i)
+    for (int i = 0; i < range; ++i)
     {
         x[i]  = i;
         y[i] = hist.at<float>(i);

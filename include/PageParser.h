@@ -8,19 +8,22 @@
 #include <QDebug>
 #include "QString"
 
-using namespace std;
 
-class PageParser{
-public:
-    void readFromTo(QString filename, vector<QString> &words, vector<QString> &coords);
-    void getElements(QDomElement root, QString tagname, QString attribute1, QString attribute2);
+
+class PageParser
+{
+  public:
+    void readFromTo(QString filename, std::vector<QString> &words,
+                    std::vector<QString> &coords);
+    void getElements(QDomElement root, QString tagname, QString attribute1,
+                     QString attribute2);
     void cropPolygons(const QString filename, QString saveDir,
-                                 vector<QString> &words,
-                                 vector<QString> &coordinates);
+                      std::vector<QString> &words,
+                      std::vector<QString> &coordinates);
 
-private:
-    vector<QString> *words;
-    vector<QString> *coords;
+  private:
+    std::vector<QString> *words;
+    std::vector<QString> *coords;
 };
 
 #endif

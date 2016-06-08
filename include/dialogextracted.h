@@ -2,7 +2,8 @@
 #define DIALOGEXTRACTED_H
 
 #include <QDialog>
-namespace Ui {
+namespace Ui
+{
 class DialogExtracted;
 }
 
@@ -10,12 +11,12 @@ class DialogExtracted : public QDialog
 {
     Q_OBJECT
 
-public:
+  public:
     explicit DialogExtracted(QWidget *parent = 0);
     void setLabel(QImage &image);
     ~DialogExtracted();
 
-private:
+  private:
     Ui::DialogExtracted *ui;
 };
 

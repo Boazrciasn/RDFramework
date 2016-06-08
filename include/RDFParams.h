@@ -16,9 +16,10 @@ struct  RDFParams
     int maxIteration;
 
     template<class Archive>
-    void serialize(Archive & archive)
+    void serialize(Archive &archive)
     {
-      archive(probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels, labelCount, maxIteration);
+        archive(probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels,
+                labelCount, maxIteration);
     }
 
     ~RDFParams()

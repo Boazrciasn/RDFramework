@@ -5,7 +5,8 @@
 
 #include "RandomDecisionForest.h"
 
-namespace Ui {
+namespace Ui
+{
 class RDFDialog;
 }
 
@@ -13,24 +14,24 @@ class RDFDialog : public QDialog
 {
     Q_OBJECT
 
-public:
+  public:
     explicit RDFDialog(QWidget *parent = 0);
     ~RDFDialog();
 
-public slots:
+  public slots:
     void onTrainingBrowse();
     void onTestBrowse();
     void onTrain();
     void onTest();
     void new_tree_constructed();
-    void image_at_classified_as(int index,char label);
+    void image_at_classified_as(int index, char label);
     void resultPercetange(double accuracy);
 
-private slots:
+  private slots:
     void onLoad();
     void onSave();
 
-private:
+  private:
     RDFParams PARAMS;
     Ui::RDFDialog *ui;
     rdf_ptr m_forest;

@@ -13,14 +13,18 @@
 #include <dirent.h>
 #include <iostream>
 
-class Reader{
-public:
+class Reader
+{
+  public:
     void readFromTo(std::string filename, std::vector<QString> &imgName);
-    void findImages(QString baseDir, QString query, std::vector<QString> &foundImages, std::vector<QString> &labels);
-    void findImages(QString baseDir, QString query, std::vector<QString> &foundImages);
+    void findImages(QString baseDir, QString query,
+                    std::vector<QString> &foundImages, std::vector<QString> &labels);
+    void findImages(QString baseDir, QString query,
+                    std::vector<QString> &foundImages);
     static void readTextFiles(QString baseDir, std::vector<QString> &foundText);
-    static void readTextFiles(QString baseDir, QString query, std::vector<QString> &foundText);
-private:
+    static void readTextFiles(QString baseDir, QString query,
+                              std::vector<QString> &foundText);
+  private:
     DIR *m_dir;
 };
 

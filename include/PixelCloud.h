@@ -16,7 +16,7 @@ struct Coord
     {
     }
 
-    Coord(const Coord& c) : m_dx(c.m_dx), m_dy(c.m_dy)
+    Coord(const Coord &c) : m_dx(c.m_dx), m_dy(c.m_dy)
     {
     }
 
@@ -25,9 +25,9 @@ struct Coord
     }
 
     template<class Archive>
-    void serialize(Archive & archive)
+    void serialize(Archive &archive)
     {
-      archive( m_dx, m_dy ); // serialize things by passing them to the archive
+        archive( m_dx, m_dy ); // serialize things by passing them to the archive
     }
 };
 
@@ -44,7 +44,7 @@ struct ImageInfo
     {
     }
 
-    ImageInfo(const ImageInfo& ii) : m_label(ii.m_label), m_sampleId(ii.m_sampleId)
+    ImageInfo(const ImageInfo &ii) : m_label(ii.m_label), m_sampleId(ii.m_sampleId)
     {
     }
 
@@ -61,11 +61,13 @@ struct Pixel
     quint8 intensity;
     imageinfo_ptr imgInfo;
 
-    Pixel(Coord crd, unsigned char intnsty, imageinfo_ptr imgInf): position(crd), intensity(intnsty),imgInfo(imgInf)
+    Pixel(Coord crd, unsigned char intnsty, imageinfo_ptr imgInf): position(crd),
+        intensity(intnsty), imgInfo(imgInf)
     {
     }
 
-    Pixel(const Pixel& px): position(px.position), intensity(px.intensity),imgInfo(px.imgInfo)
+    Pixel(const Pixel &px): position(px.position), intensity(px.intensity),
+        imgInfo(px.imgInfo)
     {
     }
 

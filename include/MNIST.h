@@ -6,9 +6,10 @@
 #include <opencv2/core/mat.hpp>
 
 
-class MNIST {
+class MNIST
+{
 
-public:
+  public:
 
     typedef std::vector<cv::Mat> *ImageDataSet;
     typedef std::vector<int> *LabelDataSet;
@@ -24,7 +25,7 @@ public:
     static std::string trainLabelsFilename;
     static std::string trainImagesFilename;
 
-private:
+  private:
 
     static int reverseInt(int i);
     static void readMINST(std::string filename, ImageDataSet vec);

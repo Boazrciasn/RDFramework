@@ -5,7 +5,8 @@
 
 #include "Util.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResizeAllImagesDialog;
 }
 
@@ -13,17 +14,17 @@ class ResizeAllImagesDialog : public QDialog
 {
     Q_OBJECT
 
-public:
+  public:
     explicit ResizeAllImagesDialog(QWidget *parent = 0);
     ~ResizeAllImagesDialog();
 
-private slots:
+  private slots:
     void on_pushButton_browse_clicked();
     void selectSaveDir();
     void on_pushButton_resizeall_clicked();
     void create();
 
-private:
+  private:
     Ui::ResizeAllImagesDialog *ui;
     QString m_browseDir;
     QString m_saveDir;

@@ -11,7 +11,8 @@
 
 #define FILE_HEADER 5
 
-namespace Ui {
+namespace Ui
+{
 class AnnExtractorDialog;
 }
 
@@ -19,20 +20,20 @@ class AnnExtractorDialog : public QDialog
 {
     Q_OBJECT
 
-public:
+  public:
     explicit AnnExtractorDialog(QWidget *parent = 0);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     ~AnnExtractorDialog();
 
-private slots:
+  private slots:
     void on_browse_button_clicked();
     void on_save_button_clicked();
     void on_previous_button_clicked();
     void on_next_button_clicked();
 
-private:
+  private:
     bool isBrowseble();
     bool loadFiles();
     void createSaveDir();
