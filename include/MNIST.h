@@ -11,25 +11,25 @@ class MNIST
 
   public:
 
-    typedef std::vector<cv::Mat> *ImageDataSet;
-    typedef std::vector<int> *LabelDataSet;
+    MNIST(std::string filepath);
+    typedef std::vector<cv::Mat> &ImageDataSet;
+    typedef std::vector<int> &LabelDataSet;
 
-    static ImageDataSet getTestImages();
-    static LabelDataSet getTestLabels();
-    static ImageDataSet getTrainImages();
-    static LabelDataSet getTrainLabels();
-    // TODO: Paths must be input from UI
-    static std::string rootPath;
-    static std::string testImagesFilename;
-    static std::string testLabelsFilename;
-    static std::string trainLabelsFilename;
-    static std::string trainImagesFilename;
+    void getTestImages(ImageDataSet &images);
+    void getTestLabels(LabelDataSet labels);
+    void getTrainImages(ImageDataSet &images);
+    void getTrainLabels(LabelDataSet labels);
 
   private:
 
-    static int reverseInt(int i);
-    static void readMINST(std::string filename, ImageDataSet vec);
-    static void readMINSTLabel(std::string filename, LabelDataSet vec);
+    std::string m_testImagesFilename = "t10k-images.idx3-ubyte";
+    std::string m_testLabelsFilename = "t10k-labels.idx1-ubyte";
+    std::string m_trainLabelsFilename = "train-labels.idx1-ubyte";
+    std::string m_trainImagesFilename = "train-images.idx3-ubyte";
+    std::string m_rootPath;
+    int reverseInt(int i);
+    void readMINST(std::string filename, ImageDataSet vec);
+    void readMINSTLabel(std::string filename, LabelDataSet vec);
 
 };
 

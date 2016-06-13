@@ -5,11 +5,10 @@
 
 
 // TODO: Paths must be input from UI
-std::string MNIST::testImagesFilename = "t10k-images.idx3-ubyte";
-std::string MNIST::testLabelsFilename = "t10k-labels.idx1-ubyte";
-std::string MNIST::trainLabelsFilename = "train-labels.idx1-ubyte";
-std::string MNIST::trainImagesFilename = "train-images.idx3-ubyte";
-std::string MNIST::rootPath = "/Users/barisozcan/Documents/MNIST_dataset/";
+
+
+MNIST::MNIST(std::string filepath) : m_rootPath(filepath) {}
+
 
 int MNIST::reverseInt(int i)
 {
@@ -21,38 +20,31 @@ int MNIST::reverseInt(int i)
     return((int) ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
-std::vector<cv::Mat> *MNIST::getTestImages()
+void MNIST::getTestImages(ImageDataSet &images)
 {
-    std::vector<cv::Mat> *images = new std::vector<cv::Mat>();
-    MNIST::readMINST(MNIST::testImagesFilename, images);
-    return images;
+    MNIST::readMINST(MNIST::m_testImagesFilename, images);
 }
 
-std::vector<int> *MNIST::getTestLabels()
+void MNIST::getTestLabels(LabelDataSet labels)
 {
-    std::vector<int> *labels = new std::vector<int>();
-    MNIST::readMINSTLabel(MNIST::testLabelsFilename, labels);
-    return labels;
+    MNIST::readMINSTLabel(MNIST::m_testLabelsFilename, labels);
 }
 
-MNIST::ImageDataSet MNIST::getTrainImages()
+
+void MNIST::getTrainImages(ImageDataSet &images)
 {
-    std::vector<cv::Mat> *images = new std::vector<cv::Mat>();
-    MNIST::readMINST(MNIST::trainImagesFilename, images);
-    return images;
+    MNIST::readMINST(MNIST::m_trainImagesFilename, images);
 }
 
-std::vector<int> *MNIST::getTrainLabels()
+void MNIST::getTrainLabels(LabelDataSet labels)
 {
-    std::vector<int> *labels = new std::vector<int>();
-    MNIST::readMINSTLabel(MNIST::trainLabelsFilename, labels);
-    return labels;
+    MNIST::readMINSTLabel(MNIST::m_trainLabelsFilename, labels);
 }
 
-void MNIST::readMINST(std::string filename, std::vector<cv::Mat> *vec)
+void MNIST::readMINST(std::string filename, ImageDataSet vec)
 {
     //TODO: Refactor due to our needs :
-    std::string path = MNIST::rootPath + filename;
+    std::string path = m_rootPath + filename;
     std::ifstream file(path, std::ios::binary);
 
     if (file.is_open())
@@ -84,15 +76,15 @@ void MNIST::readMINST(std::string filename, std::vector<cv::Mat> *vec)
                 }
             }
 
-            vec->push_back(tp);
+            vec.push_back(tp);
         }
     }
 }
 
-void MNIST::readMINSTLabel(std::string filename, std::vector<int> *vec)
+void MNIST::readMINSTLabel(std::string filename, LabelDataSet vec)
 {
     //TODO: Refactor due to our needs :
-    std::string path = MNIST::rootPath + filename;
+    std::string path = m_rootPath + filename;
     std::ifstream file(path, std::ios::binary);
 
     if (file.is_open())
@@ -108,7 +100,7 @@ void MNIST::readMINSTLabel(std::string filename, std::vector<int> *vec)
         {
             unsigned char temp = 0;
             file.read((char *) &temp, sizeof(temp));
-            vec->push_back((int) temp);
+            vec.push_back((int) temp);
         }
     }
 }

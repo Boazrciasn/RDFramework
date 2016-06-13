@@ -17,8 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     reader = new Reader();
     ui->setupUi(this);
     ui->label->setScaledContents(true);
-    ui->IMG_button->setChecked(true);
-    ui->Rectangle_button->setChecked(true);
+
     connect(ui->runButton, SIGNAL (clicked()), this, SLOT (update()));
     // Shortcut to Random Desicion Forest Window
     QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
@@ -34,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::display()
 {
+    //TODO : move this part to a word/line detector UI :
     QString fileName = dir + "/" + this->fNames[fileIndex];
     //    QImage image(fileName + ".jpg");
     QImage image(fileName + ".png");
@@ -92,8 +92,7 @@ void MainWindow::on_browse_clicked()
     }
 }
 
-// ****************************** //
-// ****************************** //
+
 
 void MainWindow::on_previous_clicked()
 {

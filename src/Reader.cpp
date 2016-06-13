@@ -82,6 +82,17 @@ void Reader::findImages(QString baseDir, QString query,
     }
 }
 
+void Reader::MNISTReader(std::string filepath,
+                         std::vector<cv::Mat> &testImagesVector, std::vector<cv::Mat> &trainImagesVector,
+                         std::vector<int> &testLabels, std::vector<int> &trainLabels)
+{
+    MNIST mnist_reader(filepath);
+    mnist_reader.getTestImages(testImagesVector);
+    mnist_reader.getTrainImages(trainImagesVector);
+    mnist_reader.getTestLabels(testLabels);
+    mnist_reader.getTrainLabels(trainLabels);
+}
+
 void Reader::readTextFiles(QString baseDir, QString query,
                            std::vector<QString> &foundText)
 {
