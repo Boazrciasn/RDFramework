@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <opencv2/core/mat.hpp>
+#include "src/precompiled.h"
 
 
 class MNIST
@@ -11,7 +12,7 @@ class MNIST
 
   public:
 
-    MNIST(std::string filepath);
+    MNIST(QString filepath);
     typedef std::vector<cv::Mat> &ImageDataSet;
     typedef std::vector<int> &LabelDataSet;
 
@@ -22,14 +23,14 @@ class MNIST
 
   private:
 
-    std::string m_testImagesFilename = "t10k-images.idx3-ubyte";
-    std::string m_testLabelsFilename = "t10k-labels.idx1-ubyte";
-    std::string m_trainLabelsFilename = "train-labels.idx1-ubyte";
-    std::string m_trainImagesFilename = "train-images.idx3-ubyte";
-    std::string m_rootPath;
+    QString m_testImagesFilename = "t10k-images.idx3-ubyte";
+    QString m_testLabelsFilename = "t10k-labels.idx1-ubyte";
+    QString m_trainLabelsFilename = "train-labels.idx1-ubyte";
+    QString m_trainImagesFilename = "train-images.idx3-ubyte";
+    QString m_rootPath;
     int reverseInt(int i);
-    void readMINST(std::string filename, ImageDataSet vec);
-    void readMINSTLabel(std::string filename, LabelDataSet vec);
+    void readMINST(QString filename, ImageDataSet vec);
+    void readMINSTLabel(QString filename, LabelDataSet vec);
 
 };
 

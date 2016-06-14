@@ -82,7 +82,7 @@ void Reader::findImages(QString baseDir, QString query,
     }
 }
 
-void Reader::MNISTReader(std::string filepath,
+void Reader::MNISTReader(QString filepath,
                          std::vector<cv::Mat> &testImagesVector, std::vector<cv::Mat> &trainImagesVector,
                          std::vector<int> &testLabels, std::vector<int> &trainLabels)
 {

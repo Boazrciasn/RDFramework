@@ -23,7 +23,7 @@ class Reader
                     std::vector<QString> &foundImages, std::vector<QString> &labels);
     void findImages(QString baseDir, QString query,
                     std::vector<QString> &foundImages);
-    void MNISTReader(std::string filepath, std::vector<cv::Mat> &imagesVector,
+    void MNISTReader(QString filepath, std::vector<cv::Mat> &imagesVector,
                      std::vector<cv::Mat> &trainImagesVector, std::vector<int> &testLabels,
                      std::vector<int> &trainLabels);
     static void readTextFiles(QString baseDir, std::vector<QString> &foundText);

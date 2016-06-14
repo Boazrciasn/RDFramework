@@ -7,6 +7,11 @@
 #include "include/TextRegionDetector.h"
 //#include <omp.h>
 
+void RandomDecisionForest::readTrainData()
+{
+    m_dir = m_params.trainImagesDir;
+    //MNIST OR IMAGE FOLDER ?
+}
 
 // histogram normalize ?
 // getLeafNode and Test  needs rework
@@ -14,7 +19,7 @@
 // read subsampled part of the images into pixel cloud
 void RandomDecisionForest::readTrainingImageFiles()
 {
-    m_dir = m_params.trainImagesDir;
+    // TODO :  make applicable to both MNIST and image folders
     std::vector<QString> fNames;
     auto *reader = new Reader();
     reader->findImages(m_dir, "", fNames, m_DS.m_trainlabels);
@@ -24,7 +29,6 @@ void RandomDecisionForest::readTrainingImageFiles()
     for (auto filePath : fNames)
     {
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-        //pad image and save to vector
         cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY,
                            m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
         m_DS.m_trainImagesVector.push_back(image);
@@ -38,6 +42,7 @@ void RandomDecisionForest::readTrainingImageFiles()
 
 void RandomDecisionForest::readTestImageFiles()
 {
+    // TODO :  make applicable to both MNIST and image folders
     m_DS.m_testImagesVector.clear();
     m_dir = m_params.testDir;
     std::vector<QString> fNames;
@@ -209,6 +214,7 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
     output.close();
     input.close();
 }
+
 
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)

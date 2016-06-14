@@ -7,7 +7,7 @@
 // TODO: Paths must be input from UI
 
 
-MNIST::MNIST(std::string filepath) : m_rootPath(filepath) {}
+MNIST::MNIST(QString filepath) : m_rootPath(filepath) {}
 
 
 int MNIST::reverseInt(int i)
@@ -41,11 +41,10 @@ void MNIST::getTrainLabels(LabelDataSet labels)
     MNIST::readMINSTLabel(MNIST::m_trainLabelsFilename, labels);
 }
 
-void MNIST::readMINST(std::string filename, ImageDataSet vec)
+void MNIST::readMINST(QString filename, ImageDataSet vec)
 {
-    //TODO: Refactor due to our needs :
-    std::string path = m_rootPath + filename;
-    std::ifstream file(path, std::ios::binary);
+    QString path = m_rootPath + filename;
+    std::ifstream file(path.toStdString(), std::ios::binary);
 
     if (file.is_open())
     {
@@ -79,13 +78,18 @@ void MNIST::readMINST(std::string filename, ImageDataSet vec)
             vec.push_back(tp);
         }
     }
+
+    else
+    {
+        qDebug() << filename << " not found !";
+    }
 }
 
-void MNIST::readMINSTLabel(std::string filename, LabelDataSet vec)
+void MNIST::readMINSTLabel(QString filename, LabelDataSet vec)
 {
     //TODO: Refactor due to our needs :
-    std::string path = m_rootPath + filename;
-    std::ifstream file(path, std::ios::binary);
+    QString path = m_rootPath + filename;
+    std::ifstream file(path.toStdString(), std::ios::binary);
 
     if (file.is_open())
     {
@@ -102,6 +106,11 @@ void MNIST::readMINSTLabel(std::string filename, LabelDataSet vec)
             file.read((char *) &temp, sizeof(temp));
             vec.push_back((int) temp);
         }
+    }
+
+    else
+    {
+        qDebug() << filename << " not found !";
     }
 }
 
