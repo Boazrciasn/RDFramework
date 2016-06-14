@@ -253,15 +253,11 @@ void Util::calcWidthHeightStat(QString srcDir)
 void Util::averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol)
 {
     int nCols = mat.cols;
-
     for (int i = 0; i < nCols; ++i)
-    {
         mat.col(i) = mat.col(i) / fgNumberCol[i];
-    }
 }
 
-void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
-                                 QString &word, float &conf)
+void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QString &word, float &conf)
 {
     // store average width and hight
     QVector<int> avgWidth(nLabel);
@@ -300,8 +296,8 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
     /*************************************/
     /*********** extract peaks ***********/
     /*************************************/
-    cv::Mat peaks = cv::Mat::zeros(layeredHist.rows, layeredHist.cols,
-                                   layeredHist.type());
+    cv::Mat_<float> peaks(layeredHist.size());
+    peaks.setTo(0.0f);
     bool isIncreasing = true;
     int cols = peaks.cols;
     // filter each label with corresponding filter
@@ -309,7 +305,7 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
 
     for (int i = 0; i < nLabel; ++i)
     {
-        cv::Mat hist = layeredHist.row(i);
+        cv::Mat_<float> hist = layeredHist.row(i);
         ksize = avgWidth[i];
         cv::GaussianBlur(hist, hist, cv::Size(ksize, 1), 0, 0, cv::BORDER_CONSTANT);
         layeredHist.row(i) = hist;
@@ -317,15 +313,14 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
         // find peaks
         for (int j = 1; j < cols - 1; ++j)
         {
-            if(isIncreasing && (hist.at<float>(j) - hist.at<float>(j - 1)) < 0)
+            if(isIncreasing && (hist(j) - hist(j - 1)) < 0)
             {
-                peaks.at<float>(i, j) = hist.at<float>(j);
-                isIncreasing = !isIncreasing;
+                peaks(i, j) = hist(j);
+                isIncreasing ^= 1;
             }
-
-            else if(!isIncreasing && (hist.at<float>(j) - hist.at<float>(j - 1)) > 0)
+            else if(!isIncreasing && (hist(j) - hist(j - 1)) > 0)
             {
-                isIncreasing = !isIncreasing;
+                isIncreasing ^= 1;
             }
         }
     }
@@ -357,7 +352,7 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
     /*************************************/
     /************ expand peaks ***********/
     /*************************************/
-    cv::Mat peaksRow;
+    cv::Mat_<float> peaksRow;
     int winBw;
 
     for (int i = 0; i < nLabel; ++i)
@@ -366,19 +361,10 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
         winBw = avgWidth[i] / 2;
 
         for (int j = 0; j < cols; ++j)
-        {
-            // if peak expand
-            if(peaksRow.at<float>(j) > 0)
-            {
+            if(peaksRow(j) > 0) // if peak expand
                 for (int k = 0; k < cols; ++k)
-                {
-                    if(std::abs(k - j) <= winBw && (peaks.at<float>(i, k) < peaks.at<float>(i, j)))
-                    {
-                        peaks.at<float>(i, k) = peaks.at<float>(i, j);
-                    }
-                }
-            }
-        }
+                    if(std::abs(k - j) <= winBw && (peaks(i, k) < peaks(i, j)))
+                        peaks(i, k) = peaks(i, j);
     }
 
     int maxIdx;
@@ -387,14 +373,14 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
     for (int i = 0; i < cols; ++i)
     {
         maxIdx = 0;
-        max = peaks.at<float>(0, i);
+        max = peaks(0, i);
 
         for (int j = 1; j < nLabel; ++j)
         {
-            if(max < peaks.at<float>(j, i))
+            if(max < peaks(j, i))
             {
                 maxIdx = j;
-                max = peaks.at<float>(maxIdx, i);
+                max = peaks(maxIdx, i);
             }
         }
 
@@ -418,18 +404,13 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
             continue;
 
         // see is it greater that others or not
-        bool isLabel = true;
+        bool bIsLabel = true;
 
         for (int j = 0; j < nLabel; ++j)
-        {
-            if(j == label[i])
-                continue;
+            if(j != label[i] && layeredHist(j, i) > accuracy[i])
+                bIsLabel = false;
 
-            if(layeredHist.at<float>(j, i) > accuracy[i])
-                isLabel = false;
-        }
-
-        if(isLabel)
+        if(bIsLabel)
             word += QString((char)(label[i] + 'a'));
     }
 
@@ -461,7 +442,7 @@ void Util::getWordWithConfidance(cv::Mat &layeredHist, int nLabel,
         lbl = label[i];
         wind = avgWidth[lbl];
         lblCount++;
-        acc += layeredHist.at<float>(lbl, i);
+        acc += layeredHist(lbl, i);
     }
 
     if(lblCount > wind / 3)

@@ -174,8 +174,7 @@ class Util
     static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
     static void calcWidthHeightStat(QString srcDir);
     static void averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol);
-    static void getWordWithConfidance(cv::Mat &mat, int nLabel, QString &word,
-                                      float &conf);
+    static void getWordWithConfidence(cv::Mat_<float> &mat, int nLabel, QString &word, float &conf);
 };
 
 #endif

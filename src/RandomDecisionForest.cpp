@@ -384,13 +384,12 @@ void RandomDecisionForest::placeHistogram(cv::Mat &output,
 }
 
 // confidenceMat : LabelCount x testImage.rows : each row displays likelooh for each column of a label.
-cv::Mat RandomDecisionForest::createLetterConfidenceMatrix(
-    const cv::Mat &layeredHist, const QVector<quint32> &fgPxNumberPerCol)
+cv::Mat_<float> RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat &layeredHist, const QVector<quint32> &fgPxNumberPerCol)
 {
     int labelcount = m_params.labelCount;
     int layered_Cols = layeredHist.cols;
     int confmat_cols = layered_Cols / labelcount;
-    cv::Mat confidenceMat(labelcount, confmat_cols, CV_32FC1);
+    cv::Mat_<float> confidenceMat(labelcount, confmat_cols);
     int i_row;
     int i_col;
 
@@ -417,13 +416,12 @@ void RandomDecisionForest::test()
         QVector<quint32> fgPxNumberPerCol;
         cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i,
                                               fgPxNumberPerCol);
-        cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredImage,
-                                                              fgPxNumberPerCol);
+        cv::Mat_<float> confidenceMat = createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
         //        std::cout<<confidenceMat.row(0)<<std::endl;
         QString word = "Hello";
         float conf = 0;
         //        Util::plot(confidenceMat.row('n'-'a'), m_parent, "n");
-        Util::getWordWithConfidance(confidenceMat, 26, word, conf);
+        Util::getWordWithConfidence(confidenceMat, 26, word, conf);
         qDebug() << "Word extracted & conf: " << word << "  " << 100 * conf;
     }
 
