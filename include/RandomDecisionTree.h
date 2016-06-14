@@ -54,7 +54,6 @@ struct DataSet
 {
 
     QHash<int, cv::Mat> m_TrainHashTable;
-
     std::vector<cv::Mat> m_trainImagesVector;
     std::vector<cv::Mat> m_testImagesVector;
     std::vector<QString> m_testlabels;
@@ -129,13 +128,13 @@ class RandomDecisionTree : public QObject
     {
         m_probe_distanceX = probe_distanceX;
         m_disProbX   = std::uniform_int_distribution<>(-m_probe_distanceX,
-                       m_probe_distanceX);
+                                                       m_probe_distanceX);
     }
     inline void setProbeDistanceY(int probe_distanceY )
     {
         m_probe_distanceY = probe_distanceY;
         m_disProbY   = std::uniform_int_distribution<>(-m_probe_distanceY,
-                       m_probe_distanceY);
+                                                       m_probe_distanceY);
     }
 
     inline void setMinimumLeafPixelCount(unsigned int min_leaf_pixel_count)
@@ -160,20 +159,16 @@ class RandomDecisionTree : public QObject
     {
         node_ptr root = m_nodes[nodeId];
         assert( root != NULL);
-
         if(root->m_isLeaf)
         {
             // qDebug()<<"LEAF REACHED :"<<root.id;
             return root;
         }
-
         cv::Mat img = DS.m_testImagesVector[px->imgInfo->m_sampleId];
         int childId = root->m_id * 2 ;
-
         //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
         if(!isLeft(px, *root, img))
             ++childId;
-
         return getLeafNode(DS, px, childId - 1);
     }
 

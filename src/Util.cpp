@@ -34,13 +34,11 @@ double Util::calculateAccuracy(const std::vector<QString> &groundtruth,
 {
     int nSize = groundtruth.size();
     int count = 0;
-
     for (int i = 0; i < nSize; ++i )
     {
         if (groundtruth[i] == results[i])
             ++count;
     }
-
     return 100 * ((double)count) / nSize;
 }
 
@@ -55,14 +53,12 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
     quint16 width = src.cols;
     quint16 height = src.rows;
     QImage dest = QImage(width, height, format);
-
     if(src.type() == CV_8UC3)
     {
         for(int i = 0; i < height; i++)
         {
             const quint8 *pSrc = src.ptr<quint8>(i);
             quint8 *pDest = dest.scanLine(i);
-
             for(int j = 0; j < width; j++)
             {
                 *pDest++ = *pSrc++;
@@ -71,14 +67,12 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
             }
         }
     }
-
     else if(src.type() == CV_8UC1)
     {
         for(int i = 0; i < height; i++)
         {
             const quint8 *pSrc = src.ptr<quint8>(i);
             quint8 *pDest = dest.scanLine(i);
-
             for (int j = 0; j < width; j++)
             {
                 quint8 val = *pSrc++;
@@ -88,7 +82,6 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
             }
         }
     }
-
     return dest;
 }
 
@@ -98,34 +91,27 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     QString toReturn = "";
     int i = 0;
     int j = toClean.length();
-
     //find head pos to trim
     while (i < j)
     {
         if (!puncs.contains(toClean[i]))
             break;
-
         i++;
     }
-
     //find tail pos to trim
     while (j > i)
     {
         j--;
-
         if (!puncs.contains(toClean[j]))
             break;
     }
-
     toReturn = toClean.mid(i, j - i + 1);
     i = 0;
     j = toReturn.length();
     //check if the word starts or ends with a number or a whole number
     bool isNumber;
     toReturn.toInt(&isNumber);
-
     /* FIXME: if there is a number, return "Numbers/number/.. */
-
     /*  if (!isNumber)
         {
             return toReturn.toLower();
@@ -136,7 +122,6 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
         toReturn = "Numbers/" + toReturn;
         return toReturn;
     }
-
     return toReturn.toLower();
 }
 
@@ -163,7 +148,6 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
     outDir += "_ksize_" + QString::number(ksize);
     QDirIterator ittDir(srcDir,
                         QDir::Dirs | QDir::NoDotAndDotDot | QDir::CaseSensitive);
-
     while (ittDir.hasNext())
     {
         ittDir.next();
@@ -171,15 +155,12 @@ void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
         QDirIterator ittFile(srcDir + "/" + folder,
                              QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files);
         QDir dir_save(outDir + "/" + folder);
-
         if (!dir_save.exists())
         {
             dir_save.mkpath(".");
-
             if(!dir_save.exists())
                 qDebug() << "ERROR : " << dir_save << " can not be created!";
         }
-
         while(ittFile.hasNext())
         {
             ittFile.next();
@@ -209,7 +190,6 @@ void Util::calcWidthHeightStat(QString srcDir)
                         QDir::Dirs | QDir::NoDotAndDotDot | QDir::CaseSensitive) ;
     QFile outLog(srcDir + "/AverageWidthHeight.txt");
     outLog.open(QIODevice::WriteOnly);
-
     while (ittDir.hasNext())
     {
         ittDir.next();
@@ -218,7 +198,6 @@ void Util::calcWidthHeightStat(QString srcDir)
                              QStringList() << "*.jpg" << "*.jpeg", QDir::Files);
         w_avrg = h_avrg = 0;
         count = 0;
-
         while(ittFile.hasNext())
         {
             ittFile.next();
@@ -230,7 +209,6 @@ void Util::calcWidthHeightStat(QString srcDir)
             ++count;
             img_bw.release();
         }
-
         w_avrg /= count;
         h_avrg /= count;
         outLog.write(folder.toStdString().c_str());
@@ -246,7 +224,6 @@ void Util::calcWidthHeightStat(QString srcDir)
         //        textFile.write(QByteArray::number(h_avrg));
         //        textFile.close();
     }
-
     outLog.close();
 }
 
@@ -266,10 +243,8 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     // source file for average values
     QString avg = "./AverageWidthHeight.txt";
     QFile input(avg);
-
     if(!input.open(QIODevice::ReadOnly))
         std::cout << "Util::getWordWithConfidance failed to open file! \n";
-
     /*************************************/
     /*********** extract values **********/
     /*************************************/
@@ -280,16 +255,13 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
         index = str[0].unicode() % 'a';
         avgWidth[index] = myStringList[1].toInt();
         avgHight[index] = myStringList[2].toInt();
-
         // make odd number
         if(avgWidth[index] % 2 == 0)
             ++avgWidth[index];
-
         if(avgHight[index] % 2 == 0)
             ++avgHight[index];
     }
     while(input.canReadLine());
-
     input.close();
     //    for (int i = 0; i < nLabel; ++i)
     //        qDebug() << avgWidth[i] << " " << avgHight[i];
@@ -302,14 +274,12 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     int cols = peaks.cols;
     // filter each label with corresponding filter
     int ksize;
-
     for (int i = 0; i < nLabel; ++i)
     {
         cv::Mat_<float> hist = layeredHist.row(i);
         ksize = avgWidth[i];
         cv::GaussianBlur(hist, hist, cv::Size(ksize, 1), 0, 0, cv::BORDER_CONSTANT);
         layeredHist.row(i) = hist;
-
         // find peaks
         for (int j = 1; j < cols - 1; ++j)
         {
@@ -324,7 +294,6 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
             }
         }
     }
-
     //    std::cout << "Kernel: " << avgWidth[23] << std::endl;
     //    std::cout << peaks.t() << std::endl;
     //    std::cout << std::endl;
@@ -354,27 +323,22 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     /*************************************/
     cv::Mat_<float> peaksRow;
     int winBw;
-
     for (int i = 0; i < nLabel; ++i)
     {
         peaksRow = peaks.row(i);
         winBw = avgWidth[i] / 2;
-
         for (int j = 0; j < cols; ++j)
             if(peaksRow(j) > 0) // if peak expand
                 for (int k = 0; k < cols; ++k)
                     if(std::abs(k - j) <= winBw && (peaks(i, k) < peaks(i, j)))
                         peaks(i, k) = peaks(i, j);
     }
-
     int maxIdx;
     float max;
-
     for (int i = 0; i < cols; ++i)
     {
         maxIdx = 0;
         max = peaks(0, i);
-
         for (int j = 1; j < nLabel; ++j)
         {
             if(max < peaks(j, i))
@@ -383,37 +347,29 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
                 max = peaks(maxIdx, i);
             }
         }
-
         if(max == 0)
         {
             max = 0;
             maxIdx = -1;
         }
-
         label[i] = maxIdx;
         accuracy[i] = max;
     }
-
     //    qDebug()<<label;
     //    qDebug()<<accuracy;
     word = "";
-
     for (int i = 0; i < cols; ++i)
     {
         if(label[i] < 0)
             continue;
-
         // see is it greater that others or not
         bool bIsLabel = true;
-
         for (int j = 0; j < nLabel; ++j)
             if(j != label[i] && layeredHist(j, i) > accuracy[i])
                 bIsLabel = false;
-
         if(bIsLabel)
             word += QString((char)(label[i] + 'a'));
     }
-
     /*  2nd method */
     word = "";
     conf = 0;
@@ -421,7 +377,6 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     int wind;
     int lblCount = 0;
     float acc = 0;
-
     for (int i = 0; i < cols; ++i)
     {
         if(label[i] != lbl)
@@ -431,26 +386,21 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
                 word += QString((char)(lbl + 'a'));
                 conf += acc / lblCount;
             }
-
             lblCount = 0;
             acc = 0;
         }
-
         if(label[i] < 0)
             continue;
-
         lbl = label[i];
         wind = avgWidth[lbl];
         lblCount++;
         acc += layeredHist(lbl, i);
     }
-
     if(lblCount > wind / 3)
     {
         word += QString((char)(lbl + 'a'));
         conf += acc / lblCount;
     }
-
     conf /= word.length();
     //    qDebug() << "Word extracted: " << word;
 }

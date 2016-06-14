@@ -1,5 +1,7 @@
 #include "src/precompiled.h"
 
+#include <vector>
+
 #include "include/mainwindow.h"
 #include "include/Reader.h"
 #include "include/RandomDecisionForest.h"
@@ -45,6 +47,15 @@ int main(int argc, char *argv[]) {
 //    }
 
 //    m_saveFile->close();
+
+    QString MNIST_path = "/Users/barisozcan/Documents/MNIST_dataset/";
+
+    MNIST mnist(MNIST_path);
+    mnist.MNISTReader();
+    qDebug()<< "no of test images :" << mnist.m_testImagesVector->size();
+    qDebug()<< "no of train images :" << mnist.m_trainImagesVector->size();
+    qDebug()<< "test label count : " << mnist.m_testLabels->size();
+    qDebug()<< "train label count : " << mnist.m_trainLabels->size();
 
     QApplication app(argc, argv);
     MainWindow w;

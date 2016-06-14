@@ -54,7 +54,6 @@ class RandomDecisionForest : public QObject
 
     void readAndIdentifyWords();
     void searchWords(QString query, int queryId);
-    void readTrainData();
     void readTrainingImageFiles();
     void readTestImageFiles();
     void printPixelCloud();

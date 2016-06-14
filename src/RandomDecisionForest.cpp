@@ -7,12 +7,6 @@
 #include "include/TextRegionDetector.h"
 //#include <omp.h>
 
-void RandomDecisionForest::readTrainData()
-{
-    m_dir = m_params.trainImagesDir;
-    //MNIST OR IMAGE FOLDER ?
-}
-
 // histogram normalize ?
 // getLeafNode and Test  needs rework
 // given the directory of the all samples

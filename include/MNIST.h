@@ -12,14 +12,18 @@ class MNIST
 
   public:
 
+    typedef std::vector<cv::Mat> *ImageDataSet;
+    typedef std::vector<int> *LabelDataSet;
     MNIST(QString filepath);
-    typedef std::vector<cv::Mat> &ImageDataSet;
-    typedef std::vector<int> &LabelDataSet;
-
-    void getTestImages(ImageDataSet &images);
-    void getTestLabels(LabelDataSet labels);
-    void getTrainImages(ImageDataSet &images);
-    void getTrainLabels(LabelDataSet labels);
+    void MNISTReader();
+    ImageDataSet m_trainImagesVector;
+    ImageDataSet m_testImagesVector;
+    LabelDataSet m_trainLabels;
+    LabelDataSet m_testLabels;
+    ImageDataSet getTestImages();
+    LabelDataSet getTestLabels();
+    ImageDataSet getTrainImages();
+    LabelDataSet getTrainLabels();
 
   private:
 
