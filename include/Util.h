@@ -175,6 +175,8 @@ class Util
     static void calcWidthHeightStat(QString srcDir);
     static void averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol);
     static void getWordWithConfidence(cv::Mat_<float> &mat, int nLabel, QString &word, float &conf);
+    static int  countImagesInDir(QString dir);
+    static void covert32FC1to8UC1(cv::Mat &input, cv::Mat &output);
 };
 
 #endif

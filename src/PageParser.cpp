@@ -11,22 +11,18 @@ void PageParser::readFromTo(QString filename, std::vector<QString> &words,
     QDomDocument document;
     //Load the file
     QFile file(filename + ".xml");
-
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "Failed to open file";
     }
-
     else
     {
         if(!document.setContent(&file))
         {
             qDebug() << "Failed to load document";
         }
-
         file.close();
     }
-
     //get the root element
     QDomElement root = document.firstChildElement();
     getElements(root, "Word", "Coords", "Unicode");
@@ -37,11 +33,9 @@ void PageParser::getElements(QDomElement root, QString tagname,
 {
     QDomNodeList items = root.elementsByTagName(tagname);
     int count = items.count();
-
     for(int i = 0; i < count ; ++i)
     {
         QDomNode itemnode = items.at(i);
-
         //convert to element
         if(itemnode.isElement())
         {
@@ -53,7 +47,6 @@ void PageParser::getElements(QDomElement root, QString tagname,
             QDomNode coordNode = coords.at(0);
             QDomElement coordElement = coordNode.toElement();
             QString word = uniCodeElement.text();
-
             //            word = Util::cleanNumberAndPunctuation(word);
             if(word != "")
             {
@@ -73,27 +66,22 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
     qDebug() << "Number of words :" << words.size();
     qDebug() << "Number of words :" << coordinates.size();
     int size = words.size();
-
     for(int j = 0; j < size; ++j)
     {
         //each word represents a directory name
         QString word   = saveDir + "/" + words[j];
         //check if directory exist
         QDir dir(word);
-
         if (!dir.exists())
         {
             dir.mkpath(".");
-
             if(!dir.exists())
                 qDebug() << "ERROR : " << dir << " can not be created!" ;
         }
-
         QString coordsStr = coordinates[j];
         QStringList coords = coordsStr.split(" ");
         QPolygon poly;
         int count = coords.count();
-
         for(int i = 0; i < count; ++i)
         {
             QString pointStr = coords[i];
@@ -102,7 +90,6 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
             int y = pointCoords[1].trimmed().toInt();
             poly <<  QPoint(x, y);
         }
-
         QRect rect =  poly.boundingRect();
         QImage cropped = image.copy(rect);
         cv::Mat croppedMat = Util::toCv(cropped, CV_8UC4);
@@ -115,7 +102,6 @@ void PageParser::cropPolygons(const QString filename, QString saveDir,
         QString fileNameWithoutExt = fileInfo.fileName();
         QString fnameToSave = word + "/" + fileNameWithoutExt + QString::number(
                                   j) + ".jpg";
-
         if(!saveQIM.save(fnameToSave))
             qDebug() << "ERROR : " << fnameToSave << " can not be saved!" ;
     }

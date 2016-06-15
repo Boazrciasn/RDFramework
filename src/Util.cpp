@@ -404,3 +404,26 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     conf /= word.length();
     //    qDebug() << "Word extracted: " << word;
 }
+
+int Util::countImagesInDir(QString dir)
+{
+    int count = 0;
+    QDirIterator it(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files);
+    while(it.hasNext())
+    {
+        it.next();
+        ++count;
+    }
+    return count;
+}
+
+void Util::covert32FC1to8UC1(cv::Mat &input, cv::Mat &output)
+{
+    double Min;
+    double Max;
+    cv::minMaxLoc(input, &Min, &Max);
+    input -= Min;
+    input.convertTo(output,CV_8U,255.0/(Max-Min));
+
+}
+

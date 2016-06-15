@@ -51,6 +51,63 @@ MNIST::LabelDataSet MNIST::getTrainLabels()
     return vec;
 }
 
+void MNIST::saveDataSet(QString destdir)
+{
+    QString testpath;
+    QString trainpath;
+    createSaveDirs(destdir, trainpath, testpath);
+    saveTrainSet(trainpath);
+    saveTestSet(testpath);
+}
+
+void MNIST::saveTrainSet(QString &destdir)
+{
+    for(quint8 i = 0 ; i < m_trainImagesVector->size(); ++i)
+    {
+        QString label = QString::number(m_trainLabels->at(i));
+        QString savedir = destdir + label +  "/";
+        int img_count = Util::countImagesInDir(savedir);
+        savedir += QString::number(img_count) + ".jpg";
+        cv::Mat  temp ;
+        Util::covert32FC1to8UC1(m_trainImagesVector->at(i), temp);
+        QImage img = Util::toQt(m_trainImagesVector->at(i), QImage::Format_RGB888);
+        saveImage(savedir, img);
+    }
+}
+
+void MNIST::saveTestSet(QString &destdir)
+{
+    for(quint8 i = 0 ; i < m_testImagesVector->size(); ++i)
+    {
+        QString label = QString::number(m_testLabels->at(i));
+        QString savedir = destdir + label;
+        cv::Mat temp_img;
+        m_testImagesVector->at(i).convertTo(temp_img, CV_8UC1);
+        QImage img = Util::toQt(m_testImagesVector->at(i), QImage::Format_RGB888);
+        saveImage(savedir, img);
+    }
+}
+
+void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpath)
+{
+    QDir dir(destdir);
+    dir.mkpath("MNIST_DataSet/Test");
+    dir.mkpath("MNIST_DataSet/Train");
+    testpath = destdir + "MNIST_DataSet/Test/";
+    trainpath = destdir + "MNIST_DataSet/Train/";
+    qDebug() << " Train path : " << trainpath;
+    QDir testDir(testpath);
+    QDir trainDir(trainpath);
+    for(auto it : m_labels)
+    {
+        QString labeldir = QString::number(it);
+        trainDir.mkpath(labeldir);
+        testDir.mkpath(labeldir);
+    }
+}
+
+
+
 void MNIST::MNISTReader()
 {
     m_testImagesVector = getTestImages();
