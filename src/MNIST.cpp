@@ -56,36 +56,42 @@ void MNIST::saveDataSet(QString destdir)
     QString testpath;
     QString trainpath;
     createSaveDirs(destdir, trainpath, testpath);
-    saveTrainSet(trainpath);
     saveTestSet(testpath);
+    saveTrainSet(trainpath);
 }
 
 void MNIST::saveTrainSet(QString &destdir)
 {
-    for(quint8 i = 0 ; i < m_trainImagesVector->size(); ++i)
+    std::cout<< m_trainImagesVector->size()<<std::endl;
+    for(int i = 0 ; i < m_trainImagesVector->size(); ++i)
     {
         QString label = QString::number(m_trainLabels->at(i));
         QString savedir = destdir + label +  "/";
         int img_count = Util::countImagesInDir(savedir);
         savedir += QString::number(img_count) + ".jpg";
-        cv::Mat  temp ;
-        Util::covert32FC1to8UC1(m_trainImagesVector->at(i), temp);
-        QImage img = Util::toQt(m_trainImagesVector->at(i), QImage::Format_RGB888);
+        cv::Mat  temp_img ;
+        Util::covert32FCto8UC(m_trainImagesVector->at(i), temp_img);
+        QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
         saveImage(savedir, img);
     }
+    qDebug() << "Training set extraction done ! ";
 }
 
 void MNIST::saveTestSet(QString &destdir)
 {
-    for(quint8 i = 0 ; i < m_testImagesVector->size(); ++i)
+    std::cout<< m_trainImagesVector->size()<<std::endl;
+    for(int i = 0 ; i < m_testImagesVector->size(); ++i)
     {
         QString label = QString::number(m_testLabels->at(i));
-        QString savedir = destdir + label;
+        QString savedir = destdir + label + "/";
+        int img_count = Util::countImagesInDir(savedir);
+        savedir += QString::number(img_count) + ".jpg";
         cv::Mat temp_img;
-        m_testImagesVector->at(i).convertTo(temp_img, CV_8UC1);
-        QImage img = Util::toQt(m_testImagesVector->at(i), QImage::Format_RGB888);
+        Util::covert32FCto8UC(m_testImagesVector->at(i), temp_img);
+        QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
         saveImage(savedir, img);
     }
+    qDebug() << "Test set extraction done ! ";
 }
 
 void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpath)
@@ -95,7 +101,6 @@ void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpat
     dir.mkpath("MNIST_DataSet/Train");
     testpath = destdir + "MNIST_DataSet/Test/";
     trainpath = destdir + "MNIST_DataSet/Train/";
-    qDebug() << " Train path : " << trainpath;
     QDir testDir(testpath);
     QDir trainDir(trainpath);
     for(auto it : m_labels)

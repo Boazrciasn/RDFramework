@@ -417,7 +417,7 @@ int Util::countImagesInDir(QString dir)
     return count;
 }
 
-void Util::covert32FC1to8UC1(cv::Mat &input, cv::Mat &output)
+void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
 {
     double Min;
     double Max;
