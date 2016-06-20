@@ -13,6 +13,7 @@
 class MNIST
 {
 
+    using vMatSize = std::vector<cv::Mat>::size_type;
   public:
 
     typedef std::vector<cv::Mat> *ImageDataSet;

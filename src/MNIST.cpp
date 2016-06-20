@@ -63,7 +63,7 @@ void MNIST::saveDataSet(QString destdir)
 void MNIST::saveTrainSet(QString &destdir)
 {
     std::cout<< m_trainImagesVector->size()<<std::endl;
-    for(int i = 0 ; i < m_trainImagesVector->size(); ++i)
+    for(vMatSize i = 0 ; i < m_trainImagesVector->size(); ++i)
     {
         QString label = QString::number(m_trainLabels->at(i));
         QString savedir = destdir + label +  "/";
@@ -80,7 +80,7 @@ void MNIST::saveTrainSet(QString &destdir)
 void MNIST::saveTestSet(QString &destdir)
 {
     std::cout<< m_trainImagesVector->size()<<std::endl;
-    for(int i = 0 ; i < m_testImagesVector->size(); ++i)
+    for(vMatSize i = 0 ; i < m_testImagesVector->size(); ++i)
     {
         QString label = QString::number(m_testLabels->at(i));
         QString savedir = destdir + label + "/";
