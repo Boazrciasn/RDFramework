@@ -7,11 +7,18 @@
 #include <QLabel>
 #include <QImage>
 #include <QThread>
+#include <qstackedwidget.h>
+
 #include "include/Reader.h"
 #include "include/mydialog.h"
 #include "histogramdialog.h"
 #include "include/PageParser.h"
 #include "include/Util.h"
+#include "rdfdialog.h"
+#include "annextractordialog.h"
+#include "resizeallimagesdialog.h"
+#include "displayimageswidget.h"
+
 
 namespace Ui
 {
@@ -37,11 +44,15 @@ class MainWindow : public QMainWindow
     void on_actionAnnotation_Extractor_triggered();
     void on_actionRDF_triggered();
     void on_actionResizer_triggered();
+    void open_displayimageswidget();
+    void open_RDFwidget();
+    void open_AnnExtwidget();
+    void open_Resizerwidget();
 
   private:
-    void setLable();
-
     Ui::MainWindow *ui;
+    void setLable();
+    int m_pageindex = 0;
     MyDialog *mDialog;
     HistogramDialog *histDialog;
     Reader *reader;

@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     reader = new Reader();
     ui->setupUi(this);
     ui->label->setScaledContents(true);
-
     connect(ui->runButton, SIGNAL (clicked()), this, SLOT (update()));
     // Shortcut to Random Desicion Forest Window
     QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
@@ -154,4 +153,28 @@ void MainWindow::on_actionResizer_triggered()
 {
     ResizeAllImagesDialog *mDialog = new ResizeAllImagesDialog(this);
     mDialog->exec();
+}
+
+void MainWindow::open_displayimageswidget()
+{
+    DisplayImagesWidget *displayimageswidget = new DisplayImagesWidget();
+    displayimageswidget->show();
+}
+
+void MainWindow::open_RDFwidget()
+{
+    RDFDialog *rdfwidget = new RDFDialog();
+    rdfwidget->show();
+}
+
+void MainWindow::open_AnnExtwidget()
+{
+    AnnExtractorDialog *annextwidget = new AnnExtractorDialog();
+    annextwidget->show();
+}
+
+void MainWindow::open_Resizerwidget()
+{
+    ResizeAllImagesDialog * resizerwidget = new ResizeAllImagesDialog();
+    resizerwidget->show();
 }

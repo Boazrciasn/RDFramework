@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>1058</height>
+    <width>410</width>
+    <height>761</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,6 +44,34 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="RDF_pushButton">
+      <property name="text">
+       <string>RDF</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="AnnExtract_pushButton">
+      <property name="text">
+       <string>Annotation Extractor</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="Resizer_pushButton">
+      <property name="text">
+       <string>Resizer</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Browse Images</string>
+      </property>
      </widget>
     </item>
     <item alignment="Qt::AlignHCenter|Qt::AlignBottom">
@@ -141,7 +169,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>420</width>
+     <width>410</width>
      <height>22</height>
     </rect>
    </property>
@@ -185,5 +213,76 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_displayimageswidget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>276</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>378</x>
+     <y>715</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>RDF_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_RDFwidget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>196</x>
+     <y>350</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>546</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Resizer_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_Resizerwidget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>412</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>499</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AnnExtract_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_AnnExtwidget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>268</x>
+     <y>377</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>327</x>
+     <y>498</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>open_displayimageswidget()</slot>
+  <slot>open_RDFwidget()</slot>
+  <slot>open_Resizerwidget()</slot>
+  <slot>open_AnnExtwidget()</slot>
+ </slots>
 </ui>
