@@ -1,9 +1,6 @@
 #include "precompiled.h"
 
 #include "include/mainwindow.h"
-#include "include/annextractordialog.h"
-#include "include/rdfdialog.h"
-#include "include/resizeallimagesdialog.h"
 
 #include "include/TextRegionDetector.h"
 #include "ui_mainwindow.h"

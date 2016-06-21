@@ -50,7 +50,7 @@ class MainWindow : public QMainWindow
 
   private:
     Ui::MainWindow *ui;
-    void setLable();
+    void setLabel();
     int m_pageindex = 0;
     MyDialog *mDialog;
     HistogramDialog *histDialog;

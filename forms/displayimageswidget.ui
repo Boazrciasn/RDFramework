@@ -61,16 +61,16 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="next_pushButton">
+         <widget class="QPushButton" name="prev_pushButton">
           <property name="text">
-           <string>&gt;&gt;</string>
+           <string>&lt;&lt;</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="prev_pushButton">
+         <widget class="QPushButton" name="next_pushButton">
           <property name="text">
-           <string>&lt;&lt;</string>
+           <string>&gt;&gt;</string>
           </property>
          </widget>
         </item>
@@ -95,5 +95,59 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>next_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DisplayImagesWidget</receiver>
+   <slot>nextButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>182</x>
+     <y>502</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>495</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>browse_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DisplayImagesWidget</receiver>
+   <slot>browseButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>108</x>
+     <y>505</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>prev_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DisplayImagesWidget</receiver>
+   <slot>prevButton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>297</x>
+     <y>509</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>398</x>
+     <y>465</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>browseButton_clicked()</slot>
+  <slot>prevButton_clicked()</slot>
+  <slot>nextButton_clicked()</slot>
+ </slots>
 </ui>
