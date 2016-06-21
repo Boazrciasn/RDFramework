@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QImage>
 #include <QThread>
-#include <qstackedwidget.h>
 
 #include "include/Reader.h"
 #include "include/mydialog.h"

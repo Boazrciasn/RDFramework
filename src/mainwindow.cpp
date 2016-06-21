@@ -49,16 +49,14 @@ void MainWindow::display()
     qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap,
                          Qt::BevelJoin));
     qDebug() << out.size();
-
     for (int i = 0; i < out.size(); i++)
     {
         qPainter.drawRect(out[i]);
     }
-
     image.save("out.jpg");
     QPixmap pixmap = QPixmap::fromImage(image);
     QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(),
-                         Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                                                 Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());
     QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
     ui->label->setPixmap(*newScaledPixmap);
@@ -81,7 +79,6 @@ void MainWindow::on_browse_clicked()
                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     fileIndex = 0;
     reader->readFromTo(dir.toStdString(), this->fNames);
-
     if (!this->fNames.empty())
     {
         display();
@@ -96,10 +93,8 @@ void MainWindow::on_browse_clicked()
 void MainWindow::on_previous_clicked()
 {
     fileIndex--;
-
     if (fileIndex < 0)
         fileIndex++;
-
     display();
 }
 
@@ -109,21 +104,18 @@ void MainWindow::on_previous_clicked()
 void MainWindow::on_next_clicked()
 {
     fileIndex++;
-
     if (fileIndex >= (int)this->fNames.size())
         fileIndex--;
-
     display();
 }
 
 void MainWindow::on_extractWords_clicked()
 {
     QString saveDir = QFileDialog::getExistingDirectory(this,
-                      tr("Open Image Direrctory"), QDir::currentPath(),
-                      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                                        tr("Open Image Direrctory"), QDir::currentPath(),
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     pageParser = new PageParser();
     int size = (int)this->fNames.size();
-
     for (int i = 0; i < size ; ++i)
     {
         QString fileName = dir + "/" + this->fNames[i];
@@ -132,7 +124,6 @@ void MainWindow::on_extractWords_clicked()
         this->words.clear();
         this->coords.clear();
     }
-
     delete pageParser;
     pageParser = NULL;
 }
@@ -175,6 +166,6 @@ void MainWindow::open_AnnExtwidget()
 
 void MainWindow::open_Resizerwidget()
 {
-    ResizeAllImagesDialog * resizerwidget = new ResizeAllImagesDialog();
+    ResizeAllImagesDialog *resizerwidget = new ResizeAllImagesDialog();
     resizerwidget->show();
 }

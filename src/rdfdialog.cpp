@@ -28,16 +28,16 @@ RDFDialog::~RDFDialog()
 void RDFDialog::onTrainingBrowse()
 {
     PARAMS.trainImagesDir = QFileDialog::getExistingDirectory(this,
-                            tr("Open Image Directory"), QDir::currentPath(),
-                            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                                              tr("Open Image Directory"), QDir::currentPath(),
+                                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_train->setText(PARAMS.trainImagesDir);
 }
 
 void RDFDialog::onTestBrowse()
 {
     PARAMS.testDir = QFileDialog::getExistingDirectory(this,
-                     tr("Open Image Directory"), PARAMS.trainImagesDir,
-                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                                       tr("Open Image Directory"), PARAMS.trainImagesDir,
+                                                       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
 
@@ -52,7 +52,6 @@ void RDFDialog::onTrain()
     PARAMS.labelCount = ui->spinBox_LabelCount->value();
     PARAMS.maxIteration = ui->spinBox_MaxIteration->value();
     m_forest->setParams(PARAMS);
-
     if(m_forest->params().trainImagesDir.isEmpty())
     {
         auto *msgBox = new QMessageBox();
@@ -61,7 +60,6 @@ void RDFDialog::onTrain()
         msgBox->show();
         return;
     }
-
     Util::calcWidthHeightStat(m_forest->params().trainImagesDir);
     m_treeid = 0;
     m_forest->readTrainingImageFiles();
@@ -76,7 +74,6 @@ void RDFDialog::onTest()
 {
     m_forest->params().testDir = PARAMS.testDir;
     //m_forest->readAndIdentifyWords();
-
     if(m_forest->params().testDir.isEmpty())
     {
         QMessageBox *msgBox = new QMessageBox();
@@ -85,7 +82,6 @@ void RDFDialog::onTest()
         msgBox->show();
         return;
     }
-
     m_forest->readTestImageFiles();
     ui->textBrowser_test->append("Test images read");
     m_forest->test();
@@ -133,8 +129,8 @@ void RDFDialog::onLoad()
 void RDFDialog::onSave()
 {
     QString dirname = QFileDialog::getExistingDirectory(this,
-                      tr("Open Save Directory"), PARAMS.trainImagesDir,
-                      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                                        tr("Open Save Directory"), PARAMS.trainImagesDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     QString fname = "nT_" + QString::number(m_forest->params().nTrees) + "_D_" +
                     QString::number(m_forest->params().maxDepth)
                     + "_nTImg_" + QString::number(m_forest->m_imagesContainer.size())
