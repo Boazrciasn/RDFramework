@@ -26,7 +26,8 @@ class Reader
     static void readTextFiles(QString baseDir, std::vector<QString> &foundText);
     static void readTextFiles(QString baseDir, QString query,
                               std::vector<QString> &foundText);
-  private:
+    void findImages(QString baseDir, std::vector<QString> &foundImages);
+private:
     DIR *m_dir;
 };
 

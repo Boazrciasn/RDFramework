@@ -18,16 +18,25 @@ DisplayImagesWidget::~DisplayImagesWidget()
 
 void DisplayImagesWidget::display()
 {
-
+    QImage image(m_fNames[m_fileIndex]);
+    cv::Mat img_bw = Util::toCv(image, CV_8UC4);
+    cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(),
+                                                 Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    scaledImage.setDevicePixelRatio(devicePixelRatio());
+    QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->label->setPixmap(*newScaledPixmap);
+    ui->label->resize(ui->label->pixmap()->size());
 }
 
 void DisplayImagesWidget::browseButton_clicked()
 {
     m_dir = QFileDialog::getExistingDirectory(this, tr("Open Image Direrctory"),
-                                            "/home/vvglab/Desktop/ImageCLEF2016/pages_devel"/*QDir::currentPath()*/,
+                                            QDir::currentPath(),
                                             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     m_fileIndex = 0;
-    m_reader->readFromTo(m_dir.toStdString(), m_fNames);
+    m_reader->findImages(m_dir, m_fNames);
     if (!m_fNames.empty())
     {
         display();

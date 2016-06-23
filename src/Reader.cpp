@@ -4,6 +4,7 @@
 
 void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
 {
+    // TO DO : UPDATE readFromTo
     struct dirent *ent;
     // check for valid directory
     if ((m_dir = opendir(filename.c_str())) != NULL)
@@ -70,6 +71,18 @@ void Reader::findImages(QString baseDir, QString query,
         }
     }
 }
+
+void Reader::findImages(QString baseDir, std::vector<QString> &foundImages)
+{
+    QDirIterator itFile(baseDir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files,
+                        QDirIterator::Subdirectories);
+    while(itFile.hasNext())
+    {
+        itFile.next();
+        foundImages.push_back(itFile.filePath());
+    }
+}
+
 
 void Reader::readTextFiles(QString baseDir, QString query,
                            std::vector<QString> &foundText)
