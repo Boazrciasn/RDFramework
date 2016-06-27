@@ -26,23 +26,42 @@ void DisplayImagesWidget::display()
                                                  Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());
     QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    ui->label->setScaledContents(true);
     ui->label->setPixmap(*newScaledPixmap);
     ui->label->resize(ui->label->pixmap()->size());
+}
+
+void DisplayImagesWidget::extractWords()
+{
+
+    //TO DO : needs update.
+    QString saveDir = QFileDialog::getExistingDirectory(this,
+                                                        tr("Open Image Direrctory"), QDir::currentPath(),
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_pageParser = new PageParser();
+    int size = (int)m_fNames.size();
+    for (int i = 0; i < size ; ++i)
+    {
+        QString fileName = m_dir + "/" + m_fNames[i];
+        m_pageParser->readFromTo(fileName, m_words, m_coords);
+        m_pageParser->cropPolygons(fileName, saveDir, m_words, m_coords);
+        m_words.clear();
+        m_coords.clear();
+    }
+    delete m_pageParser;
+    m_pageParser = NULL;
 }
 
 void DisplayImagesWidget::browseButton_clicked()
 {
     m_dir = QFileDialog::getExistingDirectory(this, tr("Open Image Direrctory"),
-                                            QDir::currentPath(),
-                                            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                                              QDir::currentPath(),
+                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     m_fileIndex = 0;
     m_reader->findImages(m_dir, m_fNames);
     if (!m_fNames.empty())
     {
         display();
-        //        mDialog = new MyDialog(this);
-        //        mDialog->show();
-        //        mDialog->setFNames(this->fNames,dir);
     }
 }
 

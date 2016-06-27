@@ -27,7 +27,7 @@
      <property name="title">
       <string>View Images</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,0">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,0,0">
       <item>
        <widget class="QLabel" name="label">
         <property name="autoFillBackground">
@@ -88,6 +88,13 @@
          </spacer>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Extract Words</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

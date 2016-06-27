@@ -163,7 +163,6 @@ void MNIST::readMINST(QString filename, ImageDataSet vec)
 
 void MNIST::readMINSTLabel(QString filename, LabelDataSet vec)
 {
-    //TODO: Refactor due to our needs :
     QString path = m_rootPath + filename;
     std::ifstream file(path.toStdString(), std::ios::binary);
     if (file.is_open())

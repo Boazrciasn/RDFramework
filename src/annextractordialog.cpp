@@ -121,7 +121,6 @@ void AnnExtractorDialog::on_browse_button_clicked()
     }
 }
 
-//TODO unnecessarry check
 bool AnnExtractorDialog::isBrowseble()
 {
     if (m_searchChar.size() != 1)

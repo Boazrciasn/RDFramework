@@ -11,7 +11,6 @@
 #include "include/Reader.h"
 #include "include/mydialog.h"
 #include "histogramdialog.h"
-#include "include/PageParser.h"
 #include "include/Util.h"
 #include "rdfdialog.h"
 #include "annextractordialog.h"
@@ -32,14 +31,7 @@ class MainWindow : public QMainWindow
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-  public slots:
-    void display();
-
   private slots:
-    void on_browse_clicked();
-    void on_previous_clicked();
-    void on_next_clicked();
-    void on_extractWords_clicked();
     void on_actionAnnotation_Extractor_triggered();
     void on_actionRDF_triggered();
     void on_actionResizer_triggered();
@@ -50,20 +42,8 @@ class MainWindow : public QMainWindow
 
   private:
     Ui::MainWindow *ui;
-    void setLabel();
-    int m_pageindex = 0;
     MyDialog *mDialog;
     HistogramDialog *histDialog;
-    Reader *reader;
-    QString dir;                // file directory
-    std::vector<QString> fNames;     // file names are stored
-    int fileIndex;              // index of file being viewed
-    PageParser *pageParser;
-    std::vector<QString> words;     // file names are stored
-    std::vector<QString> coords;     // file names are stored
-    int process_type = -1;      // 0 for IMG / 1 for video
-    int nParticles = 100;
-    int nIters = 10;
 };
 
 #endif // MAINWINDOW_H

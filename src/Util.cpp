@@ -427,3 +427,33 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
 
 }
 
+
+// TODO : WORD AND  LINE DETECTION CODE HERE :
+
+// Word and Line Recognition test code
+//cv::Mat img_bw = Util::toCv(image, CV_8UC4);
+//cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
+//    cv::threshold(img_bw, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+//    img_bw.convertTo(img_bw,CV_32FC1);
+//    img_bw = 255 - img_bw;
+//QVector<QRect> out = TextRegionDetector::detectWordsFromLine(img_bw, this);
+//    QVector<QRect> out = TextRegionDetector::detectRegions(img_bw,this);
+//QPainter qPainter(&image);
+//qPainter.setBrush(Qt::NoBrush);
+//qPainter.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine, Qt::SquareCap,
+//                     Qt::BevelJoin));
+//qDebug() << out.size();
+//for (int i = 0; i < out.size(); i++)
+//{
+//    qPainter.drawRect(out[i]);
+//}
+//image.save("out.jpg");
+//QPixmap pixmap = QPixmap::fromImage(image);
+//QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(),
+//                                             Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+//scaledImage.setDevicePixelRatio(devicePixelRatio());
+//QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+//ui->label->setPixmap(*newScaledPixmap);
+//ui->label->resize(ui->label->pixmap()->size());
+
+
