@@ -51,48 +51,32 @@ MNIST::LabelDataSet MNIST::getTrainLabels()
     return vec;
 }
 
-void MNIST::saveDataSet(QString destdir)
+void MNIST::extractDataSet(QString destdir)
 {
     QString testpath;
     QString trainpath;
     createSaveDirs(destdir, trainpath, testpath);
-    saveTestSet(testpath);
-    saveTrainSet(trainpath);
+    saveDataSet(trainpath, m_trainImagesVector, m_trainLabels);
+    saveDataSet(testpath, m_testImagesVector, m_testLabels);
+    qDebug() << "Dataset extraction done ! ";
 }
 
-void MNIST::saveTrainSet(QString &destdir)
+void MNIST::saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSet imageLabels)
 {
-    std::cout<< m_trainImagesVector->size()<<std::endl;
-    for(vMatSize i = 0 ; i < m_trainImagesVector->size(); ++i)
+    std::cout<< imageDataSet->size()<<std::endl;
+    for(vMatSize i = 0 ; i < imageDataSet->size(); ++i)
     {
-        QString label = QString::number(m_trainLabels->at(i));
-        QString savedir = destdir + label +  "/";
+        QString label = QString::number(imageLabels->at(i));
+        QString savedir = destdir + "/";
         int img_count = Util::countImagesInDir(savedir);
-        savedir += QString::number(img_count) + ".jpg";
+        savedir += label + "_" + QString::number(img_count) + ".jpg";
         cv::Mat  temp_img ;
-        Util::covert32FCto8UC(m_trainImagesVector->at(i), temp_img);
+        Util::covert32FCto8UC(imageDataSet->at(i), temp_img);
         QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
         saveImage(savedir, img);
     }
-    qDebug() << "Training set extraction done ! ";
 }
 
-void MNIST::saveTestSet(QString &destdir)
-{
-    std::cout<< m_trainImagesVector->size()<<std::endl;
-    for(vMatSize i = 0 ; i < m_testImagesVector->size(); ++i)
-    {
-        QString label = QString::number(m_testLabels->at(i));
-        QString savedir = destdir + label + "/";
-        int img_count = Util::countImagesInDir(savedir);
-        savedir += QString::number(img_count) + ".jpg";
-        cv::Mat temp_img;
-        Util::covert32FCto8UC(m_testImagesVector->at(i), temp_img);
-        QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
-        saveImage(savedir, img);
-    }
-    qDebug() << "Test set extraction done ! ";
-}
 
 void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpath)
 {
@@ -100,15 +84,7 @@ void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpat
     dir.mkpath("MNIST_DataSet/Test");
     dir.mkpath("MNIST_DataSet/Train");
     testpath = destdir + "MNIST_DataSet/Test/";
-    trainpath = destdir + "MNIST_DataSet/Train/";
-    QDir testDir(testpath);
-    QDir trainDir(trainpath);
-    for(auto it : m_labels)
-    {
-        QString labeldir = QString::number(it);
-        trainDir.mkpath(labeldir);
-        testDir.mkpath(labeldir);
-    }
+    trainpath = destdir + "MNIST_DataSet/Train/";   
 }
 
 

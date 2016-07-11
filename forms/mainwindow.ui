@@ -58,7 +58,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="Browse_pushButton">
       <property name="text">
        <string>Browse Images</string>
       </property>
@@ -117,7 +117,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>Browse_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>open_displayimageswidget()</slot>

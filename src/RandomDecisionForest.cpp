@@ -78,7 +78,6 @@ void RandomDecisionForest::readAndIdentifyWords()
         QStringList myStringList = offsetLine.split(' ');
         int offsetX = myStringList[2].split('+')[1].toInt();
         int offsetY = myStringList[3].split('+')[1].toInt();
-        //TODO UPDATE CODE ITS FUCKED UP
         m_DS.m_testImagesVector.clear();
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
         // Call word extractor
@@ -100,7 +99,7 @@ void RandomDecisionForest::readAndIdentifyWords()
             cv::Mat layeredWordRoiMat =  layeredImage(layeredWordRoi);
             cv::Mat confidenceMat =  createLetterConfidenceMatrix(layeredWordRoiMat,
                                                                   fgPxNumberPerCol);
-            //Nekruz baba top sende
+            //FIXME : Nekruz baba top sende
             //            Util::plot(confidenceMat.row(23), m_parent, "x");
             QString wordDetected = "baris";
             float conf = 0;
@@ -187,7 +186,8 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
 
 
 
-//FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image, img_Info : label of  test image & id of the image inside vector(optional)
+//FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image,
+//img_Info : label of  test image & id of the image inside vector(optional)
 void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
                                          const cv::Mat &image , imageinfo_ptr img_inf )
 {

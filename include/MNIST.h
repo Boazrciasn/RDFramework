@@ -37,9 +37,8 @@ class MNIST
             return;
         }
     }
-    void saveDataSet(QString destdir);
-    void saveTrainSet(QString &destdir);
-    void saveTestSet(QString &destdir);
+    void extractDataSet(QString destdir);
+    void saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSet imageLabels);
 
   private:
 
