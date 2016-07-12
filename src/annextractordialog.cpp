@@ -181,7 +181,7 @@ void AnnExtractorDialog::createSaveFile()
     {
         // set initial values and create header
         m_avgWidth = 0;
-        m_avgHight = 0;
+        m_avgHeight = 0;
         m_fileIndex = 0;
         m_sampleCount = 0;
         writeHeader();
@@ -206,7 +206,7 @@ void AnnExtractorDialog::loadHeader()
             break;
 
         case 2:
-            m_avgHight = str.split(" ")[0].toInt();
+            m_avgHeight = str.split(" ")[0].toInt();
             break;
 
         case 3:
@@ -235,7 +235,7 @@ void AnnExtractorDialog::writeHeader()
     QString s;
     QTextStream t(m_saveFile);
     s += QString::number(m_avgWidth) + "\n";
-    s += QString::number(m_avgHight) + "\n";
+    s += QString::number(m_avgHeight) + "\n";
     s += QString::number(m_sampleCount) + "\n";
     s += QString::number(m_fileIndex) + "\n";
     s += m_searchChar + "\n";
@@ -276,7 +276,7 @@ void AnnExtractorDialog::updateValues()
 {
     m_avgWidth = (m_avgWidth * m_sampleCount + m_rect.width()) /
                  (m_sampleCount + 1);
-    m_avgHight = (m_avgHight * m_sampleCount + m_rect.height()) /
+    m_avgHeight = (m_avgHeight * m_sampleCount + m_rect.height()) /
                  (m_sampleCount + 1);
     m_sampleCount++;
     ui->counter_label->setText(QString::number(m_sampleCount));

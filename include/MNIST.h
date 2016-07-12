@@ -51,7 +51,10 @@ class MNIST
     int reverseInt(int i);
     void readMINST(QString filename, ImageDataSet vec);
     void readMINSTLabel(QString filename, LabelDataSet vec);
-
+    void writeHeader(QFile *logfile, int sampleCount, QString label);
+    void writeEntry(QFile *logfile, QString imgName);
+    void createSaveFiles(QVector<QFile *> &logfiles, QString path);
+    void writeHeaders(QVector<QFile *> &logfiles, const QVector<int> &vec_samplecounts);
 };
 
 

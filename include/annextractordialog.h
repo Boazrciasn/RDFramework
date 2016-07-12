@@ -54,7 +54,7 @@ class AnnExtractorDialog : public QDialog
     int m_fileIndex;              // index of file being viewed
     int m_sampleCount;
     int m_avgWidth;
-    int m_avgHight;
+    int m_avgHeight;
     QFile *m_saveFile;
     void writeEntry();
     void updateValues();

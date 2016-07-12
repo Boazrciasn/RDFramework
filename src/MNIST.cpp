@@ -61,20 +61,77 @@ void MNIST::extractDataSet(QString destdir)
     qDebug() << "Dataset extraction done ! ";
 }
 
+void MNIST::writeHeader(QFile *logfile, int sampleCount, QString label)
+{
+    logfile->open(QIODevice::ReadWrite | QIODevice::Text);
+    QString s;
+    QTextStream t(logfile);
+    s += QString::number(16) + "\n";
+    s += QString::number(16) + "\n";
+    s += QString::number(sampleCount) + "\n";
+    s += QString::number(0) + "\n";
+    s += label + "\n";
+    int ctr = 0;
+    while(!t.atEnd())
+    {
+        QString line = t.readLine();
+        if(++ctr > 5)
+            s.append(line + "\n");
+    }
+    logfile->resize(0);
+    t << s;
+    logfile->flush();
+    logfile->close();
+}
+
+void MNIST::writeHeaders(QVector<QFile *> &logfiles, const QVector<int> &vec_samplecounts)
+{
+    for (quint8 i = 0 ; i < logfiles.size(); ++i)
+    {
+        writeHeader(logfiles[i], vec_samplecounts[i], QString::number(i));
+    }
+}
+
+void MNIST::writeEntry(QFile *logfile, QString imgName)
+{
+    logfile->open(QIODevice::Append);
+    logfile->write(imgName.toUtf8());
+    logfile->write(" 16 16 0 0 \n");
+    logfile->flush();
+    logfile->close();
+}
+
+void MNIST::createSaveFiles(QVector<QFile *> &logfiles, QString path)
+{
+    for (quint8 i = 0 ; i < logfiles.size(); ++i)
+    {
+        logfiles[i] = new QFile(path + "/" + QString::number(i) + "_lastSession.txt");
+    }
+}
+
+
 void MNIST::saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSet imageLabels)
 {
-    std::cout<< imageDataSet->size()<<std::endl;
+    QVector<QFile *> logfiles(10);
+    QVector<int> vec_samplecounts(10, 0);
+    QString logDir = destdir + "/LogFiles/";
+    createSaveFiles(logfiles, logDir);
+    std::cout << imageDataSet->size() << std::endl;
     for(vMatSize i = 0 ; i < imageDataSet->size(); ++i)
     {
         QString label = QString::number(imageLabels->at(i));
+        vec_samplecounts[imageLabels->at(i)]++;
         QString savedir = destdir + "/";
         int img_count = Util::countImagesInDir(savedir);
-        savedir += label + "_" + QString::number(img_count) + ".jpg";
+        QString imageName = label + "_" + QString::number(img_count) + ".jpg";
+        savedir += imageName;
         cv::Mat  temp_img ;
         Util::covert32FCto8UC(imageDataSet->at(i), temp_img);
         QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
         saveImage(savedir, img);
+        writeEntry(logfiles[imageLabels->at(i)], imageName);
     }
+    writeHeaders(logfiles, vec_samplecounts);
 }
 
 
@@ -83,8 +140,10 @@ void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpat
     QDir dir(destdir);
     dir.mkpath("MNIST_DataSet/Test");
     dir.mkpath("MNIST_DataSet/Train");
+    dir.mkpath("MNIST_DataSet/Test/LogFiles");
+    dir.mkpath("MNIST_DataSet/Train/LogFiles");
     testpath = destdir + "MNIST_DataSet/Test/";
-    trainpath = destdir + "MNIST_DataSet/Train/";   
+    trainpath = destdir + "MNIST_DataSet/Train/";
 }
 
 
@@ -161,5 +220,6 @@ void MNIST::readMINSTLabel(QString filename, LabelDataSet vec)
         qDebug() << filename << " not found !";
     }
 }
+
 
 
