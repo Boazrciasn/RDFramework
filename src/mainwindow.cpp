@@ -68,3 +68,9 @@ void MainWindow::open_Resizerwidget()
     ResizeAllImagesDialog *resizerwidget = new ResizeAllImagesDialog();
     resizerwidget->show();
 }
+
+void MainWindow::open_PFTracker()
+{
+    PFWidget *pfwidget = new PFWidget();
+    pfwidget->show();
+}

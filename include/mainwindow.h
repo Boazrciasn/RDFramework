@@ -16,6 +16,7 @@
 #include "annextractordialog.h"
 #include "resizeallimagesdialog.h"
 #include "displayimageswidget.h"
+#include "pfwidget.h"
 
 
 namespace Ui
@@ -39,6 +40,7 @@ class MainWindow : public QMainWindow
     void open_RDFwidget();
     void open_AnnExtwidget();
     void open_Resizerwidget();
+    void open_PFTracker();
 
   private:
     Ui::MainWindow *ui;
