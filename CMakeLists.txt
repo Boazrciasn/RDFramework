@@ -32,7 +32,7 @@ file(GLOB HEADERS include/* qcustomplot/qcustomplot.h cereal/*)
 # Create Qt MOC files
 QT5_WRAP_UI(UISrcs forms/mainwindow.ui forms/mydialog.ui forms/annextractordialog.ui
                    forms/dialogextracted.ui forms/histogramdialog.ui forms/rdfdialog.ui
-                   forms/resizeallimagesdialog.ui forms/displayimageswidget.ui)
+                   forms/resizeallimagesdialog.ui forms/displayimageswidget.ui forms/pfwidget.ui)
 
 add_executable("${project_name}" ${SOURCES} ${HEADERS} ${UISrcs})
 

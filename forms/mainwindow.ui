@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>241</width>
-    <height>203</height>
+    <height>212</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,6 +61,13 @@
      <widget class="QPushButton" name="pushButton">
       <property name="text">
        <string>Browse Images</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="PF_pushButton">
+      <property name="text">
+       <string>PF Tracker</string>
       </property>
      </widget>
     </item>
@@ -123,12 +130,12 @@
    <slot>open_displayimageswidget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>450</y>
+     <x>231</x>
+     <y>156</y>
     </hint>
     <hint type="destinationlabel">
-     <x>378</x>
-     <y>715</y>
+     <x>240</x>
+     <y>211</y>
     </hint>
    </hints>
   </connection>
@@ -139,12 +146,12 @@
    <slot>open_RDFwidget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>196</x>
-     <y>350</y>
+     <x>205</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>361</x>
-     <y>546</y>
+     <x>240</x>
+     <y>211</y>
     </hint>
    </hints>
   </connection>
@@ -155,12 +162,12 @@
    <slot>open_Resizerwidget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>374</x>
-     <y>412</y>
+     <x>231</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel">
-     <x>385</x>
-     <y>499</y>
+     <x>240</x>
+     <y>211</y>
     </hint>
    </hints>
   </connection>
@@ -171,12 +178,28 @@
    <slot>open_AnnExtwidget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>268</x>
-     <y>377</y>
+     <x>231</x>
+     <y>106</y>
     </hint>
     <hint type="destinationlabel">
-     <x>327</x>
-     <y>498</y>
+     <x>240</x>
+     <y>211</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PF_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_PFTracker()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>172</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>316</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
@@ -186,5 +209,6 @@
   <slot>open_RDFwidget()</slot>
   <slot>open_Resizerwidget()</slot>
   <slot>open_AnnExtwidget()</slot>
+  <slot>open_PFTracker()</slot>
  </slots>
 </ui>
