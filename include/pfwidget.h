@@ -1,5 +1,6 @@
 #ifndef PFWIDGET_H
 #define PFWIDGET_H
+#include "src/precompiled.h"
 
 #include <QWidget>
 
