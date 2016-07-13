@@ -63,6 +63,21 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pause_pushButton">
+       <property name="font">
+        <font>
+         <family>Futura</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Pause</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="stop_pushButton">
        <property name="font">
         <font>
@@ -103,8 +118,8 @@
    <slot>on_actionOpen_triggered()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>228</x>
-     <y>595</y>
+     <x>227</x>
+     <y>608</y>
     </hint>
     <hint type="destinationlabel">
      <x>173</x>
@@ -112,8 +127,59 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>start_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>on_actionPlay_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>283</x>
+     <y>588</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>506</x>
+     <y>614</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pause_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>on_actionPause_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>341</x>
+     <y>587</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>454</x>
+     <y>703</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stop_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>on_actionStop_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>455</x>
+     <y>583</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>462</x>
+     <y>619</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_actionOpen_triggered()</slot>
+  <slot>on_actionPlay_triggered()</slot>
+  <slot>on_actionPause_triggered()</slot>
+  <slot>on_actionStop_triggered()</slot>
  </slots>
 </ui>
