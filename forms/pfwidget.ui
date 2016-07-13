@@ -105,5 +105,25 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>browse_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>on_actionOpen_triggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>595</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>778</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>on_actionOpen_triggered()</slot>
+ </slots>
 </ui>

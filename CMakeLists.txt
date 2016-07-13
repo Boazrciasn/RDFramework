@@ -20,6 +20,8 @@ INCLUDE_DIRECTORIES(qcustomplot/)
 # Qt5 package
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 find_package(Qt5Xml REQUIRED)
+find_package(Qt5Multimedia REQUIRED)
+find_package(Qt5MultimediaWidgets REQUIRED)
 
 # NM Not tested yet
 find_package(Qt5PrintSupport REQUIRED)
@@ -39,6 +41,6 @@ QT5_WRAP_UI(UISrcs forms/mainwindow.ui forms/mydialog.ui forms/annextractordialo
 add_executable("${project_name}" ${SOURCES} ${HEADERS} ${UISrcs})
 
 # NM Not tested yet
-target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport)
+target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
 
 qt5_use_modules("${project_name}" Core Gui Widgets)
