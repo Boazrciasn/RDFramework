@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QProgressBar>
 #include <QSlider>
+#include <videoframegrabber.h>
 
 namespace Ui {
 class PFWidget;
@@ -23,15 +24,16 @@ public:
     ~PFWidget();
 
 private slots:
-    void on_actionOpen_triggered();
-    void on_actionPlay_triggered();
-    void on_actionPause_triggered();
-    void on_actionStop_triggered();
+    void onActionOpen();
+    void onActionPlay();
+    void onActionPause();
+    void onActionStop();
+    void processFrame(QImage image);
 
 private:
     Ui::PFWidget *ui;
     QMediaPlayer* mPlayer;
-    QVideoWidget* mVideoWidg;
+    VideoFrameGrabber* mVideoWidg;
     QProgressBar* mProgressBar;
     QSlider* mSlider;
 };
