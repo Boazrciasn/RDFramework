@@ -115,7 +115,7 @@
    <sender>browse_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>PFWidget</receiver>
-   <slot>on_actionOpen_triggered()</slot>
+   <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>227</x>
@@ -131,7 +131,7 @@
    <sender>start_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>PFWidget</receiver>
-   <slot>on_actionPlay_triggered()</slot>
+   <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>283</x>
@@ -147,7 +147,7 @@
    <sender>pause_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>PFWidget</receiver>
-   <slot>on_actionPause_triggered()</slot>
+   <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>341</x>
@@ -163,7 +163,7 @@
    <sender>stop_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>PFWidget</receiver>
-   <slot>on_actionStop_triggered()</slot>
+   <slot>onActionStop()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>455</x>
@@ -177,9 +177,9 @@
   </connection>
  </connections>
  <slots>
-  <slot>on_actionOpen_triggered()</slot>
-  <slot>on_actionPlay_triggered()</slot>
-  <slot>on_actionPause_triggered()</slot>
-  <slot>on_actionStop_triggered()</slot>
+  <slot>onActionOpen()</slot>
+  <slot>onActionPlay()</slot>
+  <slot>onActionPause()</slot>
+  <slot>onActionStop()</slot>
  </slots>
 </ui>

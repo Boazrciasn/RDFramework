@@ -12,9 +12,11 @@ PFWidget::PFWidget(QWidget *parent) :
     videoWidget->setLayout(layout);
 
     mPlayer = new QMediaPlayer(this);
-    mVideoWidg = new QVideoWidget(this);
+    mVideoWidg = new VideoFrameGrabber(this);
     mPlayer->setVideoOutput(mVideoWidg);
-    layout->addWidget(mVideoWidg);
+
+    connect(mVideoWidg, SIGNAL(frameAvailable(QImage)), this, SLOT(processFrame(QImage)));
+//    layout->addWidget(mVideoWidg);
 }
 
 PFWidget::~PFWidget()
@@ -22,25 +24,30 @@ PFWidget::~PFWidget()
     delete ui;
 }
 
-void PFWidget::on_actionOpen_triggered()
+void PFWidget::processFrame(QImage image)
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open a File","","Video File (*.*)");
-    on_actionStop_triggered();
-    mPlayer->setMedia(QUrl::fromLocalFile(filename));
-    on_actionPlay_triggered();
+    qDebug()<<"Testing";
 }
 
-void PFWidget::on_actionPlay_triggered()
+void PFWidget::onActionOpen()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Open a File","","Video File (*.*)");
+    onActionStop();
+    mPlayer->setMedia(QUrl::fromLocalFile(filename));
+    onActionPlay();
+}
+
+void PFWidget::onActionPlay()
 {
     mPlayer->play();
 }
 
-void PFWidget::on_actionPause_triggered()
+void PFWidget::onActionPause()
 {
     mPlayer->pause();
 }
 
-void PFWidget::on_actionStop_triggered()
+void PFWidget::onActionStop()
 {
     mPlayer->stop();
 }
