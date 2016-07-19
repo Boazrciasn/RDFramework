@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QImage>
 #include <QWaitCondition>
+//#include "opencv2/opencv.hpp"  //TODO: move to precompiled
 
 #include "Util.h"
 

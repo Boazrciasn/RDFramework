@@ -13,10 +13,11 @@ void videoPlayer::run()
             m_stop = true;
             qDebug() << "NULL";
         }
-        m_img = Util::toQt(m_frame, QImage::Format_RGB888);
+        cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
+        m_img = Util::toQt(m_RGBframe,QImage::Format_RGB888);
+        emit processedImage(m_img);
+        msleep(delay);
     }
-    emit processedImage(m_img);
-    msleep(delay);
 }
 
 void videoPlayer::msleep(int ms)
@@ -36,10 +37,13 @@ bool videoPlayer::loadVideo(std::string filename)
     if(m_capture->isOpened())
     {
         m_frameRate = (int) m_capture->get(CV_CAP_PROP_FPS);
+        qDebug() << "file is open!";
         return true;
     }
-    else
+    else{
+        qDebug() << "Unable to open video file!";
         return false;
+    }
 }
 
 void videoPlayer::playVideo()

@@ -52,23 +52,27 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
 {
     quint16 width = src.cols;
     quint16 height = src.rows;
-    QImage dest = QImage(width, height, format);
+    QImage dest;
+
     if(src.type() == CV_8UC3)
     {
-        for(int i = 0; i < height; i++)
-        {
-            const quint8 *pSrc = src.ptr<quint8>(i);
-            quint8 *pDest = dest.scanLine(i);
-            for(int j = 0; j < width; j++)
-            {
-                *pDest++ = *pSrc++;
-                *pDest++ = *pSrc++;
-                *pDest++ = *pSrc++;
-            }
-        }
+        dest = QImage((const unsigned char*)(src.data),
+                                  src.cols,src.rows,format);
+//        for(int i = 0; i < height; i++)
+//        {
+//            const quint8 *pSrc = src.ptr<quint8>(i);
+//            quint8 *pDest = dest.scanLine(i);
+//            for(int j = 0; j < width; j++)
+//            {
+//                *pDest++ = *pSrc++;
+//                *pDest++ = *pSrc++;
+//                *pDest++ = *pSrc++;
+//            }
+//        }
     }
     else if(src.type() == CV_8UC1)
     {
+        dest = QImage(width, height, format);
         for(int i = 0; i < height; i++)
         {
             const quint8 *pSrc = src.ptr<quint8>(i);
