@@ -7,7 +7,6 @@ project("${project_name}")
 SET(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
-SET(CMAKE_PREFIX_PATH : "/usr/local/Cellar/qt5/5.5.1_2")
 
 # OpenCV package
 FIND_PACKAGE(OpenCV 3 REQUIRED)

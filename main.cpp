@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[])
 {
+
     //    QString file = "/home/neko/Desktop/lastSession.txt";
     //    QFile  *m_saveFile = new QFile(file);
     //    bool fileExists = m_saveFile->exists();

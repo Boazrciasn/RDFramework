@@ -4,12 +4,9 @@
 
 #include <QWidget>
 
-#include <QMediaPlayer>
-#include <QVideoWidget>
 #include <QFileDialog>
-#include <QProgressBar>
-#include <QSlider>
-#include <videoframegrabber.h>
+#include <QMessageBox>
+#include "videoplayer.h"
 
 namespace Ui {
 class PFWidget;
@@ -24,6 +21,11 @@ public:
     ~PFWidget();
 
 private slots:
+    void updatePlayerUI(QImage img);
+    QString getFormattedTime(int timeInSeconds);
+    void onHorizontalSliderPressed();
+    void onHorizontalSliderReleased();
+    void onHorizontalSliderMoved(int position);
     void onActionOpen();
     void onActionPlay();
     void onActionPause();
@@ -32,13 +34,8 @@ private slots:
 
 private:
     Ui::PFWidget *ui;
-    QLabel* mFrameLabel;
-    QString mVideoFile;
+    videoPlayer *myPlayer;
 
-    QMediaPlayer* mPlayer;
-    VideoFrameGrabber* mVideoWidg;
-    QProgressBar* mProgressBar;
-    QSlider* mSlider;
 };
 
 #endif // PFWIDGET_H
