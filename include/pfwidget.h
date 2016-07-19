@@ -32,6 +32,9 @@ private slots:
 
 private:
     Ui::PFWidget *ui;
+    QLabel* mFrameLabel;
+    QString mVideoFile;
+
     QMediaPlayer* mPlayer;
     VideoFrameGrabber* mVideoWidg;
     QProgressBar* mProgressBar;

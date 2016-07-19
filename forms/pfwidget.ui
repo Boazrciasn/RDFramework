@@ -15,7 +15,26 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
-    <widget class="QWidget" name="video_widget" native="true"/>
+    <widget class="QWidget" name="video_widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="videoFrameLabel">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">Background-color: #000;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
