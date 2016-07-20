@@ -367,7 +367,7 @@
   <slot>onHorizontalSliderReleased()</slot>
   <slot>onHorizontalSliderMoved(int)</slot>
   <slot>onParticleCountChange(int)</slot>
-  <slot>onItterationCountChange(int)</slot>
+  <slot>onIterationCountChange(int)</slot>
   <slot>onParticleWidthChange(int)</slot>
  </slots>
 </ui>

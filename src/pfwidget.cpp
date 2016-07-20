@@ -5,7 +5,7 @@ PFWidget::PFWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PFWidget)
 {
-    myPlayer = new videoPlayer(this);
+    myPlayer = new VideoPlayer(this);
     QObject::connect(myPlayer, SIGNAL(processedImage(QImage)), SLOT(updatePlayerUI(QImage)));
     ui->setupUi(this);
     ui->start_pushButton->setEnabled(false);
@@ -98,7 +98,7 @@ void PFWidget::onParticleCountChange(int value)
     mPF->setNumParticles(nParticles);
 }
 
-void PFWidget::onItterationCountChange(int value)
+void PFWidget::onIterationCountChange(int value)
 {
     nIters = value;
     mPF->setNumIters(nIters);

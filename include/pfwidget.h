@@ -33,12 +33,12 @@ private slots:
     void onActionStop();
 
     void onParticleCountChange(int value);
-    void onItterationCountChange(int value);
+    void onIterationCountChange(int value);
     void onParticleWidthChange(int value);
 
 private:
     Ui::PFWidget *ui;
-    videoPlayer *myPlayer;
+    VideoPlayer *myPlayer;
     SimplePF *mPF;
 
     cv::Mat mFrame;
