@@ -6,120 +6,175 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
-    <height>619</height>
+    <width>883</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
    <item>
-    <widget class="QLabel" name="display_label">
-     <property name="styleSheet">
-      <string notr="true">Background-color: #000;</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
+    <widget class="QWidget" name="playerWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+      <item>
+       <widget class="QLabel" name="display_label">
+        <property name="styleSheet">
+         <string notr="true">Background-color: #000;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <spacer name="buttonsLeft_horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browse_pushButton">
+          <property name="font">
+           <font>
+            <family>Futura</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="start_pushButton">
+          <property name="font">
+           <font>
+            <family>Futura</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pause_pushButton">
+          <property name="font">
+           <font>
+            <family>Futura</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Pause</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="stop_pushButton">
+          <property name="font">
+           <font>
+            <family>Futura</family>
+            <pointsize>14</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="buttonsRight_horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <widget class="QSlider" name="horizontalSlider">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>PF Settings</string>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="particleCountLabel">
+           <property name="text">
+            <string># Particles</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QSpinBox" name="particleCountSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="itterCountLabel">
+           <property name="text">
+            <string># Itterations</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QSpinBox" name="itteCountSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="buttonsLeft_horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="browse_pushButton">
-       <property name="font">
-        <font>
-         <family>Futura</family>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="start_pushButton">
-       <property name="font">
-        <font>
-         <family>Futura</family>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Start</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pause_pushButton">
-       <property name="font">
-        <font>
-         <family>Futura</family>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Pause</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="stop_pushButton">
-       <property name="font">
-        <font>
-         <family>Futura</family>
-         <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="buttonsRight_horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>
@@ -132,12 +187,12 @@
    <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>608</y>
+     <x>254</x>
+     <y>604</y>
     </hint>
     <hint type="destinationlabel">
-     <x>173</x>
-     <y>778</y>
+     <x>163</x>
+     <y>710</y>
     </hint>
    </hints>
   </connection>
@@ -148,12 +203,12 @@
    <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>283</x>
-     <y>588</y>
+     <x>338</x>
+     <y>602</y>
     </hint>
     <hint type="destinationlabel">
-     <x>506</x>
-     <y>614</y>
+     <x>353</x>
+     <y>663</y>
     </hint>
    </hints>
   </connection>
@@ -164,12 +219,12 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>341</x>
-     <y>587</y>
+     <x>436</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
-     <x>454</x>
-     <y>703</y>
+     <x>450</x>
+     <y>683</y>
     </hint>
    </hints>
   </connection>
@@ -180,44 +235,12 @@
    <slot>onActionStop()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>455</x>
-     <y>583</y>
+     <x>520</x>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
-     <x>462</x>
-     <y>619</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>horizontalSlider</sender>
-   <signal>sliderPressed()</signal>
-   <receiver>PFWidget</receiver>
-   <slot>onHorizontalSliderPressed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>126</x>
-     <y>572</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>118</x>
-     <y>656</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>horizontalSlider</sender>
-   <signal>sliderReleased()</signal>
-   <receiver>PFWidget</receiver>
-   <slot>onHorizontalSliderReleased()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>59</x>
-     <y>566</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>59</x>
-     <y>637</y>
+     <x>532</x>
+     <y>744</y>
     </hint>
    </hints>
   </connection>
@@ -229,11 +252,75 @@
    <hints>
     <hint type="sourcelabel">
      <x>106</x>
-     <y>569</y>
+     <y>578</y>
     </hint>
     <hint type="destinationlabel">
-     <x>105</x>
-     <y>681</y>
+     <x>146</x>
+     <y>769</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>sliderPressed()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onHorizontalSliderPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>574</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>193</x>
+     <y>724</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onHorizontalSliderReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>574</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>48</x>
+     <y>727</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>particleCountSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onParticleCountChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>800</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1140</x>
+     <y>77</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>itteCountSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onParticleCountChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>813</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1004</x>
+     <y>136</y>
     </hint>
    </hints>
   </connection>
@@ -246,5 +333,7 @@
   <slot>onHorizontalSliderPressed()</slot>
   <slot>onHorizontalSliderReleased()</slot>
   <slot>onHorizontalSliderMoved(int)</slot>
+  <slot>onParticleCountChange(int)</slot>
+  <slot>onItterationCountChange(int)</slot>
  </slots>
 </ui>

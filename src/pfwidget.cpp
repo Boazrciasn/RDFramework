@@ -11,8 +11,8 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
 
-    nParticles = 100;
-    nIters = 10;
+    nParticles = ui->particleCountSpinBox->value();
+    nIters = ui->itteCountSpinBox->value();
 
     mPF = new SimplePF(&mFrame, nParticles, nIters);
     mPF->setParticleWidth(55);
@@ -69,11 +69,6 @@ void PFWidget::onHorizontalSliderMoved(int position)
     myPlayer->setCurrentFrame(position);
 }
 
-void PFWidget::processFrame(QImage image)
-{
-    qDebug() << "Testing";
-}
-
 void PFWidget::onActionOpen()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open a File", "", "Video File (*.*)");
@@ -96,17 +91,36 @@ void PFWidget::onActionOpen()
     }
 }
 
+void PFWidget::onParticleCountChange(int value)
+{
+    nParticles = value;
+    mPF->setNumParticles(nParticles);
+}
+
+void PFWidget::onItterationCountChange(int value)
+{
+    nIters = value;
+    mPF->setNumIters(nIters);
+}
+
+
 void PFWidget::onActionPlay()
 {
     myPlayer->playVideo();
+    ui->particleCountSpinBox->setEnabled(false);
+    ui->itteCountSpinBox->setEnabled(false);
 }
 
 void PFWidget::onActionPause()
 {
     myPlayer->stopVideo();
+    ui->particleCountSpinBox->setEnabled(true);
+    ui->itteCountSpinBox->setEnabled(true);
 }
 
 void PFWidget::onActionStop()
 {
     myPlayer->stopVideo();
+    ui->particleCountSpinBox->setEnabled(true);
+    ui->itteCountSpinBox->setEnabled(true);
 }

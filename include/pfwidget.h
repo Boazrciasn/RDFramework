@@ -31,7 +31,9 @@ private slots:
     void onActionPlay();
     void onActionPause();
     void onActionStop();
-    void processFrame(QImage image);
+
+    void onParticleCountChange(int value);
+    void onItterationCountChange(int value);
 
 private:
     Ui::PFWidget *ui;
