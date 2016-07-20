@@ -15,9 +15,21 @@ void videoPlayer::run()
         }
         cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
         m_img = Util::toQt(m_RGBframe,QImage::Format_RGB888);
+
+        if(mPF != NULL)
+            processFrame();
         emit processedImage(m_img);
         msleep(delay);
     }
+}
+
+void videoPlayer::processFrame()
+{
+    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
+    mPF->setIMG(&m_frame_gray);
+    mPF->run();
+    m_frame_out = mPF->getIMG();
+    m_img = Util::toQt(m_frame_out,QImage::Format_RGB888);
 }
 
 void videoPlayer::msleep(int ms)
@@ -29,6 +41,7 @@ void videoPlayer::msleep(int ms)
 videoPlayer::videoPlayer(QObject *parent) : QThread(parent)
 {
     m_stop = true;
+    mPF = NULL;
 }
 
 bool videoPlayer::loadVideo(std::string filename)

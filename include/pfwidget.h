@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "videoplayer.h"
+#include "SimplePF.h"
 
 namespace Ui {
 class PFWidget;
@@ -35,6 +36,13 @@ private slots:
 private:
     Ui::PFWidget *ui;
     videoPlayer *myPlayer;
+    SimplePF *mPF;
+
+    cv::Mat mFrame;
+    cv::Mat mFrameGray;
+    cv::Mat mFrameOut;
+    int nParticles;
+    int nIters;
 
 };
 

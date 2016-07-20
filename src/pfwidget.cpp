@@ -10,6 +10,13 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
+
+    nParticles = 100;
+    nIters = 10;
+
+    mPF = new SimplePF(&mFrame, nParticles, nIters);
+    mPF->setParticleWidth(55);
+    myPlayer->setPF(mPF);
 }
 
 PFWidget::~PFWidget()
@@ -19,6 +26,13 @@ PFWidget::~PFWidget()
 
 void PFWidget::updatePlayerUI(QImage img)
 {
+//    mFrame = Util::toCv(frameImg,CV_8UC3);
+//    cv::cvtColor(mFrame, mFrameGray, CV_BGR2GRAY);
+//    mPF->setIMG(&mFrameGray);
+//    mPF->run();
+//    mFrameOut = mPF->getIMG();
+//    QImage img = Util::toQt(mFrameOut,QImage::Format_RGB888);
+
     if (!img.isNull())
     {
         ui->display_label->setAlignment(Qt::AlignCenter);

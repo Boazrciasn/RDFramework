@@ -11,11 +11,12 @@ public:
     inline void exec(cv::Mat *img)
     {
         float mean = 0.0;
+        cv::Mat roi(*img, cv::Rect(m_x,m_y,m_width,m_width));
+        mean = cv::sum(roi)[0];
 
-        for (int row = m_y; row < m_y + m_width; row++)
-            for (int col = m_x; col < m_x + m_width; col++)
-                mean += img->at<uchar>(row, col);
-
+//        for (int row = m_y; row < m_y + m_width; row++)
+//            for (int col = m_x; col < m_x + m_width; col++)
+//                mean += img->at<uchar>(row, col);
         mean = 255 -mean / (m_width*m_width);
         setWeight(mean);
     }
