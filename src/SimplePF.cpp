@@ -206,4 +206,29 @@ void SimplePF::showParticles()
 // ****************************** //
 // ****************************** //
 
+void SimplePF::showTopNParticles(int count)
+{
+    img->copyTo(outIMG);
+
+    if(count > m_num_particles)
+        count = m_num_particles;
+    else if(count == 0)
+        showParticles();
+
+    int x = 0;
+    int y = 0;
+
+    for (int i = 0; i < count; ++i)
+    {
+        x = m_pParticles[i]->x();
+        y = m_pParticles[i]->y();
+        int x_end = x + m_particle_width;
+        int y_end = y + m_particle_width;
+        rectangle(outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+    }
+}
+
+// ****************************** //
+// ****************************** //
+
 SimplePF::~SimplePF(){}

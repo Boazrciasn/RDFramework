@@ -13,9 +13,10 @@ PFWidget::PFWidget(QWidget *parent) :
 
     nParticles = ui->particleCountSpinBox->value();
     nIters = ui->itteCountSpinBox->value();
+    mParticleWidth = ui->particleWidthLSpinBox->value();
 
     mPF = new SimplePF(&mFrame, nParticles, nIters);
-    mPF->setParticleWidth(55);
+    mPF->setParticleWidth(mParticleWidth);
     myPlayer->setPF(mPF);
 }
 
@@ -103,24 +104,27 @@ void PFWidget::onItterationCountChange(int value)
     mPF->setNumIters(nIters);
 }
 
+void PFWidget::onParticleWidthChange(int value)
+{
+    mParticleWidth = value;
+    mPF->setParticleWidth(mParticleWidth);
+}
+
 
 void PFWidget::onActionPlay()
 {
     myPlayer->playVideo();
-    ui->particleCountSpinBox->setEnabled(false);
-    ui->itteCountSpinBox->setEnabled(false);
+    ui->groupBox->setEnabled(false);
 }
 
 void PFWidget::onActionPause()
 {
     myPlayer->stopVideo();
-    ui->particleCountSpinBox->setEnabled(true);
-    ui->itteCountSpinBox->setEnabled(true);
+    ui->groupBox->setEnabled(true);
 }
 
 void PFWidget::onActionStop()
 {
     myPlayer->stopVideo();
-    ui->particleCountSpinBox->setEnabled(true);
-    ui->itteCountSpinBox->setEnabled(true);
+    ui->groupBox->setEnabled(true);
 }

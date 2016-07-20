@@ -170,6 +170,23 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="particleWidthLbel">
+           <property name="text">
+            <string>Particle Width</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QSpinBox" name="particleWidthLSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>55</number>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -324,6 +341,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>particleWidthLSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onParticleWidthChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>786</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1091</x>
+     <y>185</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onActionOpen()</slot>
@@ -335,5 +368,6 @@
   <slot>onHorizontalSliderMoved(int)</slot>
   <slot>onParticleCountChange(int)</slot>
   <slot>onItterationCountChange(int)</slot>
+  <slot>onParticleWidthChange(int)</slot>
  </slots>
 </ui>

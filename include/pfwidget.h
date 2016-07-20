@@ -34,6 +34,7 @@ private slots:
 
     void onParticleCountChange(int value);
     void onItterationCountChange(int value);
+    void onParticleWidthChange(int value);
 
 private:
     Ui::PFWidget *ui;
@@ -45,6 +46,7 @@ private:
     cv::Mat mFrameOut;
     int nParticles;
     int nIters;
+    int mParticleWidth;
 
 };
 

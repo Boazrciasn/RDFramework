@@ -30,7 +30,6 @@ public:
     inline void setModelType(int value) { type = value; }
 
 	void run();
-    void showParticles();
 
 	~SimplePF();
 
@@ -56,6 +55,11 @@ private:
 	// distort x or y by a standart deviation
 	void distort(Particle *p, int &x, int &y);
 	void updateParticles();
+
+
+    // display particles
+    void showParticles();
+    void showTopNParticles(int count);
 
 	// variables 
 	int m_num_particles;

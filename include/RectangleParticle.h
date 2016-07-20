@@ -11,6 +11,11 @@ public:
     inline void exec(cv::Mat *img)
     {
         float mean = 0.0;
+
+        // handle out of bounds
+        if(m_x+m_width >= img->cols || m_y+m_width >= img->rows)
+            return;
+
         cv::Mat roi(*img, cv::Rect(m_x,m_y,m_width,m_width));
         mean = cv::sum(roi)[0];
 
