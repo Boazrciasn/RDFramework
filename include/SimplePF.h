@@ -29,7 +29,13 @@ public:
     inline int modelType() const { return type; }
     inline void setModelType(int value) { type = value; }
 
+    inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
+
 	void run();
+
+    // display particles
+    void showParticles();
+    void showTopNParticles(int count);
 
 	~SimplePF();
 
@@ -56,15 +62,11 @@ private:
 	void distort(Particle *p, int &x, int &y);
 	void updateParticles();
 
-
-    // display particles
-    void showParticles();
-    void showTopNParticles(int count);
-
 	// variables 
 	int m_num_particles;
 	int m_num_iters;
     int m_particle_width;
+    int m_num_particles_to_display;
 
     int type = Rectangle;
 

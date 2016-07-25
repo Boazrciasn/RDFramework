@@ -187,6 +187,33 @@
            </property>
           </widget>
          </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Top N particles</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QSlider" name="particlesToDisplaySlider">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLabel" name="particlesToDisplayLabel">
+           <property name="minimumSize">
+            <size>
+             <width>30</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -329,11 +356,11 @@
    <sender>itteCountSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>PFWidget</receiver>
-   <slot>onParticleCountChange(int)</slot>
+   <slot>onItterationCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>813</x>
-     <y>136</y>
+     <x>809</x>
+     <y>143</y>
     </hint>
     <hint type="destinationlabel">
      <x>1004</x>
@@ -357,6 +384,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>particlesToDisplaySlider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onSetParticleCountSliderMoved(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>779</x>
+     <y>231</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1065</x>
+     <y>233</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onActionOpen()</slot>
@@ -369,5 +412,6 @@
   <slot>onParticleCountChange(int)</slot>
   <slot>onIterationCountChange(int)</slot>
   <slot>onParticleWidthChange(int)</slot>
+  <slot>onSetParticleCountSliderMoved(int)</slot>
  </slots>
 </ui>

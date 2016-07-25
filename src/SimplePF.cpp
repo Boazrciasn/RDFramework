@@ -4,9 +4,11 @@
 
 SimplePF::SimplePF(cv::Mat *pImage, int nParticles, int nIters){
     setIMG(*&pImage);
+    m_num_particles_to_display = 0;
 	setNumParticles(nParticles);
     setNumIters(nIters);
     setParticleWidth(115);
+    setParticlesToDisplay(m_num_particles_to_display);
 	srand(time(NULL));
 }
 
@@ -23,7 +25,8 @@ void SimplePF::run()
 		normalize();
 		resample();
 	}
-    showParticles();
+//    showParticles();
+    showTopNParticles(m_num_particles_to_display);
 }
 
 // ****************************** //
