@@ -15,6 +15,7 @@ PFWidget::PFWidget(QWidget *parent) :
     nIters = ui->itteCountSpinBox->value();
     mParticleWidth = ui->particleWidthLSpinBox->value();
 
+    ui->particlesToDisplaySlider->setMaximum(nParticles);
     mPF = new SimplePF(&mFrame, nParticles, nIters);
     mPF->setParticleWidth(mParticleWidth);
     myPlayer->setPF(mPF);
@@ -70,6 +71,13 @@ void PFWidget::onHorizontalSliderMoved(int position)
     myPlayer->setCurrentFrame(position);
 }
 
+void PFWidget::onSetParticleCountSliderMoved(int position)
+{
+    ui->particlesToDisplayLabel->setText(QString::number(position));
+    mPF->setParticlesToDisplay(position);
+    mPF->showTopNParticles(position);
+}
+
 void PFWidget::onActionOpen()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open a File", "", "Video File (*.*)");
@@ -96,6 +104,7 @@ void PFWidget::onParticleCountChange(int value)
 {
     nParticles = value;
     mPF->setNumParticles(nParticles);
+    ui->particlesToDisplaySlider->setMaximum(nParticles);
 }
 
 void PFWidget::onItterationCountChange(int value)

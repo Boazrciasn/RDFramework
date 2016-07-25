@@ -27,6 +27,8 @@ private slots:
     void onHorizontalSliderPressed();
     void onHorizontalSliderReleased();
     void onHorizontalSliderMoved(int position);
+    void onSetParticleCountSliderMoved(int position);
+
     void onActionOpen();
     void onActionPlay();
     void onActionPause();
