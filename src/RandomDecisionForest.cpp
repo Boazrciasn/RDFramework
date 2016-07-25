@@ -26,9 +26,8 @@ void RandomDecisionForest::readTrainingImageFiles()
                            m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
         m_DS.m_trainImagesVector.push_back(image);
     }
-    qDebug() << "No of IMAGES : " << m_DS.m_trainImagesVector.size() <<
-             " NO of Fnames" << m_numOfLetters << "Images Vector Size : " <<
-             m_DS.m_trainImagesVector.size();
+    qDebug() << "No of IMAGES : " << m_DS.m_trainImagesVector.size() << " NO of Fnames" << m_numOfLetters <<
+             "Images Vector Size : " << m_DS.m_trainImagesVector.size();
     fNames.clear();
 }
 

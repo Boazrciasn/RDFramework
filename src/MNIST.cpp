@@ -92,14 +92,18 @@ void MNIST::writeHeaders(QVector<QFile *> &logfiles, const QVector<int> &vec_sam
     }
 }
 
-void MNIST::writeEntry(QFile *logfile, QString imgName)
+void MNIST::writeEntries(QVector<QFile *> &logfiles, QVector<QString> &vec_logs)
 {
-    logfile->open(QIODevice::Append);
-    logfile->write(imgName.toUtf8());
-    logfile->write(" 16 16 0 0 \n");
-    logfile->flush();
-    logfile->close();
+    for(int i = 0 ; i < logfiles.size() ; ++i )
+    {
+        logfiles[i]->open(QIODevice::Append);
+        logfiles[i]->write(vec_logs[i].toUtf8());
+        logfiles[i]->flush();
+        logfiles[i]->close();
+    }
 }
+
+
 
 void MNIST::createSaveFiles(QVector<QFile *> &logfiles, QString path)
 {
@@ -113,25 +117,27 @@ void MNIST::createSaveFiles(QVector<QFile *> &logfiles, QString path)
 void MNIST::saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSet imageLabels)
 {
     QVector<QFile *> logfiles(10);
-    QVector<int> vec_samplecounts(10, 0);
+    QVector<int> vec_sampleCounts(10, 0);
+    QVector<QString> vec_logs(10, "");
     QString logDir = destdir + "/LogFiles/";
     createSaveFiles(logfiles, logDir);
     std::cout << imageDataSet->size() << std::endl;
     for(vMatSize i = 0 ; i < imageDataSet->size(); ++i)
     {
-        QString label = QString::number(imageLabels->at(i));
-        vec_samplecounts[imageLabels->at(i)]++;
+        int i_label = imageLabels->at(i);
+        QString label = QString::number(i_label);
+        vec_sampleCounts[i_label]++;
         QString savedir = destdir + "/";
-        int img_count = Util::countImagesInDir(savedir);
-        QString imageName = label + "_" + QString::number(img_count) + ".jpg";
+        QString imageName = label + "_" + QString::number(vec_sampleCounts[i_label]) + ".jpg";
         savedir += imageName;
         cv::Mat  temp_img ;
         Util::covert32FCto8UC(imageDataSet->at(i), temp_img);
         QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
         saveImage(savedir, img);
-        writeEntry(logfiles[imageLabels->at(i)], imageName);
+        vec_logs[i_label] += mergeLogEntry(imageName);
     }
-    writeHeaders(logfiles, vec_samplecounts);
+    writeHeaders(logfiles, vec_sampleCounts);
+    writeEntries(logfiles, vec_logs);
 }
 
 
