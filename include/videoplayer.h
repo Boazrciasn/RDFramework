@@ -10,7 +10,7 @@
 
 #include "Util.h"
 
-class videoPlayer : public QThread
+class VideoPlayer : public QThread
 {
     Q_OBJECT
 
@@ -38,8 +38,8 @@ class videoPlayer : public QThread
     void msleep(int ms);
 
   public:
-    videoPlayer(QObject *parent);
-    ~videoPlayer();
+    VideoPlayer(QObject *parent);
+    ~VideoPlayer();
     bool loadVideo(std::string filename);
     void playVideo();
     void stopVideo();

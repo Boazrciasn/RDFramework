@@ -2,12 +2,12 @@
 
 #include "videoplayer.h"
 
-void videoPlayer::run()
+void VideoPlayer::run()
 {
     int delay = (1000 / m_frameRate);
     while(!m_stop)
     {
-        bool capSuccess =  m_capture->read(m_frame);
+        bool capSuccess = m_capture->read(m_frame);
         if (!capSuccess)
         {
             m_stop = true;
@@ -23,7 +23,7 @@ void videoPlayer::run()
     }
 }
 
-void videoPlayer::processFrame()
+void VideoPlayer::processFrame()
 {
     cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
     mPF->setIMG(&m_frame_gray);
@@ -32,19 +32,19 @@ void videoPlayer::processFrame()
     m_img = Util::toQt(m_frame_out,QImage::Format_RGB888);
 }
 
-void videoPlayer::msleep(int ms)
+void VideoPlayer::msleep(int ms)
 {
     struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
     nanosleep(&ts, NULL);
 }
 
-videoPlayer::videoPlayer(QObject *parent) : QThread(parent)
+VideoPlayer::VideoPlayer(QObject *parent) : QThread(parent)
 {
     m_stop = true;
     mPF = NULL;
 }
 
-bool videoPlayer::loadVideo(std::string filename)
+bool VideoPlayer::loadVideo(std::string filename)
 {
     m_capture = new cv::VideoCapture(filename);
     if(m_capture->isOpened())
@@ -59,60 +59,59 @@ bool videoPlayer::loadVideo(std::string filename)
     }
 }
 
-void videoPlayer::playVideo()
+void VideoPlayer::playVideo()
 {
     if(!isRunning())
     {
         if(isStopped())
-        {
             m_stop = false;
-        }
+
         start(LowPriority);
     }
 }
 
-void videoPlayer::stopVideo()
+void VideoPlayer::stopVideo()
 {
     m_stop = true;
 }
 
-bool videoPlayer::isStopped() const
+bool VideoPlayer::isStopped() const
 {
     return m_stop;
 }
 
-void videoPlayer::setCurrentFrame(int frameNumber)
+void VideoPlayer::setCurrentFrame(int frameNumber)
 {
     m_capture->set(CV_CAP_PROP_POS_FRAMES, frameNumber);
 }
 
-double videoPlayer::getFrameRate()
+double VideoPlayer::getFrameRate()
 {
     return m_frameRate;
 }
 
-double videoPlayer::getCurrentFrame()
+double VideoPlayer::getCurrentFrame()
 {
     return m_capture->get(CV_CAP_PROP_POS_FRAMES);
 }
 
-double videoPlayer::getNumberOfFrames()
+double VideoPlayer::getNumberOfFrames()
 {
     return m_capture->get(CV_CAP_PROP_FRAME_COUNT);
 }
 
-double videoPlayer::getFrameHeight()
+double VideoPlayer::getFrameHeight()
 {
     return m_capture->get(CV_CAP_PROP_FRAME_HEIGHT);
 }
 
-double videoPlayer::getFrameWidth()
+double VideoPlayer::getFrameWidth()
 {
     return m_capture->get(CV_CAP_PROP_FRAME_WIDTH);
 }
 
 
-videoPlayer::~videoPlayer()
+VideoPlayer::~VideoPlayer()
 {
     m_mutex.lock();
     m_stop = true;
