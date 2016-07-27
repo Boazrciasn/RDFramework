@@ -154,14 +154,14 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="itterCountLabel">
+          <widget class="QLabel" name="iterCountLabel">
            <property name="text">
-            <string># Itterations</string>
+            <string># Iterations</string>
            </property>
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QSpinBox" name="itteCountSpinBox">
+          <widget class="QSpinBox" name="iterCountSpinBox">
            <property name="maximum">
             <number>1000</number>
            </property>
@@ -367,10 +367,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>itteCountSpinBox</sender>
+   <sender>iterCountSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>PFWidget</receiver>
-   <slot>onItterationCountChange(int)</slot>
+   <slot>onIterationCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>809</x>
@@ -400,7 +400,7 @@
   </connection>
   <connection>
    <sender>particlesToDisplaySlider</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>PFWidget</receiver>
    <slot>onSetParticleCountSliderMoved(int)</slot>
    <hints>
@@ -424,7 +424,7 @@
   <slot>onHorizontalSliderReleased()</slot>
   <slot>onHorizontalSliderMoved(int)</slot>
   <slot>onParticleCountChange(int)</slot>
-  <slot>onItterationCountChange(int)</slot>
+  <slot>onIterationCountChange(int)</slot>
   <slot>onParticleWidthChange(int)</slot>
   <slot>onSetParticleCountSliderMoved(int)</slot>
  </slots>

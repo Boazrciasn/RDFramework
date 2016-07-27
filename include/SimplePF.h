@@ -1,10 +1,11 @@
 #pragma once
 #include <iostream>
 #include <random>
+#include <atomic>
 
 #include "Particle.h"
 #include "RectangleParticle.h"
-#include <tbb/tbb.h>
+//#include <tbb/tbb.h>
 
 class SimplePF{
 public:
@@ -28,7 +29,7 @@ public:
     inline int modelType() const { return type; }
     inline void setModelType(int value) { type = value; }
 
-    inline int getRationOfTop(int count){
+    inline int getRatioOfTop(int count){
         float total_weight = 0;
         for (int i = 0; i < count; ++i)
             total_weight += m_pParticles[i]->weight();
@@ -72,7 +73,7 @@ private:
 	int m_num_particles;
 	int m_num_iters;
     int m_particle_width;
-    int m_num_particles_to_display;
+    std::atomic<int> m_num_particles_to_display;
 
     int type = Rectangle;
 

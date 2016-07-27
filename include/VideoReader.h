@@ -29,7 +29,7 @@ class VideoReader : public QThread
     cv::Mat m_RGBframe;
     QImage m_img;
 
-    std::vector<cv::Mat> m_frame_buffer;
+    std::deque<cv::Mat> m_frame_buffer;
 
     void addToBuffer(cv::Mat frame);
     void processFrame();
