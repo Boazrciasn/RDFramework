@@ -2,14 +2,18 @@
 #include <time.h>
 #include <opencv2/imgproc.hpp>
 
-SimplePF::SimplePF(cv::Mat *pImage, int nParticles, int nIters){
-    setIMG(*&pImage);
+
+SimplePF::SimplePF(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth){
+    img_height = frameHeight;
+    img_width = frameWidth;
     m_num_particles_to_display = 0;
+
 	setNumParticles(nParticles);
     setNumIters(nIters);
-    setParticleWidth(115);
+    setParticleWidth(particleWidth);
     setParticlesToDisplay(m_num_particles_to_display);
 	srand(time(NULL));
+    initializeParticles();
 }
 
 // ****************************** //
@@ -17,13 +21,13 @@ SimplePF::SimplePF(cv::Mat *pImage, int nParticles, int nIters){
 
 void SimplePF::run()
 {
-	initializeParticles();
+//	initializeParticles();
 	for (int i = 0; i < m_num_iters; i++)
 	{
+        resample();
 		updateWeights();
 		sortParticlesDescending();
 		normalize();
-		resample();
 	}
 //    showParticles();
     showTopNParticles(m_num_particles_to_display);

@@ -5,8 +5,10 @@ PFWidget::PFWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PFWidget)
 {
-    myPlayer = new VideoPlayer(this);
-    QObject::connect(myPlayer, SIGNAL(processedImage(QImage)), SLOT(updatePlayerUI(QImage)));
+//    m_reader = new VideoReader(this);
+//    QObject::connect(m_reader, SIGNAL(processedImage(QImage)), SLOT(updatePlayerUI(QImage)));
+    m_PF_executor = new PFExecutor(this);
+    QObject::connect(m_PF_executor, SIGNAL(processedImage(QImage)), SLOT(updatePlayerUI(QImage)));
     ui->setupUi(this);
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
@@ -16,9 +18,9 @@ PFWidget::PFWidget(QWidget *parent) :
     mParticleWidth = ui->particleWidthLSpinBox->value();
 
     ui->particlesToDisplaySlider->setMaximum(nParticles);
-    mPF = new SimplePF(&mFrame, nParticles, nIters);
-    mPF->setParticleWidth(mParticleWidth);
-    myPlayer->setPF(mPF);
+//    mPF = new SimplePF(&mFrame, nParticles, nIters);
+//    mPF->setParticleWidth(mParticleWidth);
+//    m_reader->setPF(mPF);
 }
 
 PFWidget::~PFWidget()
@@ -40,8 +42,12 @@ void PFWidget::updatePlayerUI(QImage img)
         ui->display_label->setAlignment(Qt::AlignCenter);
         ui->display_label->setPixmap(QPixmap::fromImage(img).scaled(ui->display_label->size(), Qt::KeepAspectRatio,
                                                                     Qt::FastTransformation));
-        ui->horizontalSlider->setValue(myPlayer->getCurrentFrame());
+        ui->horizontalSlider->setValue(m_PF_executor->getCurrentFrame());
     }
+
+    int ratio = mPF->getRationOfTop(ui->particlesToDisplaySlider->value());
+    ui->top_n_ratio_label->setText(QString::number(ratio));
+    ui->top_n_ratio_label->repaint();
 }
 
 QString PFWidget::getFormattedTime(int timeInSeconds)
@@ -58,31 +64,39 @@ QString PFWidget::getFormattedTime(int timeInSeconds)
 
 void PFWidget::onHorizontalSliderPressed()
 {
-    myPlayer->stopVideo();
+//    m_reader->stopVideo();
+    m_PF_executor->stopVideo();
 }
 
 void PFWidget::onHorizontalSliderReleased()
 {
-    myPlayer->playVideo();
+//    m_reader->playVideo();
+    m_PF_executor->playVideo();
 }
 
 void PFWidget::onHorizontalSliderMoved(int position)
 {
-    myPlayer->setCurrentFrame(position);
+//    m_reader->setCurrentFrame(position);
+    m_PF_executor->setCurrentFrame(position);
 }
 
 void PFWidget::onSetParticleCountSliderMoved(int position)
 {
     ui->particlesToDisplayLabel->setText(QString::number(position));
     mPF->setParticlesToDisplay(position);
-    mPF->showTopNParticles(position);
+//    mPF->showTopNParticles(position);
+
+    int ratio = mPF->getRationOfTop(position);
+    ui->top_n_ratio_label->setText(QString::number(ratio));
+    ui->top_n_ratio_label->repaint();
 }
 
 void PFWidget::onActionOpen()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open a File", "", "Video File (*.*)");
     QFileInfo name = filename;
-    if (!myPlayer->loadVideo(filename.toStdString()))
+//    if (!m_reader->loadVideo(filename.toStdString()))
+    if (!m_PF_executor->loadVideo(filename.toStdString()))
     {
         QMessageBox msgBox;
         msgBox.setText(" Selected video could not be opened! ");
@@ -93,10 +107,14 @@ void PFWidget::onActionOpen()
         setWindowTitle(name.fileName());
         ui->start_pushButton->setEnabled(true);
         ui->horizontalSlider->setEnabled(true);
-        ui->horizontalSlider->setMaximum(myPlayer->getNumberOfFrames());
-        qDebug() << myPlayer->getNumberOfFrames();
-        qDebug() <<  myPlayer->getFrameHeight();
-        qDebug() << myPlayer->getFrameWidth();
+        ui->horizontalSlider->setMaximum(m_PF_executor->getNumberOfFrames());
+        qDebug() << m_PF_executor->getNumberOfFrames();
+        qDebug() <<  m_PF_executor->getFrameHeight();
+        qDebug() << m_PF_executor->getFrameWidth();
+
+        mPF = new SimplePF(m_PF_executor->getFrameWidth(), m_PF_executor->getFrameHeight(),
+                           nParticles, nIters, mParticleWidth);
+        m_PF_executor->setPF(mPF);
     }
 }
 
@@ -107,7 +125,7 @@ void PFWidget::onParticleCountChange(int value)
     ui->particlesToDisplaySlider->setMaximum(nParticles);
 }
 
-void PFWidget::onIterationCountChange(int value)
+void PFWidget::onItterationCountChange(int value)
 {
     nIters = value;
     mPF->setNumIters(nIters);
@@ -122,18 +140,29 @@ void PFWidget::onParticleWidthChange(int value)
 
 void PFWidget::onActionPlay()
 {
-    myPlayer->playVideo();
-    ui->groupBox->setEnabled(false);
+//    m_reader->playVideo();
+    m_PF_executor->playVideo();
+    setPFSettingsEnabled(false);
 }
 
 void PFWidget::onActionPause()
 {
-    myPlayer->stopVideo();
-    ui->groupBox->setEnabled(true);
+//    m_reader->stopVideo();
+    m_PF_executor->stopVideo();
+    setPFSettingsEnabled(true);
 }
 
 void PFWidget::onActionStop()
 {
-    myPlayer->stopVideo();
-    ui->groupBox->setEnabled(true);
+//    m_reader->stopVideo();
+    m_PF_executor->stopVideo();
+    setPFSettingsEnabled(true);
+}
+
+void PFWidget::setPFSettingsEnabled(bool state)
+{
+//    ui->groupBox->setEnabled(state);
+    ui->particleCountSpinBox->setEnabled(state);
+    ui->itteCountSpinBox->setEnabled(state);
+    ui->particleWidthLSpinBox->setEnabled(state);
 }

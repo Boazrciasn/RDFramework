@@ -40,6 +40,6 @@ QT5_WRAP_UI(UISrcs forms/mainwindow.ui forms/mydialog.ui forms/annextractordialo
 add_executable("${project_name}" ${SOURCES} ${HEADERS} ${UISrcs})
 
 # NM Not tested yet
-target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
+target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} -lpthread Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
 
 qt5_use_modules("${project_name}" Core Gui Widgets)

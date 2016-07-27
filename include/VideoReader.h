@@ -6,11 +6,14 @@
 #include <QImage>
 #include <QWaitCondition>
 #include "SimplePF.h"
+#include <queue>
+
+
 //#include "opencv2/opencv.hpp"  //TODO: move to precompiled
 
 #include "Util.h"
 
-class VideoPlayer : public QThread
+class VideoReader : public QThread
 {
     Q_OBJECT
 
@@ -26,8 +29,9 @@ class VideoPlayer : public QThread
     cv::Mat m_RGBframe;
     QImage m_img;
 
-    SimplePF *mPF;
+    std::vector<cv::Mat> m_frame_buffer;
 
+    void addToBuffer(cv::Mat frame);
     void processFrame();
 
   signals :
@@ -38,22 +42,25 @@ class VideoPlayer : public QThread
     void msleep(int ms);
 
   public:
-    VideoPlayer(QObject *parent);
-    ~VideoPlayer();
+    VideoReader(QObject *parent);
+    ~VideoReader();
     bool loadVideo(std::string filename);
     void playVideo();
     void stopVideo();
     bool isStopped() const;
 
-    inline void setPF(SimplePF *pf){ mPF = pf;}
-    inline SimplePF* getPF(){ return mPF;}
+//    inline void setPF(SimplePF *pf){ mPF = pf;}
+//    inline SimplePF* getPF(){ return mPF;}
 
     void setCurrentFrame(int frameNumber);
     double getFrameRate();
     double getCurrentFrame();
-    double getNumberOfFrames();
-    double getFrameHeight();
-    double getFrameWidth();
+    int getNumberOfFrames();
+    int getFrameHeight();
+    int getFrameWidth();
+
+    cv::Mat getFrame();
+    void getFrame(cv::Mat &frame, int index);
 };
 
 #endif // VIDEOPLAYER_H
