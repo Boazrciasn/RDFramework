@@ -37,13 +37,11 @@ void Reader::findImages(QString baseDir, QString query,
                         std::vector<QString> &foundImages , std::vector<QString> &labels)
 {
     query = "*" + query + "*";
-    QDirIterator it(baseDir, QStringList() << query,
-                    QDir::Dirs | QDir::NoDotAndDotDot | QDir::CaseSensitive) ;
+    QDirIterator it(baseDir, QStringList() << query, QDir::Dirs | QDir::NoDotAndDotDot | QDir::CaseSensitive) ;
     while (it.hasNext())
     {
         it.next();
-        QDirIterator itFile(baseDir + "/" + it.fileName(),
-                            QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files);
+        QDirIterator itFile(baseDir + "/" + it.fileName(), QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files);
         while(itFile.hasNext())
         {
             itFile.next();

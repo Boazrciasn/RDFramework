@@ -82,7 +82,7 @@ void RandomDecisionTree::subSample()
         QFile currAnnotateFile(fname);
         if(!currAnnotateFile.open(QIODevice::ReadOnly))
             std::cout <<
-                      "RandomDecisionForest::readAndIdentifyWords failed to open file! \n";
+                      "failed to open file! \n";
         while(!currAnnotateFile.atEnd())
         {
             QString line = currAnnotateFile.readLine();

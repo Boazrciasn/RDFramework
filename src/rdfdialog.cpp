@@ -27,17 +27,19 @@ RDFDialog::~RDFDialog()
 
 void RDFDialog::onTrainingBrowse()
 {
-    PARAMS.trainImagesDir = QFileDialog::getExistingDirectory(this,
-                                                              tr("Open Image Directory"), QDir::currentPath(),
+    PARAMS.trainImagesDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), QDir::currentPath(),
                                                               QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_forest->readTrainingImageFiles();
+    ui->textBrowser_train->append("Training images read");
     ui->textBrowser_train->setText(PARAMS.trainImagesDir);
 }
 
 void RDFDialog::onTestBrowse()
 {
-    PARAMS.testDir = QFileDialog::getExistingDirectory(this,
-                                                       tr("Open Image Directory"), PARAMS.trainImagesDir,
+    PARAMS.testDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), PARAMS.trainImagesDir,
                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_forest->readTestImageFiles();
+    ui->textBrowser_test->append("Test images read");
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
 
@@ -62,9 +64,6 @@ void RDFDialog::onTrain()
     }
     Util::calcWidthHeightStat(m_forest->params().trainImagesDir);
     m_treeid = 0;
-    m_forest->readTrainingImageFiles();
-    ui->textBrowser_train->append("Training images read");
-    ui->textBrowser_train->repaint();
     m_forest->trainForest();
     ui->textBrowser_train->append(  "Forest Trained ! ");
     ui->textBrowser_train->repaint();
@@ -82,8 +81,6 @@ void RDFDialog::onTest()
         msgBox->show();
         return;
     }
-    m_forest->readTestImageFiles();
-    ui->textBrowser_test->append("Test images read");
     m_forest->test();
 }
 
