@@ -14,7 +14,7 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->horizontalSlider->setEnabled(false);
 
     nParticles = ui->particleCountSpinBox->value();
-    nIters = ui->itteCountSpinBox->value();
+    nIters = ui->iterCountSpinBox->value();
     mParticleWidth = ui->particleWidthLSpinBox->value();
 
     ui->particlesToDisplaySlider->setMaximum(nParticles);
@@ -40,12 +40,13 @@ void PFWidget::updatePlayerUI(QImage img)
     if (!img.isNull())
     {
         ui->display_label->setAlignment(Qt::AlignCenter);
-        ui->display_label->setPixmap(QPixmap::fromImage(img).scaled(ui->display_label->size(), Qt::KeepAspectRatio,
-                                                                    Qt::FastTransformation));
+        ui->display_label->setPixmap(
+                    QPixmap::fromImage(img).scaled(ui->display_label->size(), Qt::KeepAspectRatio, Qt::FastTransformation)
+                    );
         ui->horizontalSlider->setValue(m_PF_executor->getCurrentFrame());
     }
 
-    int ratio = mPF->getRationOfTop(ui->particlesToDisplaySlider->value());
+    int ratio = mPF->getRatioOfTop(ui->particlesToDisplaySlider->value());
     ui->top_n_ratio_label->setText(QString::number(ratio));
     ui->top_n_ratio_label->repaint();
 }
@@ -86,7 +87,7 @@ void PFWidget::onSetParticleCountSliderMoved(int position)
     mPF->setParticlesToDisplay(position);
 //    mPF->showTopNParticles(position);
 
-    int ratio = mPF->getRationOfTop(position);
+    int ratio = mPF->getRatioOfTop(position);
     ui->top_n_ratio_label->setText(QString::number(ratio));
     ui->top_n_ratio_label->repaint();
 }
@@ -109,7 +110,7 @@ void PFWidget::onActionOpen()
         ui->horizontalSlider->setEnabled(true);
         ui->horizontalSlider->setMaximum(m_PF_executor->getNumberOfFrames());
         qDebug() << m_PF_executor->getNumberOfFrames();
-        qDebug() <<  m_PF_executor->getFrameHeight();
+        qDebug() << m_PF_executor->getFrameHeight();
         qDebug() << m_PF_executor->getFrameWidth();
 
         mPF = new SimplePF(m_PF_executor->getFrameWidth(), m_PF_executor->getFrameHeight(),
@@ -125,7 +126,7 @@ void PFWidget::onParticleCountChange(int value)
     ui->particlesToDisplaySlider->setMaximum(nParticles);
 }
 
-void PFWidget::onItterationCountChange(int value)
+void PFWidget::onIterationCountChange(int value)
 {
     nIters = value;
     mPF->setNumIters(nIters);
@@ -163,6 +164,6 @@ void PFWidget::setPFSettingsEnabled(bool state)
 {
 //    ui->groupBox->setEnabled(state);
     ui->particleCountSpinBox->setEnabled(state);
-    ui->itteCountSpinBox->setEnabled(state);
+    ui->iterCountSpinBox->setEnabled(state);
     ui->particleWidthLSpinBox->setEnabled(state);
 }

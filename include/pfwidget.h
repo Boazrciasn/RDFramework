@@ -36,7 +36,7 @@ private slots:
     void onActionStop();
 
     void onParticleCountChange(int value);
-    void onItterationCountChange(int value);
+    void onIterationCountChange(int value);
     void onParticleWidthChange(int value);
 
 private:

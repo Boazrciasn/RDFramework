@@ -8,7 +8,7 @@ VideoReader::VideoReader(QObject *parent) : QThread(parent)
 
 void VideoReader::run()
 {
-    int delay = (1000 / m_frameRate);
+//    int delay = (1000 / m_frameRate);
     while(!m_stop)
     {
         bool capSuccess = m_capture->read(m_frame);
@@ -18,22 +18,20 @@ void VideoReader::run()
             qDebug() << "NULL";
         }
         cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
-        addToBuffer(m_RGBframe);
+        addToBuffer(m_RGBframe.clone());
 
 //        m_img = Util::toQt(m_RGBframe,QImage::Format_RGB888);
 
 //        if(mPF != NULL)
 //            processFrame();
 //        emit processedImage(m_img);
-        msleep(delay);
+        msleep(0);
     }
-
-    while(true){}
 }
 
 void VideoReader::addToBuffer(cv::Mat frame){
     m_mutex.lock();
-    m_frame_buffer.push(frame);
+    m_frame_buffer.push_back(frame);
     m_mutex.unlock();
 }
 
@@ -41,10 +39,12 @@ cv::Mat VideoReader::getFrame(){
     cv::Mat out;
     m_mutex.lock();
     qDebug()<<m_frame_buffer.size() << "Test size";
-    if(!m_frame_buffer.empty()){
+    if(!m_frame_buffer.empty())
+    {
         out = m_frame_buffer.front();
-        m_frame_buffer.pop();
+        m_frame_buffer.pop_front();
     }
+
     qDebug()<<m_frame_buffer.size() << "after Test size";
     m_mutex.unlock();
     return out;
@@ -116,17 +116,17 @@ double VideoReader::getCurrentFrame()
     return m_capture->get(CV_CAP_PROP_POS_FRAMES);
 }
 
-double VideoReader::getNumberOfFrames()
+int VideoReader::getNumberOfFrames()
 {
     return m_capture->get(CV_CAP_PROP_FRAME_COUNT);
 }
 
-double VideoReader::getFrameHeight()
+int VideoReader::getFrameHeight()
 {
     return m_capture->get(CV_CAP_PROP_FRAME_HEIGHT);
 }
 
-double VideoReader::getFrameWidth()
+int VideoReader::getFrameWidth()
 {
     return m_capture->get(CV_CAP_PROP_FRAME_WIDTH);
 }
