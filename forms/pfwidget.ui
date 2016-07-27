@@ -214,6 +214,20 @@
            </property>
           </widget>
          </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Ratio: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLabel" name="top_n_ratio_label">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -410,7 +424,7 @@
   <slot>onHorizontalSliderReleased()</slot>
   <slot>onHorizontalSliderMoved(int)</slot>
   <slot>onParticleCountChange(int)</slot>
-  <slot>onIterationCountChange(int)</slot>
+  <slot>onItterationCountChange(int)</slot>
   <slot>onParticleWidthChange(int)</slot>
   <slot>onSetParticleCountSliderMoved(int)</slot>
  </slots>

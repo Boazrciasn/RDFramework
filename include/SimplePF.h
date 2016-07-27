@@ -4,18 +4,17 @@
 
 #include "Particle.h"
 #include "RectangleParticle.h"
+#include <tbb/tbb.h>
 
 class SimplePF{
 public:
-    SimplePF(cv::Mat *pImage, int nParticles, int nIters);
+    SimplePF(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth);
 
 	cv::Mat getIMG() { return outIMG; }
 
     void setIMG(cv::Mat *pImage) {
         img = pImage;
-        img_height = img->rows;
-        img_width = img->cols;
-	}
+    }
 
     inline int numParticles() const { return m_num_particles; }
 	inline void setNumParticles(int value) { m_num_particles = value; }
@@ -29,6 +28,13 @@ public:
     inline int modelType() const { return type; }
     inline void setModelType(int value) { type = value; }
 
+    inline int getRationOfTop(int count){
+        float total_weight = 0;
+        for (int i = 0; i < count; ++i)
+            total_weight += m_pParticles[i]->weight();
+        return total_weight*100;
+    }
+
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
 
 	void run();
@@ -40,8 +46,8 @@ public:
 	~SimplePF();
 
 private:
-	// creates random particles with equal weights
-	void initializeParticles();
+    // creates random particles with equal weights
+    void initializeParticles();
 
 	// traverse all particles and checks the particle's value against our model's values
 	// and update the weights

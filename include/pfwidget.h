@@ -6,8 +6,9 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-#include "videoplayer.h"
+#include "VideoReader.h"
 #include "SimplePF.h"
+#include "PFExecutor.h"
 
 namespace Ui {
 class PFWidget;
@@ -35,12 +36,13 @@ private slots:
     void onActionStop();
 
     void onParticleCountChange(int value);
-    void onIterationCountChange(int value);
+    void onItterationCountChange(int value);
     void onParticleWidthChange(int value);
 
 private:
     Ui::PFWidget *ui;
-    VideoPlayer *myPlayer;
+    VideoReader *m_reader;
+    PFExecutor* m_PF_executor;
     SimplePF *mPF;
 
     cv::Mat mFrame;
@@ -50,6 +52,7 @@ private:
     int nIters;
     int mParticleWidth;
 
+    void setPFSettingsEnabled(bool state);
 };
 
 #endif // PFWIDGET_H
