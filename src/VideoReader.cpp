@@ -8,7 +8,6 @@ VideoReader::VideoReader(QObject *parent) : QThread(parent)
 
 void VideoReader::run()
 {
-//    int delay = (1000 / m_frameRate);
     while(!m_stop)
     {
         bool capSuccess = m_capture->read(m_frame);
@@ -19,44 +18,40 @@ void VideoReader::run()
         }
         cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
         addToBuffer(m_RGBframe.clone());
-
-//        m_img = Util::toQt(m_RGBframe,QImage::Format_RGB888);
-
-//        if(mPF != NULL)
-//            processFrame();
-//        emit processedImage(m_img);
         msleep(0);
     }
+    m_bufferReady = true;
 }
 
-void VideoReader::addToBuffer(cv::Mat frame){
+void VideoReader::addToBuffer(cv::Mat frame)
+{
     m_mutex.lock();
     m_frame_buffer.push_back(frame);
     m_mutex.unlock();
 }
 
-cv::Mat VideoReader::getFrame(){
+cv::Mat VideoReader::getFrame()
+{
     cv::Mat out;
     m_mutex.lock();
-    qDebug()<<m_frame_buffer.size() << "Test size";
+    qDebug() << m_frame_buffer.size() << "Test size";
     if(!m_frame_buffer.empty())
     {
         out = m_frame_buffer.front();
         m_frame_buffer.pop_front();
     }
-
-    qDebug()<<m_frame_buffer.size() << "after Test size";
+    qDebug() << m_frame_buffer.size() << "after Test size";
     m_mutex.unlock();
     return out;
 }
 
 void VideoReader::processFrame()
 {
-//    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
-//    mPF->setIMG(&m_frame_gray);
-//    mPF->run();
-//    m_frame_out = mPF->getIMG();
-//    m_img = Util::toQt(m_frame_out,QImage::Format_RGB888);
+    //    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
+    //    mPF->setIMG(&m_frame_gray);
+    //    mPF->run();
+    //    m_frame_out = mPF->getIMG();
+    //    m_img = Util::toQt(m_frame_out,QImage::Format_RGB888);
 }
 
 void VideoReader::msleep(int ms)
@@ -74,19 +69,19 @@ bool VideoReader::loadVideo(std::string filename)
         qDebug() << "file is open!";
         return true;
     }
-    else{
+    else
+    {
         qDebug() << "Unable to open video file!";
         return false;
     }
 }
 
-void VideoReader::playVideo()
+void VideoReader::loadBuffer()
 {
     if(!isRunning())
     {
         if(isStopped())
             m_stop = false;
-
         start(LowPriority);
     }
 }
@@ -99,6 +94,11 @@ void VideoReader::stopVideo()
 bool VideoReader::isStopped() const
 {
     return m_stop;
+}
+
+int VideoReader::getBufferSize()
+{
+    return m_frame_buffer.size();
 }
 
 void VideoReader::setCurrentFrame(int frameNumber)

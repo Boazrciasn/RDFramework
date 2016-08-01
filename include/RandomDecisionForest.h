@@ -87,10 +87,8 @@ class RandomDecisionForest : public QObject
     inline void printForest()
     {
         qDebug() << "FOREST {";
-
         for(rdt_ptr tree : m_forest)
             tree->printTree();
-
         qDebug() << "}";
     }
 
@@ -121,7 +119,6 @@ void save(Archive &archive,
           RandomDecisionForest const &rdf)
 {
     archive( rdf.m_params );
-
     for(auto rdtPtr : rdf.m_forest)
     {
         archive(*rdtPtr);
@@ -135,7 +132,6 @@ void load(Archive &archive,
     archive( rdf.m_params );
     auto size = rdf.m_params.nTrees;
     rdf.m_forest.resize(size);
-
     for(auto i = 0; i < size; ++i)
     {
         rdt_ptr rdt(new RandomDecisionTree(&rdf));

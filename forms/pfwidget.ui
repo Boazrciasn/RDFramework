@@ -95,7 +95,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="stop_pushButton">
+         <widget class="QPushButton" name="saveTarget_pushButton">
           <property name="font">
            <font>
             <family>Futura</family>
@@ -105,7 +105,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Stop</string>
+           <string>Save Target</string>
           </property>
          </widget>
         </item>
@@ -277,28 +277,12 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>436</x>
+     <x>434</x>
      <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
      <y>683</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>stop_pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>PFWidget</receiver>
-   <slot>onActionStop()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>520</x>
-     <y>600</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>532</x>
-     <y>744</y>
     </hint>
    </hints>
   </connection>
@@ -357,8 +341,8 @@
    <slot>onParticleCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>800</x>
-     <y>75</y>
+     <x>786</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>1140</x>
@@ -373,8 +357,8 @@
    <slot>onIterationCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>809</x>
-     <y>143</y>
+     <x>786</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
      <x>1004</x>
@@ -414,12 +398,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>saveTarget_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onActionSaveTarget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>506</x>
+     <y>613</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>507</x>
+     <y>699</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onActionOpen()</slot>
   <slot>onActionPlay()</slot>
   <slot>onActionPause()</slot>
-  <slot>onActionStop()</slot>
   <slot>onHorizontalSliderPressed()</slot>
   <slot>onHorizontalSliderReleased()</slot>
   <slot>onHorizontalSliderMoved(int)</slot>
@@ -427,5 +426,6 @@
   <slot>onIterationCountChange(int)</slot>
   <slot>onParticleWidthChange(int)</slot>
   <slot>onSetParticleCountSliderMoved(int)</slot>
+  <slot>onActionSaveTarget()</slot>
  </slots>
 </ui>

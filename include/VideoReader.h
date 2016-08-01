@@ -44,10 +44,12 @@ class VideoReader : public QThread
   public:
     VideoReader(QObject *parent);
     ~VideoReader();
+    bool m_bufferReady = false;
     bool loadVideo(std::string filename);
-    void playVideo();
+    void loadBuffer();
     void stopVideo();
     bool isStopped() const;
+    int getBufferSize();
 
 //    inline void setPF(SimplePF *pf){ mPF = pf;}
 //    inline SimplePF* getPF(){ return mPF;}

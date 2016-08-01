@@ -15,21 +15,17 @@ void PFExecutor::run()
     while(!m_stop && m_current_frame != m_numOfFrames)
     {
         m_RGBframe = m_video_reader->getFrame();
-
         if (m_RGBframe.empty())
         {
             msleep(delay);
             continue;
         }
-
         m_current_frame++;
-        m_img = Util::toQt(m_RGBframe,QImage::Format_RGB888);
-//        qDebug()<<m_current_frame;
-
         if(mPF != NULL)
             processFrame();
+        else
+            m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
         emit processedImage(m_img);
-//        cv::imshow("test",m_RGBframe);
         msleep(delay);
     }
 }
@@ -40,7 +36,7 @@ void PFExecutor::processFrame()
     mPF->setIMG(&m_frame_gray);
     mPF->run();
     m_frame_out = mPF->getIMG();
-    m_img = Util::toQt(m_frame_out,QImage::Format_RGB888);
+    m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
 }
 
 void PFExecutor::msleep(int ms)
@@ -53,17 +49,25 @@ void PFExecutor::msleep(int ms)
 bool PFExecutor::loadVideo(std::string filename)
 {
     bool isLoaded = m_video_reader->loadVideo(filename);
-    if(isLoaded){
+    if(isLoaded)
+    {
         m_frameRate = m_video_reader->getFrameRate();
         m_numOfFrames = m_video_reader->getNumberOfFrames();
-        m_video_reader->playVideo();
+        m_video_reader->loadBuffer();
     }
+    while(m_video_reader->getBufferSize() < 1 ) {};
+    m_RGBframe = m_video_reader->getFrame();
+    m_current_frame++;
+    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
+    m_img = Util::toQt(m_frame_gray, QImage::Format_RGB888);
+    if(mPF != NULL)
+        processFrame();
+    emit processedImage(m_img);
     return isLoaded;
 }
 
 void PFExecutor::playVideo()
 {
-//    m_video_reader->playVideo();
     if(!isRunning())
     {
         if(isStopped())
@@ -74,7 +78,6 @@ void PFExecutor::playVideo()
 
 void PFExecutor::stopVideo()
 {
-//    m_video_reader->stopVideo();
     m_stop = true;
 }
 
@@ -85,7 +88,6 @@ bool PFExecutor::isStopped() const
 
 void PFExecutor::setCurrentFrame(int frameNumber)
 {
-//    m_video_reader->setCurrentFrame(frameNumber);
     m_current_frame = frameNumber;
 }
 

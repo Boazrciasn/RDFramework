@@ -4,13 +4,16 @@
 
 #include <QWidget>
 
+#include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
 #include "VideoReader.h"
 #include "SimplePF.h"
 #include "PFExecutor.h"
+#include "Target.h"
 
-namespace Ui {
+namespace Ui
+{
 class PFWidget;
 }
 
@@ -18,11 +21,14 @@ class PFWidget : public QWidget
 {
     Q_OBJECT
 
-public:
+  public:
     explicit PFWidget(QWidget *parent = 0);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     ~PFWidget();
 
-private slots:
+  private slots:
     void updatePlayerUI(QImage img);
     QString getFormattedTime(int timeInSeconds);
     void onHorizontalSliderPressed();
@@ -33,16 +39,15 @@ private slots:
     void onActionOpen();
     void onActionPlay();
     void onActionPause();
-    void onActionStop();
+    void onActionSaveTarget();
 
     void onParticleCountChange(int value);
     void onIterationCountChange(int value);
     void onParticleWidthChange(int value);
 
-private:
+  private:
     Ui::PFWidget *ui;
-    VideoReader *m_reader;
-    PFExecutor* m_PF_executor;
+    PFExecutor *m_PF_executor;
     SimplePF *mPF;
 
     cv::Mat mFrame;
@@ -51,6 +56,13 @@ private:
     int nParticles;
     int nIters;
     int mParticleWidth;
+
+    QRubberBand *m_RubberBand;
+    QRect m_TargetROI;
+    QPoint m_Point;
+
+    QVector<Target *> m_TargetsVector;
+    quint32 m_TargetCount = 0 ;
 
     void setPFSettingsEnabled(bool state);
 };

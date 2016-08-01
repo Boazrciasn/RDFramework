@@ -96,7 +96,6 @@ void AnnExtractorDialog::on_browse_button_clicked()
 
             case QMessageBox::Cancel:
             default:
-                qDebug() << "GFY SIR or MADAM!";
                 ui->search_char->text() = m_searchChar;
                 break;
             }
