@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "Util.h"
 #include "VideoReader.h"
 #include "SimplePF.h"
 #include "PFExecutor.h"
@@ -56,7 +57,7 @@ class PFWidget : public QWidget
     int nParticles;
     int nIters;
     int mParticleWidth;
-
+    bool m_VideoLodaded = false;
     QRubberBand *m_RubberBand;
     QRect m_TargetROI;
     QPoint m_Point;

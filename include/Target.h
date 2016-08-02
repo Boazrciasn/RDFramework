@@ -1,6 +1,7 @@
 #ifndef TARGET_H
 #define TARGET_H
-
+#include "src/precompiled.h"
+#include "Util.h"
 
 
 class Target
@@ -10,14 +11,15 @@ class Target
     void setLabel(QString label);
     void setImage( QImage image);
     QString getLabel();
-    QImage getImage();
+    cv::Mat getImage();
 
 
     ~Target();
 
   private:
     QString m_Label;
-    QImage m_TargetImg;
+    cv::Mat m_TargetImg;
+    cv::Mat m_TargetHist;
 
 };
 

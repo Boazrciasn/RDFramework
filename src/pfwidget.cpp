@@ -10,6 +10,7 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
+    ui->particlesToDisplaySlider->setEnabled(false);
     nParticles = ui->particleCountSpinBox->value();
     nIters = ui->iterCountSpinBox->value();
     mParticleWidth = ui->particleWidthLSpinBox->value();
@@ -19,36 +20,45 @@ PFWidget::PFWidget(QWidget *parent) :
 
 void PFWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    m_RubberBand->setGeometry(QRect(m_Point, event->pos()).normalized());
+    if(m_VideoLodaded)
+    {
+        m_RubberBand->setGeometry(QRect(m_Point, event->pos()).normalized());
+    }
 }
 
 void PFWidget::mousePressEvent(QMouseEvent *event)
 {
-    m_PF_executor->stopVideo();
-    if (m_RubberBand->isEnabled())
-        m_RubberBand->hide();
-    if(ui->display_label->underMouse())
+    if(m_VideoLodaded)
     {
-        m_Point = event->pos();
-        m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-        m_RubberBand->show();
+        m_PF_executor->stopVideo();
+        if (m_RubberBand->isEnabled())
+            m_RubberBand->hide();
+        if(ui->display_label->underMouse())
+        {
+            m_Point = event->pos();
+            m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+            m_RubberBand->show();
+        }
     }
 }
 
 void PFWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    QPoint a = mapToGlobal(m_Point);
-    QPoint b = event->globalPos();
-    a = ui->display_label->mapFromGlobal(a);
-    b = ui->display_label->mapFromGlobal(b);
-    QPixmap OriginalPix(*ui->display_label->pixmap());
-    double sx = ui->display_label->rect().width();
-    double sy = ui->display_label->rect().height();
-    sx = OriginalPix.width() / sx;
-    sy = OriginalPix.height() / sy;
-    a = QPoint(int(a.x() * sx), int(a.y() * sy));
-    b = QPoint(int(b.x() * sx), int(b.y() * sy));
-    m_TargetROI = QRect(a, b);
+    if(m_VideoLodaded)
+    {
+        QPoint a = mapToGlobal(m_Point);
+        QPoint b = event->globalPos();
+        a = ui->display_label->mapFromGlobal(a);
+        b = ui->display_label->mapFromGlobal(b);
+        QPixmap OriginalPix(*ui->display_label->pixmap());
+        double sx = ui->display_label->rect().width();
+        double sy = ui->display_label->rect().height();
+        sx = OriginalPix.width() / sx;
+        sy = OriginalPix.height() / sy;
+        a = QPoint(int(a.x() * sx), int(a.y() * sy));
+        b = QPoint(int(b.x() * sx), int(b.y() * sy));
+        m_TargetROI = QRect(a, b);
+    }
 }
 
 void PFWidget::onActionSaveTarget()
@@ -57,7 +67,6 @@ void PFWidget::onActionSaveTarget()
     QPixmap OriginalPix(*ui->display_label->pixmap());
     QPixmap targetPixMap = OriginalPix.copy(m_TargetROI);
     QString labelno = QString::number(m_TargetCount).rightJustified(4, '0');
-    qDebug() << labelno;
     QString labelName = "Human_" + labelno;
     QMessageBox msgBox;
     msgBox.setText("Would you like to track this target?");
@@ -69,8 +78,10 @@ void PFWidget::onActionSaveTarget()
     {
     case QMessageBox::Save:
         labelName = QInputDialog::getText(&msgBox, "Set Label Name", " Label :", QLineEdit::Normal, labelName);
-        currTarget = new Target(labelName, targetPixMap.toImage());
+        currTarget = new Target(labelName,targetPixMap.toImage());
         m_TargetsVector.push_back(currTarget);
+        ui->targets_ListWidget->addItem(currTarget->getLabel());
+        m_TargetCount = m_TargetsVector.size();
         break;
     case QMessageBox::Cancel:
     default:
@@ -151,10 +162,12 @@ void PFWidget::onActionOpen()
         setWindowTitle(name.fileName());
         ui->start_pushButton->setEnabled(true);
         ui->horizontalSlider->setEnabled(true);
+        ui->particlesToDisplaySlider->setEnabled(true);
         ui->horizontalSlider->setMaximum(m_PF_executor->getNumberOfFrames());
         mPF = new SimplePF(m_PF_executor->getFrameWidth(), m_PF_executor->getFrameHeight(),
                            nParticles, nIters, mParticleWidth);
         m_PF_executor->setPF(mPF);
+        m_VideoLodaded = true;
     }
 }
 

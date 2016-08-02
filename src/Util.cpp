@@ -29,6 +29,14 @@ void deneme()
     });
 }
 
+void Util::print3DHistogram(cv::Mat &inMat)
+{
+    for (cv::MatConstIterator_<int> it = inMat.begin<int>(); it != inMat.end<int>(); it++)
+    {
+        std::cout << *it << " ";
+    }
+}
+
 double Util::calculateAccuracy(const std::vector<QString> &groundtruth,
                                const std::vector<QString> &results)
 {
@@ -48,27 +56,36 @@ cv::Mat Util::toCv(const QImage &image , int cv_type)
                    (void *)image.scanLine(0), image.bytesPerLine());
 }
 
+void Util::CalculateHistogram(cv::Mat &inputMat, cv::Mat &hist, int histSize)
+{
+    const int channels[3] = {0, 1, 2};
+    const int histSizes[3] = {histSize, histSize, histSize};
+    const float rgbRange[2] = {0, 256};
+    const float *ranges[3] = {rgbRange, rgbRange, rgbRange};
+    cv::calcHist(&inputMat, 1, channels, cv::Mat(), hist, 3, histSizes, ranges, true, false);
+    std::cout<<hist.rows << "x"<< hist.cols << std::endl;
+}
+
 QImage Util::toQt(const cv::Mat &src, QImage::Format format)
 {
     quint16 width = src.cols;
     quint16 height = src.rows;
     QImage dest;
-
     if(src.type() == CV_8UC3)
     {
-        dest = QImage((const unsigned char*)(src.data),
-                                  src.cols,src.rows,format);
-//        for(int i = 0; i < height; i++)
-//        {
-//            const quint8 *pSrc = src.ptr<quint8>(i);
-//            quint8 *pDest = dest.scanLine(i);
-//            for(int j = 0; j < width; j++)
-//            {
-//                *pDest++ = *pSrc++;
-//                *pDest++ = *pSrc++;
-//                *pDest++ = *pSrc++;
-//            }
-//        }
+        dest = QImage((const unsigned char *)(src.data),
+                      src.cols, src.rows, format);
+        //        for(int i = 0; i < height; i++)
+        //        {
+        //            const quint8 *pSrc = src.ptr<quint8>(i);
+        //            quint8 *pDest = dest.scanLine(i);
+        //            for(int j = 0; j < width; j++)
+        //            {
+        //                *pDest++ = *pSrc++;
+        //                *pDest++ = *pSrc++;
+        //                *pDest++ = *pSrc++;
+        //            }
+        //        }
     }
     else if(src.type() == CV_8UC1)
     {
@@ -427,8 +444,7 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     double Max;
     cv::minMaxLoc(input, &Min, &Max);
     input -= Min;
-    input.convertTo(output,CV_8U,255.0/(Max-Min));
-
+    input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
 

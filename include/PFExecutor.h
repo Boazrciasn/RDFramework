@@ -26,7 +26,6 @@ private:
   QMutex m_mutex;
   QWaitCondition m_waitcond;
   cv::Mat m_frame_out;
-  cv::Mat m_frame_gray;
   int m_frameRate;
   cv::Mat m_RGBframe;
   QImage m_img;

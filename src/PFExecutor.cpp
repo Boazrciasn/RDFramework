@@ -32,8 +32,7 @@ void PFExecutor::run()
 
 void PFExecutor::processFrame()
 {
-    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
-    mPF->setIMG(&m_frame_gray);
+    mPF->setIMG(&m_RGBframe);
     mPF->run();
     m_frame_out = mPF->getIMG();
     m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
@@ -58,8 +57,7 @@ bool PFExecutor::loadVideo(std::string filename)
     while(m_video_reader->getBufferSize() < 1 ) {};
     m_RGBframe = m_video_reader->getFrame();
     m_current_frame++;
-    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
-    m_img = Util::toQt(m_frame_gray, QImage::Format_RGB888);
+    m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
     if(mPF != NULL)
         processFrame();
     emit processedImage(m_img);
