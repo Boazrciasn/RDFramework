@@ -33,7 +33,7 @@ private:
   double m_current_frame;
   double m_numOfFrames;
 
-  SimplePF *mPF;
+  SimplePF *m_PF;
   void processFrame();
 
 public:
@@ -42,8 +42,8 @@ public:
   void stopVideo();
   bool isStopped() const;
 
-  inline void setPF(SimplePF *pf){ mPF = pf;}
-  inline SimplePF* getPF(){ return mPF;}
+  inline void setPF(SimplePF *pf) { m_PF = pf; }
+  inline SimplePF* getPF() const { return m_PF; }
 
   void setCurrentFrame(int frameNumber);
   double getFrameRate();

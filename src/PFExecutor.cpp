@@ -4,7 +4,7 @@
 PFExecutor::PFExecutor(QObject *parent): QThread(parent)
 {
     m_stop = true;
-    mPF = NULL;
+    m_PF = NULL;
     m_current_frame = 0;
     m_video_reader = new VideoReader(parent);
 }
@@ -21,7 +21,7 @@ void PFExecutor::run()
             continue;
         }
         m_current_frame++;
-        if(mPF != NULL)
+        if(m_PF != NULL)
             processFrame();
         else
             m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
@@ -32,9 +32,9 @@ void PFExecutor::run()
 
 void PFExecutor::processFrame()
 {
-    mPF->setIMG(&m_RGBframe);
-    mPF->run();
-    m_frame_out = mPF->getIMG();
+    m_PF->setIMG(&m_RGBframe);
+    m_PF->run();
+    m_frame_out = m_PF->getIMG();
     m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
 }
 
@@ -58,7 +58,7 @@ bool PFExecutor::loadVideo(std::string filename)
     m_RGBframe = m_video_reader->getFrame();
     m_current_frame++;
     m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
-    if(mPF != NULL)
+    if(m_PF != NULL)
         processFrame();
     emit processedImage(m_img);
     return isLoaded;

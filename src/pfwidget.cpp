@@ -11,10 +11,10 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
     ui->particlesToDisplaySlider->setEnabled(false);
-    nParticles = ui->particleCountSpinBox->value();
-    nIters = ui->iterCountSpinBox->value();
-    mParticleWidth = ui->particleWidthLSpinBox->value();
-    ui->particlesToDisplaySlider->setMaximum(nParticles);
+    m_nParticles = ui->particleCountSpinBox->value();
+    m_nIters = ui->iterCountSpinBox->value();
+    m_ParticleWidth = ui->particleWidthLSpinBox->value();
+    ui->particlesToDisplaySlider->setMaximum(m_nParticles);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
 
@@ -78,7 +78,7 @@ void PFWidget::onActionSaveTarget()
     {
     case QMessageBox::Save:
         labelName = QInputDialog::getText(&msgBox, "Set Label Name", " Label :", QLineEdit::Normal, labelName);
-        currTarget = new Target(labelName,targetPixMap.toImage());
+        currTarget = new Target(labelName, targetPixMap.toImage(), m_histSize);
         m_TargetsVector.push_back(currTarget);
         ui->targets_ListWidget->addItem(currTarget->getLabel());
         m_TargetCount = m_TargetsVector.size();
@@ -105,7 +105,7 @@ void PFWidget::updatePlayerUI(QImage img)
         );
         ui->horizontalSlider->setValue(m_PF_executor->getCurrentFrame());
     }
-    int ratio = mPF->getRatioOfTop(ui->particlesToDisplaySlider->value());
+    int ratio = m_simplePF->getRatioOfTop(ui->particlesToDisplaySlider->value());
     ui->top_n_ratio_label->setText(QString::number(ratio));
     ui->top_n_ratio_label->repaint();
 }
@@ -140,9 +140,9 @@ void PFWidget::onHorizontalSliderMoved(int position)
 void PFWidget::onSetParticleCountSliderMoved(int position)
 {
     ui->particlesToDisplayLabel->setText(QString::number(position));
-    mPF->setParticlesToDisplay(position);
+    m_simplePF->setParticlesToDisplay(position);
     //    mPF->showTopNParticles(position);
-    int ratio = mPF->getRatioOfTop(position);
+    int ratio = m_simplePF->getRatioOfTop(position);
     ui->top_n_ratio_label->setText(QString::number(ratio));
     ui->top_n_ratio_label->repaint();
 }
@@ -164,43 +164,56 @@ void PFWidget::onActionOpen()
         ui->horizontalSlider->setEnabled(true);
         ui->particlesToDisplaySlider->setEnabled(true);
         ui->horizontalSlider->setMaximum(m_PF_executor->getNumberOfFrames());
-        mPF = new SimplePF(m_PF_executor->getFrameWidth(), m_PF_executor->getFrameHeight(),
-                           nParticles, nIters, mParticleWidth);
-        m_PF_executor->setPF(mPF);
         m_VideoLodaded = true;
     }
 }
 
 void PFWidget::onParticleCountChange(int value)
 {
-    nParticles = value;
-    mPF->setNumParticles(nParticles);
-    ui->particlesToDisplaySlider->setMaximum(nParticles);
+    m_nParticles = value;
+    m_simplePF->setNumParticles(m_nParticles);
+    ui->particlesToDisplaySlider->setMaximum(m_nParticles);
 }
 
 void PFWidget::onIterationCountChange(int value)
 {
-    nIters = value;
-    mPF->setNumIters(nIters);
+    m_nIters = value;
 }
 
 void PFWidget::onParticleWidthChange(int value)
 {
-    mParticleWidth = value;
-    mPF->setParticleWidth(mParticleWidth);
+    m_ParticleWidth = value;
+}
+
+void PFWidget::onHistSizeChanged(int value)
+{
+    m_histSize = value;
 }
 
 
 void PFWidget::onActionPlay()
 {
-    m_PF_executor->playVideo();
-    setPFSettingsEnabled(false);
+    if(m_VideoLodaded)
+    {
+        m_simplePF = new SimplePF(m_PF_executor->getFrameWidth(), m_PF_executor->getFrameHeight(),
+                                  m_nParticles, m_nIters, m_ParticleWidth);
+        m_simplePF->setHistSize(m_histSize);
+        m_simplePF->setParticleWidth(m_ParticleWidth);
+        m_simplePF->setNumIters(m_nIters);
+        m_simplePF->setTargets(m_TargetsVector);
+        m_PF_executor->setPF(m_simplePF);
+        m_PF_executor->playVideo();
+        setPFSettingsEnabled(false);
+    }
 }
 
 void PFWidget::onActionPause()
 {
-    m_PF_executor->stopVideo();
-    setPFSettingsEnabled(true);
+    if(m_VideoLodaded)
+    {
+        m_PF_executor->stopVideo();
+        setPFSettingsEnabled(true);
+    }
 }
 
 

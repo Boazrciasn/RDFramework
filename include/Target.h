@@ -7,19 +7,33 @@
 class Target
 {
   public:
-    Target(QString label, QImage image);
+    Target(QString label, QImage image, int histSize);
+    void setHistSize(int histSize);
     void setLabel(QString label);
     void setImage( QImage image);
-    QString getLabel();
-    cv::Mat getImage();
+    inline QString getLabel()
+    {
+        return m_label;
+    }
+
+    inline cv::Mat getImage()
+    {
+        return m_targetImg;
+    }
+
+    inline cv::Mat getHist()
+    {
+        return m_targetHist;
+    }
 
 
     ~Target();
 
   private:
-    QString m_Label;
-    cv::Mat m_TargetImg;
-    cv::Mat m_TargetHist;
+    int m_histSize;
+    QString m_label;
+    cv::Mat m_targetImg;
+    cv::Mat m_targetHist;
 
 };
 

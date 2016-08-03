@@ -45,18 +45,20 @@ class PFWidget : public QWidget
     void onParticleCountChange(int value);
     void onIterationCountChange(int value);
     void onParticleWidthChange(int value);
+    void onHistSizeChanged(int value);
 
   private:
     Ui::PFWidget *ui;
     PFExecutor *m_PF_executor;
-    SimplePF *mPF;
+    SimplePF *m_simplePF;
 
-    cv::Mat mFrame;
-    cv::Mat mFrameGray;
-    cv::Mat mFrameOut;
-    int nParticles;
-    int nIters;
-    int mParticleWidth;
+    cv::Mat m_Frame;
+    cv::Mat m_FrameGray;
+    cv::Mat m_FrameOut;
+    int m_nParticles;
+    int m_nIters;
+    int m_ParticleWidth;
+    int m_histSize = 64;
     bool m_VideoLodaded = false;
     QRubberBand *m_RubberBand;
     QRect m_TargetROI;

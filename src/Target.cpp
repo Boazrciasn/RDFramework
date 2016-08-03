@@ -2,33 +2,36 @@
 #include "Target.h"
 #include <iostream>
 
-Target::Target(QString label, QImage image) :  m_Label(label)
+Target::Target(QString label, QImage image, int histSize)
 {
-    m_TargetImg = Util::toCv(image, CV_8UC4);
-    cv::cvtColor(m_TargetImg, m_TargetImg, CV_RGBA2RGB);
-    Util::CalculateHistogram(m_TargetImg, m_TargetHist, 64);
+    m_label = label;
+    m_histSize = histSize;
+    m_targetImg = Util::toCv(image, CV_8UC4);
+    cv::cvtColor(m_targetImg, m_targetImg, CV_RGBA2RGB);
+    Util::CalculateHistogram(m_targetImg, m_targetHist, m_histSize);
+}
+
+void Target::setHistSize(int histSize)
+{
+    m_histSize = histSize;
+    Util::CalculateHistogram(m_targetImg, m_targetHist, m_histSize);
 }
 
 void Target::setLabel(QString label)
 {
-    m_Label = label;
+    m_label = label;
 }
 
 void Target::setImage(QImage image)
 {
-    m_TargetImg = Util::toCv(image, CV_8UC4);
-    cv::cvtColor(m_TargetImg, m_TargetImg, CV_RGBA2RGB);
+    m_targetImg = Util::toCv(image, CV_8UC4);
+    cv::cvtColor(m_targetImg, m_targetImg, CV_RGBA2RGB);
+    Util::CalculateHistogram(m_targetImg, m_targetHist, m_histSize);
 }
 
-QString Target::getLabel()
-{
-    return m_Label;
-}
 
-cv::Mat Target::getImage()
-{
-    return m_TargetImg;
-}
+
+
 
 Target::~Target()
 {

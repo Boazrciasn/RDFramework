@@ -8,37 +8,82 @@
 #include "RectangleParticle.h"
 //#include <tbb/tbb.h>
 
-class SimplePF{
-public:
+class SimplePF
+{
+  public:
     SimplePF(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth);
+    QVector<Target *> m_Targets;
 
-    cv::Mat getIMG() { return outIMG; }
+    cv::Mat getIMG()
+    {
+        return outIMG;
+    }
 
     void setIMG(cv::Mat *pImage)
     {
         img = pImage;
     }
 
-    inline int numParticles() const { return m_num_particles; }
-    inline void setNumParticles(int value) { m_num_particles = value; }
+    inline int numParticles() const
+    {
+        return m_num_particles;
+    }
+    inline void setNumParticles(int value)
+    {
+        m_num_particles = value;
+    }
+    inline void setHistSize(int histSize)
+    {
+        m_histSize = histSize;
+    }
+    inline int getHistSize()
+    {
+        return m_histSize;
+    }
 
-    inline int numIters() const { return m_num_iters; }
-    inline void setNumIters(int value) { m_num_iters = value; }
+    inline int numIters() const
+    {
+        return m_num_iters;
+    }
+    inline void setNumIters(int value)
+    {
+        m_num_iters = value;
+    }
+    inline void setTargets(QVector<Target *> targets)
+    {
+        m_Targets = targets;
+    }
 
-    inline int particleWidth() const { return m_particle_width; }
-    inline void setParticleWidth(int value) { m_particle_width = value; }
+    inline int particleWidth() const
+    {
+        return m_particle_width;
+    }
+    inline void setParticleWidth(int value)
+    {
+        m_particle_width = value;
+    }
 
-    inline int modelType() const { return type; }
-    inline void setModelType(int value) { type = value; }
+    inline int modelType() const
+    {
+        return type;
+    }
+    inline void setModelType(int value)
+    {
+        type = value;
+    }
 
-    inline int getRatioOfTop(int count){
+    inline int getRatioOfTop(int count)
+    {
         float total_weight = 0;
         for (int i = 0; i < count; ++i)
             total_weight += m_pParticles[i]->weight();
-        return total_weight*100;
+        return total_weight * 100;
     }
 
-    inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
+    inline void setParticlesToDisplay(int value)
+    {
+        m_num_particles_to_display = value;
+    }
 
     void run();
 
@@ -48,7 +93,7 @@ public:
 
     ~SimplePF();
 
-private:
+  private:
     // creates random particles with equal weights
     void initializeParticles();
 
@@ -76,6 +121,7 @@ private:
     int m_num_particles;
     int m_num_iters;
     int m_particle_width;
+    int m_histSize = 64;
     std::atomic<int> m_num_particles_to_display;
 
     int type = Rectangle;
@@ -87,7 +133,6 @@ private:
     cv::Mat outIMG;
     int img_height, img_width;
     std::default_random_engine generator;
-    std::vector<Target *> m_Targets;
 
 };
 

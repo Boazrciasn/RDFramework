@@ -63,7 +63,6 @@ void Util::CalculateHistogram(cv::Mat &inputMat, cv::Mat &hist, int histSize)
     const float rgbRange[2] = {0, 256};
     const float *ranges[3] = {rgbRange, rgbRange, rgbRange};
     cv::calcHist(&inputMat, 1, channels, cv::Mat(), hist, 3, histSizes, ranges, true, false);
-    std::cout<<hist.rows << "x"<< hist.cols << std::endl;
 }
 
 QImage Util::toQt(const cv::Mat &src, QImage::Format format)

@@ -13,12 +13,13 @@ SimplePF::SimplePF(int frameWidth, int frameHeight, int nParticles, int nIters, 
     setParticleWidth(particleWidth);
     setParticlesToDisplay(m_num_particles_to_display);
     srand(time(NULL));
-    initializeParticles();
+    //    initializeParticles();
 }
+
 
 void SimplePF::run()
 {
-    //	initializeParticles();
+    initializeParticles();
     for (int i = 0; i < m_num_iters; i++)
     {
         resample();
@@ -39,7 +40,7 @@ void SimplePF::initializeParticles()
         int y = (rand() % (img_height - m_particle_width));
         float weight = 1.0 / m_num_particles;
         Particle *particle;
-        particle = new RectangleParticle(x, y, m_particle_width, weight);
+        particle = new RectangleParticle(x, y, m_particle_width, weight, m_Targets.at(0)->getHist(), m_histSize);
         m_pParticles.push_back(particle);
     }
 }
@@ -82,7 +83,8 @@ void SimplePF::resample()
         int newX, newY;
         distort(p_to_distort, newX, newY);
         Particle *p_new;
-        p_new = new RectangleParticle(newX, newY, m_particle_width, 1.0 / m_num_particles);
+        p_new = new RectangleParticle(newX, newY, m_particle_width, 1.0 / m_num_particles, m_Targets.at(0)->getHist(),
+                                      m_histSize);
         m_pParticlesNew.push_back(p_new);
     }
     updateParticles();
