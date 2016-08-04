@@ -12,7 +12,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
 FIND_PACKAGE(OpenCV 3 REQUIRED)
 
 #add OpenCV directories
-include_directories(${OpenCV_INCLUDE_DIRS} include/)
+include_directories(${OpenCV_INCLUDE_DIRS}  include/gui/
+                                            include/ocr/ include/rdf/
+                                            include/tracking/ include/util/)
 
 INCLUDE_DIRECTORIES(qcustomplot/)
 
@@ -29,15 +31,31 @@ set(QT_USE_QTXML TRUE)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-file(GLOB SOURCES main.cpp src/* qcustomplot/qcustomplot.cpp cereal/*)
-file(GLOB HEADERS include/* qcustomplot/qcustomplot.h cereal/*)
+#SOURCE FILES
+file(GLOB SOURCES main.cpp src/*.cpp  qcustomplot/qcustomplot.cpp cereal/*)
+file(GLOB GUISOURCES src/gui/*.cpp)
+file(GLOB RDFSOURCES src/rdf/*.cpp)
+file(GLOB OCRSOURCES src/ocr/*.cpp)
+file(GLOB TRACKSOURCES src/tracking/*.cpp)
+file(GLOB PFSOURCES src/tracking/particlefilter/*.cpp)
+file(GLOB UTILSOURCES src/util/*.cpp src/util/*.h)
+
+#HEADER FILES
+file(GLOB HEADERS include/*.h qcustomplot/qcustomplot.h cereal/*)
+file(GLOB GUIHEADERS include/gui/*.h)
+file(GLOB RDFHEADERS include/rdf/*.h)
+file(GLOB OCRHEADERS include/ocr/*.h)
+file(GLOB TRACKHEADERS include/tracking/*.h)
+file(GLOB PFHEADERS include/tracking/particlefilter/*.h)
+file(GLOB UTILHEADERS include/util/*.h include/util/*.hpp)
 
 # Create Qt MOC files
 QT5_WRAP_UI(UISrcs forms/MainWindow.ui forms/MyDialog.ui forms/AnnExtractorDialog.ui
-                   forms/DialogExtracted.ui forms/HistogramDialog.ui forms/RDFDialog.ui
+                   forms/ExtractedDialog.ui forms/HistogramDialog.ui forms/RDFDialog.ui
                    forms/ResizeallImagesDialog.ui forms/DisplayImagesWidget.ui forms/PFWidget.ui)
 
-add_executable("${project_name}" ${SOURCES} ${HEADERS} ${UISrcs})
+add_executable("${project_name}" ${SOURCES} ${GUISOURCES} ${RDFSOURCES} ${OCRSOURCES} ${TRACKSOURCES}  ${PFSOURCES}
+                ${UTILSOURCES} ${GUIHEADERS} ${RDFHEADERS} ${OCRHEADERS} ${TRACKHEADERS} ${PFHEADERS} ${UTILHEADERS} ${HEADERS} ${UISrcs})
 
 # NM Not tested yet
 target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)

@@ -1,10 +1,10 @@
-#include "src/precompiled.h"
+#include "src/util/precompiled.h"
 
 #include <vector>
 
-#include "include/mainwindow.h"
-#include "include/Reader.h"
-#include "include/RandomDecisionForest.h"
+#include "mainwindow.h"
+#include "Reader.h"
+#include "RandomDecisionForest.h"
 
 int main(int argc, char *argv[])
 {
