@@ -405,22 +405,6 @@
   </connection>
   <connection>
    <sender>horizontalSlider</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>PFWidget</receiver>
-   <slot>onHorizontalSliderMoved(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>106</x>
-     <y>578</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>146</x>
-     <y>769</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>horizontalSlider</sender>
    <signal>sliderPressed()</signal>
    <receiver>PFWidget</receiver>
    <slot>onHorizontalSliderPressed()</slot>
@@ -560,6 +544,22 @@
     <hint type="destinationlabel">
      <x>758</x>
      <y>673</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onHorizontalSliderMoved(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>106</x>
+     <y>578</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>769</y>
     </hint>
    </hints>
   </connection>

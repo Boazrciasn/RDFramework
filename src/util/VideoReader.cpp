@@ -68,17 +68,14 @@ void VideoReader::setCurrentFrame(int frameNumber)
     m_FrameBuffer->clear();
     m_bufferEndPos = frameNumber;
     m_capture->set(CV_CAP_PROP_POS_FRAMES, frameNumber);
-    startBuffer();
 }
 
 VideoReader::~VideoReader()
 {
-    m_mutex.lock();
     m_stop = true;
     m_capture->release();
     delete m_capture;
     delete m_FrameBuffer;
     m_waitcond.wakeOne();
-    m_mutex.unlock();
     wait();
 }

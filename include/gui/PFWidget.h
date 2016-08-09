@@ -57,11 +57,12 @@ class PFWidget : public QWidget
     cv::Mat m_Frame;
     cv::Mat m_FrameGray;
     cv::Mat m_FrameOut;
-    int m_nParticles;
-    int m_nIters;
-    int m_ParticleWidth;
-    int m_histSize = 64;
+    int m_particleCount;
+    int m_numIters;
+    int m_particleWidth;
+    int m_histSize = 10;
     bool m_VideoLodaded = false;
+    bool m_isPlaying;
     QRubberBand *m_RubberBand;
     QRect m_TargetROI;
     QPoint m_Point;
@@ -70,6 +71,7 @@ class PFWidget : public QWidget
 
     QVector<Target *> m_TargetsVector;
     quint32 m_TargetCount = 0 ;
+    int m_currFrame;
 
     void setPFSettingsEnabled(bool state);
 };

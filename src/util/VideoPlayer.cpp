@@ -79,8 +79,12 @@ void VideoPlayer::playVideo()
 
 void VideoPlayer::setCurrentFrame(int frameNumber)
 {
+    m_VideoReader->stopBuffer();
     m_CurrentFrame = frameNumber;
     m_VideoReader->setCurrentFrame(m_CurrentFrame);
+    m_VideoReader->startBuffer();
+    initializeVideo();
+    emit playerFrame(m_img);
 }
 
 double VideoPlayer::getCurrentFrame()

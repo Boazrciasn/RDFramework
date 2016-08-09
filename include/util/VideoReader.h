@@ -17,7 +17,6 @@ class VideoReader : public QThread
     Q_OBJECT
 
   private:
-    QMutex m_mutex;
     QWaitCondition m_waitcond;
     cv::Mat m_frame;
     cv::Mat m_frame_out;

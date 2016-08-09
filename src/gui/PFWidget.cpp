@@ -11,10 +11,11 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
     ui->particlesToDisplaySlider->setEnabled(false);
-    m_nParticles = ui->particleCountSpinBox->value();
-    m_nIters = ui->iterCountSpinBox->value();
-    m_ParticleWidth = ui->particleWidthLSpinBox->value();
-    ui->particlesToDisplaySlider->setMaximum(m_nParticles);
+    m_particleCount = ui->particleCountSpinBox->value();
+    m_numIters = ui->iterCountSpinBox->value();
+    m_particleWidth = ui->particleWidthLSpinBox->value();
+    ui->particlesToDisplaySlider->setMaximum(m_particleCount);
+    ui->histogramSizespinBox->setValue(m_histSize);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }
 
@@ -93,12 +94,10 @@ void PFWidget::onActionSetupPF()
     int width;
     int height;
     std::tie(width, height) = frameSize;
-
-    m_TargetsVector[0]->setHistSize(10);
-
-    m_PF = new ParticleFilter(width, height, m_nParticles, m_nIters, m_ParticleWidth, m_TargetsVector[0]);
-
-    ui->particlesToDisplaySlider->setMaximum(m_nParticles);
+    m_TargetsVector[0]->setHistSize(m_histSize);
+    m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters, m_particleWidth, m_TargetsVector[0]);
+    m_PF->setHistSize(m_histSize);
+    ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setPF(m_PF);
 }
 
@@ -137,17 +136,20 @@ QString PFWidget::getFormattedTime(int timeInSeconds)
 
 void PFWidget::onHorizontalSliderPressed()
 {
+    m_isPlaying = !m_VideoPlayer->isStopped();
     m_VideoPlayer->stopVideo();
 }
 
 void PFWidget::onHorizontalSliderReleased()
 {
-    m_VideoPlayer->playVideo();
+    m_VideoPlayer->setCurrentFrame(m_currFrame);
+    if(m_isPlaying)
+        m_VideoPlayer->playVideo();
 }
 
 void PFWidget::onHorizontalSliderMoved(int position)
 {
-    m_VideoPlayer->setCurrentFrame(position);
+    m_currFrame = position;
 }
 
 void PFWidget::onSetParticleCountSliderMoved(int position)
@@ -177,32 +179,32 @@ void PFWidget::onActionOpen()
         ui->horizontalSlider->setEnabled(true);
         ui->particlesToDisplaySlider->setEnabled(true);
         ui->horizontalSlider->setMaximum(m_VideoPlayer->getNumberOfFrames());
-        std::tuple<int,int> framesize = m_VideoPlayer->getFrameSize();
+        std::tuple<int, int> framesize = m_VideoPlayer->getFrameSize();
         int frameWidth;
         int frameHeight;
-        std::tie (frameWidth,frameHeight) = framesize;
+        std::tie(frameWidth, frameHeight) = framesize;
         m_VideoLodaded = true;
     }
 }
 
 void PFWidget::onParticleCountChange(int value)
 {
-    m_PF->setNumParticles(value);
+    m_particleCount = value;
 }
 
 void PFWidget::onIterationCountChange(int value)
 {
-    m_PF->setNumIters(value);
+    m_numIters = value;
 }
 
 void PFWidget::onParticleWidthChange(int value)
 {
-    m_PF->setParticleWidth(value);
+    m_particleWidth = value;
 }
 
 void PFWidget::onHistSizeChanged(int value)
 {
-//    m_PF->setHistSize(value);
+    m_histSize = value;
 }
 
 
