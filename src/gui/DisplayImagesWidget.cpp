@@ -1,8 +1,8 @@
 #include "src/util/precompiled.h"
 
 
-#include "displayimageswidget.h"
-#include "ui_displayimageswidget.h"
+#include "DisplayImagesWidget.h"
+#include "ui_DisplayImagesWidget.h"
 
 DisplayImagesWidget::DisplayImagesWidget(QWidget *parent) :
     QWidget(parent),

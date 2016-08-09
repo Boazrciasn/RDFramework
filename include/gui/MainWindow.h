@@ -9,14 +9,14 @@
 #include <QThread>
 
 #include "Reader.h"
-#include "mydialog.h"
-#include "histogramdialog.h"
+#include "MyDialog.h"
+#include "HistogramDialog.h"
 #include "Util.h"
-#include "rdfdialog.h"
-#include "annextractordialog.h"
-#include "resizeallimagesdialog.h"
-#include "displayimageswidget.h"
-#include "pfwidget.h"
+#include "RDFDialog.h"
+#include "AnnExtractorDialog.h"
+#include "ResizeAllImagesDialog.h"
+#include "DisplayImagesWidget.h"
+#include "PFWidget.h"
 
 
 namespace Ui

@@ -1,5 +1,5 @@
-#include "pfwidget.h"
-#include "ui_pfwidget.h"
+#include "PFWidget.h"
+#include "ui_PFWidget.h"
 
 PFWidget::PFWidget(QWidget *parent) :
     QWidget(parent),

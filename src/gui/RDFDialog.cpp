@@ -1,8 +1,8 @@
 #include "src/util/precompiled.h"
 
 #include "RDFParams.h"
-#include "rdfdialog.h"
-#include "ui_rdfdialog.h"
+#include "RDFDialog.h"
+#include "ui_RDFDialog.h"
 
 
 RDFDialog::RDFDialog(QWidget *parent) :

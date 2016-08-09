@@ -1,6 +1,6 @@
 #include "src/util/precompiled.h"
 
-#include "mainwindow.h"
+#include "MainWindow.h"
 
 #include "TextRegionDetector.h"
 #include "ui_mainwindow.h"

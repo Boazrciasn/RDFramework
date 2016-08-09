@@ -1,7 +1,7 @@
 #include "src/util/precompiled.h"
 
-#include "resizeallimagesdialog.h"
-#include "ui_resizeallimagesdialog.h"
+#include "ResizeAllImagesDialog.h"
+#include "ui_ResizeallImagesDialog.h"
 
 #include "Reader.h"
 

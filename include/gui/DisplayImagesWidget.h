@@ -10,8 +10,8 @@
 
 #include "PageParser.h"
 #include "Reader.h"
-#include "mydialog.h"
-#include "histogramdialog.h"
+#include "MyDialog.h"
+#include "HistogramDialog.h"
 #include "PageParser.h"
 #include "Util.h"
 

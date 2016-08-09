@@ -1,7 +1,7 @@
 #include "src/util/precompiled.h"
 
-#include "annextractordialog.h"
-#include "ui_annextractordialog.h"
+#include "AnnExtractorDialog.h"
+#include "ui_AnnExtractorDialog.h"
 #include "Util.h"
 
 AnnExtractorDialog::AnnExtractorDialog(QWidget *parent) :

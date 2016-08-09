@@ -1,7 +1,7 @@
 #ifndef CPV_UTIL
 #define CPV_UTIL
 
-#include "histogramdialog.h"
+#include "HistogramDialog.h"
 #include "PixelCloud.h"
 
 template <typename T, typename FUNC>

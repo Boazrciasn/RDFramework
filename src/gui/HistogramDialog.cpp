@@ -1,7 +1,7 @@
 #include "src/util/precompiled.h"
 
-#include "histogramdialog.h"
-#include "ui_histogramdialog.h"
+#include "HistogramDialog.h"
+#include "ui_HistogramDialog.h"
 
 HistogramDialog::HistogramDialog(QWidget *parent) :
     QDialog(parent),

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "mainwindow.h"
+#include "MainWindow.h"
 #include "Reader.h"
 #include "RandomDecisionForest.h"
 
