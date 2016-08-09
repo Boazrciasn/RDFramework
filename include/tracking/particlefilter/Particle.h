@@ -11,11 +11,10 @@ enum {Circle, Rectangle};
 class Particle
 {
   public:
-    Particle(int x, int y, int width, float weight, cv::Mat &target, int histSize)
+    Particle(int x, int y, float weight, cv::Mat &target, int histSize)
     {
         m_x = x;
         m_y = y;
-        m_width = width;
         m_weight = weight;
         m_TargetHist = target;
         m_histSize = histSize;
@@ -32,20 +31,14 @@ class Particle
     inline void setX(int value) {m_x = value;}
     inline void setY(int value) {m_y = value;}
     inline void setWidth(int value) {m_width = value;}
-    inline void setWeight(float distBhat)
-    {
-        if (distBhat > 1.0)
-            distBhat = 1.0;
-        else if (distBhat < 0.0)
-            distBhat = 1.0;
-        m_weight = 1.0 - (distBhat);
-    }
+    inline void setWeight(float value) { m_weight = value; }
 
 
   protected:
     int m_x;
     int m_y;
     int m_width;
+    int m_height;
     int m_histSize;
     float m_weight;
     cv::Mat m_TargetHist;

@@ -16,8 +16,6 @@ PFWidget::PFWidget(QWidget *parent) :
     m_ParticleWidth = ui->particleWidthLSpinBox->value();
     ui->particlesToDisplaySlider->setMaximum(m_nParticles);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-
-
 }
 
 void PFWidget::mouseMoveEvent(QMouseEvent *event)
@@ -91,6 +89,15 @@ void PFWidget::onActionSaveTarget()
 
 void PFWidget::onActionSetupPF()
 {
+    std::tuple<int, int> frameSize = m_VideoPlayer->getFrameSize();
+    int width;
+    int height;
+    std::tie(width, height) = frameSize;
+
+    m_TargetsVector[0]->setHistSize(10);
+
+    m_PF = new ParticleFilter(width, height, m_nParticles, m_nIters, m_ParticleWidth, m_TargetsVector[0]);
+
     ui->particlesToDisplaySlider->setMaximum(m_nParticles);
     m_VideoPlayer->setPF(m_PF);
 }
@@ -195,7 +202,7 @@ void PFWidget::onParticleWidthChange(int value)
 
 void PFWidget::onHistSizeChanged(int value)
 {
-    m_PF->setHistSize(value);
+//    m_PF->setHistSize(value);
 }
 
 

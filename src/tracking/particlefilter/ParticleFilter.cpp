@@ -4,8 +4,9 @@
 
 
 ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters,
-                               int particleWidth)
+                               int particleWidth, Target *target)
 {
+    m_target = target;
     img_height = frameHeight;
     img_width = frameWidth;
     m_num_particles_to_display = 0;
@@ -38,7 +39,7 @@ void ParticleFilter::initializeParticles()
         int y = (rand() % (img_height - m_particle_width));
         float weight = 1.0 / m_num_particles;
         Particle *particle;
-        particle = new RectangleParticle(x, y, m_particle_width, weight, m_Targets.at(0)->getHist(), m_histSize);
+        particle = new RectangleParticle(x, y, m_particle_width, m_particle_width, weight, m_target->getHist(), m_histSize);
         m_Particles.push_back(particle);
     }
 }
@@ -81,7 +82,7 @@ void ParticleFilter::resampleParticles()
         int newX, newY;
         distortParticle(p_to_distort, newX, newY);
         Particle *p_new;
-        p_new = new RectangleParticle(newX, newY, m_particle_width, 1.0 / m_num_particles, m_Targets.at(0)->getHist(),
+        p_new = new RectangleParticle(newX, newY, m_particle_width, m_particle_width, 1.0 / m_num_particles, m_target->getHist(),
                                       m_histSize);
         m_ParticlesNew.push_back(p_new);
     }

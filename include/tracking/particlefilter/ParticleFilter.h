@@ -11,14 +11,13 @@
 #include "Target.h"
 #include "RectangleParticle.h"
 #include "VideoReader.h"
-//#include <tbb/tbb.h>
 
 class ParticleFilter
 {
 
   public:
-    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth);
-    QVector<Target *> m_Targets;
+    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, Target *target);
+    Target *m_target;
 
     inline int getNumParticles() const { return m_num_particles; }
     inline int getHistSize() const { return m_histSize; }
@@ -37,7 +36,7 @@ class ParticleFilter
     inline void setNumParticles(int value) { m_num_particles = value; }
     inline void setHistSize(int histSize) { m_histSize = histSize; }
     inline void setNumIters(int value) { m_num_iters = value; }
-    inline void setTargets(QVector<Target *> targets) { m_Targets = targets;}
+    inline void setTarget(Target *target) { m_target = target;}
     inline void setParticleWidth(int value) { m_particle_width = value; }
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
@@ -66,7 +65,7 @@ class ParticleFilter
     int m_num_particles;
     int m_num_iters;
     int m_particle_width;
-    int m_histSize = 64;
+    int m_histSize = 10;
     std::atomic<int> m_num_particles_to_display;
     int type = Rectangle;
     std::vector<Particle *> m_Particles;
