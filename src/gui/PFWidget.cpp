@@ -5,8 +5,8 @@ PFWidget::PFWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PFWidget)
 {
-    m_PF_executor = new PFExecutor(this);
-    QObject::connect(m_PF_executor, SIGNAL(processedImage(QImage)), SLOT(updatePlayerUI(QImage)));
+    m_VideoPlayer = new VideoPlayer(this);
+    QObject::connect(m_VideoPlayer, SIGNAL(playerFrame(QImage)), SLOT(updatePlayerUI(QImage)));
     ui->setupUi(this);
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
@@ -16,24 +16,24 @@ PFWidget::PFWidget(QWidget *parent) :
     m_ParticleWidth = ui->particleWidthLSpinBox->value();
     ui->particlesToDisplaySlider->setMaximum(m_nParticles);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+
+
 }
 
 void PFWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(m_VideoLodaded)
-    {
+    if (m_VideoLodaded)
         m_RubberBand->setGeometry(QRect(m_Point, event->pos()).normalized());
-    }
 }
 
 void PFWidget::mousePressEvent(QMouseEvent *event)
 {
-    if(m_VideoLodaded)
+    if (m_VideoLodaded)
     {
-        m_PF_executor->stopVideo();
+        m_VideoPlayer->stopVideo();
         if (m_RubberBand->isEnabled())
             m_RubberBand->hide();
-        if(ui->display_label->underMouse())
+        if (ui->display_label->underMouse())
         {
             m_Point = event->pos();
             m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
@@ -44,7 +44,7 @@ void PFWidget::mousePressEvent(QMouseEvent *event)
 
 void PFWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(m_VideoLodaded)
+    if (m_VideoLodaded)
     {
         QPoint a = mapToGlobal(m_Point);
         QPoint b = event->globalPos();
@@ -89,9 +89,15 @@ void PFWidget::onActionSaveTarget()
     }
 }
 
+void PFWidget::onActionSetupPF()
+{
+    ui->particlesToDisplaySlider->setMaximum(m_nParticles);
+    m_VideoPlayer->setPF(m_PF);
+}
+
 PFWidget::~PFWidget()
 {
-    delete m_PF_executor;
+    delete m_VideoPlayer;
     delete ui;
 }
 
@@ -103,20 +109,20 @@ void PFWidget::updatePlayerUI(QImage img)
         ui->display_label->setPixmap(
             QPixmap::fromImage(img).scaled(ui->display_label->size(), Qt::KeepAspectRatio, Qt::FastTransformation)
         );
-        ui->horizontalSlider->setValue(m_PF_executor->getCurrentFrame());
+        ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
     }
-    int ratio = m_simplePF->getRatioOfTop(ui->particlesToDisplaySlider->value());
+    int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());
     ui->top_n_ratio_label->setText(QString::number(ratio));
     ui->top_n_ratio_label->repaint();
 }
 
 QString PFWidget::getFormattedTime(int timeInSeconds)
 {
-    int seconds = (int) (timeInSeconds) % 60 ;
-    int minutes = (int) ((timeInSeconds / 60) % 60);
-    int hours   = (int) ((timeInSeconds / (60 * 60)) % 24);
+    int seconds = (int)(timeInSeconds) % 60 ;
+    int minutes = (int)((timeInSeconds / 60) % 60);
+    int hours   = (int)((timeInSeconds / (60 * 60)) % 24);
     QTime t(hours, minutes, seconds);
-    if (hours == 0 )
+    if (hours == 0)
         return t.toString("mm:ss");
     else
         return t.toString("h:mm:ss");
@@ -124,25 +130,25 @@ QString PFWidget::getFormattedTime(int timeInSeconds)
 
 void PFWidget::onHorizontalSliderPressed()
 {
-    m_PF_executor->stopVideo();
+    m_VideoPlayer->stopVideo();
 }
 
 void PFWidget::onHorizontalSliderReleased()
 {
-    m_PF_executor->playVideo();
+    m_VideoPlayer->playVideo();
 }
 
 void PFWidget::onHorizontalSliderMoved(int position)
 {
-    m_PF_executor->setCurrentFrame(position);
+    m_VideoPlayer->setCurrentFrame(position);
 }
 
 void PFWidget::onSetParticleCountSliderMoved(int position)
 {
     ui->particlesToDisplayLabel->setText(QString::number(position));
-    m_simplePF->setParticlesToDisplay(position);
+    m_PF->setParticlesToDisplay(position);
     //    mPF->showTopNParticles(position);
-    int ratio = m_simplePF->getRatioOfTop(position);
+    int ratio = m_PF->getRatioOfTop(position);
     ui->top_n_ratio_label->setText(QString::number(ratio));
     ui->top_n_ratio_label->repaint();
 }
@@ -151,7 +157,7 @@ void PFWidget::onActionOpen()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open a File", "", "Video File (*.*)");
     QFileInfo name = filename;
-    if (!m_PF_executor->loadVideo(filename.toStdString()))
+    if (!m_VideoPlayer->loadVideo(filename.toStdString()))
     {
         QMessageBox msgBox;
         msgBox.setText(" Selected video could not be opened! ");
@@ -163,55 +169,50 @@ void PFWidget::onActionOpen()
         ui->start_pushButton->setEnabled(true);
         ui->horizontalSlider->setEnabled(true);
         ui->particlesToDisplaySlider->setEnabled(true);
-        ui->horizontalSlider->setMaximum(m_PF_executor->getNumberOfFrames());
+        ui->horizontalSlider->setMaximum(m_VideoPlayer->getNumberOfFrames());
+        std::tuple<int,int> framesize = m_VideoPlayer->getFrameSize();
+        int frameWidth;
+        int frameHeight;
+        std::tie (frameWidth,frameHeight) = framesize;
         m_VideoLodaded = true;
     }
 }
 
 void PFWidget::onParticleCountChange(int value)
 {
-    m_nParticles = value;
-    m_simplePF->setNumParticles(m_nParticles);
-    ui->particlesToDisplaySlider->setMaximum(m_nParticles);
+    m_PF->setNumParticles(value);
 }
 
 void PFWidget::onIterationCountChange(int value)
 {
-    m_nIters = value;
+    m_PF->setNumIters(value);
 }
 
 void PFWidget::onParticleWidthChange(int value)
 {
-    m_ParticleWidth = value;
+    m_PF->setParticleWidth(value);
 }
 
 void PFWidget::onHistSizeChanged(int value)
 {
-    m_histSize = value;
+    m_PF->setHistSize(value);
 }
 
 
 void PFWidget::onActionPlay()
 {
-    if(m_VideoLodaded)
+    if (m_VideoLodaded)
     {
-        m_simplePF = new SimplePF(m_PF_executor->getFrameWidth(), m_PF_executor->getFrameHeight(),
-                                  m_nParticles, m_nIters, m_ParticleWidth);
-        m_simplePF->setHistSize(m_histSize);
-        m_simplePF->setParticleWidth(m_ParticleWidth);
-        m_simplePF->setNumIters(m_nIters);
-        m_simplePF->setTargets(m_TargetsVector);
-        m_PF_executor->setPF(m_simplePF);
-        m_PF_executor->playVideo();
+        m_VideoPlayer->playVideo();
         setPFSettingsEnabled(false);
     }
 }
 
 void PFWidget::onActionPause()
 {
-    if(m_VideoLodaded)
+    if (m_VideoLodaded)
     {
-        m_PF_executor->stopVideo();
+        m_VideoPlayer->stopVideo();
         setPFSettingsEnabled(true);
     }
 }

@@ -1,9 +1,10 @@
-#include "particlefilter/SimplePF.h"
+#include "particlefilter/ParticleFilter.h"
 #include <time.h>
 #include <opencv2/imgproc.hpp>
 
 
-SimplePF::SimplePF(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth)
+ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters,
+                               int particleWidth)
 {
     img_height = frameHeight;
     img_width = frameWidth;
@@ -13,26 +14,23 @@ SimplePF::SimplePF(int frameWidth, int frameHeight, int nParticles, int nIters, 
     setParticleWidth(particleWidth);
     setParticlesToDisplay(m_num_particles_to_display);
     srand(time(NULL));
-    //    initializeParticles();
+    initializeParticles();
 }
 
-
-void SimplePF::run()
+void ParticleFilter::processImage()
 {
-    initializeParticles();
     for (int i = 0; i < m_num_iters; i++)
     {
-        resample();
+        resampleParticles();
         updateWeights();
         sortParticlesDescending();
-        normalize();
+        normalizeWeights();
     }
-    //    showParticles();
     showTopNParticles(m_num_particles_to_display);
 }
 
 
-void SimplePF::initializeParticles()
+void ParticleFilter::initializeParticles()
 {
     for (int i = 0; i < m_num_particles; ++i)
     {
@@ -41,77 +39,77 @@ void SimplePF::initializeParticles()
         float weight = 1.0 / m_num_particles;
         Particle *particle;
         particle = new RectangleParticle(x, y, m_particle_width, weight, m_Targets.at(0)->getHist(), m_histSize);
-        m_pParticles.push_back(particle);
+        m_Particles.push_back(particle);
     }
 }
 
-void SimplePF::updateWeights()
+void ParticleFilter::updateWeights()
 {
     for (int i = 0; i < m_num_particles; i++)
-        m_pParticles[i]->exec( *&img);
+        m_Particles[i]->exec( *&m_img);
 }
 
-void SimplePF::sortParticlesDescending()
+void ParticleFilter::sortParticlesDescending()
 {
     for (int i = 0; i < m_num_particles; i++)
         for (int j = i; j < m_num_particles; j++)
-            if (m_pParticles[i]->weight() < m_pParticles[j]->weight())
+            if (m_Particles[i]->getWeight() < m_Particles[j]->getWeight())
                 swap(i, j);
 }
 
-void SimplePF::swap(int indA, int indB)
+void ParticleFilter::swap(int indA, int indB)
 {
-    Particle *temp = m_pParticles[indA];
-    m_pParticles[indA] = m_pParticles[indB];
-    m_pParticles[indB] = temp;
+    Particle *temp = m_Particles[indA];
+    m_Particles[indA] = m_Particles[indB];
+    m_Particles[indB] = temp;
 }
 
-void SimplePF::normalize()
+void ParticleFilter::normalizeWeights()
 {
     float total_weight = 0;
     for (int i = 0; i < m_num_particles; ++i)
-        total_weight += m_pParticles[i]->weight();
-    for (unsigned int i = 0; i < m_pParticles.size(); ++i)
-        m_pParticles[i]->setWeight(m_pParticles[i]->weight() / total_weight);
+        total_weight += m_Particles[i]->getWeight();
+    for (unsigned int i = 0; i < m_Particles.size(); ++i)
+        m_Particles[i]->setWeight(m_Particles[i]->getWeight() / total_weight);
 }
 
-void SimplePF::resample()
+void ParticleFilter::resampleParticles()
 {
     for (int j = 0; j < m_num_particles; j++)
     {
-        Particle *p_to_distort = m_pParticles[randomParticle()];
+        Particle *p_to_distort = m_Particles[randomParticle()];
         int newX, newY;
-        distort(p_to_distort, newX, newY);
+        distortParticle(p_to_distort, newX, newY);
         Particle *p_new;
         p_new = new RectangleParticle(newX, newY, m_particle_width, 1.0 / m_num_particles, m_Targets.at(0)->getHist(),
                                       m_histSize);
-        m_pParticlesNew.push_back(p_new);
+        m_ParticlesNew.push_back(p_new);
     }
     updateParticles();
 }
 
-int SimplePF::randomParticle()
+int ParticleFilter::randomParticle()
 {
     float rand_number = (float)(rand() % 100) / 100;
     float sum = 0;
     for (int i = 0; i < m_num_particles; i++)
     {
-        sum += m_pParticles[i]->weight();
+        sum += m_Particles[i]->getWeight();
         if (sum >= rand_number)
             return i;
     }
     return 0;
 }
 
-void SimplePF::distort(Particle *p, int &x, int &y)
+void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
 {
     try
     {
         std::normal_distribution<double> distribution(0, 5);
         int dx = (int)distribution(generator);
         int dy = (int)distribution(generator);
-        x = p->x();
-        y = p->y();
+        x = p->getX();
+        y = p->getY();
         int newx = x + dx;
         int newy = y + dy;
         if (newx < img_width - m_particle_width && newx > 0)
@@ -125,58 +123,55 @@ void SimplePF::distort(Particle *p, int &x, int &y)
     }
 }
 
-void SimplePF::updateParticles()
+void ParticleFilter::updateParticles()
 {
     for (int j = 0; j < m_num_particles; j++)
     {
-        m_pParticles[j] = m_pParticlesNew.back();
-        m_pParticlesNew.pop_back();
+        m_Particles[j] = m_ParticlesNew.back();
+        m_ParticlesNew.pop_back();
     }
 }
 
-void SimplePF::showParticles()
+void ParticleFilter::showParticles()
 {
-    img->copyTo(outIMG);
+    m_img->copyTo(m_outIMG);
     int x = 0;
     int y = 0;
     for (int i = 0; i < m_num_particles; ++i)
     {
-        x += m_pParticles[i]->x();
-        y += m_pParticles[i]->y();
-        //int x_end = x + particle_radius;
-        //int y_end = y + particle_radius;
-        //rectangle(outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        x += m_Particles[i]->getX();
+        y += m_Particles[i]->getY();
     }
     x = x / m_num_particles;
     y = y / m_num_particles;
     int x_end = x + m_particle_width;
     int y_end = y + m_particle_width;
     int r = m_particle_width / 2;;
-    if(modelType() == Circle)
-        circle(outIMG, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
-    else if(modelType() == Rectangle)
-        rectangle(outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+    if (getModelType() == Circle)
+        circle(m_outIMG, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
+    else if (getModelType() == Rectangle)
+        rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     else
-        rectangle(outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
 }
 
-void SimplePF::showTopNParticles(int count)
+void ParticleFilter::showTopNParticles(int count)
 {
-    img->copyTo(outIMG);
-    if(count > m_num_particles)
+    m_img->copyTo(m_outIMG);
+    if (count > m_num_particles)
         count = m_num_particles;
-    else if(count == 0)
+    else if (count == 0)
         showParticles();
     int x = 0;
     int y = 0;
     for (int i = 0; i < count; ++i)
     {
-        x = m_pParticles[i]->x();
-        y = m_pParticles[i]->y();
+        x = m_Particles[i]->getX();
+        y = m_Particles[i]->getY();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_width;
-        rectangle(outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     }
 }
 
-SimplePF::~SimplePF() {}
+ParticleFilter::~ParticleFilter() {}

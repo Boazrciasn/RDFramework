@@ -24,45 +24,23 @@ class Particle
     virtual void exec(cv::Mat *img) = 0;
     virtual Particle *clone() = 0;
 
-    inline int x() const
-    {
-        return m_x;
-    }
-    inline void setX(int value)
-    {
-        m_x = value;
-    }
+    inline int getWidth() const {return m_width;}
+    inline int getX() const {return m_x;}
+    inline int getY() const {return m_y;}
+    inline float getWeight() const {return m_weight;}
 
-    inline int y() const
-    {
-        return m_y;
-    }
-    inline void setY(int value)
-    {
-        m_y = value;
-    }
-
-    inline float weight() const
-    {
-        return m_weight;
-    }
+    inline void setX(int value) {m_x = value;}
+    inline void setY(int value) {m_y = value;}
+    inline void setWidth(int value) {m_width = value;}
     inline void setWeight(float distBhat)
     {
-        if(distBhat > 1.0)
+        if (distBhat > 1.0)
             distBhat = 1.0;
         else if (distBhat < 0.0)
             distBhat = 1.0;
         m_weight = 1.0 - (distBhat);
     }
 
-    inline int width() const
-    {
-        return m_width;
-    }
-    inline void setWidth(int value)
-    {
-        m_width = value;
-    }
 
   protected:
     int m_x;

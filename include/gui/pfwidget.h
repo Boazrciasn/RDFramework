@@ -7,10 +7,11 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <tuple>
 #include "Util.h"
 #include "VideoReader.h"
-#include "particlefilter/SimplePF.h"
-#include "particlefilter/PFExecutor.h"
+#include "particlefilter/ParticleFilter.h"
+#include "VideoPlayer.h"
 #include "Target.h"
 
 namespace Ui
@@ -41,6 +42,7 @@ class PFWidget : public QWidget
     void onActionPlay();
     void onActionPause();
     void onActionSaveTarget();
+    void onActionSetupPF();
 
     void onParticleCountChange(int value);
     void onIterationCountChange(int value);
@@ -49,8 +51,8 @@ class PFWidget : public QWidget
 
   private:
     Ui::PFWidget *ui;
-    PFExecutor *m_PF_executor;
-    SimplePF *m_simplePF;
+    VideoPlayer *m_VideoPlayer;
+    ParticleFilter *m_PF;
 
     cv::Mat m_Frame;
     cv::Mat m_FrameGray;
@@ -63,6 +65,8 @@ class PFWidget : public QWidget
     QRubberBand *m_RubberBand;
     QRect m_TargetROI;
     QPoint m_Point;
+
+    RectangleParticle *m_RectParticle;
 
     QVector<Target *> m_TargetsVector;
     quint32 m_TargetCount = 0 ;

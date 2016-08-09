@@ -1,57 +1,27 @@
 #include "precompiled.h"
 #include "VideoReader.h"
 
-VideoReader::VideoReader(QObject *parent) : QThread(parent)
+
+VideoReader::VideoReader(QObject *parent, BufferQueue *buffer) : QThread(parent)
 {
-    m_stop = true;
+    m_FrameBuffer = buffer;
 }
 
 void VideoReader::run()
 {
-    while(!m_stop)
+    while (!m_stop)
     {
-        bool capSuccess = m_capture->read(m_frame);
-        if (!capSuccess)
+        while (getBufferSize() < 200 && m_bufferEndPos <= m_numOfFrames)
         {
-            m_stop = true;
-            qDebug() << "NULL";
+            bool capSuccess = m_capture->read(m_frame);
+            if (!capSuccess)
+                qDebug() << "NULL";
+            cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
+            m_FrameBuffer->enqueue(m_RGBframe.clone());
+            ++m_bufferEndPos;
+            msleep(0);
         }
-        cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
-        addToBuffer(m_RGBframe.clone());
-        msleep(0);
     }
-    m_bufferReady = true;
-}
-
-void VideoReader::addToBuffer(cv::Mat frame)
-{
-    m_mutex.lock();
-    m_frame_buffer.push_back(frame);
-    m_mutex.unlock();
-}
-
-cv::Mat VideoReader::getFrame()
-{
-    cv::Mat out;
-    m_mutex.lock();
-    qDebug() << m_frame_buffer.size() << "Test size";
-    if(!m_frame_buffer.empty())
-    {
-        out = m_frame_buffer.front();
-        m_frame_buffer.pop_front();
-    }
-    qDebug() << m_frame_buffer.size() << "after Test size";
-    m_mutex.unlock();
-    return out;
-}
-
-void VideoReader::processFrame()
-{
-    //    cv::cvtColor(m_RGBframe, m_frame_gray, CV_BGR2GRAY);
-    //    mPF->setIMG(&m_frame_gray);
-    //    mPF->run();
-    //    m_frame_out = mPF->getIMG();
-    //    m_img = Util::toQt(m_frame_out,QImage::Format_RGB888);
 }
 
 void VideoReader::msleep(int ms)
@@ -60,12 +30,14 @@ void VideoReader::msleep(int ms)
     nanosleep(&ts, NULL);
 }
 
+
 bool VideoReader::loadVideo(std::string filename)
 {
     m_capture = new cv::VideoCapture(filename);
-    if(m_capture->isOpened())
+    if (m_capture->isOpened())
     {
         m_frameRate = (int) m_capture->get(CV_CAP_PROP_FPS);
+        m_numOfFrames = m_capture->get(CV_CAP_PROP_FRAME_COUNT);
         qDebug() << "file is open!";
         return true;
     }
@@ -76,61 +48,28 @@ bool VideoReader::loadVideo(std::string filename)
     }
 }
 
-void VideoReader::loadBuffer()
+void VideoReader::startBuffer()
 {
-    if(!isRunning())
+    if (!isRunning())
     {
-        if(isStopped())
+        if (m_stop)
             m_stop = false;
-        start(LowPriority);
+        start(HighestPriority);
     }
 }
 
-void VideoReader::stopVideo()
+int VideoReader::getBufferSize() const
 {
-    m_stop = true;
-}
-
-bool VideoReader::isStopped() const
-{
-    return m_stop;
-}
-
-int VideoReader::getBufferSize()
-{
-    return m_frame_buffer.size();
+    return m_FrameBuffer->getSize();
 }
 
 void VideoReader::setCurrentFrame(int frameNumber)
 {
+    m_FrameBuffer->clear();
+    m_bufferEndPos = frameNumber;
     m_capture->set(CV_CAP_PROP_POS_FRAMES, frameNumber);
+    startBuffer();
 }
-
-double VideoReader::getFrameRate()
-{
-    return m_frameRate;
-}
-
-double VideoReader::getCurrentFrame()
-{
-    return m_capture->get(CV_CAP_PROP_POS_FRAMES);
-}
-
-int VideoReader::getNumberOfFrames()
-{
-    return m_capture->get(CV_CAP_PROP_FRAME_COUNT);
-}
-
-int VideoReader::getFrameHeight()
-{
-    return m_capture->get(CV_CAP_PROP_FRAME_HEIGHT);
-}
-
-int VideoReader::getFrameWidth()
-{
-    return m_capture->get(CV_CAP_PROP_FRAME_WIDTH);
-}
-
 
 VideoReader::~VideoReader()
 {
@@ -138,7 +77,7 @@ VideoReader::~VideoReader()
     m_stop = true;
     m_capture->release();
     delete m_capture;
-    delete &m_frame_buffer;
+    delete m_FrameBuffer;
     m_waitcond.wakeOne();
     m_mutex.unlock();
     wait();

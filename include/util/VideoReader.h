@@ -1,68 +1,54 @@
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
-
-#include <QMutex>
+#include "src/util/precompiled.h"
 #include <QThread>
 #include <QImage>
 #include <QWaitCondition>
-#include "particlefilter/SimplePF.h"
 #include <queue>
+#include "Util.h"
+#include "BufferQueue.h"
 
 
 //#include "opencv2/opencv.hpp"  //TODO: move to precompiled
 
-#include "Util.h"
 
 class VideoReader : public QThread
 {
     Q_OBJECT
 
   private:
-    bool m_stop;
     QMutex m_mutex;
     QWaitCondition m_waitcond;
     cv::Mat m_frame;
     cv::Mat m_frame_out;
     cv::Mat m_frame_gray;
-    int m_frameRate;
+    double m_frameRate;
+    int m_numOfFrames;
+    int m_bufferEndPos = 0;
     cv::VideoCapture *m_capture;
     cv::Mat m_RGBframe;
     QImage m_img;
-
-    std::deque<cv::Mat> m_frame_buffer;
-
-    void addToBuffer(cv::Mat frame);
-    void processFrame();
-
-  signals :
-    void processedImage(const QImage &image);
+    BufferQueue *m_FrameBuffer;
+    bool m_stop = false;
 
   protected:
     void run();
     void msleep(int ms);
 
   public:
-    VideoReader(QObject *parent);
+    VideoReader(QObject *parent, BufferQueue *buffer);
     ~VideoReader();
-    bool m_bufferReady = false;
     bool loadVideo(std::string filename);
-    void loadBuffer();
-    void stopVideo();
-    bool isStopped() const;
-    int getBufferSize();
-
-//    inline void setPF(SimplePF *pf){ mPF = pf;}
-//    inline SimplePF* getPF(){ return mPF;}
+    void startBuffer();
+    void stopBuffer() { m_stop = true; }
 
     void setCurrentFrame(int frameNumber);
-    double getFrameRate();
-    double getCurrentFrame();
-    int getNumberOfFrames();
-    int getFrameHeight();
-    int getFrameWidth();
+    int getBufferSize() const;
+    double getFrameRate() const { return m_frameRate; }
+    int getNumberOfFrames() const { return m_capture->get(CV_CAP_PROP_FRAME_COUNT); }
+    int getFrameHeight() const { return m_capture->get(CV_CAP_PROP_FRAME_HEIGHT); }
+    int getFrameWidth() const { return m_capture->get(CV_CAP_PROP_FRAME_WIDTH); }
 
-    cv::Mat getFrame();
-    void getFrame(cv::Mat &frame, int index);
 };
 
 #endif // VIDEOPLAYER_H
