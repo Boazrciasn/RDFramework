@@ -1,7 +1,7 @@
 #ifndef RDFPARAMS_H
 #define RDFPARAMS_H
 
-struct  RDFParams
+struct RDFParams
 {
     QString trainImagesDir;
     QString trainAnnotationsDir;

@@ -13,10 +13,6 @@ class VideoPlayer : public QThread
 {
     Q_OBJECT
 
-  public:
-    VideoPlayer(QObject *parent);
-    ~VideoPlayer();
-
   signals :
     void playerFrame(const QImage &image);
 
@@ -37,12 +33,15 @@ class VideoPlayer : public QThread
 
     double m_CurrentFrame;
 
-    ParticleFilter *m_PF = NULL;
+    ParticleFilter *m_PF{};
     void processPF();
 
     void initializeVideo();
 
   public:
+    VideoPlayer(QObject *parent);
+    ~VideoPlayer();
+
     bool loadVideo(std::string filename);
     void playVideo();
     void stopVideo() { m_stop = true; }
@@ -51,7 +50,7 @@ class VideoPlayer : public QThread
     inline ParticleFilter *getPF() const { return m_PF; }
 
     int getNumberOfFrames() const { return m_VideoReader->getNumberOfFrames(); }
-    std::tuple<int,int> getFrameSize();
+    std::tuple<int, int> getFrameSize();
 
     inline void setPF(ParticleFilter *pf) { m_PF = pf; }
     void setCurrentFrame(int frameNumber);

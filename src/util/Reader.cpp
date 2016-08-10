@@ -7,11 +7,11 @@ void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
     // TO DO : UPDATE readFromTo
     struct dirent *ent;
     // check for valid directory
-    if ((m_dir = opendir(filename.c_str())) != NULL)
+    if ((m_dir = opendir(filename.c_str())))
     {
         QString prev = "abdd";
         // read from folder until it is empty
-        while((ent = readdir(m_dir)) != NULL)
+        while((ent = readdir(m_dir)))
         {
             // get filename and convert it to string
             std::string str = (std::string)ent->d_name;

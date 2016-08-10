@@ -14,6 +14,8 @@
 #include "VideoPlayer.h"
 #include "Target.h"
 
+class RectangleParticle;
+
 namespace Ui
 {
 class PFWidget;
@@ -53,7 +55,7 @@ class PFWidget : public QWidget
   private:
     Ui::PFWidget *ui;
     VideoPlayer *m_VideoPlayer;
-    ParticleFilter *m_PF;
+    ParticleFilter *m_PF{};
 
     cv::Mat m_Frame;
     cv::Mat m_FrameGray;

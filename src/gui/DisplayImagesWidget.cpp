@@ -50,7 +50,7 @@ void DisplayImagesWidget::extractWords()
         m_coords.clear();
     }
     delete m_pageParser;
-    m_pageParser = NULL;
+    m_pageParser = nullptr;
 }
 
 void DisplayImagesWidget::browseButton_clicked()

@@ -4,18 +4,10 @@
 #include <queue>
 
 
-template<class T>
-
+template <class T>
 class BufferQueue
 {
-
   public:
-    BufferQueue(){}
-    ~BufferQueue()
-    {
-        delete &m_buffer;
-    }
-
     inline T dequeue()
     {
         T out;
@@ -28,20 +20,23 @@ class BufferQueue
         m_mutex.unlock();
         return out;
     }
+
     inline void enqueue(T input)
     {
         m_mutex.lock();
         m_buffer.push_back(input);
         m_mutex.unlock();
     }
-    inline int getSize()
+
+    inline int size()
     {
-        int size;
+        int sz;
         m_mutex.lock();
-        size = m_buffer.size();
+        sz = m_buffer.size();
         m_mutex.unlock();
-        return size;
+        return sz;
     }
+
     inline bool empty()
     {
         bool empty;
@@ -50,6 +45,7 @@ class BufferQueue
         m_mutex.unlock();
         return empty;
     }
+
     inline void clear()
     {
         m_mutex.lock();

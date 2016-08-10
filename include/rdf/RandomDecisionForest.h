@@ -14,7 +14,7 @@ class RandomDecisionForest : public QObject
   public:
     RandomDecisionForest()
     {
-        srand(time(NULL));
+        srand(time(nullptr));
         //       m_begin = rdfclock::now();
     }
 

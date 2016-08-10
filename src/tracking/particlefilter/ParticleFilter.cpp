@@ -1,11 +1,17 @@
-#include "particlefilter/ParticleFilter.h"
-#include <time.h>
-#include <opencv2/imgproc.hpp>
+#include "src/util/precompiled.h"
 
+#include <time.h>
+
+#include "particlefilter/ParticleFilter.h"
+#include "Util.h"
+#include "Target.h"
+#include "particlefilter/RectangleParticle.h"
 
 ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters,
                                int particleWidth, int particleHeight, Target *target)
 {
+    type = Rectangle;
+
     m_target = target;
     img_height = frameHeight;
     img_width = frameWidth;
@@ -15,9 +21,19 @@ ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, 
     setParticleWidth(particleWidth);
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
-    srand(time(NULL));
+    srand(time(nullptr));
     initializeParticles();
 }
+
+int ParticleFilter::getRatioOfTop(int count)
+{
+    float total_weight = 0;
+    for (int i = 0; i < count; ++i)
+        total_weight += m_particles[i]->getWeight();
+    return total_weight * 100;
+}
+
+void ParticleFilter::setVideoReader(VideoReader *videoReader) {m_VideoReader = videoReader; }
 
 void ParticleFilter::processImage()
 {
@@ -38,48 +54,45 @@ void ParticleFilter::initializeParticles()
     {
         int x = (rand() % (img_width - m_particle_width));
         int y = (rand() % (img_height - m_particle_width));
-        float weight = 1.0 / m_num_particles;
-        Particle *particle;
-        particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(), m_histSize);
-        m_Particles.push_back(particle);
+        auto weight = 1.0f / m_num_particles;
+        Particle *particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(), m_histSize);
+        m_particles.push_back(particle);
     }
 }
 
 void ParticleFilter::updateWeights()
 {
-    for (int i = 0; i < m_num_particles; i++)
-        m_Particles[i]->exec( *&m_img);
+    for (int i = 0; i < m_num_particles; ++i)
+        m_particles[i]->exec(*&m_img);
 }
 
 void ParticleFilter::sortParticlesDescending()
 {
-    for (int i = 0; i < m_num_particles; i++)
-        for (int j = i; j < m_num_particles; j++)
-            if (m_Particles[i]->getWeight() < m_Particles[j]->getWeight())
-                swap(i, j);
-}
-
-void ParticleFilter::swap(int indA, int indB)
-{
-    Particle *temp = m_Particles[indA];
-    m_Particles[indA] = m_Particles[indB];
-    m_Particles[indB] = temp;
+    using namespace std;
+    sort(begin(m_particles), end(m_particles), [](Particle *P1, Particle *P2) {
+        return P1->getWeight() > P2->getWeight();
+    });
 }
 
 void ParticleFilter::normalizeWeights()
 {
-    float total_weight = 0;
-    for (int i = 0; i < m_num_particles; ++i)
-        total_weight += m_Particles[i]->getWeight();
-    for (unsigned int i = 0; i < m_Particles.size(); ++i)
-        m_Particles[i]->setWeight(m_Particles[i]->getWeight() / total_weight);
+    auto total_weight = sumall(m_particles, [](Particle *P) { return P->getWeight(); });
+
+    auto nParticles = m_particles.size();
+
+//    double total_weight = 0;
+//    for (int i = 0; i < nParticles; ++i)
+//        total_weight += m_particles[i]->getWeight();
+
+    for (unsigned int i = 0; i < nParticles; ++i)
+        m_particles[i]->setWeight(m_particles[i]->getWeight() / total_weight);
 }
 
 void ParticleFilter::resampleParticles()
 {
-    for (int j = 0; j < m_num_particles; j++)
+    for (int j = 0; j < m_num_particles; ++j)
     {
-        Particle *p_to_distort = m_Particles[randomParticle()];
+        Particle *p_to_distort = m_particles[randomParticle()];
         int newX, newY;
         distortParticle(p_to_distort, newX, newY);
         m_newCoordinates.push_back(cv::Point(newX,newY));
@@ -93,7 +106,7 @@ int ParticleFilter::randomParticle()
     float sum = 0;
     for (int i = 0; i < m_num_particles; i++)
     {
-        sum += m_Particles[i]->getWeight();
+        sum += m_particles[i]->getWeight();
         if (sum >= rand_number)
             return i;
     }
@@ -126,7 +139,7 @@ void ParticleFilter::updateParticles()
 {
     for (int i = 0; i < m_num_particles; ++i)
     {
-        Particle *p_particle = m_Particles[i];
+        Particle *p_particle = m_particles[i];
         p_particle->setCoordinates(m_newCoordinates[i]);
         p_particle->setWeight(1.0 / m_num_particles);
     }
@@ -140,8 +153,8 @@ void ParticleFilter::showParticles()
     int y = 0;
     for (int i = 0; i < m_num_particles; ++i)
     {
-        x += m_Particles[i]->getX();
-        y += m_Particles[i]->getY();
+        x += m_particles[i]->getX();
+        y += m_particles[i]->getY();
     }
     x = x / m_num_particles;
     y = y / m_num_particles;
@@ -167,8 +180,8 @@ void ParticleFilter::showTopNParticles(int count)
     int y = 0;
     for (int i = 0; i < count; ++i)
     {
-        x = m_Particles[i]->getX();
-        y = m_Particles[i]->getY();
+        x = m_particles[i]->getX();
+        y = m_particles[i]->getY();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_height;
         rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);

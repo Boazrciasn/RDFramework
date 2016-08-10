@@ -7,14 +7,12 @@
 #include <QMutex>
 #include <QThread>
 
-#include "Particle.h"
-#include "Target.h"
-#include "RectangleParticle.h"
-#include "VideoReader.h"
+class Particle;
+class Target;
+class VideoReader;
 
 class ParticleFilter
 {
-
   public:
     ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, Target *target);
     Target *m_target;
@@ -24,15 +22,9 @@ class ParticleFilter
     inline int getNumIters() const { return m_num_iters; }
     inline int getParticleWidth() const { return m_particle_width; }
     inline int getModelType() const { return type; }
-    inline int getRatioOfTop(int count)
-    {
-        float total_weight = 0;
-        for (int i = 0; i < count; ++i)
-            total_weight += m_Particles[i]->getWeight();
-        return total_weight * 100;
-    }
+    int getRatioOfTop(int count);
     cv::Mat getIMG() const { return m_outIMG; }
-    std::vector<Particle *> getParticles() const {return m_Particles; }
+    std::vector<Particle *> getParticles() const {return m_particles; }
     inline void setNumParticles(int value) { m_num_particles = value; }
     inline void setHistSize(int histSize) { m_histSize = histSize; }
     inline void setNumIters(int value) { m_num_iters = value; }
@@ -41,7 +33,7 @@ class ParticleFilter
     inline void setParticleHeight(int value) { m_particle_height = value; }
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
-    inline void setVideoReader(VideoReader *videoReader) {m_VideoReader = videoReader; }
+    void setVideoReader(VideoReader *videoReader);
     void setIMG(cv::Mat *pImage) { m_img = pImage; }
     void processImage();
     void showParticles();
@@ -56,7 +48,6 @@ class ParticleFilter
     void updateWeights();
     //TODO: Lambda func practice
     void sortParticlesDescending();
-    void swap(int indA, int indB);
     void normalizeWeights();
     void resampleParticles();
     int randomParticle();
@@ -69,8 +60,8 @@ class ParticleFilter
     int m_particle_height;
     int m_histSize = 10;
     std::atomic<int> m_num_particles_to_display;
-    int type = Rectangle;
-    std::vector<Particle *> m_Particles;
+    int type;
+    std::vector<Particle *> m_particles;
 
     std::vector<cv::Point> m_newCoordinates;
 

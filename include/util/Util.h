@@ -30,16 +30,37 @@ void setForAllPixels(cv::Mat_<T> &M, const FUNC &func)
     }
 }
 
+template <typename T>
+inline double sumall(const T &container)
+{
+    double sum{};
+    for(const auto &a : container)
+        sum += a;
+
+    return sum;
+}
+
+template <typename T, typename FUNC>
+inline double sumall(const T &container, const FUNC &func)
+{
+    double sum{};
+    for(const auto &a : container)
+        sum += func(a);
+
+    return sum;
+}
+
 inline int letterIndex(char letter)
 {
     return letter - 'a';
 }
 
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
-inline cv::Mat createHistogram(PixelCloud &pixels, int labelCount)
+inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 {
-    cv::Mat hist = cv::Mat::zeros(1, labelCount, cv::DataType<float>::type);
-    for (pixel_ptr px : pixels)
+    cv::Mat_<float> hist(1, labelCount);
+    hist.setTo(0.0f);
+    for (auto px : pixels)
     {
         int index = letterIndex(px->imgInfo->m_label.at(0).toLatin1());
         ++hist.at<float>(0, index);
@@ -47,16 +68,17 @@ inline cv::Mat createHistogram(PixelCloud &pixels, int labelCount)
     return hist;
 }
 
-inline float calculateEntropy(cv::Mat &hist)
+inline float calculateEntropy(const cv::Mat_<float> &hist)
 {
-    float entr = 0;
-    float totalSize = 0;
+    float entr{};
+    float totalSize{};
     int nCols = hist.cols;
     for(int i = 0; i < nCols; ++i)
-        totalSize += hist.at<float>(0, i);
+        totalSize += hist(0, i);
+
     for(int i = 0; i < nCols; ++i)
     {
-        float nPixelsAt = hist.at<float>(0, i);
+        float nPixelsAt = hist(0, i);
         if(nPixelsAt > 0)
         {
             float probability = nPixelsAt / totalSize;
@@ -69,8 +91,7 @@ inline float calculateEntropy(cv::Mat &hist)
 
 inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
 {
-    cv::Mat hist = createHistogram(pixels, labelCount);
-    return calculateEntropy(hist);
+    return calculateEntropy(createHistogram(pixels, labelCount));
 }
 
 
@@ -85,22 +106,11 @@ inline int getTotalNumberOfPixels(const cv::Mat &hist)
 
 inline int getMaxLikelihoodIndex(const QVector<float> &hist)
 {
-    int max_val = -1;
-    int max_index = 0;
-    int nCols = hist.size();
-    for(int i = 0; i < nCols; ++i)
-    {
-        if(hist[i] > max_val)
-        {
-            max_val = hist[i];
-            max_index = i;
-        }
-    }
-    return max_index;
+    using namespace std;
+    return distance(begin(hist), max_element(begin(hist), end(hist)));
 }
 
-inline void getImageLabelVotes(const cv::Mat_<uchar> &label_image,
-                               QVector<float> &vote_vector)
+inline void getImageLabelVotes(const cv::Mat_<uchar> &label_image, QVector<float> &vote_vector)
 {
     doForAllPixels(label_image, [&](uchar value, int, int)
     {

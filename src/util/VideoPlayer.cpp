@@ -20,7 +20,7 @@ void VideoPlayer::run()
             continue;
         }
         m_CurrentFrame++;
-        if (m_PF != NULL)
+        if (m_PF)
             processPF();
         else
             m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
@@ -40,7 +40,7 @@ void VideoPlayer::processPF()
 void VideoPlayer::msleep(int ms)
 {
     struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
-    nanosleep(&ts, NULL);
+    nanosleep(&ts, nullptr);
 }
 
 
@@ -48,7 +48,7 @@ void VideoPlayer::msleep(int ms)
 
 void VideoPlayer::initializeVideo()
 {
-    while (m_FrameBuffer->getSize() < 1) {};
+    while (m_FrameBuffer->size() < 1) {};
     m_RGBframe = m_FrameBuffer->dequeue();
     m_CurrentFrame++;
     m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);

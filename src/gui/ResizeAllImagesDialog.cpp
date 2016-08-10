@@ -34,7 +34,7 @@ void ResizeAllImagesDialog::selectSaveDir()
 
 void ResizeAllImagesDialog::on_pushButton_resizeall_clicked()
 {
-    if(m_browseDir == NULL)
+    if(m_browseDir.isEmpty())
     {
         QMessageBox *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");

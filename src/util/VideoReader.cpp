@@ -27,7 +27,7 @@ void VideoReader::run()
 void VideoReader::msleep(int ms)
 {
     struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
-    nanosleep(&ts, NULL);
+    nanosleep(&ts, nullptr);
 }
 
 
@@ -60,7 +60,7 @@ void VideoReader::startBuffer()
 
 int VideoReader::getBufferSize() const
 {
-    return m_FrameBuffer->getSize();
+    return m_FrameBuffer->size();
 }
 
 void VideoReader::setCurrentFrame(int frameNumber)

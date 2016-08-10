@@ -158,7 +158,7 @@ class RandomDecisionTree : public QObject
     inline node_ptr getLeafNode(const DataSet &DS, pixel_ptr px, int nodeId)
     {
         node_ptr root = m_nodes[nodeId];
-        assert( root != NULL);
+        assert(root);
         if(root->m_isLeaf)
         {
             // qDebug()<<"LEAF REACHED :"<<root.id;

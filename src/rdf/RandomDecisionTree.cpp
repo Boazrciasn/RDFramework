@@ -222,7 +222,7 @@ void RandomDecisionTree::printTree()
     qDebug() << "TREE {";
     for(auto node : m_nodes)
     {
-        if(node != nullptr)
+        if(node)
             printNode(*node);
     }
     qDebug() << "}";
