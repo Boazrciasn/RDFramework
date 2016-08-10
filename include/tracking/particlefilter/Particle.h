@@ -23,6 +23,13 @@ class Particle
     virtual void exec(cv::Mat *img) = 0;
     virtual Particle *clone() = 0;
 
+    inline cv::Point getCoordinates() const {return cv::Point(m_x,m_y);}
+    inline void setCoordinates(cv::Point coord)
+    {
+        m_x = coord.x;
+        m_y = coord.y;
+    }
+
     inline int getX() const {return m_x;}
     inline void setX(int value) {m_x = value;}
 

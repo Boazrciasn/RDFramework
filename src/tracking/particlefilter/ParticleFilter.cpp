@@ -81,18 +81,7 @@ void ParticleFilter::resampleParticles()
         Particle *p_to_distort = m_Particles[randomParticle()];
         int newX, newY;
         distortParticle(p_to_distort, newX, newY);
-
-        // TODO: add set width and set height
-//        Particle *tmp = m_Particles[j];
-//        tmp->setX(newX);
-//        tmp->setY(newY);
-//        tmp->setWeight(1.0 / m_num_particles);
-
-        // TODO: delete after implementing reusable particles
-        Particle *p_new;
-        p_new = new RectangleParticle(newX, newY, m_particle_width, m_particle_width, 1.0 / m_num_particles, m_target->getHist(),
-                                      m_histSize);
-        m_ParticlesNew.push_back(p_new);
+        m_newCoordinates.push_back(cv::Point(newX,newY));
     }
     updateParticles();
 }
@@ -134,11 +123,13 @@ void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
 
 void ParticleFilter::updateParticles()
 {
-    for (int j = 0; j < m_num_particles; j++)
+    for (int i = 0; i < m_num_particles; ++i)
     {
-        m_Particles[j] = m_ParticlesNew.back();
-        m_ParticlesNew.pop_back();
+        Particle *p_particle = m_Particles[i];
+        p_particle->setCoordinates(m_newCoordinates[i]);
+        p_particle->setWeight(1.0 / m_num_particles);
     }
+    m_newCoordinates.clear();
 }
 
 void ParticleFilter::showParticles()

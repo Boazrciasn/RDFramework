@@ -69,6 +69,9 @@ class ParticleFilter
     std::atomic<int> m_num_particles_to_display;
     int type = Rectangle;
     std::vector<Particle *> m_Particles;
+
+    std::vector<cv::Point> m_newCoordinates;
+
     std::vector<Particle *> m_ParticlesNew;
     cv::Mat *m_img;
     cv::Mat m_outIMG;

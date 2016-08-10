@@ -12,7 +12,6 @@ class RectangleParticle : public Particle
     {
         m_width = width;
         m_height = height;
-        m_Rect = cv::Rect(m_x, m_y, m_width, m_height);
     }
 
     Particle *clone() override
@@ -32,7 +31,7 @@ class RectangleParticle : public Particle
 
         if (m_TargetHist.size > 0)
         {
-            cv::Mat roi(*img, m_Rect);
+            cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
             cv::Mat roiHist;
             Util::CalculateHistogram(roi, roiHist, m_histSize); // TODO: we might use "m_TargetHist.size()" instead of m_histSize
             double distBhat = compareHist(m_TargetHist, roiHist, CV_COMP_CORREL);
@@ -40,7 +39,7 @@ class RectangleParticle : public Particle
         }
     }
 
-    inline cv::Rect getParticle() const {return m_Rect; }
+    inline cv::Rect getParticle() const {return cv::Rect(m_x, m_y, m_width, m_height); }
 
     inline int getWidth() const {return m_width;}
     inline void setWidth(int value) {m_width = value;}
@@ -52,8 +51,6 @@ class RectangleParticle : public Particle
   private:
     int m_width;
     int m_height;
-    cv::Rect m_Rect;
-
 };
 
 #endif // RECTANGLEPARTICLE_H

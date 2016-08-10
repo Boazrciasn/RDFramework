@@ -1,7 +1,7 @@
 #include "src/util/precompiled.h"
 
 #include "ExtractedDialog.h"
-#include "ui_dialogextracted.h"
+#include "ui_ExtractedDialog.h"
 
 DialogExtracted::DialogExtracted(QWidget *parent) :
     QDialog(parent),

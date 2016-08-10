@@ -1,7 +1,7 @@
 #include "src/util/precompiled.h"
 
 #include "MyDialog.h"
-#include "ui_mydialog.h"
+#include "ui_MyDialog.h"
 
 #include "Util.h"
 

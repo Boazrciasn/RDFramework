@@ -3,7 +3,7 @@
 #include "MainWindow.h"
 
 #include "TextRegionDetector.h"
-#include "ui_mainwindow.h"
+#include "ui_MainWindow.h"
 
 
 

@@ -63,6 +63,7 @@ void PFWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void PFWidget::onActionSaveTarget()
 {
+    m_RubberBand->hide();
     Target *currTarget;
     QPixmap OriginalPix(*ui->display_label->pixmap());
     QPixmap targetPixMap = OriginalPix.copy(m_TargetROI);
