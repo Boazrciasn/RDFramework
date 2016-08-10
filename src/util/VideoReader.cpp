@@ -2,7 +2,7 @@
 #include "VideoReader.h"
 
 
-VideoReader::VideoReader(QObject *parent, BufferQueue *buffer) : QThread(parent)
+VideoReader::VideoReader(QObject *parent, BufferQueue<cv::Mat> *buffer) : QThread(parent)
 {
     m_FrameBuffer = buffer;
 }

@@ -26,7 +26,7 @@ class VideoPlayer : public QThread
 
   private:
     VideoReader *m_VideoReader;
-    BufferQueue *m_FrameBuffer;
+    BufferQueue<cv::Mat> *m_FrameBuffer;
     bool m_stop;
     QMutex m_mutex;
     QWaitCondition m_waitcond;

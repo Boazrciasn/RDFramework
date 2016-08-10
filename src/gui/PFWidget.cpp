@@ -17,6 +17,7 @@ PFWidget::PFWidget(QWidget *parent) :
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     ui->histogramSizespinBox->setValue(m_histSize);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+    m_PF = NULL;
 }
 
 void PFWidget::mouseMoveEvent(QMouseEvent *event)

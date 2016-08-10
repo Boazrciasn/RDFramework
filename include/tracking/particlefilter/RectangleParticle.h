@@ -41,7 +41,17 @@ class RectangleParticle : public Particle
     }
 
     inline cv::Rect getParticle() const {return m_Rect; }
+
+    inline int getWidth() const {return m_width;}
+    inline void setWidth(int value) {m_width = value;}
+
+    inline int getHeight() const {return m_height;}
+    inline void setHeight(int value) {m_height = value;}
+
+
   private:
+    int m_width;
+    int m_height;
     cv::Rect m_Rect;
 
 };

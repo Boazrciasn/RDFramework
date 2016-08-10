@@ -27,7 +27,7 @@ class VideoReader : public QThread
     cv::VideoCapture *m_capture;
     cv::Mat m_RGBframe;
     QImage m_img;
-    BufferQueue *m_FrameBuffer;
+    BufferQueue<cv::Mat> *m_FrameBuffer;
     bool m_stop = false;
 
   protected:
@@ -35,7 +35,7 @@ class VideoReader : public QThread
     void msleep(int ms);
 
   public:
-    VideoReader(QObject *parent, BufferQueue *buffer);
+    VideoReader(QObject *parent, BufferQueue<cv::Mat> *buffer);
     ~VideoReader();
     bool loadVideo(std::string filename);
     void startBuffer();

@@ -4,6 +4,8 @@
 #include <queue>
 
 
+template<class T>
+
 class BufferQueue
 {
 
@@ -14,9 +16,9 @@ class BufferQueue
         delete &m_buffer;
     }
 
-    inline cv::Mat dequeue()
+    inline T dequeue()
     {
-        cv::Mat out;
+        T out;
         m_mutex.lock();
         if (!m_buffer.empty())
         {
@@ -26,7 +28,7 @@ class BufferQueue
         m_mutex.unlock();
         return out;
     }
-    inline void enqueue(cv::Mat input)
+    inline void enqueue(T input)
     {
         m_mutex.lock();
         m_buffer.push_back(input);
@@ -57,7 +59,7 @@ class BufferQueue
 
   private:
     QMutex m_mutex;
-    std::deque<cv::Mat> m_buffer;
+    std::deque<T> m_buffer;
 };
 
 #endif // BUFFERQUEUE_H

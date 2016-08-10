@@ -5,7 +5,7 @@
 
 VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)
 {
-    m_FrameBuffer = new BufferQueue();
+    m_FrameBuffer = new BufferQueue<cv::Mat>();
     m_VideoReader = new VideoReader(this, m_FrameBuffer);
 }
 void VideoPlayer::run()
