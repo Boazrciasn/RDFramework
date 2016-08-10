@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>913</width>
-    <height>640</height>
+    <height>655</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -209,6 +209,29 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="particleHeightLbel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Particle Height</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="particleHeightLSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>55</number>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="HistogramSizelabel">
            <property name="font">
             <font>
@@ -362,12 +385,12 @@
    <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>254</x>
-     <y>604</y>
+     <x>220</x>
+     <y>635</y>
     </hint>
     <hint type="destinationlabel">
      <x>163</x>
-     <y>710</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -378,12 +401,12 @@
    <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>602</y>
+     <x>306</x>
+     <y>635</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
-     <y>663</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -394,12 +417,12 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>434</x>
-     <y>603</y>
+     <x>392</x>
+     <y>635</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
-     <y>683</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -410,12 +433,12 @@
    <slot>onHorizontalSliderPressed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>176</x>
-     <y>574</y>
+     <x>194</x>
+     <y>597</y>
     </hint>
     <hint type="destinationlabel">
      <x>193</x>
-     <y>724</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -426,12 +449,12 @@
    <slot>onHorizontalSliderReleased()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>59</x>
-     <y>574</y>
+     <x>77</x>
+     <y>597</y>
     </hint>
     <hint type="destinationlabel">
      <x>48</x>
-     <y>727</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -446,7 +469,7 @@
      <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1140</x>
+     <x>912</x>
      <y>77</y>
     </hint>
    </hints>
@@ -462,7 +485,7 @@
      <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1004</x>
+     <x>912</x>
      <y>136</y>
     </hint>
    </hints>
@@ -478,7 +501,7 @@
      <y>210</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1091</x>
+     <x>912</x>
      <y>185</y>
     </hint>
    </hints>
@@ -491,10 +514,10 @@
    <hints>
     <hint type="sourcelabel">
      <x>845</x>
-     <y>313</y>
+     <y>387</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1065</x>
+     <x>912</x>
      <y>233</y>
     </hint>
    </hints>
@@ -511,7 +534,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
-     <y>699</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -522,11 +545,11 @@
    <slot>onHistSizeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>821</x>
-     <y>252</y>
+     <x>882</x>
+     <y>336</y>
     </hint>
     <hint type="destinationlabel">
-     <x>930</x>
+     <x>912</x>
      <y>480</y>
     </hint>
    </hints>
@@ -543,7 +566,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>758</x>
-     <y>673</y>
+     <y>654</y>
     </hint>
    </hints>
   </connection>
@@ -554,12 +577,28 @@
    <slot>onHorizontalSliderMoved(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>106</x>
-     <y>578</y>
+     <x>124</x>
+     <y>597</y>
     </hint>
     <hint type="destinationlabel">
      <x>146</x>
-     <y>769</y>
+     <y>654</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>particleHeightLSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PFWidget</receiver>
+   <slot>onParticleHeightChange(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>756</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1134</x>
+     <y>264</y>
     </hint>
    </hints>
   </connection>
@@ -578,5 +617,6 @@
   <slot>onActionSaveTarget()</slot>
   <slot>onHistSizeChanged(int)</slot>
   <slot>onActionSetupPF()</slot>
+  <slot>onParticleHeightChange(int)</slot>
  </slots>
 </ui>

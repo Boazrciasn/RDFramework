@@ -16,7 +16,7 @@ class ParticleFilter
 {
 
   public:
-    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, Target *target);
+    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, Target *target);
     Target *m_target;
 
     inline int getNumParticles() const { return m_num_particles; }
@@ -38,6 +38,7 @@ class ParticleFilter
     inline void setNumIters(int value) { m_num_iters = value; }
     inline void setTarget(Target *target) { m_target = target;}
     inline void setParticleWidth(int value) { m_particle_width = value; }
+    inline void setParticleHeight(int value) { m_particle_height = value; }
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
     inline void setVideoReader(VideoReader *videoReader) {m_VideoReader = videoReader; }
@@ -65,6 +66,7 @@ class ParticleFilter
     int m_num_particles;
     int m_num_iters;
     int m_particle_width;
+    int m_particle_height;
     int m_histSize = 10;
     std::atomic<int> m_num_particles_to_display;
     int type = Rectangle;

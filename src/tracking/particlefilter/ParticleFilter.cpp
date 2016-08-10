@@ -4,7 +4,7 @@
 
 
 ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters,
-                               int particleWidth, Target *target)
+                               int particleWidth, int particleHeight, Target *target)
 {
     m_target = target;
     img_height = frameHeight;
@@ -13,6 +13,7 @@ ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, 
     setNumParticles(nParticles);
     setNumIters(nIters);
     setParticleWidth(particleWidth);
+    setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
     srand(time(NULL));
     initializeParticles();
@@ -39,7 +40,7 @@ void ParticleFilter::initializeParticles()
         int y = (rand() % (img_height - m_particle_width));
         float weight = 1.0 / m_num_particles;
         Particle *particle;
-        particle = new RectangleParticle(x, y, m_particle_width, m_particle_width, weight, m_target->getHist(), m_histSize);
+        particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(), m_histSize);
         m_Particles.push_back(particle);
     }
 }
@@ -145,7 +146,7 @@ void ParticleFilter::showParticles()
     x = x / m_num_particles;
     y = y / m_num_particles;
     int x_end = x + m_particle_width;
-    int y_end = y + m_particle_width;
+    int y_end = y + m_particle_height;
     int r = m_particle_width / 2;;
     if (getModelType() == Circle)
         circle(m_outIMG, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
@@ -169,7 +170,7 @@ void ParticleFilter::showTopNParticles(int count)
         x = m_Particles[i]->getX();
         y = m_Particles[i]->getY();
         int x_end = x + m_particle_width;
-        int y_end = y + m_particle_width;
+        int y_end = y + m_particle_height;
         rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     }
 }

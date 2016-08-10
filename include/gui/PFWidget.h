@@ -47,6 +47,7 @@ class PFWidget : public QWidget
     void onParticleCountChange(int value);
     void onIterationCountChange(int value);
     void onParticleWidthChange(int value);
+    void onParticleHeightChange(int value);
     void onHistSizeChanged(int value);
 
   private:
@@ -60,6 +61,7 @@ class PFWidget : public QWidget
     int m_particleCount;
     int m_numIters;
     int m_particleWidth;
+    int m_particleHeight;
     int m_histSize = 10;
     bool m_VideoLodaded = false;
     bool m_isPlaying;
