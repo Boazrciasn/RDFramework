@@ -12,11 +12,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
 FIND_PACKAGE(OpenCV 3 REQUIRED)
 
 #add OpenCV directories
-include_directories(${OpenCV_INCLUDE_DIRS}  include/gui/
-                                            include/ocr/ include/rdf/
-                                            include/tracking/ include/util/)
-
-INCLUDE_DIRECTORIES(qcustomplot/)
+include_directories(${OpenCV_INCLUDE_DIRS}  Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
+                                            modules/    util/)
 
 # Qt5 package
 FIND_PACKAGE(Qt5Widgets REQUIRED)
@@ -31,31 +28,27 @@ set(QT_USE_QTXML TRUE)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-#SOURCE FILES
-file(GLOB SOURCES main.cpp src/*.cpp  qcustomplot/qcustomplot.cpp cereal/*)
-file(GLOB GUISOURCES src/gui/*.cpp)
-file(GLOB RDFSOURCES src/rdf/*.cpp)
-file(GLOB OCRSOURCES src/ocr/*.cpp)
-file(GLOB TRACKSOURCES src/tracking/*.cpp)
-file(GLOB PFSOURCES src/tracking/particlefilter/*.cpp)
-file(GLOB UTILSOURCES src/util/*.cpp src/util/*.h)
 
-#HEADER FILES
-file(GLOB HEADERS include/*.h qcustomplot/qcustomplot.h cereal/*)
-file(GLOB GUIHEADERS include/gui/*.h)
-file(GLOB RDFHEADERS include/rdf/*.h)
-file(GLOB OCRHEADERS include/ocr/*.h)
-file(GLOB TRACKHEADERS include/tracking/*.h)
-file(GLOB PFHEADERS include/tracking/particlefilter/*.h)
-file(GLOB UTILHEADERS include/util/*.h include/util/*.hpp)
+file(GLOB CORE Core/*.ui Core/*.cpp Core/*.h Core/*.hpp)
+file(GLOB OCR modules/ocr/*.ui modules/ocr/*.cpp modules/ocr/*.h modules/ocr/*.hpp)
+file(GLOB RDF modules/rdf/*.ui modules/rdf/*.cpp modules/rdf/*.h modules/rdf/*.hpp)
+file(GLOB PF modules/tracking/particlefilter/*.ui modules/tracking/particlefilter/*.cpp modules/tracking/particlefilter/*.h modules/tracking/particlefilter/*.hpp)
+file(GLOB VIDEOPLAYER modules/tracking/videoplayer/*.ui modules/tracking/videoplayer/*.cpp modules/tracking/videoplayer/*.h modules/tracking/videoplayer/*.hpp)
+file(GLOB UTIL util/*.ui util/*.cpp util/*.h util/*.hpp)
+file(GLOB QCUSTOMPLOT 3rdparty/qcustomplot/*.ui 3rdparty/qcustomplot/*.cpp 3rdparty/qcustomplot/*.h 3rdparty/qcustomplot/*.hpp)
+file(GLOB CEREAL 3rdparty/cereal/*)
+file(GLOB 3RDPARTY 3rdparty/*.ui 3rdparty/*.cpp 3rdparty/*.h 3rdparty/*.hpp)
+
+
 
 # Create Qt MOC files
-QT5_WRAP_UI(UISrcs forms/MainWindow.ui forms/MyDialog.ui forms/AnnExtractorDialog.ui
-                   forms/ExtractedDialog.ui forms/HistogramDialog.ui forms/RDFDialog.ui
-                   forms/ResizeallImagesDialog.ui forms/DisplayImagesWidget.ui forms/PFWidget.ui)
+QT5_WRAP_UI(UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui
+                    modules/ocr/AnnExtractorDialogGui.ui modules/ocr/ExtractedDialogGui.ui modules/ocr/HistogramDialogGui.ui modules/ocr/MyDialogGui.ui
+                    modules/rdf/RandomDecisionForestDialogGui.ui
+                    modules/tracking/particlefilter/ParticleFilterWidgetGui.ui)
 
-add_executable("${project_name}" ${SOURCES} ${GUISOURCES} ${RDFSOURCES} ${OCRSOURCES} ${TRACKSOURCES}  ${PFSOURCES}
-                ${UTILSOURCES} ${GUIHEADERS} ${RDFHEADERS} ${OCRHEADERS} ${TRACKHEADERS} ${PFHEADERS} ${UTILHEADERS} ${HEADERS} ${UISrcs})
+add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
+                ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${3RDPARTY} ${UISrcs})
 
 # NM Not tested yet
 target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
