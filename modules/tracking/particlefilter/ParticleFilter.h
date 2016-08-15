@@ -14,7 +14,7 @@ class VideoReader;
 class ParticleFilter
 {
   public:
-    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, Target *target);
+    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, int histSize, Target *target);
     Target *m_target;
 
     inline int getNumParticles() const { return m_num_particles; }
@@ -38,6 +38,7 @@ class ParticleFilter
     void processImage();
     void showParticles();
     void showTopNParticles(int count);
+    void reInitialiaze();
     ~ParticleFilter();
 
   signals:
@@ -58,7 +59,7 @@ class ParticleFilter
     int m_num_iters;
     int m_particle_width;
     int m_particle_height;
-    int m_histSize = 10;
+    int m_histSize;
     std::atomic<int> m_num_particles_to_display;
     int type;
     std::vector<Particle *> m_particles;

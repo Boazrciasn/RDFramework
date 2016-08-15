@@ -29,10 +29,6 @@ void Target::setImage(QImage image)
     Util::CalculateHistogram(m_targetImg, m_targetHist, m_histSize);
 }
 
-
-
-
-
 Target::~Target()
 {
 }

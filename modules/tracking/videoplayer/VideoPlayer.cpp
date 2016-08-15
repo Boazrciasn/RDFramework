@@ -100,9 +100,7 @@ std::tuple<int, int> VideoPlayer::getFrameSize()
 
 VideoPlayer::~VideoPlayer()
 {
-    m_mutex.lock();
     delete m_VideoReader;
     m_waitcond.wakeOne();
-    m_mutex.unlock();
     wait();
 }

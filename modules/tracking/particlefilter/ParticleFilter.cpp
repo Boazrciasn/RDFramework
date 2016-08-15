@@ -8,7 +8,7 @@
 #include "tracking/particlefilter/RectangleParticle.h"
 
 ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters,
-                               int particleWidth, int particleHeight, Target *target)
+                               int particleWidth, int particleHeight, int histSize, Target *target)
 {
     type = Rectangle;
 
@@ -21,6 +21,7 @@ ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, 
     setParticleWidth(particleWidth);
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
+    setHistSize(histSize);
     srand(time(nullptr));
     initializeParticles();
 }
@@ -186,6 +187,12 @@ void ParticleFilter::showTopNParticles(int count)
         int y_end = y + m_particle_height;
         rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     }
+}
+
+void ParticleFilter::reInitialiaze()
+{
+    m_particles.clear();
+    initializeParticles();
 }
 
 ParticleFilter::~ParticleFilter() {}

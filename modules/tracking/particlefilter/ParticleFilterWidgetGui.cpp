@@ -15,6 +15,7 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     m_numIters = ui->iterCountSpinBox->value();
     m_particleWidth = ui->particleWidthLSpinBox->value();
     m_particleHeight = ui->particleHeightLSpinBox->value();
+    m_histSize = ui->histogramSizespinBox->value();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     ui->histogramSizespinBox->setValue(m_histSize);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
@@ -103,9 +104,8 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     int height;
     std::tie(width, height) = frameSize;
     m_TargetsVector[0]->setHistSize(m_histSize);
-    m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters, m_particleWidth, m_particleHeight,
+    m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters, m_particleWidth, m_particleHeight, m_histSize,
                               m_TargetsVector[0]);
-    m_PF->setHistSize(m_histSize);
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setPF(m_PF);
 }
@@ -152,6 +152,7 @@ void ParticleFilterWidgetGui::onHorizontalSliderPressed()
 void ParticleFilterWidgetGui::onHorizontalSliderReleased()
 {
     m_VideoPlayer->setCurrentFrame(m_currFrame);
+    m_PF->reInitialiaze();
     if (m_isPlaying)
         m_VideoPlayer->playVideo();
 }

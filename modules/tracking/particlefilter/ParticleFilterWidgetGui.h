@@ -64,7 +64,7 @@ class ParticleFilterWidgetGui : public QWidget
     int m_numIters;
     int m_particleWidth;
     int m_particleHeight;
-    int m_histSize = 10;
+    int m_histSize ;
     bool m_VideoLodaded = false;
     bool m_isPlaying;
     QRubberBand *m_RubberBand;
