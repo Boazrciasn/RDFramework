@@ -11,7 +11,6 @@ ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, 
                                int particleWidth, int particleHeight, int histSize, Target *target)
 {
     type = Rectangle;
-
     m_target = target;
     img_height = frameHeight;
     img_width = frameWidth;
@@ -22,8 +21,11 @@ ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, 
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
     setHistSize(histSize);
+    m_distortRange = 5;
     srand(time(nullptr));
     initializeParticles();
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    m_RandomGen = std::mt19937(seed);
 }
 
 int ParticleFilter::getRatioOfTop(int count)
@@ -51,12 +53,17 @@ void ParticleFilter::processImage()
 
 void ParticleFilter::initializeParticles()
 {
+    int xRange = (img_width - m_particle_width);
+    int yRange = (img_height - m_particle_height);
+    auto randX =  [&]() { return std::uniform_int_distribution<int>(1, xRange)(m_RandomGen); };
+    auto randY =  [&]() {  return std::uniform_int_distribution<int>(1, yRange)(m_RandomGen); };
     for (int i = 0; i < m_num_particles; ++i)
     {
-        int x = (rand() % (img_width - m_particle_width));
-        int y = (rand() % (img_height - m_particle_width));
+        int x = randX();
+        int y = randY();
         auto weight = 1.0f / m_num_particles;
-        Particle *particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(), m_histSize);
+        Particle *particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(),
+                                                   m_histSize);
         m_particles.push_back(particle);
     }
 }
@@ -64,46 +71,42 @@ void ParticleFilter::initializeParticles()
 void ParticleFilter::updateWeights()
 {
     for (int i = 0; i < m_num_particles; ++i)
-        m_particles[i]->exec(*&m_img);
+        m_particles[i]->exec( *&m_img);
 }
 
 void ParticleFilter::sortParticlesDescending()
 {
     using namespace std;
-    sort(begin(m_particles), end(m_particles), [](Particle *P1, Particle *P2) {
+    sort(begin(m_particles), end(m_particles), [](Particle * P1, Particle * P2)
+    {
         return P1->getWeight() > P2->getWeight();
     });
 }
 
 void ParticleFilter::normalizeWeights()
 {
-    auto total_weight = sumall(m_particles, [](Particle *P) { return P->getWeight(); });
-
+    auto total_weight = sumall(m_particles, [](Particle * P) { return P->getWeight(); });
     auto nParticles = m_particles.size();
-
-//    double total_weight = 0;
-//    for (int i = 0; i < nParticles; ++i)
-//        total_weight += m_particles[i]->getWeight();
-
     for (unsigned int i = 0; i < nParticles; ++i)
         m_particles[i]->setWeight(m_particles[i]->getWeight() / total_weight);
 }
 
 void ParticleFilter::resampleParticles()
 {
+    auto rand_dice = [&]() { return std::uniform_real_distribution<float>(0, 1)(m_RandomGen); };
     for (int j = 0; j < m_num_particles; ++j)
     {
-        Particle *p_to_distort = m_particles[randomParticle()];
+        float rand_number = rand_dice();
+        Particle *p_to_distort = m_particles[randomParticle(rand_number)];
         int newX, newY;
         distortParticle(p_to_distort, newX, newY);
-        m_newCoordinates.push_back(cv::Point(newX,newY));
+        m_newCoordinates.push_back(cv::Point(newX, newY));
     }
     updateParticles();
 }
 
-int ParticleFilter::randomParticle()
+int ParticleFilter::randomParticle(float rand_number)
 {
-    float rand_number = (float)(rand() % 100) / 100;
     float sum = 0;
     for (int i = 0; i < m_num_particles; i++)
     {
@@ -114,13 +117,14 @@ int ParticleFilter::randomParticle()
     return 0;
 }
 
+// TODO: double'dan inte cast edilliyor tekrar?
 void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
 {
     try
     {
-        std::normal_distribution<double> distribution(0, 5);
-        int dx = (int)distribution(generator);
-        int dy = (int)distribution(generator);
+        std::normal_distribution<double> distribution(0, m_distortRange);
+        int dx = (int)distribution(m_RandomGen);
+        int dy = (int)distribution(m_RandomGen);
         x = p->getX();
         y = p->getY();
         int newx = x + dx;

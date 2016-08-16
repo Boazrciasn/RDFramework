@@ -4,6 +4,7 @@
 #include <iostream>
 #include <random>
 #include <atomic>
+#include <chrono>
 #include <QMutex>
 #include <QThread>
 
@@ -47,11 +48,10 @@ class ParticleFilter
   private:
     void initializeParticles();
     void updateWeights();
-    //TODO: Lambda func practice
     void sortParticlesDescending();
     void normalizeWeights();
     void resampleParticles();
-    int randomParticle();
+    int randomParticle(float rand_number);
     void distortParticle(Particle *p, int &x, int &y);
     void updateParticles();
 
@@ -60,17 +60,17 @@ class ParticleFilter
     int m_particle_width;
     int m_particle_height;
     int m_histSize;
+    int m_distortRange;
     std::atomic<int> m_num_particles_to_display;
     int type;
     std::vector<Particle *> m_particles;
-
     std::vector<cv::Point> m_newCoordinates;
 
     std::vector<Particle *> m_ParticlesNew;
     cv::Mat *m_img;
     cv::Mat m_outIMG;
     int img_height, img_width;
-    std::default_random_engine generator;
+    std::mt19937 m_RandomGen;
     VideoReader *m_VideoReader;
 
 };
