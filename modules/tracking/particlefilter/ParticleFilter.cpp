@@ -7,8 +7,10 @@
 #include "Target.h"
 #include "tracking/particlefilter/RectangleParticle.h"
 
-ParticleFilter::ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters,
-                               int particleWidth, int particleHeight, int histSize, Target *target)
+ParticleFilter::ParticleFilter(
+        int frameWidth, int frameHeight, int nParticles, int nIters,
+        int particleWidth, int particleHeight, int histSize, Target *target
+        )
 {
     type = Rectangle;
     m_target = target;
@@ -32,7 +34,7 @@ int ParticleFilter::getRatioOfTop(int count)
 {
     float total_weight = 0;
     for (int i = 0; i < count; ++i)
-        total_weight += m_particles[i]->getWeight();
+        total_weight += m_particles[i]->weight();
     return total_weight * 100;
 }
 
@@ -40,12 +42,53 @@ void ParticleFilter::setVideoReader(VideoReader *videoReader) {m_VideoReader = v
 
 void ParticleFilter::processImage()
 {
-    for (int i = 0; i < m_num_iters; i++)
+    auto randomParticle = [this](float rand_number) {
+        float sum{};
+        for (int i = 0; i < m_num_particles; ++i)
+        {
+            sum += m_particles[i]->weight();
+            if (sum >= rand_number)
+                return i;
+        }
+        return 0;
+    };
+
+    for (int i = 0; i < m_num_iters; ++i)
     {
-        resampleParticles();
-        updateWeights();
-        sortParticlesDescending();
-        normalizeWeights();
+        // resample particles
+        auto rand_dice = [&]() { return std::uniform_real_distribution<float>(0, 1)(m_RandomGen); };
+        for (int j = 0; j < m_num_particles; ++j)
+        {
+            float rand_number = rand_dice();
+            auto *p_to_distort = m_particles[randomParticle(rand_number)];
+            int newX, newY;
+            distortParticle(p_to_distort, newX, newY);
+            m_newCoordinates.push_back(cv::Point(newX, newY));
+        }
+
+        // update particles
+        for (int i = 0; i < m_num_particles; ++i)
+        {
+            auto *p_particle = m_particles[i];
+            p_particle->setCoordinates(m_newCoordinates[i]);
+            p_particle->setWeight(1.0f / m_num_particles);
+        }
+        m_newCoordinates.clear();
+
+        // update weights
+        for(Particle *P : m_particles)
+            P->exec(*&m_img);
+
+        // sort descending
+        std::sort(std::begin(m_particles), std::end(m_particles), [](Particle * P1, Particle * P2) {
+            return P1->weight() > P2->weight();
+        });
+
+        // normalize weights
+        auto total_weight = sumall(m_particles, [](Particle * P) { return P->weight(); });
+        auto nParticles = m_particles.size();
+        for (quint32 i = 0; i < nParticles; ++i)
+            m_particles[i]->setWeight(m_particles[i]->weight() / total_weight);
     }
     showTopNParticles(m_num_particles_to_display);
 }
@@ -68,55 +111,6 @@ void ParticleFilter::initializeParticles()
     }
 }
 
-void ParticleFilter::updateWeights()
-{
-    for (int i = 0; i < m_num_particles; ++i)
-        m_particles[i]->exec( *&m_img);
-}
-
-void ParticleFilter::sortParticlesDescending()
-{
-    using namespace std;
-    sort(begin(m_particles), end(m_particles), [](Particle * P1, Particle * P2)
-    {
-        return P1->getWeight() > P2->getWeight();
-    });
-}
-
-void ParticleFilter::normalizeWeights()
-{
-    auto total_weight = sumall(m_particles, [](Particle * P) { return P->getWeight(); });
-    auto nParticles = m_particles.size();
-    for (unsigned int i = 0; i < nParticles; ++i)
-        m_particles[i]->setWeight(m_particles[i]->getWeight() / total_weight);
-}
-
-void ParticleFilter::resampleParticles()
-{
-    auto rand_dice = [&]() { return std::uniform_real_distribution<float>(0, 1)(m_RandomGen); };
-    for (int j = 0; j < m_num_particles; ++j)
-    {
-        float rand_number = rand_dice();
-        Particle *p_to_distort = m_particles[randomParticle(rand_number)];
-        int newX, newY;
-        distortParticle(p_to_distort, newX, newY);
-        m_newCoordinates.push_back(cv::Point(newX, newY));
-    }
-    updateParticles();
-}
-
-int ParticleFilter::randomParticle(float rand_number)
-{
-    float sum = 0;
-    for (int i = 0; i < m_num_particles; i++)
-    {
-        sum += m_particles[i]->getWeight();
-        if (sum >= rand_number)
-            return i;
-    }
-    return 0;
-}
-
 // TODO: double'dan inte cast edilliyor tekrar?
 void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
 {
@@ -125,8 +119,8 @@ void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
         std::normal_distribution<double> distribution(0, m_distortRange);
         int dx = (int)distribution(m_RandomGen);
         int dy = (int)distribution(m_RandomGen);
-        x = p->getX();
-        y = p->getY();
+        x = p->x();
+        y = p->y();
         int newx = x + dx;
         int newy = y + dy;
         if (newx < img_width - m_particle_width && newx > 0)
@@ -140,17 +134,6 @@ void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
     }
 }
 
-void ParticleFilter::updateParticles()
-{
-    for (int i = 0; i < m_num_particles; ++i)
-    {
-        Particle *p_particle = m_particles[i];
-        p_particle->setCoordinates(m_newCoordinates[i]);
-        p_particle->setWeight(1.0 / m_num_particles);
-    }
-    m_newCoordinates.clear();
-}
-
 void ParticleFilter::showParticles()
 {
     m_img->copyTo(m_outIMG);
@@ -158,8 +141,8 @@ void ParticleFilter::showParticles()
     int y = 0;
     for (int i = 0; i < m_num_particles; ++i)
     {
-        x += m_particles[i]->getX();
-        y += m_particles[i]->getY();
+        x += m_particles[i]->x();
+        y += m_particles[i]->y();
     }
     x = x / m_num_particles;
     y = y / m_num_particles;
@@ -185,8 +168,8 @@ void ParticleFilter::showTopNParticles(int count)
     int y = 0;
     for (int i = 0; i < count; ++i)
     {
-        x = m_particles[i]->getX();
-        y = m_particles[i]->getY();
+        x = m_particles[i]->x();
+        y = m_particles[i]->y();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_height;
         rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);

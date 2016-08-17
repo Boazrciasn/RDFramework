@@ -16,7 +16,7 @@ class Particle
         m_x = x;
         m_y = y;
         m_weight = weight;
-        m_TargetHist = target;
+        m_targetHist = target;
         m_histSize = histSize;
     }
 
@@ -30,19 +30,19 @@ class Particle
         m_y = coord.y;
     }
 
-    inline int getX() const {return m_x;}
+    inline int x() const { return m_x; }
     inline void setX(int value) {m_x = value;}
 
-    inline int getY() const {return m_y;}
+    inline int y() const { return m_y; }
     inline void setY(int value) {m_y = value;}
 
-    inline float getWeight() const {return m_weight;}
+    inline float weight() const {return m_weight;}
     inline void setWeight(float value) { m_weight = value; }
 
-    inline cv::Mat getTarget() const {return m_TargetHist;}
-    inline void setTarget(cv::Mat &target) {m_TargetHist = target;}
+    inline cv::Mat target() const {return m_targetHist;}
+    inline void setTarget(cv::Mat &target) {m_targetHist = target;}
 
-    inline int getHistSize() const {return m_histSize;}
+    inline int histSize() const {return m_histSize;}
     inline void setHistSize(int value) {m_histSize = value;}
 
   protected:
@@ -50,8 +50,7 @@ class Particle
     int m_y;
     int m_histSize;
     float m_weight;
-    cv::Mat m_TargetHist;
-
+    cv::Mat m_targetHist;
 };
 
 #endif

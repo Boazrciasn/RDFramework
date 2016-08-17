@@ -12,11 +12,19 @@ class Particle;
 class Target;
 class VideoReader;
 
+enum class ParticleType
+{
+    Rectangle,
+    Circle
+};
+
 class ParticleFilter
 {
   public:
-    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, int histSize, Target *target);
     Target *m_target;
+
+    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, int histSize, Target *target);
+    ~ParticleFilter();
 
     inline int getNumParticles() const { return m_num_particles; }
     inline int getHistSize() const { return m_histSize; }
@@ -36,24 +44,18 @@ class ParticleFilter
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
     void setVideoReader(VideoReader *videoReader);
     void setIMG(cv::Mat *pImage) { m_img = pImage; }
-    void processImage();
+    void processImage();    
     void showParticles();
     void showTopNParticles(int count);
     void reInitialiaze();
-    ~ParticleFilter();
 
   signals:
     void processedImage(const QImage &image);
 
   private:
     void initializeParticles();
-    void updateWeights();
-    void sortParticlesDescending();
-    void normalizeWeights();
-    void resampleParticles();
     int randomParticle(float rand_number);
     void distortParticle(Particle *p, int &x, int &y);
-    void updateParticles();
 
     int m_num_particles;
     int m_num_iters;
