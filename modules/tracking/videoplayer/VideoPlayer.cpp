@@ -1,12 +1,12 @@
 #include "precompiled.h"
 #include "VideoPlayer.h"
 
-
-
 VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)
 {
     m_FrameBuffer = new BufferQueue<cv::Mat>();
     m_VideoReader = new VideoReader(this, m_FrameBuffer);
+    m_pMOG = cv::createBackgroundSubtractorMOG2();
+    m_pMOG->setShadowValue(0);
 }
 void VideoPlayer::run()
 {
@@ -25,17 +25,65 @@ void VideoPlayer::run()
         else
             m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
         emit playerFrame(m_img);
+
+        cv::imshow("FG Mask fgMOG_no_hole", m_fgMaskMOG2_noHole);
+        cv::imshow("FG Mask", m_fgMaskMOG2);
         msleep(delay);
     }
 }
 
 void VideoPlayer::processPF()
 {
+    // Background Subtruction MOG
+    cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));
+    m_pMOG->apply(m_RGBframe,m_fgMaskMOG2);
+
+    // Default start
+    Dilation( 0, 0 );
+    Erosion( 0, 0 );
     m_PF->setIMG(&m_RGBframe);
     m_PF->processImage();
     m_frame_out = m_PF->getIMG();
     m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
 }
+
+/**  @function Erosion  */
+void VideoPlayer::Erosion( int, void* )
+{
+  int erosion_type;
+
+  if( m_erosion_elem == 0 ){ erosion_type = cv::MORPH_RECT; }
+  else if( m_erosion_elem == 1 ){ erosion_type = cv::MORPH_CROSS; }
+  else if( m_erosion_elem == 2) { erosion_type = cv::MORPH_ELLIPSE; }
+
+
+//  erosion_type = cv::MORPH_RECT;
+  cv::Mat element = cv::getStructuringElement( erosion_type,
+                                       cv::Size( 2*m_erosion_size + 1, 2*m_erosion_size+1 ),
+                                       cv::Point( m_erosion_size, m_erosion_size ) );
+
+  /// Apply the erosion operation
+  cv::erode( m_fgMaskMOG2_dilated, m_fgMaskMOG2_noHole, element );
+}
+
+/** @function Dilation */
+void VideoPlayer::Dilation( int, void* )
+{
+  int dilation_type;
+  if( m_dilation_elem == 0 ){ dilation_type = cv::MORPH_RECT; }
+  else if( m_dilation_elem == 1 ){ dilation_type = cv::MORPH_CROSS; }
+  else if( m_dilation_elem == 2) { dilation_type = cv::MORPH_ELLIPSE; }
+
+
+//  dilation_type = cv::MORPH_RECT;
+  cv::Mat element = cv::getStructuringElement( dilation_type,
+                                       cv::Size( 2*m_dilation_size + 1, 2*m_dilation_size+1 ),
+                                       cv::Point( m_dilation_size, m_dilation_size ) );
+  /// Apply the dilation operation
+  cv::dilate( m_fgMaskMOG2, m_fgMaskMOG2_dilated, element );
+}
+
+
 
 void VideoPlayer::msleep(int ms)
 {

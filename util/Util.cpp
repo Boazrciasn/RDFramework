@@ -161,7 +161,7 @@ QString Util::fileNameWithoutPath(QString &filePath)
     return fname;
 }
 
-void Util::convertToOSRAndBlure(QString srcDir, QString outDir, int ksize)
+void Util::convertToOSRAndBlur(QString srcDir, QString outDir, int ksize)
 {
     QString folder;
     QString file;

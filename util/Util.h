@@ -167,7 +167,7 @@ class Util
     static QString cleanNumberAndPunctuation(QString toClean);
     static void plot(const cv::Mat &hist, QWidget *parent, const QString title);
     static QString fileNameWithoutPath(QString &filePath);
-    static void convertToOSRAndBlure(QString srcDir, QString outDir, int ksize);
+    static void convertToOSRAndBlur(QString srcDir, QString outDir, int ksize);
     static void calcWidthHeightStat(QString srcDir);
     static void averageLHofCol(cv::Mat &mat, const QVector<quint32> fgNumberCol);
     static void getWordWithConfidence(cv::Mat_<float> &mat, int nLabel, QString &word, float &conf);

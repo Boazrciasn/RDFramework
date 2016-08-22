@@ -9,6 +9,8 @@
 #include "tracking/particlefilter/ParticleFilter.h"
 #include "BufferQueue.h"
 
+#include <opencv2/video/background_segm.hpp>
+
 class VideoPlayer : public QThread
 {
     Q_OBJECT
@@ -37,6 +39,21 @@ class VideoPlayer : public QThread
     void processPF();
 
     void initializeVideo();
+
+
+    cv::Ptr<cv::BackgroundSubtractorMOG2> m_pMOG;
+    cv::Mat m_fgMaskMOG2;
+    cv::Mat m_fgMaskMOG2_dilated;
+    cv::Mat m_fgMaskMOG2_noHole;
+
+    int m_erosion_elem = 0;
+    int m_erosion_size = 4;
+    int m_dilation_elem = 0;
+    int m_dilation_size = 4;
+
+    /** Function Headers */
+    void Erosion( int, void* );
+    void Dilation( int, void* );
 
   public:
     VideoPlayer(QObject *parent);

@@ -69,6 +69,6 @@ void ResizeAllImagesDialogGui::on_pushButton_resizeall_clicked()
 
 void ResizeAllImagesDialogGui::create()
 {
-    Util::convertToOSRAndBlure(m_browseDir, m_saveDir,
+    Util::convertToOSRAndBlur(m_browseDir, m_saveDir,
                                ui->spinBox_kernelSize->value());
 }
