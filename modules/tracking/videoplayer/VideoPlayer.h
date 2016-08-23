@@ -11,6 +11,7 @@
 
 #include <opencv2/video/background_segm.hpp>
 
+
 class VideoPlayer : public QThread
 {
     Q_OBJECT
@@ -42,7 +43,7 @@ class VideoPlayer : public QThread
 
 
     cv::Ptr<cv::BackgroundSubtractorMOG2> m_pMOG;
-    cv::Mat m_fgMaskMOG2;
+    cv::Mat_<uchar> m_fgMaskMOG2;
     cv::Mat m_fgMaskMOG2_dilated;
     cv::Mat m_fgMaskMOG2_noHole;
 

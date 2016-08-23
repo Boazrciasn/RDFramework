@@ -1,5 +1,7 @@
 #include "precompiled.h"
 #include "VideoPlayer.h"
+#include "Util.h"
+
 
 VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)
 {
@@ -37,6 +39,24 @@ void VideoPlayer::processPF()
     // Background Subtruction MOG
     cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));
     m_pMOG->apply(m_RGBframe,m_fgMaskMOG2);
+
+//    std::cout << m_fgMaskMOG2 << std::endl;
+
+    int pointCount = cv::sum(m_fgMaskMOG2)[0]/255 + 1;  // +1 for dummy first elem
+    int index = 1;
+    std::vector<cv::Point> fgPixs(pointCount);
+
+    doForAllPixels(m_fgMaskMOG2,[&](uchar value, int x, int y)
+    {
+        value = value/255;
+        fgPixs[index*value] = cv::Point(x,y);
+        index += value;
+    });
+
+    fgPixs.erase(fgPixs.begin()); // remove dummy
+
+    std::vector<std::vector<cv::Point> > clusters = Util::DBSCAN_points(&fgPixs,40.0,1);
+//    std::cout << clusters.size() << std::endl;
 
     // Default start
     Dilation( 0, 0 );

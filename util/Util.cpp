@@ -446,6 +446,89 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
+std::vector<int> Util::regionQuery(std::vector<cv::Point> *points, cv::Point *point, float eps)
+{
+    float dist;
+    std::vector<int> retKeys;
+    for(unsigned int i = 0; i< points->size(); i++)
+    {
+        dist = sqrt(pow((point->x - points->at(i).x),2)+pow((point->y - points->at(i).y),2));
+        if(dist <= eps && dist != 0.0f)
+        {
+            retKeys.push_back(i);
+        }
+    }
+    return retKeys;
+}
+
+std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts)
+{
+    std::vector<std::vector<cv::Point> > clusters;
+    std::vector<bool> clustered;
+    std::vector<int> noise;
+    std::vector<bool> visited;
+    std::vector<int> neighborPts;
+    std::vector<int> neighborPts_;
+    int c;
+
+    int noKeys = points->size();
+
+    //init clustered and visited
+    for(int k = 0; k < noKeys; k++)
+    {
+        clustered.push_back(false);
+        visited.push_back(false);
+    }
+
+    //C =0;
+    c = 0;
+    clusters.push_back(std::vector<cv::Point>()); //will stay empty?
+
+    //for each unvisted point P in dataset points
+    for(int i = 0; i < noKeys; i++)
+    {
+        if(!visited[i])
+        {
+            //Mark P as visited
+            visited[i] = true;
+            neighborPts = regionQuery(points,&points->at(i),eps);
+            if(neighborPts.size() < minPts)
+                //Mark P as Noise
+                noise.push_back(i);
+            else
+            {
+                clusters.push_back(std::vector<cv::Point>());
+
+                // expand cluster
+                // add P to cluster c
+                clusters[c].push_back(points->at(i));
+                c++;
+                //for each point P' in neighborPts
+                for(unsigned int j = 0; j < neighborPts.size(); j++)
+                {
+                    //if P' is not visited
+                    if(!visited[neighborPts[j]])
+                    {
+                        //Mark P' as visited
+                        visited[neighborPts[j]] = true;
+                        neighborPts_ = regionQuery(points,&points->at(neighborPts[j]),eps);
+                        if(neighborPts_.size() >= minPts)
+                        {
+                            neighborPts.insert(neighborPts.end(),neighborPts_.begin(),neighborPts_.end());
+                        }
+                    }
+                    // if P' is not yet a member of any cluster
+                    // add P' to cluster c
+                    if(!clustered[neighborPts[j]])
+                        clusters[c].push_back(points->at(neighborPts[j]));
+                }
+            }
+
+        }
+    }
+    return clusters;
+}
+
 
 // TODO : WORD AND  LINE DETECTION CODE HERE :
 

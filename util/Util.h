@@ -156,6 +156,10 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
     return unpadded;
 }
 
+
+/* DBSCAN - density-based spatial clustering of applications with noise */
+
+
 class Util
 {
   public:
@@ -173,6 +177,9 @@ class Util
     static void getWordWithConfidence(cv::Mat_<float> &mat, int nLabel, QString &word, float &conf);
     static int  countImagesInDir(QString dir);
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
+
+    static std::vector<int> regionQuery(std::vector<cv::Point> *points, cv::Point *point, float eps);
+    static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts);
 };
 
 #endif
