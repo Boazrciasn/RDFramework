@@ -55,7 +55,7 @@ void VideoPlayer::processPF()
 
     fgPixs.erase(fgPixs.begin()); // remove dummy
 
-    std::vector<std::vector<cv::Point> > clusters = Util::DBSCAN_points(&fgPixs,40.0,1);
+//    std::vector<std::vector<cv::Point> > clusters = Util::DBSCAN_points(&fgPixs,10.0,1);
 //    std::cout << clusters.size() << std::endl;
 
     // Default start
