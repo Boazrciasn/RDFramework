@@ -483,9 +483,19 @@ std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> 
                 neighborPts_ = regionQuery(points,&points->at(neighborPts[j]),eps);
                 unsigned int totNeighbors_ = neighborPts_.size();
                 if(totNeighbors_ >= minPts) // if true join these two sets
-                    for(unsigned int k = 0; k < totNeighbors_; ++k)
-                        if(std::find(neighborPts.begin(), neighborPts.end(), neighborPts_[k]) == neighborPts.end())
-                            neighborPts.push_back(neighborPts_[k]);
+                {
+                    std::vector<int> difference;
+                    std::set_difference(neighborPts_.begin(), neighborPts_.end(),
+                                   neighborPts.begin(), neighborPts.end(),
+                                   std::inserter(difference, difference.end()));
+                    neighborPts.insert(neighborPts.end(),difference.begin(),difference.end());
+                    totNeighbors = neighborPts.size();
+                }
+//                    for(unsigned int k = 0; k < totNeighbors_; ++k)
+//                        if(std::find(neighborPts.begin(), neighborPts.end(), neighborPts_[k]) == neighborPts.end()){
+//                            neighborPts.push_back(neighborPts_[k]);
+//                            totNeighbors = neighborPts.size();
+//                        }
             }
             // if P' is not yet a member of any cluster
             // add P' to cluster c
