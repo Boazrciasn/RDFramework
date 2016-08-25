@@ -26,7 +26,15 @@ class Target
         return m_targetHist;
     }
 
+    inline int getWidth()
+    {
+        return m_targetImg.cols;
+    }
 
+    inline int getHeight()
+    {
+        return m_targetImg.rows;
+    }
     ~Target();
 
   private:

@@ -159,7 +159,23 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
 
 class Util
 {
-  public:
+private:
+    static inline std::vector<int> regionQuery(std::vector<cv::Point> *points, cv::Point *point, float eps)
+    {
+        using namespace std;
+
+        float dist;
+        int ptTotal = points->size();
+        vector<int> retKeys;
+        for(auto i = 0; i < ptTotal; ++i)
+        {
+            dist = sqrt(pow((point->x - points->at(i).x),2)+pow((point->y - points->at(i).y),2));
+            if(dist <= eps && dist != 0.0f)
+                retKeys.push_back(i);
+        }
+        return retKeys;
+    }
+public:
     static void print3DHistogram(cv::Mat &inMat);
     static double calculateAccuracy(const std::vector<QString> &groundtruth, const std::vector<QString> &results);
     static cv::Mat toCv(const QImage &image, int cv_type);
@@ -175,7 +191,6 @@ class Util
     static int  countImagesInDir(QString dir);
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
 
-    static std::vector<int> regionQuery(std::vector<cv::Point> *points, cv::Point *point, float eps);
     static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts);
 };
 

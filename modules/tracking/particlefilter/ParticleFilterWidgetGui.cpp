@@ -104,6 +104,10 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     int height;
     std::tie(width, height) = frameSize;
     m_TargetsVector[0]->setHistSize(m_histSize);
+    m_particleWidth = m_TargetsVector[0]->getWidth();
+    m_particleHeight = m_TargetsVector[0]->getHeight();
+    ui->particleWidthLSpinBox->setValue(m_particleWidth);
+    ui->particleHeightLSpinBox->setValue(m_particleHeight);
     m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters, m_particleWidth, m_particleHeight, m_histSize,
                               m_TargetsVector[0]);
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);

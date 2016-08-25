@@ -49,8 +49,9 @@ void VideoPlayer::processPF()
         index += value;
     });
     fgPixs.erase(fgPixs.begin()); // remove dummy
+
     std::vector<std::vector<cv::Point> > clusters = Util::DBSCAN_points(&fgPixs, 10.0f, 40);
-    //    std::cout << clusters.size() << std::endl;
+
     // Default start
     Dilation(0, 0);
     Erosion(0, 0);
