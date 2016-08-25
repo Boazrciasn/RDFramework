@@ -157,9 +157,6 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
 }
 
 
-/* DBSCAN - density-based spatial clustering of applications with noise */
-
-
 class Util
 {
   public:

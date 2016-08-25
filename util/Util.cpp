@@ -464,25 +464,14 @@ std::vector<int> Util::regionQuery(std::vector<cv::Point> *points, cv::Point *po
 std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts)
 {
     std::vector<std::vector<cv::Point> > clusters;
-    std::vector<bool> clustered;
+    int noKeys = points->size();
+    std::vector<bool> clustered(noKeys,false);
     std::vector<int> noise;
-    std::vector<bool> visited;
+    std::vector<bool> visited(noKeys, false);
     std::vector<int> neighborPts;
     std::vector<int> neighborPts_;
-    int c;
-
-    int noKeys = points->size();
-
-    //init clustered and visited
-    for(int k = 0; k < noKeys; k++)
-    {
-        clustered.push_back(false);
-        visited.push_back(false);
-    }
-
-    //C =0;
-    c = 0;
-    clusters.push_back(std::vector<cv::Point>()); //will stay empty?
+    int c {};
+    clusters.push_back(std::vector<cv::Point>());
 
     //for each unvisted point P in dataset points
     for(int i = 0; i < noKeys; i++)
