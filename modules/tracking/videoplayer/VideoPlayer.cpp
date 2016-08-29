@@ -38,24 +38,13 @@ void VideoPlayer::processPF()
     // Background Subtruction MOG
     cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));
     m_pMOG->apply(m_RGBframe, m_fgMaskMOG2);
-    //    std::cout << m_fgMaskMOG2 << std::endl;
-    int pointCount = cv::sum(m_fgMaskMOG2)[0] / 255 + 1; // +1 for dummy first elem
-    int index = 1;
-    std::vector<cv::Point> fgPixs(pointCount);
-    doForAllPixels(m_fgMaskMOG2, [&](uchar value, quint16 x, quint16 y)
-    {
-        value = value / 255;
-        fgPixs[index * value] = cv::Point(x, y);
-        index += value;
-    });
-    fgPixs.erase(fgPixs.begin()); // remove dummy
-
-    std::vector<std::vector<cv::Point> > clusters = Util::DBSCAN_points(&fgPixs, 10.0f, 40);
-
+    cv::Mat labels;
+    cv::Mat stats;
+    cv::Mat centroids;
     // Default start
     Dilation(0, 0);
     Erosion(0, 0);
-    m_PF->setIMG(&m_RGBframe);
+    cv::connectedComponentsWithStats(m_fgMaskMOG2, labels, stats, centroids);
     m_PF->processImage();
     m_frame_out = m_PF->getIMG();
     m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
