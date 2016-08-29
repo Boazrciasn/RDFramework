@@ -42,7 +42,7 @@ void VideoPlayer::processPF()
     int pointCount = cv::sum(m_fgMaskMOG2)[0] / 255 + 1; // +1 for dummy first elem
     int index = 1;
     std::vector<cv::Point> fgPixs(pointCount);
-    doForAllPixels(m_fgMaskMOG2, [&](uchar value, int x, int y)
+    doForAllPixels(m_fgMaskMOG2, [&](uchar value, quint16 x, quint16 y)
     {
         value = value / 255;
         fgPixs[index * value] = cv::Point(x, y);

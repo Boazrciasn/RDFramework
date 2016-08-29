@@ -20,11 +20,11 @@ void deneme()
     cv::Mat_<int> B(5, 5);
     A.setTo(0);
     B.setTo(10);
-    doForAllPixels<float>(A, [](float pixval, int i, int j)
+    doForAllPixels<float>(A, [](float pixval, quint16 i, quint16 j)
     {
         return pixval + 1;
     });
-    doForAllPixels<int>(B, [](int pixval, int i, int j)
+    doForAllPixels<int>(B, [](int pixval, quint16 i, quint16 j)
     {
         return pixval * 5;
     });

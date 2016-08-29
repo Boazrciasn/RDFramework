@@ -9,13 +9,14 @@ void doForAllPixels(const cv::Mat_<T> &M, const FUNC &func)
 {
     int nRows = M.rows;
     int nCols = M.cols;
-    for(int i = 0; i < nRows; ++i)
+    for(quint16 i = 0; i < nRows; ++i)
     {
         auto *pRow = (T *)M.ptr(i);
-        for(int j = 0; j < nCols; ++j, ++pRow)
+        for(quint16 j = 0; j < nCols; ++j, ++pRow)
             func(*pRow, i, j);
     }
 }
+
 
 template <typename T, typename FUNC>
 void setForAllPixels(cv::Mat_<T> &M, const FUNC &func)
@@ -112,7 +113,7 @@ inline int getMaxLikelihoodIndex(const QVector<float> &hist)
 
 inline void getImageLabelVotes(const cv::Mat_<uchar> &label_image, QVector<float> &vote_vector)
 {
-    doForAllPixels(label_image, [&](uchar value, int, int)
+    doForAllPixels(label_image, [&](uchar value, quint16, quint16)
     {
         ++vote_vector[value];
     });
@@ -129,7 +130,7 @@ inline void printHistogram(cv::Mat_<float> &hist)
 {
     QString res = "HIST {";
     int nRows = hist.rows;
-    doForAllPixels(hist, [&](float value, int i, int j)
+    doForAllPixels(hist, [&](float value, quint16 i, quint16 j)
     {
         res += " " + QString::number(value);
         if(i != nRows - 1)
