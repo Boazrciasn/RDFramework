@@ -71,6 +71,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="DataExtractor_pushButton">
+      <property name="text">
+       <string>Data Extractor</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -131,7 +138,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>231</x>
-     <y>156</y>
+     <y>151</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>
@@ -146,8 +153,8 @@
    <slot>open_RDFwidget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>205</x>
-     <y>81</y>
+     <x>214</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>
@@ -163,7 +170,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>231</x>
-     <y>131</y>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>
@@ -179,7 +186,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>231</x>
-     <y>106</y>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>
@@ -203,6 +210,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>DataExtractor_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowGui</receiver>
+   <slot>open_DataExtractor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>195</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>179</x>
+     <y>260</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_displayimageswidget()</slot>
@@ -210,5 +233,6 @@
   <slot>open_Resizerwidget()</slot>
   <slot>open_AnnExtwidget()</slot>
   <slot>open_PFTracker()</slot>
+  <slot>open_DataExtractor()</slot>
  </slots>
 </ui>

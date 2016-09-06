@@ -17,6 +17,7 @@
 #include "Core/ResizeAllImagesDialogGui.h"
 #include "Core/DisplayImagesWidgetGui.h"
 #include "tracking/particlefilter/ParticleFilterWidgetGui.h"
+#include "tracking/dataExtraction/DataExtractorGui.h"
 
 
 namespace Ui
@@ -41,6 +42,7 @@ class MainWindowGui : public QMainWindow
     void open_AnnExtwidget();
     void open_Resizerwidget();
     void open_PFTracker();
+    void open_DataExtractor();
 
   private:
     Ui::MainWindowGui *ui;

@@ -29,19 +29,19 @@ MainWindowGui::~MainWindowGui()
 
 void MainWindowGui::on_actionAnnotation_Extractor_triggered()
 {
-    AnnExtractorDialogGui *mDialog = new AnnExtractorDialogGui(this);
+    AnnExtractorDialogGui *mDialog = new AnnExtractorDialogGui();
     mDialog->exec();
 }
 
 void MainWindowGui::on_actionRDF_triggered()
 {
-    RandomDecisionForestDialogGui *mDialog = new RandomDecisionForestDialogGui(this);
+    RandomDecisionForestDialogGui *mDialog = new RandomDecisionForestDialogGui();
     mDialog->exec();
 }
 
 void MainWindowGui::on_actionResizer_triggered()
 {
-    ResizeAllImagesDialogGui *mDialog = new ResizeAllImagesDialogGui(this);
+    ResizeAllImagesDialogGui *mDialog = new ResizeAllImagesDialogGui();
     mDialog->exec();
 }
 
@@ -73,4 +73,10 @@ void MainWindowGui::open_PFTracker()
 {
     ParticleFilterWidgetGui *pfwidget = new ParticleFilterWidgetGui();
     pfwidget->show();
+}
+
+void MainWindowGui::open_DataExtractor()
+{
+    DataExtractorGui *dataExtractwidget = new DataExtractorGui();
+    dataExtractwidget->show();
 }

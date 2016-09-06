@@ -23,17 +23,17 @@ void VideoPlayer::run()
         }
         m_CurrentFrame++;
         if (m_PF)
-            processPF();
+            processImage(m_PF);
         else
             m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
         emit playerFrame(m_img);
-        cv::imshow("FG Mask fgMOG_no_hole", m_fgMaskMOG2_noHole);
-        cv::imshow("FG Mask", m_fgMaskMOG2);
+        //        cv::imshow("FG Mask fgMOG_no_hole", m_fgMaskMOG2_noHole);
+        //        cv::imshow("FG Mask", m_fgMaskMOG2);
         msleep(delay);
     }
 }
-
-void VideoPlayer::processPF()
+template<typename ImgProcessor>
+void VideoPlayer::processImage(ImgProcessor process)
 {
     // Background Subtruction MOG
     cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));
@@ -45,8 +45,9 @@ void VideoPlayer::processPF()
     Dilation(0, 0);
     Erosion(0, 0);
     cv::connectedComponentsWithStats(m_fgMaskMOG2, labels, stats, centroids);
-    m_PF->processImage();
-    m_frame_out = m_PF->getIMG();
+    process->setIMG(&m_RGBframe);
+    process->processImage();
+    m_frame_out = process->getIMG();
     m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
 }
 

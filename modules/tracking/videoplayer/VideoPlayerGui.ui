@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VideoPlayerGui</class>
+ <widget class="QWidget" name="VideoPlayerGui">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>625</width>
+    <height>555</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+   <item>
+    <widget class="QLabel" name="Display_label">
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Button">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Window">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Button">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Window">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Button">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Window">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">Background-color: #000;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="Frame_horizontalSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Browse_pushButton">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Play_pushButton">
+       <property name="text">
+        <string>Play</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Pause_pushButton">
+       <property name="text">
+        <string>Pause</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>Frame_horizontalSlider</sender>
+   <signal>sliderPressed()</signal>
+   <receiver>VideoPlayerGui</receiver>
+   <slot>onHorizontalSliderPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>510</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>58</x>
+     <y>550</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Frame_horizontalSlider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>VideoPlayerGui</receiver>
+   <slot>onHorizontalSliderReleased()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>510</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>137</x>
+     <y>585</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Frame_horizontalSlider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VideoPlayerGui</receiver>
+   <slot>onHorizontalSliderMoved(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>544</x>
+     <y>507</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>543</x>
+     <y>643</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Browse_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>VideoPlayerGui</receiver>
+   <slot>onActionBrowse()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>240</x>
+     <y>530</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>627</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Play_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>VideoPlayerGui</receiver>
+   <slot>onActionPlay()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>330</x>
+     <y>527</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>641</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Pause_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>VideoPlayerGui</receiver>
+   <slot>onActionPause()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>394</x>
+     <y>535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>394</x>
+     <y>603</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onHorizontalSliderPressed()</slot>
+  <slot>onHorizontalSliderMoved(int)</slot>
+  <slot>onHorizontalSliderReleased()</slot>
+  <slot>onActionBrowse()</slot>
+  <slot>onActionPlay()</slot>
+  <slot>onActionPause()</slot>
+ </slots>
+</ui>
