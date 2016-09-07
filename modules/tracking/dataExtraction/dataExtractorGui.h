@@ -1,5 +1,5 @@
-#ifndef DATAEXTRACTOR_H
-#define DATAEXTRACTOR_H
+#ifndef DATAEXTRACTORGUI_H
+#define DATAEXTRACTORGUI_H
 
 #include <QWidget>
 #include "DisplayImagesWidgetGui.h"
@@ -7,7 +7,7 @@
 
 namespace Ui
 {
-class dataExtractor;
+class DataExtractorGui;
 }
 
 class DataExtractorGui : public QWidget
@@ -21,8 +21,8 @@ class DataExtractorGui : public QWidget
   private slots :
     void createNewWindow();
   private:
-    Ui::dataExtractor *ui;
+    Ui::DataExtractorGui *ui;
     VideoPlayerGui *m_testWin;
 };
 
-#endif // DATAEXTRACTOR_H
+#endif // DATAEXTRACTORGUI_H

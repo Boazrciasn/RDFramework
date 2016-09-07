@@ -1,5 +1,5 @@
-#ifndef PFWIDGET_H
-#define PFWIDGET_H
+#ifndef PARTICLEFILTERWIDGETGUI_H
+#define PARTICLEFILTERWIDGETGUI_H
 #include "precompiled.h"
 
 #include <QWidget>
@@ -80,4 +80,4 @@ class ParticleFilterWidgetGui : public QWidget
     void setPFSettingsEnabled(bool state);
 };
 
-#endif // PFWIDGET_H
+#endif // PARTICLEFILTERWIDGETGUI_H

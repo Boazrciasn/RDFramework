@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dataExtractor</class>
- <widget class="QWidget" name="dataExtractor">
+ <class>DataExtractorGui</class>
+ <widget class="QWidget" name="DataExtractorGui">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31,7 +31,7 @@
   <connection>
    <sender>newWindow_pushButton</sender>
    <signal>clicked()</signal>
-   <receiver>dataExtractor</receiver>
+   <receiver>DataExtractorGui</receiver>
    <slot>createNewWindow()</slot>
    <hints>
     <hint type="sourcelabel">

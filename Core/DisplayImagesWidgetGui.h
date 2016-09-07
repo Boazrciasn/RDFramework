@@ -1,5 +1,5 @@
-#ifndef DISPLAYIMAGESWIDGET_H
-#define DISPLAYIMAGESWIDGET_H
+#ifndef DISPLAYIMAGESWIDGETGUI_H
+#define DISPLAYIMAGESWIDGETGUI_H
 
 #include <QWidget>
 #include <QScrollArea>
@@ -47,4 +47,4 @@ class DisplayImagesWidgetGui : public QWidget
     std::vector<QString> m_coords;     // file names are stored
 };
 
-#endif // DISPLAYIMAGESWIDGET_H
+#endif // DISPLAYIMAGESWIDGETGUI_H

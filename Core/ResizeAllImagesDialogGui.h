@@ -1,5 +1,5 @@
-#ifndef RESIZEALLIMAGESDIALOG_H
-#define RESIZEALLIMAGESDIALOG_H
+#ifndef RESIZEALLIMAGESDIALOGGUI_H
+#define RESIZEALLIMAGESDIALOGGUI_H
 
 #include <QDialog>
 
@@ -30,4 +30,4 @@ class ResizeAllImagesDialogGui : public QDialog
     QString m_saveDir;
 };
 
-#endif // RESIZEALLIMAGESDIALOG_H
+#endif // RESIZEALLIMAGESDIALOGGUI_H

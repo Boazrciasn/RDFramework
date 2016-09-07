@@ -1,5 +1,5 @@
-#ifndef MYDIALOG_H
-#define MYDIALOG_H
+#ifndef MYDIALOGGUI_H
+#define MYDIALOGGUI_H
 
 #include <QDialog>
 #include <vector>
@@ -32,5 +32,5 @@ class MyDialogGui : public QDialog
     QString dir;
 };
 
-#endif // MYDIALOG_H
+#endif // MYDIALOGGUI_H
 

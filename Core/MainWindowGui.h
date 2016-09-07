@@ -1,5 +1,5 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAINWINDOWGUI_H
+#define MAINWINDOWGUI_H
 
 #include <QMainWindow>
 #include <QScrollArea>
@@ -50,4 +50,4 @@ class MainWindowGui : public QMainWindow
     HistogramDialogGui *histDialog;
 };
 
-#endif // MAINWINDOW_H
+#endif // MAINWINDOWGUI_H

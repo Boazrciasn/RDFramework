@@ -1,5 +1,5 @@
-#ifndef ANNEXTRACTORDIALOG_H
-#define ANNEXTRACTORDIALOG_H
+#ifndef ANNEXTRACTORDIALOGGUI_H
+#define ANNEXTRACTORDIALOGGUI_H
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -63,4 +63,4 @@ class AnnExtractorDialogGui : public QDialog
     void loadHeader();
 };
 
-#endif // ANNEXTRACTORDIALOG_H
+#endif // ANNEXTRACTORDIALOGGUI_H

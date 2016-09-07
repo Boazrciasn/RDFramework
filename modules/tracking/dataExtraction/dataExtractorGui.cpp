@@ -1,9 +1,8 @@
 #include "DataExtractorGui.h"
 #include "ui_DataExtractorGui.h"
 
-DataExtractorGui::DataExtractorGui(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::dataExtractor)
+DataExtractorGui::DataExtractorGui(QWidget *parent) : QWidget(parent),
+    ui(new Ui::DataExtractorGui)
 {
     ui->setupUi(this);
     m_testWin = new VideoPlayerGui(this);

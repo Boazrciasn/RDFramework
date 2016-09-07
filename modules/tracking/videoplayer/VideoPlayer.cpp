@@ -32,6 +32,7 @@ void VideoPlayer::run()
         msleep(delay);
     }
 }
+
 template<typename ImgProcessor>
 void VideoPlayer::processImage(ImgProcessor process)
 {

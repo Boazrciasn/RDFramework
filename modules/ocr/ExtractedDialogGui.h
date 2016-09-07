@@ -1,5 +1,5 @@
-#ifndef DIALOGEXTRACTED_H
-#define DIALOGEXTRACTED_H
+#ifndef EXTRACTEDDIALOGGUI_H
+#define EXTRACTEDDIALOGGUI_H
 
 #include <QDialog>
 namespace Ui
@@ -20,4 +20,4 @@ class DialogExtractedGui : public QDialog
     Ui::DialogExtractedGui *ui;
 };
 
-#endif // DIALOGEXTRACTED_H
+#endif // EXTRACTEDDIALOGGUI_H
