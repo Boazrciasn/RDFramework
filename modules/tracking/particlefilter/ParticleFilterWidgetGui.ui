@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>913</width>
+    <width>755</width>
     <height>685</height>
    </rect>
   </property>
@@ -385,8 +385,8 @@
    <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>220</x>
-     <y>635</y>
+     <x>266</x>
+     <y>665</y>
     </hint>
     <hint type="destinationlabel">
      <x>163</x>
@@ -401,8 +401,8 @@
    <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>306</x>
-     <y>635</y>
+     <x>352</x>
+     <y>665</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
@@ -417,8 +417,8 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>392</x>
-     <y>635</y>
+     <x>438</x>
+     <y>665</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
@@ -433,8 +433,8 @@
    <slot>onHorizontalSliderPressed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>194</x>
-     <y>597</y>
+     <x>212</x>
+     <y>631</y>
     </hint>
     <hint type="destinationlabel">
      <x>193</x>
@@ -449,8 +449,8 @@
    <slot>onHorizontalSliderReleased()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>77</x>
-     <y>597</y>
+     <x>95</x>
+     <y>631</y>
     </hint>
     <hint type="destinationlabel">
      <x>48</x>
@@ -514,7 +514,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>845</x>
-     <y>387</y>
+     <y>369</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -529,8 +529,8 @@
    <slot>onActionSaveTarget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>506</x>
-     <y>613</y>
+     <x>528</x>
+     <y>665</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
@@ -546,7 +546,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>882</x>
-     <y>336</y>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -561,8 +561,8 @@
    <slot>onActionSetupPF()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>759</x>
-     <y>598</y>
+     <x>882</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
      <x>758</x>
@@ -577,8 +577,8 @@
    <slot>onHorizontalSliderMoved(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>597</y>
+     <x>142</x>
+     <y>631</y>
     </hint>
     <hint type="destinationlabel">
      <x>146</x>
@@ -593,8 +593,8 @@
    <slot>onParticleHeightChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>756</x>
-     <y>267</y>
+     <x>882</x>
+     <y>266</y>
     </hint>
     <hint type="destinationlabel">
      <x>1134</x>

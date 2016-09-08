@@ -37,7 +37,9 @@ class VideoPlayer : public QThread
     double m_CurrentFrame;
 
     ParticleFilter *m_PF{};
-    void processPF();
+
+    template <typename ImgProcessor>
+    void processImage(ImgProcessor process);
 
     void initializeVideo();
 

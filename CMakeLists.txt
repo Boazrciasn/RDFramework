@@ -32,12 +32,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file(GLOB CORE Core/*.ui Core/*.cpp Core/*.h Core/*.hpp)
 file(GLOB OCR modules/ocr/*.ui modules/ocr/*.cpp modules/ocr/*.h modules/ocr/*.hpp)
 file(GLOB RDF modules/rdf/*.ui modules/rdf/*.cpp modules/rdf/*.h modules/rdf/*.hpp)
-file(GLOB PF modules/tracking/particlefilter/*.ui modules/tracking/particlefilter/*.cpp modules/tracking/particlefilter/*.h modules/tracking/particlefilter/*.hpp)
-file(GLOB VIDEOPLAYER modules/tracking/videoplayer/*.ui modules/tracking/videoplayer/*.cpp modules/tracking/videoplayer/*.h modules/tracking/videoplayer/*.hpp)
+file(GLOB PF modules/tracking/particlefilter/*.ui modules/tracking/particlefilter/*.cpp
+             modules/tracking/particlefilter/*.h  modules/tracking/particlefilter/*.hpp)
+file(GLOB VIDEOPLAYER modules/tracking/videoplayer/*.ui modules/tracking/videoplayer/*.cpp
+                      modules/tracking/videoplayer/*.h modules/tracking/videoplayer/*.hpp)
 file(GLOB UTIL util/*.ui util/*.cpp util/*.h util/*.hpp)
-file(GLOB QCUSTOMPLOT 3rdparty/qcustomplot/*.ui 3rdparty/qcustomplot/*.cpp 3rdparty/qcustomplot/*.h 3rdparty/qcustomplot/*.hpp)
+file(GLOB QCUSTOMPLOT 3rdparty/qcustomplot/*.ui 3rdparty/qcustomplot/*.cpp
+                      3rdparty/qcustomplot/*.h 3rdparty/qcustomplot/*.hpp)
 file(GLOB CEREAL 3rdparty/cereal/*)
 file(GLOB 3RDPARTY 3rdparty/*.ui 3rdparty/*.cpp 3rdparty/*.h 3rdparty/*.hpp)
+file(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataExtraction/*.hpp
+                   modules/tracking/dataExtraction/*.h modules/tracking/dataExtraction/*.ui)
 
 
 
@@ -45,10 +50,12 @@ file(GLOB 3RDPARTY 3rdparty/*.ui 3rdparty/*.cpp 3rdparty/*.h 3rdparty/*.hpp)
 QT5_WRAP_UI(UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui
                     modules/ocr/AnnExtractorDialogGui.ui modules/ocr/ExtractedDialogGui.ui modules/ocr/HistogramDialogGui.ui modules/ocr/MyDialogGui.ui
                     modules/rdf/RandomDecisionForestDialogGui.ui
-                    modules/tracking/particlefilter/ParticleFilterWidgetGui.ui)
+                    modules/tracking/particlefilter/ParticleFilterWidgetGui.ui
+                    modules/tracking/dataExtraction/DataExtractorGui.ui
+                    modules/tracking/videoplayer/VideoPlayerGui.ui)
 
 add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
-                ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${3RDPARTY} ${UISrcs})
+                ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
 
 # NM Not tested yet
 target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)

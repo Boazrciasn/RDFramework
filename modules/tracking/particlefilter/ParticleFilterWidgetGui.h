@@ -10,8 +10,8 @@
 #include <tuple>
 #include "Util.h"
 #include "tracking/videoplayer/VideoReader.h"
-#include "tracking/particlefilter/ParticleFilter.h"
 #include "tracking/videoplayer/VideoPlayer.h"
+#include "tracking/particlefilter/ParticleFilter.h"
 #include "Target.h"
 
 class RectangleParticle;
