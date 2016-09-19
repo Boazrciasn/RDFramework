@@ -6,9 +6,11 @@
 #include "ocr/Reader.h"
 #include "rdf/RandomDecisionForest.h"
 
+
+#include "modules/tracking/dataExtraction/HOGExtactor.h"
+
 int main(int argc, char *argv[])
 {
-
     //    QString file = "/home/neko/Desktop/lastSession.txt";
     //    QFile  *m_saveFile = new QFile(file);
     //    bool fileExists = m_saveFile->exists();
@@ -56,5 +58,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     MainWindowGui w;
     w.show();
+
+    HOGExtactor *hogExtr = new HOGExtactor();
+    std::cout << hogExtr->getDataSize() << std::endl;
+
     return app.exec();
 }
