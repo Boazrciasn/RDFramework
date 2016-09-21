@@ -3,7 +3,7 @@
 
 DataExtractorGui::DataExtractorGui(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::dataExtractor)
+    ui(new Ui::DataExtractorGui)
 {
     ui->setupUi(this);
     m_testWin = new VideoPlayerGui(this);
