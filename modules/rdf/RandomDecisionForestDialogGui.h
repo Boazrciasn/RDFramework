@@ -1,5 +1,5 @@
-#ifndef RDFDIALOG_H
-#define RDFDIALOG_H
+#ifndef RDFDIALOGGUI_H
+#define RDFDIALOGGUI_H
 
 #include <QDialog>
 
@@ -39,4 +39,4 @@ class RandomDecisionForestDialogGui : public QDialog
 
 };
 
-#endif // RDFDIALOG_H
+#endif // RDFDIALOGGUI_H

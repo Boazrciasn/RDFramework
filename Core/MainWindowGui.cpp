@@ -14,11 +14,9 @@ MainWindowGui::MainWindowGui(QWidget *parent) :
     ui->setupUi(this);
     // Shortcut to Random Desicion Forest Window
     QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+F"), this);
-    QObject::connect(shortcut, SIGNAL(activated()), this,
-                     SLOT(on_actionRDF_triggered()));
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionRDF_triggered()));
     shortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
-    QObject::connect(shortcut, SIGNAL(activated()), this,
-                     SLOT(on_actionResizer_triggered()));
+    QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionResizer_triggered()));
 }
 
 MainWindowGui::~MainWindowGui()

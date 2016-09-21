@@ -1,5 +1,5 @@
-#ifndef HISTOGRAMDIALOG_H
-#define HISTOGRAMDIALOG_H
+#ifndef HISTOGRAMDIALOGGUI_H
+#define HISTOGRAMDIALOGGUI_H
 
 #include <QDialog>
 #include "qcustomplot.h" // the header file of QCustomPlot. Don't forget to add it to your project, if you use an IDE, so it gets compiled.
@@ -22,4 +22,4 @@ class HistogramDialogGui : public QDialog
     Ui::HistogramDialogGui *ui;
 };
 
-#endif // HISTOGRAMDIALOG_H
+#endif // HISTOGRAMDIALOGGUI_H

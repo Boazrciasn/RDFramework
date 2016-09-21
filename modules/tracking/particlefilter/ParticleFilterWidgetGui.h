@@ -1,5 +1,5 @@
-#ifndef PFWIDGET_H
-#define PFWIDGET_H
+#ifndef PARTICLEFILTERWIDGETGUI_H
+#define PARTICLEFILTERWIDGETGUI_H
 #include "precompiled.h"
 
 #include <QWidget>
@@ -66,7 +66,7 @@ class ParticleFilterWidgetGui : public QWidget
     int m_particleHeight;
     int m_histSize ;
     bool m_VideoLodaded = false;
-    bool m_isPlaying;
+    bool m_isPlaying{};
     QRubberBand *m_RubberBand;
     QRect m_TargetROI;
     QPoint m_Point;
@@ -80,4 +80,4 @@ class ParticleFilterWidgetGui : public QWidget
     void setPFSettingsEnabled(bool state);
 };
 
-#endif // PFWIDGET_H
+#endif // PARTICLEFILTERWIDGETGUI_H

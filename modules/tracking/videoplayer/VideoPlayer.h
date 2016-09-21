@@ -4,13 +4,12 @@
 #include <QMutex>
 #include <QThread>
 #include <tuple>
+#include <opencv2/video/background_segm.hpp>
 
 #include "VideoReader.h"
 #include "tracking/particlefilter/ParticleFilter.h"
 #include "BufferQueue.h"
-
-#include <opencv2/video/background_segm.hpp>
-
+#include "modules/tracking/dataExtraction/DataExtractor.h"
 
 class VideoPlayer : public QThread
 {
@@ -24,9 +23,10 @@ class VideoPlayer : public QThread
     void msleep(int ms);
 
   private:
+
     VideoReader *m_VideoReader;
     BufferQueue<cv::Mat> *m_FrameBuffer;
-    bool m_stop;
+    bool m_stop = true;
     QMutex m_mutex;
     QWaitCondition m_waitcond;
     cv::Mat m_frame_out;
@@ -37,6 +37,7 @@ class VideoPlayer : public QThread
     double m_CurrentFrame;
 
     ParticleFilter *m_PF{};
+
 
     template <typename ImgProcessor>
     void processImage(ImgProcessor process);
@@ -55,8 +56,8 @@ class VideoPlayer : public QThread
     int m_dilation_size = 4;
 
     /** Function Headers */
-    void Erosion( int, void* );
-    void Dilation( int, void* );
+    void Erosion(int, void *);
+    void Dilation(int, void *);
 
   public:
     VideoPlayer(QObject *parent);
@@ -71,6 +72,7 @@ class VideoPlayer : public QThread
 
     int getNumberOfFrames() const { return m_VideoReader->getNumberOfFrames(); }
     std::tuple<int, int> getFrameSize();
+
 
     inline void setPF(ParticleFilter *pf) { m_PF = pf; }
     void setCurrentFrame(int frameNumber);
