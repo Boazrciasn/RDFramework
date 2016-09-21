@@ -156,7 +156,7 @@ void ParticleFilterWidgetGui::onHorizontalSliderPressed()
 void ParticleFilterWidgetGui::onHorizontalSliderReleased()
 {
     m_VideoPlayer->setCurrentFrame(m_currFrame);
-    if(!m_PF)
+    if(m_PF)
         m_PF->reInitialiaze();
     if (m_isPlaying)
         m_VideoPlayer->playVideo();
