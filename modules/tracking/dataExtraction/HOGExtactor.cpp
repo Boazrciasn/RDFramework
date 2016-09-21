@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "Util.h"
 
 HOGExtactor::HOGExtactor()
 {
@@ -14,7 +15,20 @@ HOGExtactor::HOGExtactor()
     extractHOG();
 
 //    int maxComponents = 2;
-//    cv::abspca_analysis(m_trainDataDescriptors, Mat(), CV_PCA_DATA_AS_ROW,maxComponents);
+
+    cv::Mat_<float> data;
+    for(auto desc : m_trainDataDescriptors)
+        data.push_back((cv::Mat_<float>(desc)).t());
+
+    Util::writeMatToFile(data,"../negDes.txt");
+
+//    cv::PCA pca_analysis(data, cv::Mat(), CV_PCA_DATA_AS_ROW,maxComponents);
+
+//    cv::Mat proj = data*pca_analysis.eigenvectors.t();
+//    Util::writeMatToFile(proj,"../neg.txt");
+
+//    cv::FileStorage file("../pos.yml", cv::FileStorage::WRITE);
+//    file << "pos" << proj;
 }
 
 void HOGExtactor::getTrainingData(QString baseDir)

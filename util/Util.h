@@ -192,6 +192,7 @@ public:
     static int  countImagesInDir(QString dir);
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
 
+    static void writeMatToFile(cv::Mat& m, const char* filename);
     static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts);
 };
 

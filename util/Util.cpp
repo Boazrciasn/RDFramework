@@ -6,7 +6,8 @@
 
 #include "omp.h"
 #include <algorithm>
-
+#include <iostream>
+#include <fstream>
 
 void openmp_deneme()
 {
@@ -445,6 +446,35 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     cv::minMaxLoc(input, &Min, &Max);
     input -= Min;
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
+}
+
+void Util::writeMatToFile(cv::Mat &m, const char *filename)
+{
+    std::ofstream fout(filename);
+    if(!fout)
+    {
+        std::cout<<"File Not Opened"<<std::endl;  return;
+    }
+
+
+
+//    quint16 cols = m.cols;
+//    doForAllPixels<float>(m,[&](int pixval, quint16 i, quint16 j)
+//    {
+//        fout<<pixval<<"\t";
+//        if(cols == j)
+//            fout<<std::endl;
+//    });
+
+    for(int i=0; i<m.rows; i++)
+    {
+        for(int j=0; j<m.cols; j++)
+        {
+            fout<<m.at<float>(i,j)<<"\t";
+        }
+        fout<<std::endl;
+    }
+    fout.close();
 }
 
 std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts)
