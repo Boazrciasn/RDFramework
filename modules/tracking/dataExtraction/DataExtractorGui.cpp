@@ -1,3 +1,6 @@
+#include "precompiled.h"
+
+#include "DataExtractor.h"
 #include "DataExtractorGui.h"
 #include "ui_DataExtractorGui.h"
 

@@ -458,22 +458,14 @@ void Util::writeMatToFile(cv::Mat &m, const char *filename)
 
 
 
-//    quint16 cols = m.cols;
-//    doForAllPixels<float>(m,[&](int pixval, quint16 i, quint16 j)
-//    {
-//        fout<<pixval<<"\t";
-//        if(cols == j)
-//            fout<<std::endl;
-//    });
-
-    for(int i=0; i<m.rows; i++)
+    quint16 lastcol = m.cols-1;
+    doForAllPixels<float>(m, [&, lastcol](float pixval, quint16/* i*/, quint16 j)
     {
-        for(int j=0; j<m.cols; j++)
-        {
-            fout<<m.at<float>(i,j)<<"\t";
-        }
-        fout<<std::endl;
-    }
+        fout << pixval << "\t";
+        if(j == lastcol)
+            fout << std::endl;
+    });
+
     fout.close();
 }
 
