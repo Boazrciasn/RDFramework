@@ -108,8 +108,8 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     m_particleHeight = m_TargetsVector[0]->getHeight();
     ui->particleWidthLSpinBox->setValue(m_particleWidth);
     ui->particleHeightLSpinBox->setValue(m_particleHeight);
-    m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters, m_particleWidth, m_particleHeight, m_histSize,
-                              m_TargetsVector[0]);
+    m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters,
+                              m_particleWidth, m_particleHeight, m_histSize,m_TargetsVector[0]);
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setPF(m_PF);
 }

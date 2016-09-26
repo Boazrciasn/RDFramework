@@ -36,11 +36,11 @@ class VideoPlayer : public QThread
 
     double m_CurrentFrame;
 
-    ParticleFilter *m_PF{};
+    ImgProcessor *m_processor{};
 
 
-    template <typename ImgProcessor>
-    void processImage(ImgProcessor process);
+//    template <typename ImgProcessor>
+    void processImage(ImgProcessor *process);
 
     void initializeVideo();
 
@@ -68,13 +68,13 @@ class VideoPlayer : public QThread
     void stopVideo() { m_stop = true; }
     bool isStopped() const { return m_stop; }
     double getCurrentFrame();
-    inline ParticleFilter *getPF() const { return m_PF; }
+    inline ImgProcessor *getImgProcessor() const { return m_processor; }
 
     int getNumberOfFrames() const { return m_VideoReader->getNumberOfFrames(); }
     std::tuple<int, int> getFrameSize();
 
 
-    inline void setPF(ParticleFilter *pf) { m_PF = pf; }
+    inline void setPF(ParticleFilter *pf) { m_processor = pf; }
     void setCurrentFrame(int frameNumber);
 };
 

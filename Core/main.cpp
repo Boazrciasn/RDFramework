@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
     MainWindowGui w;
     w.show();
 
-    HOGExtactor *hogExtr = new HOGExtactor();
-    std::cout << hogExtr->getDataSize() << std::endl;
+//    HOGExtactor *hogExtr = new HOGExtactor();
+//    std::cout << hogExtr->getDataSize() << std::endl;
 
     return app.exec();
 }

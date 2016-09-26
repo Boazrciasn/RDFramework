@@ -1,6 +1,7 @@
 #include "precompiled.h"
 #include "VideoPlayer.h"
 #include "Util.h"
+#include "tracking/particlefilter/ImgProcessor.h"
 
 
 VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)
@@ -22,8 +23,8 @@ void VideoPlayer::run()
             continue;
         }
         m_CurrentFrame++;
-        if (m_PF)
-            processImage(m_PF);
+        if (m_processor)
+            processImage(m_processor);
         else
             m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
         emit playerFrame(m_img);
@@ -33,8 +34,8 @@ void VideoPlayer::run()
     }
 }
 
-template<typename ImgProcessor>
-void VideoPlayer::processImage(ImgProcessor process)
+//template<typename ImgProcessor>
+void VideoPlayer::processImage(ImgProcessor *process)
 {
     // Background Subtruction MOG
     cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));

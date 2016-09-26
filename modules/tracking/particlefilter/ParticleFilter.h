@@ -7,6 +7,7 @@
 #include <chrono>
 #include <QMutex>
 #include <QThread>
+#include "ImgProcessor.h"
 
 class Particle;
 class Target;
@@ -18,7 +19,7 @@ enum class ParticleType
     Circle
 };
 
-class ParticleFilter
+class ParticleFilter : public ImgProcessor
 {
   public:
     Target *m_target;
@@ -32,7 +33,7 @@ class ParticleFilter
     inline int getParticleWidth() const { return m_particle_width; }
     inline int getModelType() const { return type; }
     int getRatioOfTop(int count);
-    cv::Mat getIMG() const { return m_outIMG; }
+    cv::Mat getIMG() const override { return m_outIMG; }
     std::vector<Particle *> getParticles() const {return m_particles; }
     inline void setNumParticles(int value) { m_num_particles = value; }
     inline void setHistSize(int histSize) { m_histSize = histSize; }
@@ -43,8 +44,8 @@ class ParticleFilter
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
     void setVideoReader(VideoReader *videoReader);
-    void setIMG(cv::Mat *pImage) { m_img = pImage; }
-    void processImage();    
+    void setIMG(cv::Mat *pImage) override { m_img = pImage; }
+    void processImage() override;
     void showParticles();
     void showTopNParticles(int count);
     void reInitialiaze();
