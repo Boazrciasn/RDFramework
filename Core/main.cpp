@@ -8,6 +8,7 @@
 
 
 #include "modules/tracking/dataExtraction/HOGExtactor.h"
+#include "util.h"
 
 int main(int argc, char *argv[])
 {
@@ -45,22 +46,28 @@ int main(int argc, char *argv[])
     //        m_saveFile->write(" \n");
     //    }
     //    m_saveFile->close();
-//     MNIST EXTRACTOR :
-//        QString MNIST_path = "/Users/barisozcan/Documents/MNIST_dataset/";
-//        QString destdir = "/Users/barisozcan/";
-//        MNIST mnist(MNIST_path);
-//        mnist.MNISTReader();
-//        qDebug() << "no of test images :" << mnist.m_testImagesVector->size();
-//        qDebug() << "no of train images :" << mnist.m_trainImagesVector->size();
-//        qDebug() << "test label count : " << mnist.m_testLabels->size();
-//        qDebug() << "train label count : " << mnist.m_trainLabels->size();
-//        mnist.extractDataSet(destdir);
+    //     MNIST EXTRACTOR :
+    //        QString MNIST_path = "/Users/barisozcan/Documents/MNIST_dataset/";
+    //        QString destdir = "/Users/barisozcan/";
+    //        MNIST mnist(MNIST_path);
+    //        mnist.MNISTReader();
+    //        qDebug() << "no of test images :" << mnist.m_testImagesVector->size();
+    //        qDebug() << "no of train images :" << mnist.m_trainImagesVector->size();
+    //        qDebug() << "test label count : " << mnist.m_testLabels->size();
+    //        qDebug() << "train label count : " << mnist.m_trainLabels->size();
+    //        mnist.extractDataSet(destdir);
+    Animal *animal_pntr = new Animal();
+    animal_pntr->execute();
+    Cat<float> *cat_pntr1 = new Cat<float>(15.0f);
+    Dog<QString> *dog_pntr1 = new Dog<QString>("How Many");
+    animal_pntr = cat_pntr1;
+    animal_pntr->execute();
+    animal_pntr = dog_pntr1;
+    animal_pntr->execute();
     QApplication app(argc, argv);
     MainWindowGui w;
     w.show();
-
     HOGExtactor *hogExtr = new HOGExtactor();
     std::cout << hogExtr->getDataSize() << std::endl;
-
     return app.exec();
 }
