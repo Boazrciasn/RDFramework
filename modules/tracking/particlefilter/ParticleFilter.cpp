@@ -96,6 +96,28 @@ void ParticleFilter::processImage()
 
 void ParticleFilter::initializeParticles()
 {
+    cv::Mat posData, negData, allData, labels;
+    cv::FileStorage file("posDes.yml", cv::FileStorage::READ);
+    file["posDes"] >> posData;
+    file.release();
+
+    file.open("negDes.yml",cv::FileStorage::READ);
+    file["negDes"] >> negData;
+    file.release();
+
+    allData.push_back(posData);
+    allData.push_back(negData);
+
+    labels.push_back(cv::Mat::zeros(posData.rows,1,CV_8UC1));
+    labels.push_back(cv::Mat::ones(negData.rows,1,CV_8UC1));
+
+    cv::HOGDescriptor hog;
+    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
+    svm->setType(cv::ml::SVM::C_SVC);
+    svm->setKernel(cv::ml::SVM::LINEAR);
+    svm->setTermCriteria(cv::TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001));
+    svm->train( allData , cv::ml::ROW_SAMPLE , labels );
+
     int xRange = (img_width - m_particle_width);
     int yRange = (img_height - m_particle_height);
     auto randX =  [&]() { return std::uniform_int_distribution<int>(1, xRange)(m_RandomGen); };
@@ -107,6 +129,8 @@ void ParticleFilter::initializeParticles()
         auto weight = 1.0f / m_num_particles;
         Particle *particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(),
                                                    m_histSize);
+        particle->setHOGDescriptor(&hog);
+        particle->setSVM(svm);
         m_particles.push_back(particle);
     }
 }

@@ -15,8 +15,8 @@ class VideoReader;
 
 enum class ParticleType
 {
-    Rectangle,
-    Circle
+    RECTANGLE,
+    CIRCLE
 };
 
 class ParticleFilter : public ImgProcessor

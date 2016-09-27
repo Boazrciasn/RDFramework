@@ -16,12 +16,13 @@ HOGExtactor::HOGExtactor()
     cv::Mat_<float> data;
     for (auto desc : m_trainDataDescriptors)
         data.push_back((cv::Mat_<float>(desc)).t());
-    Util::writeMatToFile(data, "../negDes.txt");
+//    Util::writeMatToFile(data, "../negDes.txt");
     //    cv::PCA pca_analysis(data, cv::Mat(), CV_PCA_DATA_AS_ROW,maxComponents);
     //    cv::Mat proj = data*pca_analysis.eigenvectors.t();
     //    Util::writeMatToFile(proj,"../neg.txt");
-    //    cv::FileStorage file("../pos.yml", cv::FileStorage::WRITE);
-    //    file << "pos" << proj;
+        cv::FileStorage file("../posDes.yml", cv::FileStorage::WRITE);
+        file << "posDes" << data;
+        file.release();
 }
 
 void HOGExtactor::getTrainingData(QString baseDir)

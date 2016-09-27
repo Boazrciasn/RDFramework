@@ -6,6 +6,9 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <opencv2/ml.hpp>
+#include <opencv2/objdetect.hpp>
+
 enum {Circle, Rectangle};
 
 class Particle
@@ -45,12 +48,21 @@ class Particle
     inline int histSize() const {return m_histSize;}
     inline void setHistSize(int value) {m_histSize = value;}
 
+    inline void setHOGDescriptor(cv::HOGDescriptor *hog){m_hog = hog;}
+    inline cv::HOGDescriptor* getHOGDescriptor(){return m_hog;}
+
+    inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
+    inline cv::Ptr<cv::ml::SVM> getSVM(){return m_svm;}
+
   protected:
     int m_x;
     int m_y;
     int m_histSize;
     float m_weight;
     cv::Mat m_targetHist;
+
+    cv::HOGDescriptor *m_hog;
+    cv::Ptr<cv::ml::SVM> m_svm;
 };
 
 #endif

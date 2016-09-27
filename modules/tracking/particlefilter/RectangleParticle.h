@@ -32,9 +32,22 @@ class RectangleParticle : public Particle
         if (m_targetHist.size > 0)
         {
             cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
-            cv::Mat roiHist;
-            Util::CalculateHistogram(roi, roiHist, m_histSize); // TODO: we might use "m_TargetHist.size()" instead of m_histSize
-            double distBhat = compareHist(m_targetHist, roiHist, CV_COMP_CORREL);
+
+            // old way
+//            cv::Mat roiHist;
+//            Util::CalculateHistogram(roi, roiHist, m_histSize); // TODO: we might use "m_TargetHist.size()" instead of m_histSize
+//            float distBhat = compareHist(m_targetHist, roiHist, CV_COMP_CORREL);
+
+            std::vector<cv::Point> positions;
+            std::vector<float> descriptor;
+            positions.push_back(cv::Point(roi.cols / 2, roi.rows / 2));
+            m_hog->compute(roi, descriptor, cv::Size(32, 32), cv::Size(0, 0), positions);
+            // TODO: using descriptor and svm calculate weight for the particle
+
+            cv::Mat_<float> out;
+            cv::Mat_<float> desc(descriptor);
+            m_svm->predict(desc,out,cv::ml::StatModel::RAW_OUTPUT);
+            float distBhat = out(0);
             setWeight(distBhat);
         }
     }
