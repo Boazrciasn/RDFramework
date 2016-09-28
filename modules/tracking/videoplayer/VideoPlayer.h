@@ -76,6 +76,7 @@ class VideoPlayer : public QThread
 
 
     inline void setPF(ParticleFilter *pf) { m_PF = pf; }
+    inline void setProcess(const VideoProcess *process) {m_process = process; }
     void setCurrentFrame(int frameNumber);
 };
 
