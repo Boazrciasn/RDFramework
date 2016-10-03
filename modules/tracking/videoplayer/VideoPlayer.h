@@ -10,6 +10,7 @@
 #include "tracking/particlefilter/ParticleFilter.h"
 #include "BufferQueue.h"
 #include "modules/tracking/dataExtraction/DataExtractor.h"
+#include "VideoProcess.h"
 
 class VideoPlayer : public QThread
 {
@@ -33,7 +34,6 @@ class VideoPlayer : public QThread
     double m_frameRate;
     cv::Mat m_RGBframe;
     QImage m_img;
-
     double m_CurrentFrame;
 
     ImgProcessor *m_processor{};

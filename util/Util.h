@@ -4,15 +4,40 @@
 #include "ocr/HistogramDialogGui.h"
 #include "rdf/PixelCloud.h"
 
+class Animal
+{
+  public:
+    Animal() {}
+    virtual void execute() { qDebug() <<  "No cats or dogs" ;}
+};
+
+template<class T>
+class Cat : public Animal
+{
+  public :
+    T m_param;
+    Cat( T param) { m_param = param;}
+    void execute() { qDebug() << m_param << " Cats" ;}
+};
+
+template<class T>
+class Dog : public Animal
+{
+  public :
+    T m_param;
+    Dog(T param) {m_param = param;}
+    void execute() { qDebug() << m_param << " Cats";}
+};
+
 template <typename T, typename FUNC>
 void doForAllPixels(const cv::Mat_<T> &M, const FUNC &func)
 {
     int nRows = M.rows;
     int nCols = M.cols;
-    for(quint16 i = 0; i < nRows; ++i)
+    for (quint16 i = 0; i < nRows; ++i)
     {
         auto *pRow = (T *)M.ptr(i);
-        for(quint16 j = 0; j < nCols; ++j, ++pRow)
+        for (quint16 j = 0; j < nCols; ++j, ++pRow)
             func(*pRow, i, j);
     }
 }
@@ -23,10 +48,10 @@ void setForAllPixels(cv::Mat_<T> &M, const FUNC &func)
 {
     int nRows = M.rows;
     int nCols = M.cols;
-    for(int i = 0; i < nRows; ++i)
+    for (int i = 0; i < nRows; ++i)
     {
         auto *pRow = (T *)M.ptr(i);
-        for(int j = 0; j < nCols; ++j, ++pRow)
+        for (int j = 0; j < nCols; ++j, ++pRow)
             *pRow = func(*pRow, i, j);
     }
 }
@@ -35,9 +60,8 @@ template <typename T>
 inline double sumall(const T &container)
 {
     double sum{};
-    for(const auto &a : container)
+    for (const auto &a : container)
         sum += a;
-
     return sum;
 }
 
@@ -45,9 +69,8 @@ template <typename T, typename FUNC>
 inline double sumall(const T &container, const FUNC &func)
 {
     double sum{};
-    for(const auto &a : container)
+    for (const auto &a : container)
         sum += func(a);
-
     return sum;
 }
 
@@ -74,13 +97,12 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
     float entr{};
     float totalSize{};
     int nCols = hist.cols;
-    for(int i = 0; i < nCols; ++i)
+    for (int i = 0; i < nCols; ++i)
         totalSize += hist(0, i);
-
-    for(int i = 0; i < nCols; ++i)
+    for (int i = 0; i < nCols; ++i)
     {
         float nPixelsAt = hist(0, i);
-        if(nPixelsAt > 0)
+        if (nPixelsAt > 0)
         {
             float probability = nPixelsAt / totalSize;
             entr -= probability * (log(probability));
@@ -100,7 +122,7 @@ inline int getTotalNumberOfPixels(const cv::Mat &hist)
 {
     int totalSize = 0;
     int nCols = hist.cols;
-    for(int i = 0; i < nCols; ++i)
+    for (int i = 0; i < nCols; ++i)
         totalSize += hist.at<float>(0, i);
     return totalSize;
 }
@@ -133,7 +155,7 @@ inline void printHistogram(cv::Mat_<float> &hist)
     doForAllPixels(hist, [&](float value, quint16 i, quint16 j)
     {
         res += " " + QString::number(value);
-        if(i != nRows - 1)
+        if (i != nRows - 1)
             res += "\n";
     });
     //    int nCols = hist.cols;
@@ -160,23 +182,22 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
 
 class Util
 {
-private:
+  private:
     static inline std::vector<int> regionQuery(std::vector<cv::Point> *points, cv::Point *point, float eps)
     {
         using namespace std;
-
         float dist;
         int ptTotal = points->size();
         vector<int> retKeys;
-        for(auto i = 0; i < ptTotal; ++i)
+        for (auto i = 0; i < ptTotal; ++i)
         {
-            dist = sqrt(pow((point->x - points->at(i).x),2)+pow((point->y - points->at(i).y),2));
-            if(dist <= eps && dist != 0.0f)
+            dist = sqrt(pow((point->x - points->at(i).x), 2) + pow((point->y - points->at(i).y), 2));
+            if (dist <= eps && dist != 0.0f)
                 retKeys.push_back(i);
         }
         return retKeys;
     }
-public:
+  public:
     static void print3DHistogram(cv::Mat &inMat);
     static double calculateAccuracy(const std::vector<QString> &groundtruth, const std::vector<QString> &results);
     static cv::Mat toCv(const QImage &image, int cv_type);
@@ -192,8 +213,9 @@ public:
     static int  countImagesInDir(QString dir);
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
 
-    static void writeMatToFile(cv::Mat& m, const char* filename);
-    static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps, unsigned int minPts);
+    static void writeMatToFile(cv::Mat &m, const char *filename);
+    static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps,
+                                                              unsigned int minPts);
 };
 
 #endif

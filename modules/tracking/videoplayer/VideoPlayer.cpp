@@ -10,6 +10,7 @@ VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)
     m_VideoReader = new VideoReader(this, m_FrameBuffer);
     m_pMOG = cv::createBackgroundSubtractorMOG2();
     m_pMOG->setShadowValue(0);
+    m_process = new VideoProcess();
 }
 void VideoPlayer::run()
 {
