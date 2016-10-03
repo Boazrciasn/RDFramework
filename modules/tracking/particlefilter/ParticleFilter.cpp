@@ -30,6 +30,12 @@ ParticleFilter::ParticleFilter(
     m_RandomGen = std::mt19937(seed);
 }
 
+void ParticleFilter::exec(cv::Mat *img)
+{
+    setImage(img);
+    processImage();
+}
+
 int ParticleFilter::getRatioOfTop(int count)
 {
     float total_weight = 0;
@@ -97,25 +103,24 @@ void ParticleFilter::processImage()
 void ParticleFilter::initializeParticles()
 {
     cv::Mat posData, negData, allData, labels;
-    cv::FileStorage file("posDes.yml", cv::FileStorage::READ);
+    cv::FileStorage file("../posDes.yml", cv::FileStorage::READ);
     file["posDes"] >> posData;
     file.release();
 
-    file.open("negDes.yml",cv::FileStorage::READ);
+    file.open("../negDes.yml",cv::FileStorage::READ);
     file["negDes"] >> negData;
     file.release();
 
     allData.push_back(posData);
     allData.push_back(negData);
 
-    labels.push_back(cv::Mat::zeros(posData.rows,1,CV_8UC1));
-    labels.push_back(cv::Mat::ones(negData.rows,1,CV_8UC1));
+    labels.push_back(cv::Mat::ones(posData.rows,1,CV_32SC1));
+    labels.push_back(-1*cv::Mat::ones(negData.rows,1,CV_32SC1));
 
-    cv::HOGDescriptor hog;
+    cv::HOGDescriptor *hog = new cv::HOGDescriptor();
     cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-    svm->setType(cv::ml::SVM::C_SVC);
     svm->setKernel(cv::ml::SVM::LINEAR);
-    svm->setTermCriteria(cv::TermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10000, 0.0001));
+    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 100, 1e-6));
     svm->train( allData , cv::ml::ROW_SAMPLE , labels );
 
     int xRange = (img_width - m_particle_width);
@@ -129,7 +134,7 @@ void ParticleFilter::initializeParticles()
         auto weight = 1.0f / m_num_particles;
         Particle *particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(),
                                                    m_histSize);
-        particle->setHOGDescriptor(&hog);
+        particle->setHOGDescriptor(hog);
         particle->setSVM(svm);
         m_particles.push_back(particle);
     }
@@ -160,7 +165,6 @@ void ParticleFilter::distortParticle(Particle *p, int &x, int &y)
 
 void ParticleFilter::showParticles()
 {
-    m_img->copyTo(m_outIMG);
     int x = 0;
     int y = 0;
     for (int i = 0; i < m_num_particles; ++i)
@@ -174,16 +178,15 @@ void ParticleFilter::showParticles()
     int y_end = y + m_particle_height;
     int r = m_particle_width / 2;;
     if (getModelType() == Circle)
-        circle(m_outIMG, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
+        circle(*m_img, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
     else if (getModelType() == Rectangle)
-        rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     else
-        rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
 }
 
 void ParticleFilter::showTopNParticles(int count)
 {
-    m_img->copyTo(m_outIMG);
     if (count > m_num_particles)
         count = m_num_particles;
     else if (count == 0)
@@ -196,7 +199,7 @@ void ParticleFilter::showTopNParticles(int count)
         y = m_particles[i]->y();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_height;
-        rectangle(m_outIMG, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     }
 }
 

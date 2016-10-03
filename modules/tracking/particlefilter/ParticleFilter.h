@@ -7,7 +7,8 @@
 #include <chrono>
 #include <QMutex>
 #include <QThread>
-#include "ImgProcessor.h"
+
+#include "modules/tracking/videoplayer/VideoProcess.h"
 
 class Particle;
 class Target;
@@ -19,12 +20,13 @@ enum class ParticleType
     CIRCLE
 };
 
-class ParticleFilter : public ImgProcessor
+class ParticleFilter : public VideoProcess
 {
   public:
     Target *m_target;
 
     ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, int histSize, Target *target);
+    void exec(cv::Mat *img) override;
     ~ParticleFilter();
 
     inline int getNumParticles() const { return m_num_particles; }
@@ -33,7 +35,6 @@ class ParticleFilter : public ImgProcessor
     inline int getParticleWidth() const { return m_particle_width; }
     inline int getModelType() const { return type; }
     int getRatioOfTop(int count);
-    cv::Mat getIMG() const override { return m_outIMG; }
     std::vector<Particle *> getParticles() const {return m_particles; }
     inline void setNumParticles(int value) { m_num_particles = value; }
     inline void setHistSize(int histSize) { m_histSize = histSize; }
@@ -44,8 +45,7 @@ class ParticleFilter : public ImgProcessor
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
     void setVideoReader(VideoReader *videoReader);
-    void setIMG(cv::Mat *pImage) override { m_img = pImage; }
-    void processImage() override;
+    void processImage();
     void showParticles();
     void showTopNParticles(int count);
     void reInitialiaze();
@@ -70,8 +70,6 @@ class ParticleFilter : public ImgProcessor
     std::vector<cv::Point> m_newCoordinates;
 
     std::vector<Particle *> m_ParticlesNew;
-    cv::Mat *m_img;
-    cv::Mat m_outIMG;
     int img_height, img_width;
     std::mt19937 m_RandomGen;
     VideoReader *m_VideoReader;

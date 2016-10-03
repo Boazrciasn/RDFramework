@@ -36,11 +36,11 @@ class VideoPlayer : public QThread
     QImage m_img;
     double m_CurrentFrame;
 
-    ImgProcessor *m_processor{};
+    VideoProcess *m_processor{};
 
 
 //    template <typename ImgProcessor>
-    void processImage(ImgProcessor *process);
+    void processImage(VideoProcess *process);
 
     void initializeVideo();
 
@@ -68,7 +68,7 @@ class VideoPlayer : public QThread
     void stopVideo() { m_stop = true; }
     bool isStopped() const { return m_stop; }
     double getCurrentFrame();
-    inline ImgProcessor *getImgProcessor() const { return m_processor; }
+    inline VideoProcess *getVideoProcess() const { return m_processor; }
 
     int getNumberOfFrames() const { return m_VideoReader->getNumberOfFrames(); }
     std::tuple<int, int> getFrameSize();

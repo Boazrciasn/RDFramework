@@ -6,12 +6,10 @@
 class VideoProcess
 {
   public :
-    VideoProcess() {}
-    virtual cv::Mat exec() { return m_img; }
-    void setImage(cv::Mat img) { m_img = img; }
-
+    virtual void exec(cv::Mat *img) {setImage(img);}
+    void setImage(cv::Mat *img) { m_img = img; }
   protected :
-    cv::Mat m_img;
+    cv::Mat *m_img;
 };
 
 #endif // VIDEOPROCESS_H

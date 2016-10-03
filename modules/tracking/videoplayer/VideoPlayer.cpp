@@ -1,3 +1,4 @@
+
 #include "precompiled.h"
 #include "VideoPlayer.h"
 #include "Util.h"
@@ -10,7 +11,7 @@ VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)
     m_VideoReader = new VideoReader(this, m_FrameBuffer);
     m_pMOG = cv::createBackgroundSubtractorMOG2();
     m_pMOG->setShadowValue(0);
-    m_process = new VideoProcess();
+    m_processor = new VideoProcess();
 }
 void VideoPlayer::run()
 {
@@ -24,19 +25,15 @@ void VideoPlayer::run()
             continue;
         }
         m_CurrentFrame++;
-        if (m_processor)
-            processImage(m_processor);
-        else
-            m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
+        m_processor->exec(&m_RGBframe);
+        m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
         emit playerFrame(m_img);
-        //        cv::imshow("FG Mask fgMOG_no_hole", m_fgMaskMOG2_noHole);
-        //        cv::imshow("FG Mask", m_fgMaskMOG2);
         msleep(delay);
     }
 }
 
 //template<typename ImgProcessor>
-void VideoPlayer::processImage(ImgProcessor *process)
+void VideoPlayer::processImage(VideoProcess *process)
 {
     // Background Subtruction MOG
     cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));
@@ -48,9 +45,9 @@ void VideoPlayer::processImage(ImgProcessor *process)
     Dilation(0, 0);
     Erosion(0, 0);
     cv::connectedComponentsWithStats(m_fgMaskMOG2, labels, stats, centroids);
-    process->setIMG(&m_RGBframe);
-    process->processImage();
-    m_frame_out = process->getIMG();
+//    process->setIMG(&m_RGBframe);
+//    process->processImage();
+//    m_frame_out = process->getIMG();
     m_img = Util::toQt(m_frame_out, QImage::Format_RGB888);
 }
 

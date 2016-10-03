@@ -8,7 +8,7 @@
 
 
 #include "modules/tracking/dataExtraction/HOGExtactor.h"
-#include "util.h"
+#include "Util.h"
 
 int main(int argc, char *argv[])
 {
@@ -56,14 +56,14 @@ int main(int argc, char *argv[])
     //        qDebug() << "test label count : " << mnist.m_testLabels->size();
     //        qDebug() << "train label count : " << mnist.m_trainLabels->size();
     //        mnist.extractDataSet(destdir);
-    Animal *animal_pntr = new Animal();
-    animal_pntr->execute();
-    Cat<float> *cat_pntr1 = new Cat<float>(15.0f);
-    Dog<QString> *dog_pntr1 = new Dog<QString>("How Many");
-    animal_pntr = cat_pntr1;
-    animal_pntr->execute();
-    animal_pntr = dog_pntr1;
-    animal_pntr->execute();
+//    Animal *animal_pntr = new Animal();
+//    animal_pntr->execute();
+//    Cat<float> *cat_pntr1 = new Cat<float>(15.0f);
+//    Dog<QString> *dog_pntr1 = new Dog<QString>("How Many");
+//    animal_pntr = cat_pntr1;
+//    animal_pntr->execute();
+//    animal_pntr = dog_pntr1;
+//    animal_pntr->execute();
     QApplication app(argc, argv);
     MainWindowGui w;
     w.show();

@@ -12,7 +12,7 @@ class DataExtractor : public VideoProcess
     {
     }
 
-    cv::Mat exec() { /*Functionality here with m_img*/ }
+    cv::Mat* exec() const { return m_img;/*Functionality here with m_img*/ }
 
   private:
     const BSubtractor &m_bsubtractor;

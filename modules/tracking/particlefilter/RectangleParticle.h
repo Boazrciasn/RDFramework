@@ -6,7 +6,7 @@
 
 class RectangleParticle : public Particle
 {
-  public:
+public:
     RectangleParticle(int x, int y, int width, int height, float weight, cv::Mat target, int histSize) :
         Particle(x, y, weight, target, histSize)
     {
@@ -44,10 +44,10 @@ class RectangleParticle : public Particle
             m_hog->compute(roi, descriptor, cv::Size(32, 32), cv::Size(0, 0), positions);
             // TODO: using descriptor and svm calculate weight for the particle
 
-            cv::Mat_<float> out;
             cv::Mat_<float> desc(descriptor);
-            m_svm->predict(desc,out,cv::ml::StatModel::RAW_OUTPUT);
-            float distBhat = out(0);
+            cv::Mat_<float> out;
+            float distBhat = m_svm->predict(desc.t(), out,cv::ml::StatModel::RAW_OUTPUT);
+            std::cout << "distBhat " << distBhat << " " << out << std::endl;
             setWeight(distBhat);
         }
     }
@@ -61,7 +61,7 @@ class RectangleParticle : public Particle
     inline void setHeight(int value) {m_height = value;}
 
 
-  private:
+private:
     int m_width;
     int m_height;
 };
