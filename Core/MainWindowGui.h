@@ -8,7 +8,7 @@
 #include <QImage>
 #include <QThread>
 
-#include "ocr/Reader.h"
+#include "util/Reader.h"
 #include "ocr/MyDialogGui.h"
 #include "ocr/HistogramDialogGui.h"
 #include "Util.h"

@@ -6,7 +6,7 @@
 #include <QMouseEvent>
 #include <QRubberBand>
 #include "ocr/ExtractedDialogGui.h"
-#include "ocr/Reader.h"
+#include "util/Reader.h"
 #include <QDialog>
 
 #define FILE_HEADER 5

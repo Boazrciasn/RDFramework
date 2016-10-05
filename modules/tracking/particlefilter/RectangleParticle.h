@@ -32,6 +32,7 @@ public:
         if (m_targetHist.size > 0)
         {
             cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
+            cv::cvtColor(roi, roi, CV_RGB2GRAY);
 
             // old way
 //            cv::Mat roiHist;
@@ -41,7 +42,7 @@ public:
             std::vector<cv::Point> positions;
             std::vector<float> descriptor;
             positions.push_back(cv::Point(roi.cols / 2, roi.rows / 2));
-            m_hog->compute(roi, descriptor, cv::Size(32, 32), cv::Size(0, 0), positions);
+            m_hog->compute(roi, descriptor, cv::Size(64, 128), cv::Size(16, 16), positions);
             // TODO: using descriptor and svm calculate weight for the particle
 
             cv::Mat_<float> desc(descriptor);

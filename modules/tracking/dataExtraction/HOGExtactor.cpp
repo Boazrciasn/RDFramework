@@ -20,7 +20,7 @@ HOGExtactor::HOGExtactor()
     //    cv::PCA pca_analysis(data, cv::Mat(), CV_PCA_DATA_AS_ROW,maxComponents);
     //    cv::Mat proj = data*pca_analysis.eigenvectors.t();
     //    Util::writeMatToFile(proj,"../neg.txt");
-        cv::FileStorage file("../posDes.yml", cv::FileStorage::WRITE);
+        cv::FileStorage file("../posDes2.yml", cv::FileStorage::WRITE);
         file << "posDes" << data;
         file.release();
 }
@@ -45,7 +45,7 @@ void HOGExtactor::extractHOG()
         std::vector<cv::Point> positions;
         std::vector<float> descriptor;
         positions.push_back(cv::Point(grayImg.cols / 2, grayImg.rows / 2));
-        m_hog.compute(grayImg, descriptor, cv::Size(32, 32), cv::Size(0, 0), positions);
+        m_hog.compute(grayImg, descriptor, cv::Size(64, 128), cv::Size(16, 16), positions);
         return descriptor;
     });
 }

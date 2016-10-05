@@ -2,7 +2,7 @@
 #include <ctime>
 
 #include "RandomDecisionForest.h"
-#include "ocr/Reader.h"
+#include "util/Reader.h"
 #include "Util.h"
 #include "ocr/TextRegionDetector.h"
 //#include <omp.h>

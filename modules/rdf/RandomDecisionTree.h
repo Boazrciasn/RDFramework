@@ -17,7 +17,7 @@
 #include "rdf/PixelCloud.h"
 #include "RDFParams.h"
 #include "3rdparty/matcerealisation.hpp"
-#include "ocr/Reader.h"
+#include "util/Reader.h"
 
 #define MIN_ENTROPY 0.05
 

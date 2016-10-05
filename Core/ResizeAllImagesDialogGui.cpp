@@ -3,7 +3,7 @@
 #include "Core/ResizeAllImagesDialogGui.h"
 #include "ui_ResizeAllImagesDialogGui.h"
 
-#include "ocr/Reader.h"
+#include "util/Reader.h"
 
 
 ResizeAllImagesDialogGui::ResizeAllImagesDialogGui(QWidget *parent) :

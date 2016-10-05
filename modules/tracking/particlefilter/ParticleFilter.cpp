@@ -103,11 +103,11 @@ void ParticleFilter::processImage()
 void ParticleFilter::initializeParticles()
 {
     cv::Mat posData, negData, allData, labels;
-    cv::FileStorage file("../posDes.yml", cv::FileStorage::READ);
+    cv::FileStorage file("../posDes2.yml", cv::FileStorage::READ);
     file["posDes"] >> posData;
     file.release();
 
-    file.open("../negDes.yml",cv::FileStorage::READ);
+    file.open("../negDes2.yml",cv::FileStorage::READ);
     file["negDes"] >> negData;
     file.release();
 

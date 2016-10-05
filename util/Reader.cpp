@@ -2,37 +2,6 @@
 
 #include "Reader.h"
 
-void Reader::readFromTo(std::string filename, std::vector<QString> &imgName)
-{
-    // TO DO : UPDATE readFromTo
-    struct dirent *ent;
-    // check for valid directory
-    if ((m_dir = opendir(filename.c_str())))
-    {
-        QString prev = "abdd";
-        // read from folder until it is empty
-        while((ent = readdir(m_dir)))
-        {
-            // get filename and convert it to string
-            std::string str = (std::string)ent->d_name;
-            size_t pos = str.find(".");
-            if (pos == std::string::npos || pos == 0)
-                continue;
-            //            cout<<str.substr(0,pos)<<endl;
-            QString file = QString::fromStdString(str.substr(0, pos));
-            if(prev != file)
-            {
-                imgName.push_back(file);
-                prev = file;
-            }
-        }
-        closedir(m_dir);
-    }
-    else
-        std::cerr << "Couldn't open directory!" << std::endl;
-}
-
-
 void Reader::findImages(QString baseDir, QString query,
                         std::vector<QString> &foundImages , std::vector<QString> &labels)
 {
