@@ -12,7 +12,7 @@ ParticleFilter::ParticleFilter(
         int particleWidth, int particleHeight, int histSize, Target *target
         )
 {
-    type = Rectangle;
+    type = RECTANGLE;
     m_target = target;
     img_height = frameHeight;
     img_width = frameWidth;
@@ -177,9 +177,9 @@ void ParticleFilter::showParticles()
     int x_end = x + m_particle_width;
     int y_end = y + m_particle_height;
     int r = m_particle_width / 2;;
-    if (getModelType() == Circle)
+    if (getModelType() == CIRCLE)
         circle(*m_img, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
-    else if (getModelType() == Rectangle)
+    else if (getModelType() == RECTANGLE)
         rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     else
         rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
