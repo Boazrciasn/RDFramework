@@ -50,9 +50,9 @@ class VideoPlayer : public QThread
     cv::Mat m_fgMaskMOG2_dilated;
     cv::Mat m_fgMaskMOG2_noHole;
 
-    int m_erosion_elem = 0;
+    cv::MorphShapes m_erosion_elem = cv::MORPH_RECT;
     int m_erosion_size = 4;
-    int m_dilation_elem = 0;
+    cv::MorphShapes m_dilation_elem = cv::MORPH_RECT;
     int m_dilation_size = 4;
 
     /** Function Headers */

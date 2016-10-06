@@ -54,12 +54,7 @@ void VideoPlayer::processImage(VideoProcess *process)
 /**  @function Erosion  */
 void VideoPlayer::Erosion(int, void *)
 {
-    int erosion_type;
-    if (m_erosion_elem == 0) erosion_type = cv::MORPH_RECT;
-    else if (m_erosion_elem == 1) erosion_type = cv::MORPH_CROSS;
-    else if (m_erosion_elem == 2)  erosion_type = cv::MORPH_ELLIPSE;
-    //  erosion_type = cv::MORPH_RECT;
-    cv::Mat element = cv::getStructuringElement(erosion_type,
+    cv::Mat element = cv::getStructuringElement(m_erosion_elem,
                                                 cv::Size(2 * m_erosion_size + 1, 2 * m_erosion_size + 1),
                                                 cv::Point(m_erosion_size, m_erosion_size));
     /// Apply the erosion operation
@@ -69,12 +64,7 @@ void VideoPlayer::Erosion(int, void *)
 /** @function Dilation */
 void VideoPlayer::Dilation(int, void *)
 {
-    int dilation_type;
-    if (m_dilation_elem == 0) dilation_type = cv::MORPH_RECT;
-    else if (m_dilation_elem == 1) dilation_type = cv::MORPH_CROSS;
-    else if (m_dilation_elem == 2)  dilation_type = cv::MORPH_ELLIPSE;
-    //  dilation_type = cv::MORPH_RECT;
-    cv::Mat element = cv::getStructuringElement(dilation_type,
+    cv::Mat element = cv::getStructuringElement(m_dilation_elem,
                                                 cv::Size(2 * m_dilation_size + 1, 2 * m_dilation_size + 1),
                                                 cv::Point(m_dilation_size, m_dilation_size));
     /// Apply the dilation operation
