@@ -7,7 +7,7 @@
 #include <queue>
 #include "Util.h"
 #include "BufferQueue.h"
-
+#include "tracking/particlefilter/ParticleFilter.h"
 
 //#include "opencv2/opencv.hpp"  //TODO: move to precompiled
 
