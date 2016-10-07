@@ -4,7 +4,7 @@
 
 #include "ocr/TextRegionDetector.h"
 #include "ui_MainWindowGui.h"
-
+#include "modules/tracking/dataExtraction/HOGExtactor.h"
 
 
 MainWindowGui::MainWindowGui(QWidget *parent) :
@@ -77,4 +77,21 @@ void MainWindowGui::open_DataExtractor()
 {
     DataExtractorGui *dataExtractwidget = new DataExtractorGui();
     dataExtractwidget->show();
+}
+
+void MainWindowGui::open_HOGExtractor()
+{
+    HOGExtactor *hogExtr = new HOGExtactor();
+    cv::Mat result = hogExtr->getResult();
+
+    if(result.rows > 0)
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, QObject::tr("Save File"),
+                                                        "/home",QObject::tr("Features Mat (*.yml)"));
+        cv::FileStorage file(fileName.toStdString(), cv::FileStorage::WRITE);
+        file << "data" << result;
+        file.release();
+    }
+
+    delete hogExtr;
 }

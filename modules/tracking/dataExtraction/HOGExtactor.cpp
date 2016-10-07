@@ -3,6 +3,7 @@
 #include "HOGExtactor.h"
 #include <QFileDialog>
 #include "Util.h"
+#include "util/Reader.h"
 
 HOGExtactor::HOGExtactor()
 {
@@ -10,30 +11,8 @@ HOGExtactor::HOGExtactor()
                                                     "/home",
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
-    getTrainingData(dir);
+    Reader::findImages(dir, m_trainDataFiles);
     extractHOG();
-    //    int maxComponents = 2;
-    cv::Mat_<float> data;
-    for (auto desc : m_trainDataDescriptors)
-        data.push_back((cv::Mat_<float>(desc)).t());
-//    Util::writeMatToFile(data, "../negDes.txt");
-    //    cv::PCA pca_analysis(data, cv::Mat(), CV_PCA_DATA_AS_ROW,maxComponents);
-    //    cv::Mat proj = data*pca_analysis.eigenvectors.t();
-    //    Util::writeMatToFile(proj,"../neg.txt");
-        cv::FileStorage file("../posDes2.yml", cv::FileStorage::WRITE);
-        file << "posDes" << data;
-        file.release();
-}
-
-void HOGExtactor::getTrainingData(QString baseDir)
-{
-    QDirIterator itFile(baseDir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files,
-                        QDirIterator::Subdirectories);
-    while (itFile.hasNext())
-    {
-        itFile.next();
-        m_trainDataFiles.append(itFile.filePath().toStdString());
-    }
 }
 
 void HOGExtactor::extractHOG()
@@ -45,7 +24,17 @@ void HOGExtactor::extractHOG()
         std::vector<cv::Point> positions;
         std::vector<float> descriptor;
         positions.push_back(cv::Point(grayImg.cols / 2, grayImg.rows / 2));
-        m_hog.compute(grayImg, descriptor, cv::Size(64, 128), cv::Size(16, 16), positions);
+        m_hog.compute(grayImg, descriptor);//, cv::Size(30,30), cv::Size(8,8), positions);
         return descriptor;
     });
+
+    for (auto desc : m_trainDataDescriptors)
+        m_result.push_back((cv::Mat_<float>(desc)).t());
+}
+
+HOGExtactor::~HOGExtactor()
+{
+    m_result.release();
+    m_trainDataFiles.clear();
+    m_trainDataDescriptors.clear();
 }

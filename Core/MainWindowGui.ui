@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>241</width>
-    <height>233</height>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -78,6 +78,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="HOGExtractor_pushButton">
+      <property name="text">
+       <string>Hog Feature Extraction</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -86,7 +93,7 @@
      <x>0</x>
      <y>0</y>
      <width>241</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -205,7 +212,7 @@
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
-     <x>316</x>
+     <x>240</x>
      <y>174</y>
     </hint>
    </hints>
@@ -222,7 +229,23 @@
     </hint>
     <hint type="destinationlabel">
      <x>179</x>
-     <y>260</y>
+     <y>257</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>HOGExtractor_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowGui</receiver>
+   <slot>open_HOGExtractor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>90</x>
+     <y>364</y>
     </hint>
    </hints>
   </connection>
@@ -234,5 +257,6 @@
   <slot>open_AnnExtwidget()</slot>
   <slot>open_PFTracker()</slot>
   <slot>open_DataExtractor()</slot>
+  <slot>open_HOGExtractor()</slot>
  </slots>
 </ui>

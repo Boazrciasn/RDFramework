@@ -43,6 +43,7 @@ class MainWindowGui : public QMainWindow
     void open_Resizerwidget();
     void open_PFTracker();
     void open_DataExtractor();
+    void open_HOGExtractor();
 
   private:
     Ui::MainWindowGui *ui;
