@@ -7,7 +7,6 @@
 #include <opencv2/video/background_segm.hpp>
 
 #include "VideoReader.h"
-#include "tracking/particlefilter/ParticleFilter.h"
 #include "BufferQueue.h"
 #include "modules/tracking/dataExtraction/DataExtractor.h"
 #include "VideoProcess.h"

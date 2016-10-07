@@ -9,7 +9,7 @@
 #include <opencv2/ml.hpp>
 #include <opencv2/objdetect.hpp>
 
-enum {Circle, Rectangle};
+enum {CIRCLE, RECTANGLE};
 
 class Particle
 {
