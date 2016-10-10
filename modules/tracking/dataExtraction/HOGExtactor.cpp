@@ -12,7 +12,7 @@ HOGExtactor::HOGExtactor()
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
     Reader::findImages(dir, m_trainDataFiles);
-    extractHOG();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                extractHOG();
 }
 
 void HOGExtactor::extractHOG()
@@ -21,10 +21,10 @@ void HOGExtactor::extractHOG()
                     [&](std::string path)
     {
         cv::Mat grayImg = cv::imread(path, CV_LOAD_IMAGE_GRAYSCALE);
+        cv::resize(grayImg,grayImg,cv::Size(64,128));
         std::vector<cv::Point> positions;
         std::vector<float> descriptor;
-        positions.push_back(cv::Point(grayImg.cols / 2, grayImg.rows / 2));
-        m_hog.compute(grayImg, descriptor);//, cv::Size(30,30), cv::Size(8,8), positions);
+        m_hog.compute(grayImg, descriptor, cv::Size(128,64), cv::Size(16,16), positions);
         return descriptor;
     });
 

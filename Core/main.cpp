@@ -68,32 +68,38 @@ int main(int argc, char *argv[])
 //    animal_pntr->execute();
 
 
+    QApplication app(argc, argv);
+    MainWindowGui w;
+    w.show();
 
-//    /************** Testing trained data **************/
+
+    /************** Testing trained data **************/
 //    cv::Mat posData, negData, allData, labels;
-//    cv::FileStorage file("../posDes2.yml", cv::FileStorage::READ);
-//    file["posDes"] >> posData;
+//    cv::FileStorage file("../posDes.yml", cv::FileStorage::READ);
+//    file["data"] >> posData;
 //    file.release();
 
-//    file.open("../negDes2.yml",cv::FileStorage::READ);
-//    file["negDes"] >> negData;
+//    file.open("../negDes.yml",cv::FileStorage::READ);
+//    file["data"] >> negData;
 //    file.release();
 
 //    allData.push_back(posData);
 //    allData.push_back(negData);
 
 //    labels.push_back(cv::Mat::ones(posData.rows,1,CV_32SC1));
-//    labels.push_back(-1*cv::Mat::ones(negData.rows,1,CV_32SC1));
+//    labels.push_back(cv::Mat::zeros(negData.rows,1,CV_32SC1));
 
 //    cv::HOGDescriptor *hog = new cv::HOGDescriptor();
 //    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-
-//    svm->setType(cv::ml::SVM::C_SVC);
 //    svm->setKernel(cv::ml::SVM::LINEAR);
 //    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 10000, 1e-6));
 //    svm->train( allData , cv::ml::ROW_SAMPLE , labels );
 
-//    QString dir = "/home/neko/Desktop/INRIAPerson/test_64x128_H96/pos/";
+//    QString dir = QFileDialog::getExistingDirectory(nullptr, QObject::tr("Open Directory"),
+//                                                    "/home",
+//                                                    QFileDialog::ShowDirsOnly
+//                                                    | QFileDialog::DontResolveSymlinks);
+
 //    std::vector<QString> foundImages;
 //    Reader::findImages(dir, foundImages);
 
@@ -104,22 +110,19 @@ int main(int argc, char *argv[])
 //        cv::Mat grayImg = cv::imread(imgPath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
 ////        cv::imshow("input", grayImg);
 ////        cv::waitKey();
-
+//        cv::resize(grayImg,grayImg,cv::Size(64,128));
 //        std::vector<cv::Point> positions;
 //        std::vector<float> descriptor;
-//        positions.push_back(cv::Point(grayImg.cols / 2, grayImg.rows / 2));
-//        hog->compute(grayImg, descriptor, cv::Size(64, 128), cv::Size(16, 16), positions);
+//        hog->compute(grayImg, descriptor, cv::Size(128, 64), cv::Size(16, 16), positions);
 
 //        cv::Mat_<float> desc(descriptor);
-//        float decision = svm->predict(desc.t()); //, cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
+//        float decision = svm->predict(desc.t(),cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
 //        rate += decision;
-////        float confidence = 1.0 / (1.0 + exp(decision));
-//        std::cout << "distBhat " << " " << decision << "\n"; //<<" confidence: " <<confidence <<std::endl;
+//        float confidence = 1.0 / (1.0 + exp(-decision));
+//        std::cout << "distBhat " << " " << decision << " confidence: " << confidence << "\n"; //<<" confidence: " <<confidence <<std::endl;
 //    }
 
-//    std::cout << "Rate: " << -100*rate/foundImages.size()<<std::endl;
-    QApplication app(argc, argv);
-    MainWindowGui w;
-    w.show();
+//    std::cout << "Rate: " << 100*rate/foundImages.size()<<std::endl;
+
     return app.exec();
 }

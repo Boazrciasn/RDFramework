@@ -87,7 +87,7 @@ void MainWindowGui::open_HOGExtractor()
     if(result.rows > 0)
     {
         QString fileName = QFileDialog::getSaveFileName(this, QObject::tr("Save File"),
-                                                        "/home",QObject::tr("Features Mat (*.yml)"));
+                                                        "/home/posDes.yml",QObject::tr("Features Mat (*.yml)"));
         cv::FileStorage file(fileName.toStdString(), cv::FileStorage::WRITE);
         file << "data" << result;
         file.release();

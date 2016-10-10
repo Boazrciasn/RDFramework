@@ -39,17 +39,20 @@ public:
 //            Util::CalculateHistogram(roi, roiHist, m_histSize); // TODO: we might use "m_TargetHist.size()" instead of m_histSize
 //            float distBhat = compareHist(m_targetHist, roiHist, CV_COMP_CORREL);
 
+            cv::resize(roi,roi,cv::Size(64,128));
             std::vector<cv::Point> positions;
             std::vector<float> descriptor;
-            positions.push_back(cv::Point(roi.cols / 2, roi.rows / 2));
             m_hog->compute(roi, descriptor, cv::Size(64, 128), cv::Size(16, 16), positions);
             // TODO: using descriptor and svm calculate weight for the particle
 
             cv::Mat_<float> desc(descriptor);
-            cv::Mat_<float> out;
-            float distBhat = m_svm->predict(desc.t(), out,cv::ml::StatModel::RAW_OUTPUT);
-            std::cout << "distBhat " << distBhat << " " << out << std::endl;
-            setWeight(distBhat);
+            float decision = m_svm->predict(desc.t(),cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
+            float confidence = 1.0 / (1.0 + exp(decision));
+//            std::cout << "decision " << decision << " confidence: " << confidence << std::endl;
+            if(decision > 0)
+                setWeight(0.01);
+            else
+                setWeight(confidence);
         }
     }
 

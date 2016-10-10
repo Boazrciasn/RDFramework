@@ -102,25 +102,30 @@ void ParticleFilter::processImage()
 
 void ParticleFilter::initializeParticles()
 {
+    QString dir = QFileDialog::getExistingDirectory(nullptr, QObject::tr("Open Training set Directory"),
+                                                    "/home",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+
     cv::Mat posData, negData, allData, labels;
-    cv::FileStorage file("../posDes2.yml", cv::FileStorage::READ);
-    file["posDes"] >> posData;
+    cv::FileStorage file(dir.toStdString() + "/posDes.yml", cv::FileStorage::READ);
+    file["data"] >> posData;
     file.release();
 
-    file.open("../negDes2.yml",cv::FileStorage::READ);
-    file["negDes"] >> negData;
+    file.open(dir.toStdString() + "/negDes.yml",cv::FileStorage::READ);
+    file["data"] >> negData;
     file.release();
 
     allData.push_back(posData);
     allData.push_back(negData);
 
     labels.push_back(cv::Mat::ones(posData.rows,1,CV_32SC1));
-    labels.push_back(-1*cv::Mat::ones(negData.rows,1,CV_32SC1));
+    labels.push_back(cv::Mat::zeros(negData.rows,1,CV_32SC1));
 
     cv::HOGDescriptor *hog = new cv::HOGDescriptor();
     cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
     svm->setKernel(cv::ml::SVM::LINEAR);
-    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 100, 1e-6));
+    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 10000, 1e-6));
     svm->train( allData , cv::ml::ROW_SAMPLE , labels );
 
     int xRange = (img_width - m_particle_width);
