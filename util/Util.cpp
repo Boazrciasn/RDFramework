@@ -5,6 +5,7 @@
 #include "Util.h"
 
 #include "omp.h"
+#include <vector>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -34,9 +35,7 @@ void deneme()
 void Util::print3DHistogram(cv::Mat &inMat)
 {
     for (cv::MatConstIterator_<int> it = inMat.begin<int>(); it != inMat.end<int>(); it++)
-    {
         std::cout << *it << " ";
-    }
 }
 
 double Util::calculateAccuracy(const std::vector<QString> &groundtruth,
@@ -44,7 +43,7 @@ double Util::calculateAccuracy(const std::vector<QString> &groundtruth,
 {
     int nSize = groundtruth.size();
     int count = 0;
-    for (int i = 0; i < nSize; ++i )
+    for (int i = 0; i < nSize; ++i)
     {
         if (groundtruth[i] == results[i])
             ++count;
@@ -72,7 +71,7 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
     quint16 width = src.cols;
     quint16 height = src.rows;
     QImage dest;
-    if(src.type() == CV_8UC3)
+    if (src.type() == CV_8UC3)
     {
         dest = QImage((const unsigned char *)(src.data),
                       src.cols, src.rows, format);
@@ -88,10 +87,10 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
         //            }
         //        }
     }
-    else if(src.type() == CV_8UC1)
+    else if (src.type() == CV_8UC1)
     {
         dest = QImage(width, height, format);
-        for(int i = 0; i < height; i++)
+        for (int i = 0; i < height; i++)
         {
             const quint8 *pSrc = src.ptr<quint8>(i);
             quint8 *pDest = dest.scanLine(i);
@@ -139,7 +138,7 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
             return toReturn.toLower();
         }
     */
-    if (toReturn[i].isDigit() || toReturn[j].isDigit() )
+    if (toReturn[i].isDigit() || toReturn[j].isDigit())
     {
         toReturn = "Numbers/" + toReturn;
         return toReturn;
@@ -180,10 +179,10 @@ void Util::convertToOSRAndBlur(QString srcDir, QString outDir, int ksize)
         if (!dir_save.exists())
         {
             dir_save.mkpath(".");
-            if(!dir_save.exists())
+            if (!dir_save.exists())
                 qDebug() << "ERROR : " << dir_save << " can not be created!";
         }
-        while(ittFile.hasNext())
+        while (ittFile.hasNext())
         {
             ittFile.next();
             file = ittFile.fileName();
@@ -220,7 +219,7 @@ void Util::calcWidthHeightStat(QString srcDir)
                              QStringList() << "*.jpg" << "*.jpeg", QDir::Files);
         w_avrg = h_avrg = 0;
         count = 0;
-        while(ittFile.hasNext())
+        while (ittFile.hasNext())
         {
             ittFile.next();
             file = ittFile.fileName();
@@ -265,7 +264,7 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     // source file for average values
     QString avg = "./AverageWidthHeight.txt";
     QFile input(avg);
-    if(!input.open(QIODevice::ReadOnly))
+    if (!input.open(QIODevice::ReadOnly))
         std::cout << "Util::getWordWithConfidance failed to open file! \n";
     /*************************************/
     /*********** extract values **********/
@@ -278,12 +277,12 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
         avgWidth[index] = myStringList[1].toInt();
         avgHight[index] = myStringList[2].toInt();
         // make odd number
-        if(avgWidth[index] % 2 == 0)
+        if (avgWidth[index] % 2 == 0)
             ++avgWidth[index];
-        if(avgHight[index] % 2 == 0)
+        if (avgHight[index] % 2 == 0)
             ++avgHight[index];
     }
-    while(input.canReadLine());
+    while (input.canReadLine());
     input.close();
     //    for (int i = 0; i < nLabel; ++i)
     //        qDebug() << avgWidth[i] << " " << avgHight[i];
@@ -305,15 +304,13 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
         // find peaks
         for (int j = 1; j < cols - 1; ++j)
         {
-            if(isIncreasing && (hist(j) - hist(j - 1)) < 0)
+            if (isIncreasing && (hist(j) - hist(j - 1)) < 0)
             {
                 peaks(i, j) = hist(j);
                 isIncreasing ^= 1;
             }
-            else if(!isIncreasing && (hist(j) - hist(j - 1)) > 0)
-            {
+            else if (!isIncreasing && (hist(j) - hist(j - 1)) > 0)
                 isIncreasing ^= 1;
-            }
         }
     }
     //    std::cout << "Kernel: " << avgWidth[23] << std::endl;
@@ -350,9 +347,9 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
         peaksRow = peaks.row(i);
         winBw = avgWidth[i] / 2;
         for (int j = 0; j < cols; ++j)
-            if(peaksRow(j) > 0) // if peak expand
+            if (peaksRow(j) > 0) // if peak expand
                 for (int k = 0; k < cols; ++k)
-                    if(std::abs(k - j) <= winBw && (peaks(i, k) < peaks(i, j)))
+                    if (std::abs(k - j) <= winBw && (peaks(i, k) < peaks(i, j)))
                         peaks(i, k) = peaks(i, j);
     }
     int maxIdx;
@@ -363,13 +360,13 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
         max = peaks(0, i);
         for (int j = 1; j < nLabel; ++j)
         {
-            if(max < peaks(j, i))
+            if (max < peaks(j, i))
             {
                 maxIdx = j;
                 max = peaks(maxIdx, i);
             }
         }
-        if(max == 0)
+        if (max == 0)
         {
             max = 0;
             maxIdx = -1;
@@ -382,14 +379,14 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     word = "";
     for (int i = 0; i < cols; ++i)
     {
-        if(label[i] < 0)
+        if (label[i] < 0)
             continue;
         // see is it greater that others or not
         bool bIsLabel = true;
         for (int j = 0; j < nLabel; ++j)
-            if(j != label[i] && layeredHist(j, i) > accuracy[i])
+            if (j != label[i] && layeredHist(j, i) > accuracy[i])
                 bIsLabel = false;
-        if(bIsLabel)
+        if (bIsLabel)
             word += QString((char)(label[i] + 'a'));
     }
     /*  2nd method */
@@ -401,9 +398,9 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
     float acc = 0;
     for (int i = 0; i < cols; ++i)
     {
-        if(label[i] != lbl)
+        if (label[i] != lbl)
         {
-            if(lblCount > wind / 3)
+            if (lblCount > wind / 3)
             {
                 word += QString((char)(lbl + 'a'));
                 conf += acc / lblCount;
@@ -411,14 +408,14 @@ void Util::getWordWithConfidence(cv::Mat_<float> &layeredHist, int nLabel, QStri
             lblCount = 0;
             acc = 0;
         }
-        if(label[i] < 0)
+        if (label[i] < 0)
             continue;
         lbl = label[i];
         wind = avgWidth[lbl];
         lblCount++;
         acc += layeredHist(lbl, i);
     }
-    if(lblCount > wind / 3)
+    if (lblCount > wind / 3)
     {
         word += QString((char)(lbl + 'a'));
         conf += acc / lblCount;
@@ -431,7 +428,7 @@ int Util::countImagesInDir(QString dir)
 {
     int count = 0;
     QDirIterator it(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files);
-    while(it.hasNext())
+    while (it.hasNext())
     {
         it.next();
         ++count;
@@ -448,24 +445,43 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
+std::vector<cv::Rect> Util::calculateBoundingBoxRect(cv::Mat_<quint8> inputImg)
+{
+    std::vector<std::vector<cv::Point> > contours;
+    std::vector<cv::Rect> boundRect( contours.size() );
+    cv::findContours(inputImg, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+    std::vector<std::vector<cv::Point> > contours_poly(contours.size());
+    for (size_t i = 0; i < contours.size(); i++)
+    {
+        approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
+        boundRect[i] = cv::boundingRect(cv::Mat(contours_poly[i]));
+    }
+}
+
+void Util::drawBoundingBox(cv::Mat inputImg, std::vector<cv::Rect> boundingBoxes)
+{
+    cv::RNG rng(12345);
+    for( size_t i = 0; i< boundingBoxes.size() ; i++ )
+       {
+         cv::Scalar color = cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+         rectangle( inputImg, boundingBoxes[i].tl(), boundingBoxes[i].br(), color, 2, 8, 0 );
+       }
+}
+
 void Util::writeMatToFile(cv::Mat &m, const char *filename)
 {
     std::ofstream fout(filename);
-    if(!fout)
+    if (!fout)
     {
-        std::cout<<"File Not Opened"<<std::endl;  return;
+        std::cout << "File Not Opened" << std::endl;  return;
     }
-
-
-
-    quint16 lastcol = m.cols-1;
-    doForAllPixels<float>(m, [&, lastcol](float pixval, quint16/* i*/, quint16 j)
+    quint16 lastcol = m.cols - 1;
+    doForAllPixels<float>(m, [ &, lastcol](float pixval, quint16/* i*/, quint16 j)
     {
         fout << pixval << "\t";
-        if(j == lastcol)
+        if (j == lastcol)
             fout << std::endl;
     });
-
     fout.close();
 }
 
@@ -474,60 +490,54 @@ std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> 
     int ptTotal = points->size();
     int c{};
     std::vector<std::vector<cv::Point> > clusters;
-    std::vector<bool> clustered(ptTotal,false);
-    std::vector<bool> visited(ptTotal,false);
+    std::vector<bool> clustered(ptTotal, false);
+    std::vector<bool> visited(ptTotal, false);
     std::vector<int> neighborPts;
     std::vector<int> neighborPts_;
-
     //for each unvisted point P in dataset points
-    for(auto i = 0; i < ptTotal; ++i)
+    for (auto i = 0; i < ptTotal; ++i)
     {
-        if(visited[i]) continue; // proceed to the next point
-
+        if (visited[i]) continue; // proceed to the next point
         visited[i] = true;
-        neighborPts = regionQuery(points,&points->at(i),eps);
-
-        if(neighborPts.size() < minPts) continue; // it is noise
-
+        neighborPts = regionQuery(points, &points->at(i), eps);
+        if (neighborPts.size() < minPts) continue; // it is noise
         clusters.push_back(std::vector<cv::Point>());
         clusters[c].push_back(points->at(i));
         clustered[i] = true;
-
         //for each point P' in neighborPts
         unsigned int totNeighbors = neighborPts.size();
-        for(unsigned int j = 0; j < totNeighbors; ++j)
+        for (unsigned int j = 0; j < totNeighbors; ++j)
         {
             //if P' is not visited
-            if(!visited[neighborPts[j]])
+            if (!visited[neighborPts[j]])
             {
                 //Mark P' as visited
                 visited[neighborPts[j]] = true;
-                neighborPts_ = regionQuery(points,&points->at(neighborPts[j]),eps);
+                neighborPts_ = regionQuery(points, &points->at(neighborPts[j]), eps);
                 unsigned int totNeighbors_ = neighborPts_.size();
-                if(totNeighbors_ >= minPts) // if true join these two sets
+                if (totNeighbors_ >= minPts) // if true join these two sets
                 {
                     std::vector<int> difference;
                     std::set_difference(neighborPts_.begin(), neighborPts_.end(),
-                                   neighborPts.begin(), neighborPts.end(),
-                                   std::inserter(difference, difference.end()));
-                    neighborPts.insert(neighborPts.end(),difference.begin(),difference.end());
+                                        neighborPts.begin(), neighborPts.end(),
+                                        std::inserter(difference, difference.end()));
+                    neighborPts.insert(neighborPts.end(), difference.begin(), difference.end());
                     totNeighbors = neighborPts.size();
                 }
-//                    for(unsigned int k = 0; k < totNeighbors_; ++k)
-//                        if(std::find(neighborPts.begin(), neighborPts.end(), neighborPts_[k]) == neighborPts.end()){
-//                            neighborPts.push_back(neighborPts_[k]);
-//                            totNeighbors = neighborPts.size();
-//                        }
+                //                    for(unsigned int k = 0; k < totNeighbors_; ++k)
+                //                        if(std::find(neighborPts.begin(), neighborPts.end(), neighborPts_[k]) == neighborPts.end()){
+                //                            neighborPts.push_back(neighborPts_[k]);
+                //                            totNeighbors = neighborPts.size();
+                //                        }
             }
             // if P' is not yet a member of any cluster
             // add P' to cluster c
-            if(!clustered[neighborPts[j]])
+            if (!clustered[neighborPts[j]])
             {
                 clusters[c].push_back(points->at(neighborPts[j]));
                 clustered[neighborPts[j]] = true;
             }
         }
-
         c++;
     }
     return clusters;

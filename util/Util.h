@@ -212,6 +212,8 @@ class Util
     static void getWordWithConfidence(cv::Mat_<float> &mat, int nLabel, QString &word, float &conf);
     static int  countImagesInDir(QString dir);
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
+    static std::vector<cv::Rect> calculateBoundingBoxRect(cv::Mat_<quint8> inputImg);
+    static void drawBoundingBox(cv::Mat inputImg, std::vector<cv::Rect> boundingBoxes);
 
     static void writeMatToFile(cv::Mat &m, const char *filename);
     static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps,

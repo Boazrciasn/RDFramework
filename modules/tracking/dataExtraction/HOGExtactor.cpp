@@ -24,7 +24,7 @@ void HOGExtactor::extractHOG()
         std::vector<cv::Point> positions;
         std::vector<float> descriptor;
         positions.push_back(cv::Point(grayImg.cols / 2, grayImg.rows / 2));
-        m_hog.compute(grayImg, descriptor);//, cv::Size(30,30), cv::Size(8,8), positions);
+        m_hog.compute(grayImg, descriptor); // , cv::Size(8,8), cv::Size(16,16), positions);
         return descriptor;
     });
 

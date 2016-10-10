@@ -14,6 +14,18 @@
 
 int main(int argc, char *argv[])
 {
+
+    //BOUNDING BOX TEST :
+    cv::Mat src_gray;
+    cv::Mat threshold_output;
+    cv::Mat src = cv::imread( "/Users/barisozcan/Documents/Development/bbtest.jpg", 1 );
+    cv::cvtColor( src, src_gray, cv::COLOR_BGR2GRAY );
+    cv::blur( src_gray, src_gray, cv::Size(3,3) );
+    threshold( src_gray, threshold_output, 128, 255, cv::THRESH_BINARY );
+    std::vector<cv::Rect> boundingboxes;
+    cv::imshow("threshold", threshold_output);
+    cv::waitKey();
+
     //    QString file = "/home/neko/Desktop/lastSession.txt";
     //    QFile  *m_saveFile = new QFile(file);
     //    bool fileExists = m_saveFile->exists();
