@@ -445,27 +445,31 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
-std::vector<cv::Rect> Util::calculateBoundingBoxRect(cv::Mat_<quint8> inputImg)
+std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize)
 {
     std::vector<std::vector<cv::Point> > contours;
-    std::vector<cv::Rect> boundRect( contours.size() );
     cv::findContours(inputImg, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+    std::vector<cv::Rect> boundRect;
+    cv::Rect curr_boundingRect;
     std::vector<std::vector<cv::Point> > contours_poly(contours.size());
     for (size_t i = 0; i < contours.size(); i++)
     {
-        approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
-        boundRect[i] = cv::boundingRect(cv::Mat(contours_poly[i]));
+        cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
+        curr_boundingRect = cv::boundingRect(cv::Mat(contours_poly[i]));
+        if (curr_boundingRect.height * curr_boundingRect.width > minSize)
+            boundRect.push_back(curr_boundingRect);
     }
+    return boundRect;
 }
 
-void Util::drawBoundingBox(cv::Mat inputImg, std::vector<cv::Rect> boundingBoxes)
+void Util::drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes)
 {
     cv::RNG rng(12345);
-    for( size_t i = 0; i< boundingBoxes.size() ; i++ )
-       {
-         cv::Scalar color = cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-         rectangle( inputImg, boundingBoxes[i].tl(), boundingBoxes[i].br(), color, 2, 8, 0 );
-       }
+    for (size_t i = 0; i < boundingBoxes.size() ; i++)
+    {
+        cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+        rectangle(inputImg, boundingBoxes[i].tl(), boundingBoxes[i].br(), color, 2, 8, 0);
+    }
 }
 
 void Util::writeMatToFile(cv::Mat &m, const char *filename)
@@ -571,5 +575,3 @@ std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> 
 //QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
 //ui->label->setPixmap(*newScaledPixmap);
 //ui->label->resize(ui->label->pixmap()->size());
-
-
