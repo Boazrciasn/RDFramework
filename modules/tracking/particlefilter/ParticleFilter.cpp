@@ -102,17 +102,18 @@ void ParticleFilter::processImage()
 
 void ParticleFilter::initializeParticles()
 {
-    QString dir = QFileDialog::getExistingDirectory(nullptr, QObject::tr("Open Training set Directory"),
-                                                    "/home",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
+    QString posDes = QFileDialog::getOpenFileName(nullptr,
+                                               QObject::tr("Open pos data"),QString(), QObject::tr("(*.yml)"));
 
     cv::Mat posData, negData, allData, labels;
-    cv::FileStorage file(dir.toStdString() + "/posDes.yml", cv::FileStorage::READ);
+    cv::FileStorage file(posDes.toStdString(), cv::FileStorage::READ);
     file["data"] >> posData;
     file.release();
 
-    file.open(dir.toStdString() + "/negDes.yml",cv::FileStorage::READ);
+    QString negDes = QFileDialog::getOpenFileName(nullptr,
+                                               QObject::tr("Open neg data"), QString(), QObject::tr("(*.yml)"));
+
+    file.open(negDes.toStdString(),cv::FileStorage::READ);
     file["data"] >> negData;
     file.release();
 

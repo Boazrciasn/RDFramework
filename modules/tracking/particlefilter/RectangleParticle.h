@@ -29,31 +29,33 @@ public:
             return;
         }
 
-        if (m_targetHist.size > 0)
-        {
-            cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
-            cv::cvtColor(roi, roi, CV_RGB2GRAY);
+        cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
+        cv::cvtColor(roi, roi, CV_RGB2GRAY);
 
-            // old way
+//        if (m_targetHist.size > 0)
+//        {
+//            // old way
 //            cv::Mat roiHist;
 //            Util::CalculateHistogram(roi, roiHist, m_histSize); // TODO: we might use "m_TargetHist.size()" instead of m_histSize
 //            float distBhat = compareHist(m_targetHist, roiHist, CV_COMP_CORREL);
+//            setWeight(distBhat);
+//        }
 
-            cv::resize(roi,roi,cv::Size(64,128));
-            std::vector<cv::Point> positions;
-            std::vector<float> descriptor;
-            m_hog->compute(roi, descriptor, cv::Size(64, 128), cv::Size(16, 16), positions);
-            // TODO: using descriptor and svm calculate weight for the particle
+        cv::resize(roi,roi,cv::Size(64,128));
+        std::vector<float> descriptor;
+        m_hog->compute(roi, descriptor, cv::Size(64, 128), cv::Size(16, 16));
+        // TODO: using descriptor and svm calculate weight for the particle
 
-            cv::Mat_<float> desc(descriptor);
-            float decision = m_svm->predict(desc.t(),cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
-            float confidence = 1.0 / (1.0 + exp(decision));
-//            std::cout << "decision " << decision << " confidence: " << confidence << std::endl;
-            if(decision > 0)
-                setWeight(0.01);
-            else
-                setWeight(confidence);
-        }
+        cv::Mat_<float> desc(descriptor);
+        float decision = m_svm->predict(desc.t(),cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
+        float confidence = 1.0 / (1.0 + exp(decision));
+        if(decision > 0)
+            setWeight(0.01);
+        else
+            setWeight(confidence);
+
+        desc.release();
+        descriptor.clear();
     }
 
     inline cv::Rect getParticle() const { return cv::Rect(m_x, m_y, m_width, m_height); }
