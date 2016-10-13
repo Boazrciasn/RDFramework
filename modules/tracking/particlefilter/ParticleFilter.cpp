@@ -103,7 +103,7 @@ void ParticleFilter::processImage()
 void ParticleFilter::initializeParticles()
 {
     QString posDes = QFileDialog::getOpenFileName(nullptr,
-                                               QObject::tr("Open pos data"),QString(), QObject::tr("(*.yml)"));
+                                               QObject::tr("Open pos data"),QDir::currentPath(), QObject::tr("(*.yml)"));
 
     cv::Mat posData, negData, allData, labels;
     cv::FileStorage file(posDes.toStdString(), cv::FileStorage::READ);
@@ -111,7 +111,7 @@ void ParticleFilter::initializeParticles()
     file.release();
 
     QString negDes = QFileDialog::getOpenFileName(nullptr,
-                                               QObject::tr("Open neg data"), QString(), QObject::tr("(*.yml)"));
+                                               QObject::tr("Open neg data"), QDir::currentPath(), QObject::tr("(*.yml)"));
 
     file.open(negDes.toStdString(),cv::FileStorage::READ);
     file["data"] >> negData;
