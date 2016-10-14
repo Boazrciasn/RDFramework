@@ -51,8 +51,12 @@ public:
         float confidence = 1.0 / (1.0 + exp(decision));
         if(decision > 0)
             setWeight(0.01);
-        else
+        else{
+            std::cout << "confidence: " << confidence << std::endl;
             setWeight(confidence);
+        }
+
+
 
         desc.release();
         descriptor.clear();

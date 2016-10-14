@@ -23,7 +23,7 @@ ParticleFilter::ParticleFilter(
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
     setHistSize(histSize);
-    m_distortRange = 5;
+    m_distortRange = 25; // set from gui
     srand(time(nullptr));
     initializeParticles();
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
