@@ -2,7 +2,6 @@
 #include "precompiled.h"
 #include "VideoPlayer.h"
 #include "Util.h"
-#include "tracking/particlefilter/ImgProcessor.h"
 
 
 VideoPlayer::VideoPlayer(QObject *parent): QThread(parent)

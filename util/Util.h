@@ -214,7 +214,16 @@ class Util
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
     static std::vector<cv::Rect> calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize = 0);
     static void drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes);
-
+    static void Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
+    {
+        cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
+        cv::erode(outputImg, inputImg, element);
+    }
+    static void Dilation(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
+    {
+        cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
+        cv::dilate(outputImg, inputImg, element);
+    }
     static void writeMatToFile(cv::Mat &m, const char *filename);
     static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps,
                                                               unsigned int minPts);

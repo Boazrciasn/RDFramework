@@ -3,6 +3,7 @@
 #include "DataExtractor.h"
 #include "DataExtractorGui.h"
 #include "ui_DataExtractorGui.h"
+#include "BackgroundSubtractors.h"
 
 DataExtractorGui::DataExtractorGui(QWidget *parent) :
     QWidget(parent),
@@ -11,6 +12,7 @@ DataExtractorGui::DataExtractorGui(QWidget *parent) :
     ui->setupUi(this);
     m_testWin = new VideoPlayerGui(this);
     ui->main_gridLayout->addWidget(m_testWin);
+
 }
 
 DataExtractorGui::~DataExtractorGui()

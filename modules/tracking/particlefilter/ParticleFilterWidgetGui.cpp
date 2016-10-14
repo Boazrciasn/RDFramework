@@ -111,7 +111,7 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters,
                               m_particleWidth, m_particleHeight, m_histSize,m_TargetsVector[0]);
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
-    m_VideoPlayer->setPF(m_PF);
+    m_VideoPlayer->setProcess(m_PF);
 }
 
 ParticleFilterWidgetGui::~ParticleFilterWidgetGui()

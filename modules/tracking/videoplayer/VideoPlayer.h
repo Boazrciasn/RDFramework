@@ -73,7 +73,7 @@ class VideoPlayer : public QThread
     std::tuple<int, int> getFrameSize();
 
 
-    inline void setPF(ParticleFilter *pf) { m_processor = pf; }
+    inline void setProcess(VideoProcess *process) { m_processor = process; }
     void setCurrentFrame(int frameNumber);
 };
 
