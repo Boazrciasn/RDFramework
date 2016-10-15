@@ -52,6 +52,7 @@ QT5_WRAP_UI(UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/Res
                     modules/rdf/RandomDecisionForestDialogGui.ui
                     modules/tracking/particlefilter/ParticleFilterWidgetGui.ui
                     modules/tracking/dataExtraction/DataExtractorGui.ui
+                    modules/tracking/dataExtraction/PredictorGui.ui
                     modules/tracking/videoplayer/VideoPlayerGui.ui)
 
 add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
