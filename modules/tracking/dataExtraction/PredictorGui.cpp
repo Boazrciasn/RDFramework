@@ -1,6 +1,7 @@
 #include "precompiled.h"
 #include "PredictorGui.h"
 #include "ui_PredictorGui.h"
+#include "HOGExtactor.h"
 
 PredictorGui::PredictorGui(QWidget *parent) :
     QWidget(parent),
@@ -16,7 +17,11 @@ PredictorGui::~PredictorGui()
 
 void PredictorGui::load()
 {
+    QString svmFile = QFileDialog::getOpenFileName(this, QObject::tr("Open Trained SVM"),
+                                                        QDir::currentPath(),QObject::tr("Trained SVM (*.xml)"));
 
+    if(svmFile.contains(".xml"))
+        m_svm = cv::ml::SVM::load<cv::ml::SVM>(svmFile.toStdString());
 }
 
 void PredictorGui::train()
@@ -24,6 +29,8 @@ void PredictorGui::train()
     QString posDes = QFileDialog::getOpenFileName(nullptr,
                                                QObject::tr("Open pos data"),QDir::currentPath(), QObject::tr("(*.yml)"));
 
+    if(!posDes.contains(".yml"))
+        return;
     cv::Mat posData, negData, allData, labels;
     cv::FileStorage file(posDes.toStdString(), cv::FileStorage::READ);
     file["data"] >> posData;
@@ -31,6 +38,9 @@ void PredictorGui::train()
 
     QString negDes = QFileDialog::getOpenFileName(nullptr,
                                                QObject::tr("Open neg data"), QDir::currentPath(), QObject::tr("(*.yml)"));
+
+    if(!negDes.contains(".yml"))
+        return;
 
     file.open(negDes.toStdString(),cv::FileStorage::READ);
     file["data"] >> negData;
@@ -51,11 +61,24 @@ void PredictorGui::train()
 void PredictorGui::save()
 {
     QString fileName = QFileDialog::getSaveFileName(this, QObject::tr("Save File"),
-                                                    "/home/svm_trained.yml",QObject::tr("Trained SVM (*.xml)"));
-    m_svm->save(fileName.toStdString());
+                                                    "/home/svm_trained.xml",QObject::tr("Trained SVM (*.xml)"));
+    if(fileName.contains(".xml"))
+        m_svm->save(fileName.toStdString());
 }
 
 void PredictorGui::extractHOGFeatures()
 {
+    HOGExtactor *hogExtr = new HOGExtactor();
+    cv::Mat result = hogExtr->getResult();
 
+    if(result.rows > 0)
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, QObject::tr("Save File"),
+                                                        "/home/posDes.yml",QObject::tr("Features Mat (*.yml)"));
+        cv::FileStorage file(fileName.toStdString(), cv::FileStorage::WRITE);
+        file << "data" << result;
+        file.release();
+    }
+
+    delete hogExtr;
 }

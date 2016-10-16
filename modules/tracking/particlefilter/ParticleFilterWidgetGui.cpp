@@ -19,6 +19,10 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     ui->histogramSizespinBox->setValue(m_histSize);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+
+
+    m_predictor = new PredictorGui(this);
+    ui->groupBox->layout()->addWidget(m_predictor);
 }
 
 void ParticleFilterWidgetGui::mouseMoveEvent(QMouseEvent *event)

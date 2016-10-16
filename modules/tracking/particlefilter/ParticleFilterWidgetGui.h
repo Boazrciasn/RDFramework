@@ -13,6 +13,7 @@
 #include "tracking/videoplayer/VideoPlayer.h"
 #include "tracking/particlefilter/ParticleFilter.h"
 #include "Target.h"
+#include "tracking/dataExtraction/PredictorGui.h"
 
 class RectangleParticle;
 
@@ -55,6 +56,7 @@ class ParticleFilterWidgetGui : public QWidget
   private:
     Ui::ParticleFilterWidgetGui *ui;
     VideoPlayer *m_VideoPlayer;
+    PredictorGui *m_predictor{};
     ParticleFilter *m_PF{};
 
     cv::Mat m_Frame;

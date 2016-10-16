@@ -56,22 +56,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>loadButton</sender>
-   <signal>clicked()</signal>
-   <receiver>PredictorGui</receiver>
-   <slot>laod()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>50</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>93</x>
-     <y>391</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>trainButton</sender>
    <signal>clicked()</signal>
    <receiver>PredictorGui</receiver>
@@ -119,11 +103,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>loadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PredictorGui</receiver>
+   <slot>load()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>74</x>
+     <y>283</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>extractHOGFeatures()</slot>
-  <slot>laod()</slot>
   <slot>save()</slot>
   <slot>train()</slot>
+  <slot>load()</slot>
  </slots>
 </ui>
