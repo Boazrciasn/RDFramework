@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>891</width>
-    <height>685</height>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -331,6 +331,16 @@
            </property>
            <property name="text">
             <string>Targets :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="predictorFrame">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
            </property>
           </widget>
          </item>

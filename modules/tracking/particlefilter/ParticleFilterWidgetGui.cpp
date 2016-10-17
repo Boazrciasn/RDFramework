@@ -22,7 +22,9 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
 
 
     m_predictor = new PredictorGui(this);
-    ui->groupBox->layout()->addWidget(m_predictor);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(m_predictor);
+    ui->predictorFrame->setLayout(layout);
 }
 
 void ParticleFilterWidgetGui::mouseMoveEvent(QMouseEvent *event)
