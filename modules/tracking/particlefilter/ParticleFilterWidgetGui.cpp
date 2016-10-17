@@ -116,6 +116,8 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     ui->particleHeightLSpinBox->setValue(m_particleHeight);
     m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters,
                               m_particleWidth, m_particleHeight, m_histSize,m_TargetsVector[0]);
+    m_PF->setSVM(m_predictor->getSvm());
+    m_PF->initializeParticles();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setPF(m_PF);
 }
@@ -132,8 +134,9 @@ void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
     {
         ui->display_label->setAlignment(Qt::AlignCenter);
         ui->display_label->setPixmap(
-            QPixmap::fromImage(img).scaled(ui->display_label->size(), Qt::KeepAspectRatio, Qt::FastTransformation)
-        );
+            QPixmap::fromImage(img).scaled(ui->display_label->size()));
+//        , Qt::KeepAspectRatio, Qt::FastTransformation)
+//        );
         ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
     }
     int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());

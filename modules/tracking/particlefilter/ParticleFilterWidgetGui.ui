@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>891</width>
-    <height>714</height>
+    <width>1100</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -336,6 +336,9 @@
          </item>
          <item>
           <widget class="QFrame" name="predictorFrame">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
            </property>
@@ -346,6 +349,9 @@
          </item>
          <item>
           <widget class="QListWidget" name="targets_ListWidget">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>

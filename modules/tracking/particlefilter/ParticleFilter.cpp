@@ -25,7 +25,7 @@ ParticleFilter::ParticleFilter(
     setHistSize(histSize);
     m_distortRange = 25; // set from gui
     srand(time(nullptr));
-    initializeParticles();
+//    initializeParticles();
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     m_RandomGen = std::mt19937(seed);
 }
@@ -102,32 +102,32 @@ void ParticleFilter::processImage()
 
 void ParticleFilter::initializeParticles()
 {
-    QString posDes = QFileDialog::getOpenFileName(nullptr,
-                                               QObject::tr("Open pos data"),QDir::currentPath(), QObject::tr("(*.yml)"));
+//    QString posDes = QFileDialog::getOpenFileName(nullptr,
+//                                               QObject::tr("Open pos data"),QDir::currentPath(), QObject::tr("(*.yml)"));
 
-    cv::Mat posData, negData, allData, labels;
-    cv::FileStorage file(posDes.toStdString(), cv::FileStorage::READ);
-    file["data"] >> posData;
-    file.release();
+//    cv::Mat posData, negData, allData, labels;
+//    cv::FileStorage file(posDes.toStdString(), cv::FileStorage::READ);
+//    file["data"] >> posData;
+//    file.release();
 
-    QString negDes = QFileDialog::getOpenFileName(nullptr,
-                                               QObject::tr("Open neg data"), QDir::currentPath(), QObject::tr("(*.yml)"));
+//    QString negDes = QFileDialog::getOpenFileName(nullptr,
+//                                               QObject::tr("Open neg data"), QDir::currentPath(), QObject::tr("(*.yml)"));
 
-    file.open(negDes.toStdString(),cv::FileStorage::READ);
-    file["data"] >> negData;
-    file.release();
+//    file.open(negDes.toStdString(),cv::FileStorage::READ);
+//    file["data"] >> negData;
+//    file.release();
 
-    allData.push_back(posData);
-    allData.push_back(negData);
+//    allData.push_back(posData);
+//    allData.push_back(negData);
 
-    labels.push_back(cv::Mat::ones(posData.rows,1,CV_32SC1));
-    labels.push_back(cv::Mat::zeros(negData.rows,1,CV_32SC1));
+//    labels.push_back(cv::Mat::ones(posData.rows,1,CV_32SC1));
+//    labels.push_back(cv::Mat::zeros(negData.rows,1,CV_32SC1));
 
     cv::HOGDescriptor *hog = new cv::HOGDescriptor();
-    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
-    svm->setKernel(cv::ml::SVM::LINEAR);
-    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 10000, 1e-6));
-    svm->train( allData , cv::ml::ROW_SAMPLE , labels );
+//    cv::Ptr<cv::ml::SVM> svm = cv::ml::SVM::create();
+//    svm->setKernel(cv::ml::SVM::LINEAR);
+//    svm->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, 10000, 1e-6));
+//    svm->train( allData , cv::ml::ROW_SAMPLE , labels );
 
     int xRange = (img_width - m_particle_width);
     int yRange = (img_height - m_particle_height);
@@ -141,7 +141,7 @@ void ParticleFilter::initializeParticles()
         Particle *particle = new RectangleParticle(x, y, m_particle_width, m_particle_height, weight, m_target->getHist(),
                                                    m_histSize);
         particle->setHOGDescriptor(hog);
-        particle->setSVM(svm);
+        particle->setSVM(m_svm);
         m_particles.push_back(particle);
     }
 }

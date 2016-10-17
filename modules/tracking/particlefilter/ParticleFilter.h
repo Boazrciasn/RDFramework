@@ -7,8 +7,10 @@
 #include <chrono>
 #include <QMutex>
 #include <QThread>
+#include <opencv2/ml.hpp>
 
 #include "modules/tracking/videoplayer/VideoProcess.h"
+
 
 class Particle;
 class Target;
@@ -29,6 +31,8 @@ class ParticleFilter : public VideoProcess
     void exec(cv::Mat *img) override;
     ~ParticleFilter();
 
+    void initializeParticles();
+
     inline int getNumParticles() const { return m_num_particles; }
     inline int getHistSize() const { return m_histSize; }
     inline int getNumIters() const { return m_num_iters; }
@@ -44,6 +48,7 @@ class ParticleFilter : public VideoProcess
     inline void setParticleHeight(int value) { m_particle_height = value; }
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
+    inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
     void setVideoReader(VideoReader *videoReader);
     void processImage();
     void showParticles();
@@ -54,7 +59,6 @@ class ParticleFilter : public VideoProcess
     void processedImage(const QImage &image);
 
   private:
-    void initializeParticles();
     int randomParticle(float rand_number);
     void distortParticle(Particle *p, int &x, int &y);
 
@@ -73,6 +77,8 @@ class ParticleFilter : public VideoProcess
     int img_height, img_width;
     std::mt19937 m_RandomGen;
     VideoReader *m_VideoReader;
+
+    cv::Ptr<cv::ml::SVM> m_svm{};
 
 };
 #endif
