@@ -308,12 +308,12 @@
               </font>
              </property>
              <property name="text">
-              <string>Ratio: </string>
+              <string>ROI Confidence</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="top_n_ratio_label">
+            <widget class="QLabel" name="roi_confidence">
              <property name="text">
               <string/>
              </property>

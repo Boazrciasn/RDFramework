@@ -70,8 +70,12 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_VideoLodaded)
     {
-        QPoint a = mapToGlobal(m_Point);
-        QPoint b = event->globalPos();
+        QPoint a = mapToGlobal(m_RubberBand->pos());
+        QPoint b;
+        if(m_dragging)
+            b = mapToGlobal(m_RubberBand->pos() + QPoint(m_RubberBand->width(),m_RubberBand->height()));
+        else
+            b = event->globalPos();
         a = ui->display_label->mapFromGlobal(a);
         b = ui->display_label->mapFromGlobal(b);
         QPixmap OriginalPix(*ui->display_label->pixmap());
@@ -82,6 +86,7 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
         a = QPoint(int(a.x() * sx), int(a.y() * sy));
         b = QPoint(int(b.x() * sx), int(b.y() * sy));
         m_TargetROI = QRect(a, b);
+        setConfidence();
     }
 }
 
@@ -156,9 +161,9 @@ void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
         //        );
         ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
     }
-    int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());
-    ui->top_n_ratio_label->setText(QString::number(ratio));
-    ui->top_n_ratio_label->repaint();
+//    int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());
+//    ui->top_n_ratio_label->setText(QString::number(ratio));
+//    ui->top_n_ratio_label->repaint();
 }
 
 QString ParticleFilterWidgetGui::getFormattedTime(int timeInSeconds)
@@ -198,9 +203,9 @@ void ParticleFilterWidgetGui::onSetParticleCountSliderMoved(int position)
     ui->particlesToDisplayLabel->setText(QString::number(position));
     m_PF->setParticlesToDisplay(position);
     //    mPF->showTopNParticles(position);
-    int ratio = m_PF->getRatioOfTop(position);
-    ui->top_n_ratio_label->setText(QString::number(ratio));
-    ui->top_n_ratio_label->repaint();
+//    int ratio = m_PF->getRatioOfTop(position);
+//    ui->top_n_ratio_label->setText(QString::number(ratio));
+//    ui->top_n_ratio_label->repaint();
 }
 
 void ParticleFilterWidgetGui::onActionOpen()
@@ -279,4 +284,30 @@ void ParticleFilterWidgetGui::setPFSettingsEnabled(bool state)
     ui->particleCountSpinBox->setEnabled(state);
     ui->iterCountSpinBox->setEnabled(state);
     ui->particleWidthLSpinBox->setEnabled(state);
+}
+
+void ParticleFilterWidgetGui::setConfidence()
+{
+    m_svm = m_predictor->getSvm();
+    if(!m_RubberBand->isVisible() || !m_svm)
+        return;
+
+    QPixmap OriginalPix(*ui->display_label->pixmap());
+    QPixmap targetPixMap = OriginalPix.copy(m_TargetROI);
+    QImage q_roi = targetPixMap.toImage();
+    cv::Mat roi = Util::toCv(q_roi, CV_8UC4);
+    cv::cvtColor(roi, roi, CV_RGB2GRAY);
+
+    cv::resize(roi,roi,cv::Size(64,128));
+    std::vector<float> descriptor;
+    cv::HOGDescriptor *hog = new cv::HOGDescriptor();
+    hog->compute(roi, descriptor, cv::Size(64, 128), cv::Size(16, 16));
+    // TODO: using descriptor and svm calculate weight for the particle
+
+    cv::Mat_<float> desc(descriptor);
+    float decision = m_svm->predict(desc.t(),cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
+    float confidence = 1.0 / (1.0 + exp(decision));
+
+    ui->roi_confidence->setText(QString::number(confidence));
+    ui->roi_confidence->repaint();
 }

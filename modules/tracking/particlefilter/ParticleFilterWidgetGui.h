@@ -14,6 +14,7 @@
 #include "tracking/particlefilter/ParticleFilter.h"
 #include "Target.h"
 #include "tracking/dataExtraction/PredictorGui.h"
+#include <opencv2/objdetect.hpp>
 
 class RectangleParticle;
 
@@ -31,6 +32,8 @@ class ParticleFilterWidgetGui : public QWidget
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+
+    inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
     ~ParticleFilterWidgetGui();
 
   private slots:
@@ -58,6 +61,7 @@ class ParticleFilterWidgetGui : public QWidget
     VideoPlayer *m_VideoPlayer;
     PredictorGui *m_predictor{};
     ParticleFilter *m_PF{};
+    cv::Ptr<cv::ml::SVM> m_svm;
 
     cv::Mat m_Frame;
     cv::Mat m_FrameGray;
@@ -82,6 +86,7 @@ class ParticleFilterWidgetGui : public QWidget
     int m_currFrame;
 
     void setPFSettingsEnabled(bool state);
+    void setConfidence();
 };
 
 #endif // PARTICLEFILTERWIDGETGUI_H
