@@ -67,11 +67,13 @@ class ParticleFilterWidgetGui : public QWidget
     int m_particleWidth;
     int m_particleHeight;
     int m_histSize ;
-    bool m_VideoLodaded = false;
+    bool m_VideoLodaded{};
     bool m_isPlaying{};
+    bool m_dragging{};
     QRubberBand *m_RubberBand;
     QRect m_TargetROI;
     QPoint m_Point;
+    QPoint m_PointMove;
 
     RectangleParticle *m_RectParticle;
 

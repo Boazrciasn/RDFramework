@@ -29,7 +29,13 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
 
 void ParticleFilterWidgetGui::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_VideoLodaded)
+    if (!m_VideoLodaded)
+        return;
+
+    if(m_dragging){
+        QPoint delta = event->pos() - m_PointMove;
+        m_RubberBand->move(m_Point + delta);
+    } else
         m_RubberBand->setGeometry(QRect(m_Point, event->pos()).normalized());
 }
 
@@ -38,13 +44,24 @@ void ParticleFilterWidgetGui::mousePressEvent(QMouseEvent *event)
     if (m_VideoLodaded)
     {
         m_VideoPlayer->stopVideo();
-        if (m_RubberBand->isEnabled())
-            m_RubberBand->hide();
-        if (ui->display_label->underMouse())
-        {
-            m_Point = event->pos();
-            m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-            m_RubberBand->show();
+
+        if(event->button() == Qt::RightButton){
+            if(m_RubberBand->isEnabled() || !m_RubberBand->isHidden())
+            {
+                m_PointMove = event->pos();
+                m_dragging = true;
+            }
+            return;
+        } else {
+            if (m_RubberBand->isEnabled())
+                m_RubberBand->hide();
+            if (ui->display_label->underMouse())
+            {
+                m_Point = event->pos();
+                m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+                m_RubberBand->show();
+                m_dragging = false;
+            }
         }
     }
 }
@@ -96,7 +113,7 @@ void ParticleFilterWidgetGui::onActionSaveTarget()
             break;
         }
         else
-           break;
+            break;
     case QMessageBox::Cancel:
     default:
         break;
@@ -134,9 +151,9 @@ void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
     {
         ui->display_label->setAlignment(Qt::AlignCenter);
         ui->display_label->setPixmap(
-            QPixmap::fromImage(img).scaled(ui->display_label->size()));
-//        , Qt::KeepAspectRatio, Qt::FastTransformation)
-//        );
+                    QPixmap::fromImage(img).scaled(ui->display_label->size()));
+        //        , Qt::KeepAspectRatio, Qt::FastTransformation)
+        //        );
         ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
     }
     int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());
