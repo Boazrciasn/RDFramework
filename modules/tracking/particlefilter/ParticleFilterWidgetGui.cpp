@@ -70,7 +70,8 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_VideoLodaded)
     {
-        QPoint a = mapToGlobal(m_RubberBand->pos());
+        m_Point = m_RubberBand->pos();
+        QPoint a = mapToGlobal(m_Point);
         QPoint b;
         if(m_dragging)
             b = mapToGlobal(m_RubberBand->pos() + QPoint(m_RubberBand->width(),m_RubberBand->height()));
@@ -309,5 +310,7 @@ void ParticleFilterWidgetGui::setConfidence()
     float confidence = 1.0 / (1.0 + exp(decision));
 
     ui->roi_confidence->setText(QString::number(confidence));
+    ui->roi_class->setText(QString::number(decision/std::abs(decision)));
     ui->roi_confidence->repaint();
+    ui->roi_class->repaint();
 }

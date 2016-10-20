@@ -308,12 +308,36 @@
               </font>
              </property>
              <property name="text">
-              <string>ROI Confidence</string>
+              <string>ROI Confidence:</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QLabel" name="roi_confidence">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_5">
+             <property name="font">
+              <font>
+               <family>Futura</family>
+               <pointsize>14</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>ROI Class:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="roi_class">
              <property name="text">
               <string/>
              </property>
