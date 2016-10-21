@@ -24,7 +24,7 @@ void VideoPlayer::run()
             continue;
         }
         m_CurrentFrame++;
-        m_processor->exec(&m_RGBframe);
+        m_processor->exec(m_RGBframe, m_RGBframe);
         m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
         emit playerFrame(m_img);
         msleep(delay);
@@ -32,7 +32,7 @@ void VideoPlayer::run()
 }
 
 //template<typename ImgProcessor>
-void VideoPlayer::processImage(VideoProcess *process)
+void VideoPlayer::processImage()
 {
     // Background Subtruction MOG
     cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));

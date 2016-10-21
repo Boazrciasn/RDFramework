@@ -1,3 +1,4 @@
+
 #include "precompiled.h"
 #include <opencv2/video/background_segm.hpp>
 
@@ -9,27 +10,48 @@
 class BackgroundSubMoG
 {
   public:
-    BackgroundSubMoG(int erosion_size, int dilation_size, int blurSize = 5,
-                     cv::MorphShapes morph_elem = cv::MORPH_ELLIPSE) :
-        m_erosion_size(erosion_size), m_dilation_size(dilation_size), m_blurSize(blurSize), m_morph_elem(morph_elem)
+    BackgroundSubMoG(int erosionSize = 5, int dilationSize = 5, int blurSize = 5,
+                     cv::MorphShapes morphElem = cv::MORPH_ELLIPSE) :
+        m_erosionSize(erosionSize), m_dilationSize(dilationSize), m_blurSize(blurSize), m_morphElem(morphElem)
     {
+        m_pMOG = cv::createBackgroundSubtractorMOG2();
+        m_pMOG->setShadowValue(0);
     }
-    cv::Mat execute(cv::Mat inputImg)
+
+    void execute(const cv::Mat &inputImg, cv::Mat &outImg)
     {
-        cv::blur(inputImg, inputImg, cv::Size(m_blurSize, m_blurSize));
-        m_pMOG->apply(inputImg, m_fgMaskMOG2);
-        Util::Dilation(m_fgMaskMOG2, m_frameOut, m_dilation_size, m_morph_elem);
-        Util::Erosion(m_frameOut, m_frameOut, m_dilation_size, m_morph_elem);
-        return m_frameOut;
+        cv::Mat blurredImg;
+        cv::blur(inputImg, blurredImg, cv::Size(m_blurSize, m_blurSize));
+        m_pMOG->apply(blurredImg, m_fgMask);
+
+        Util::Dilation(m_fgMask, m_fgMask, m_dilationSize, m_morphElem);
+        Util::Erosion(m_fgMask, m_fgMask, m_erosionSize, m_morphElem);
+        outImg = m_fgMask;
     }
+
+
+    void setParam(int erosionSize, int dilationSize, int blurSize = 5, cv::MorphShapes morphElem = cv::MORPH_ELLIPSE)
+    {
+        setErosionSize(erosionSize);
+        setDilationSize(dilationSize);
+        setBlurSize(blurSize);
+        setErosionSize(morphElem);
+        m_pMOG = cv::createBackgroundSubtractorMOG2();
+        m_pMOG->setShadowValue(0);
+    }
+    void setErosionSize(int s) { m_erosionSize = s;}
+    void setDilationSize(int s) { m_dilationSize = s;}
+    void setBlurSize(int s) { m_blurSize = s;}
+    void setErosionSize(cv::MorphShapes elem) { m_morphElem = elem;}
+
   private :
     cv::Ptr<cv::BackgroundSubtractorMOG2> m_pMOG;
-    cv::Mat_<uchar> m_fgMaskMOG2;
+    cv::Mat_<uchar> m_fgMask;
     cv::Mat m_frameOut;
-    int m_erosion_size;
-    int m_dilation_size;
+    int m_erosionSize;
+    int m_dilationSize;
     int m_blurSize;
-    cv::MorphShapes m_morph_elem = cv::MORPH_ELLIPSE;
+    cv::MorphShapes m_morphElem = cv::MORPH_ELLIPSE;
     cv::Size m_sturcture_size ; //= cv::Size(2 * m_dilation_size + 1, 2 * m_dilation_size + 1);
     cv::Point m_structure_point;
 };

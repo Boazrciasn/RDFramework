@@ -39,7 +39,7 @@ class VideoPlayer : public QThread
 
 
 //    template <typename ImgProcessor>
-    void processImage(VideoProcess *process);
+    void processImage();
 
     void initializeVideo();
 

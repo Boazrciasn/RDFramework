@@ -217,12 +217,12 @@ class Util
     static void Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
-        cv::erode(outputImg, inputImg, element);
+        cv::erode(inputImg, outputImg, element);
     }
     static void Dilation(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
-        cv::dilate(outputImg, inputImg, element);
+        cv::dilate(inputImg, outputImg, element);
     }
     static void writeMatToFile(cv::Mat &m, const char *filename);
     static std::vector<std::vector<cv::Point> > DBSCAN_points(std::vector<cv::Point> *points, float eps,

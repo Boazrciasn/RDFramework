@@ -9,10 +9,12 @@ DataExtractorGui::DataExtractorGui(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DataExtractorGui)
 {
+    m_bgsubMoG.setParam(5, 5);
+    m_dataExtractMoG = new DataExtractor<BackgroundSubMoG, int>(m_bgsubMoG, 10);
     ui->setupUi(this);
     m_testWin = new VideoPlayerGui(this);
     ui->main_gridLayout->addWidget(m_testWin);
-
+    m_testWin->setProcess(m_dataExtractMoG);
 }
 
 DataExtractorGui::~DataExtractorGui()

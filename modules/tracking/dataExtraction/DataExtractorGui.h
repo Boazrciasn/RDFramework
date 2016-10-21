@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "DisplayImagesWidgetGui.h"
+#include "BackgroundSubtractors.h"
 #include "tracking/videoplayer/VideoPlayerGui.h"
 
 namespace Ui
@@ -22,6 +23,8 @@ class DataExtractorGui : public QWidget
     void createNewWindow();
 
   private:
+    DataExtractor<BackgroundSubMoG, int> *m_dataExtractMoG;
+    BackgroundSubMoG m_bgsubMoG;
     Ui::DataExtractorGui *ui;
     VideoPlayerGui *m_testWin;
 };
