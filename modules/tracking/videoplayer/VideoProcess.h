@@ -10,7 +10,11 @@ class VideoProcess
     {
         imgOut = img;
     }
-    void setImage(const cv::Mat img) { m_img = img; }
+    void setImage(const cv::Mat img)
+    {
+        cv::Mat timg = img.clone();
+        m_img = timg;
+    }
 
   protected :
     cv::Mat m_img;

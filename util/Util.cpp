@@ -445,7 +445,7 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
-std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize)
+std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize, quint16 maxSize)
 {
     std::vector<std::vector<cv::Point> > contours;
     cv::findContours(inputImg, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
@@ -456,7 +456,8 @@ std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inp
     {
         cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
         curr_boundingRect = cv::boundingRect(cv::Mat(contours_poly[i]));
-        if (curr_boundingRect.height * curr_boundingRect.width > minSize)
+        quint16 area = curr_boundingRect.height * curr_boundingRect.width;
+        if (area > minSize && area < maxSize)
             boundRect.push_back(curr_boundingRect);
     }
     return boundRect;
