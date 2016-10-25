@@ -12,8 +12,7 @@ class VideoProcess
     }
     void setImage(const cv::Mat img)
     {
-        cv::Mat timg = img.clone();
-        m_img = timg;
+        m_img = img;
     }
 
   protected :

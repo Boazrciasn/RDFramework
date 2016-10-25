@@ -16,7 +16,6 @@ class DataExtractor : public VideoProcess
     void exec(const cv::Mat &inputImg, cv::Mat &outImg)
     {
         setImage(inputImg);
-        m_img = inputImg;
         cv::Mat fg_img;
         m_bsubtractor.execute(m_img, fg_img);
         std::vector<cv::Rect>  bBox_vec;
@@ -29,7 +28,6 @@ class DataExtractor : public VideoProcess
   private:
     BSubtractor &m_bsubtractor;
     const PFinder &m_pfinder;
-    cv::Mat m_img;
 };
 
 #endif // DATAEXTRACTOR_H
