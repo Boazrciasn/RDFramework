@@ -12,24 +12,22 @@ PredictorGui::PredictorGui(QWidget *parent) :
     readSettings();
 }
 
-QImage PredictorGui::getConfMap(const QPixmap src, QRect win)
+QImage PredictorGui::getConfMap(const QPixmap src, int roi_width, int roi_height, int step)
 {
+    if(!m_svm)
+        return src.toImage();
     cv::Mat srcImg = Util::toCv(src.toImage(),CV_8UC4);
     cv::Mat map = cv::Mat::zeros(srcImg.rows,srcImg.cols, CV_8UC3);
-    int roi_width = win.width();
-    int roi_height = win.height();
-
     cv::Mat srcGray;
     cv::cvtColor(srcImg, srcGray, CV_RGB2GRAY);
-    cv::copyMakeBorder(srcGray,srcGray, roi_height/2, roi_height/2, roi_width/2, roi_width/2, cv::BORDER_CONSTANT, cv::Scalar::all(0));
-
-
+    cv::copyMakeBorder(srcGray,srcGray, roi_height/2, roi_height/2, roi_width/2, roi_width/2, cv::BORDER_REFLECT);
     cv::HOGDescriptor *hog = new cv::HOGDescriptor();
 
 
+    map.setTo(cv::Scalar(0,255,0));
 
-    for (int i = 0; i < map.rows-1; ++i) {
-        for (int j = 0; j < map.cols-1; ++j) {
+    for (int i = step/2; i < map.rows-1; i+=step) {
+        for (int j = step/2; j < map.cols-1; j+=step) {
 
             cv::Mat roi(srcGray, cv::Rect(j, i, roi_width, roi_height));
             cv::resize(roi,roi,cv::Size(64,128));
@@ -41,9 +39,14 @@ QImage PredictorGui::getConfMap(const QPixmap src, QRect win)
 
             if(decision == 1)
                 confidence = 0;
-            map.at<cv::Vec3b>(i,j)[0] = 0;
-            map.at<cv::Vec3b>(i,j)[1] = 255 - confidence*255;
-            map.at<cv::Vec3b>(i,j)[2] = confidence*255;
+
+            for (int row = i-step/2; row < map.rows-1 && row <= i+step/2; ++row) {
+                for (int col = j-step/2; col < map.cols-1 && col <= j+step/2; ++col) {
+                    map.at<cv::Vec3b>(row,col)[0] = 0;
+                    map.at<cv::Vec3b>(row,col)[1] = 255 - confidence*255;
+                    map.at<cv::Vec3b>(row,col)[2] = confidence*255;
+                }
+            }
 
             roi.release();
             desc.release();

@@ -52,12 +52,14 @@ protected:
     void onActionPause();
     void onActionSaveTarget();
     void onActionSetupPF();
+    void onActionDispConfMap();
 
     void onParticleCountChange(int value);
     void onIterationCountChange(int value);
     void onParticleWidthChange(int value);
     void onParticleHeightChange(int value);
     void onHistSizeChanged(int value);
+    void onStepSizeChanged(int value);
 
   private:
     Ui::ParticleFilterWidgetGui *ui;
@@ -76,6 +78,7 @@ protected:
     int m_particleWidth;
     int m_particleHeight;
     int m_histSize ;
+    int m_stepSize;
     bool m_VideoLodaded{};
     bool m_isPlaying{};
     bool m_dragging{};
@@ -94,7 +97,6 @@ protected:
     void readSettings();
     void setPFSettingsEnabled(bool state);
     void setConfidence();
-    void dispConfMap();
     void loadVideo(QString filename);
 };
 

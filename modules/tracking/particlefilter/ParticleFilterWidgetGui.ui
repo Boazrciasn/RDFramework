@@ -138,129 +138,8 @@
         <property name="title">
          <string>PF Settings</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLabel" name="particleCountLabel">
-           <property name="font">
-            <font>
-             <family>Futura</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string># Particles</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="particleCountSpinBox">
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="iterCountLabel">
-           <property name="font">
-            <font>
-             <family>Futura</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string># Iterations</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="iterCountSpinBox">
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-           <property name="value">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="particleWidthLbel">
-           <property name="font">
-            <font>
-             <family>Futura</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Particle Width</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="particleWidthLSpinBox">
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-           <property name="value">
-            <number>55</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="particleHeightLbel">
-           <property name="font">
-            <font>
-             <family>Futura</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Particle Height</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="particleHeightLSpinBox">
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-           <property name="value">
-            <number>55</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="HistogramSizelabel">
-           <property name="font">
-            <font>
-             <family>Futura</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Histogram Size</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="histogramSizespinBox">
-           <property name="minimum">
-            <number>8</number>
-           </property>
-           <property name="maximum">
-            <number>256</number>
-           </property>
-           <property name="singleStep">
-            <number>4</number>
-           </property>
-           <property name="value">
-            <number>12</number>
-           </property>
-          </widget>
-         </item>
-         <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="10" column="0" colspan="2">
           <widget class="QLabel" name="label">
            <property name="font">
             <font>
@@ -273,7 +152,7 @@
            </property>
           </widget>
          </item>
-         <item>
+         <item row="11" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QSlider" name="particlesToDisplaySlider">
@@ -297,7 +176,59 @@
            </item>
           </layout>
          </item>
-         <item>
+         <item row="8" column="1">
+          <widget class="QSpinBox" name="histogramSizespinBox">
+           <property name="minimum">
+            <number>8</number>
+           </property>
+           <property name="maximum">
+            <number>256</number>
+           </property>
+           <property name="singleStep">
+            <number>4</number>
+           </property>
+           <property name="value">
+            <number>12</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="particleHeightLbel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Particle Height</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="particleCountSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="22" column="0">
+          <widget class="QPushButton" name="setupPF_pushButton">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Setup Particle Filter</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="QLabel" name="label_2">
@@ -312,16 +243,9 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QLabel" name="roi_confidence">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
-         <item>
+         <item row="13" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QLabel" name="label_5">
@@ -336,17 +260,10 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QLabel" name="roi_class">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
-         <item>
-          <widget class="QLabel" name="label_3">
+         <item row="2" column="0">
+          <widget class="QLabel" name="iterCountLabel">
            <property name="font">
             <font>
              <family>Futura</family>
@@ -354,24 +271,80 @@
             </font>
            </property>
            <property name="text">
-            <string>Targets :</string>
+            <string># Iterations</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QFrame" name="predictorFrame">
-           <property name="enabled">
-            <bool>true</bool>
+         <item row="4" column="0">
+          <widget class="QLabel" name="particleWidthLbel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+           <property name="text">
+            <string>Particle Width</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="particleCountLabel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string># Particles</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="particleWidthLSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>55</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="iterCountSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="HistogramSizelabel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Histogram Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QSpinBox" name="particleHeightLSpinBox">
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>55</number>
+           </property>
+          </widget>
+         </item>
+         <item row="21" column="0">
           <widget class="QListWidget" name="targets_ListWidget">
            <property name="enabled">
             <bool>true</bool>
@@ -395,8 +368,15 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="setupPF_pushButton">
+         <item row="12" column="1">
+          <widget class="QLabel" name="roi_confidence">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="20" column="0">
+          <widget class="QLabel" name="label_3">
            <property name="font">
             <font>
              <family>Futura</family>
@@ -404,7 +384,63 @@
             </font>
            </property>
            <property name="text">
-            <string>Setup Particle Filter</string>
+            <string>Targets :</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="0" rowspan="3" colspan="2">
+          <widget class="QFrame" name="predictorFrame">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="13" column="1">
+          <widget class="QLabel" name="roi_class">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="0">
+          <widget class="QLabel" name="stepSizeSizeLabel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Step size (conf map)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="1">
+          <widget class="QSpinBox" name="stepSizeSizeSpinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>60</number>
+           </property>
+           <property name="singleStep">
+            <number>4</number>
+           </property>
+           <property name="value">
+            <number>15</number>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="0" colspan="2">
+          <widget class="QPushButton" name="computeConfMapPushButton">
+           <property name="text">
+            <string>compute conf map</string>
            </property>
           </widget>
          </item>
@@ -425,8 +461,8 @@
    <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
-     <y>665</y>
+     <x>279</x>
+     <y>741</y>
     </hint>
     <hint type="destinationlabel">
      <x>163</x>
@@ -441,8 +477,8 @@
    <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>352</x>
-     <y>665</y>
+     <x>365</x>
+     <y>741</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
@@ -457,8 +493,8 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>438</x>
-     <y>665</y>
+     <x>451</x>
+     <y>741</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
@@ -473,8 +509,8 @@
    <slot>onHorizontalSliderPressed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>212</x>
-     <y>631</y>
+     <x>230</x>
+     <y>703</y>
     </hint>
     <hint type="destinationlabel">
      <x>193</x>
@@ -489,8 +525,8 @@
    <slot>onHorizontalSliderReleased()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>631</y>
+     <x>113</x>
+     <y>703</y>
     </hint>
     <hint type="destinationlabel">
      <x>48</x>
@@ -505,8 +541,8 @@
    <slot>onParticleCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>786</x>
-     <y>95</y>
+     <x>1069</x>
+     <y>71</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -521,8 +557,8 @@
    <slot>onIterationCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>786</x>
-     <y>148</y>
+     <x>1069</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -537,8 +573,8 @@
    <slot>onParticleWidthChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>210</y>
+     <x>1069</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -553,8 +589,8 @@
    <slot>onSetParticleCountSliderMoved(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>845</x>
-     <y>369</y>
+     <x>1032</x>
+     <y>242</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -569,8 +605,8 @@
    <slot>onActionSaveTarget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>528</x>
-     <y>665</y>
+     <x>595</x>
+     <y>741</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
@@ -585,8 +621,8 @@
    <slot>onHistSizeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>322</y>
+     <x>1069</x>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -601,8 +637,8 @@
    <slot>onActionSetupPF()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>654</y>
+     <x>1001</x>
+     <y>730</y>
     </hint>
     <hint type="destinationlabel">
      <x>758</x>
@@ -617,8 +653,8 @@
    <slot>onHorizontalSliderMoved(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>142</x>
-     <y>631</y>
+     <x>160</x>
+     <y>703</y>
     </hint>
     <hint type="destinationlabel">
      <x>146</x>
@@ -633,12 +669,44 @@
    <slot>onParticleHeightChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>882</x>
-     <y>266</y>
+     <x>1069</x>
+     <y>161</y>
     </hint>
     <hint type="destinationlabel">
      <x>1134</x>
      <y>264</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stepSizeSizeSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ParticleFilterWidgetGui</receiver>
+   <slot>onStepSizeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1045</x>
+     <y>332</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1204</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>computeConfMapPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ParticleFilterWidgetGui</receiver>
+   <slot>onActionDispConfMap()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1016</x>
+     <y>356</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1156</x>
+     <y>424</y>
     </hint>
    </hints>
   </connection>
@@ -658,5 +726,7 @@
   <slot>onHistSizeChanged(int)</slot>
   <slot>onActionSetupPF()</slot>
   <slot>onParticleHeightChange(int)</slot>
+  <slot>onStepSizeChanged(int)</slot>
+  <slot>onActionDispConfMap()</slot>
  </slots>
 </ui>

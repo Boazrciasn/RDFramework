@@ -8,6 +8,8 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     m_VideoPlayer = new VideoPlayer(this);
     QObject::connect(m_VideoPlayer, SIGNAL(playerFrame(QImage)), SLOT(updatePlayerUI(QImage)));
     ui->setupUi(this);
+    readSettings();
+
     ui->start_pushButton->setEnabled(false);
     ui->horizontalSlider->setEnabled(false);
     ui->particlesToDisplaySlider->setEnabled(false);
@@ -16,6 +18,7 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     m_particleWidth = ui->particleWidthLSpinBox->value();
     m_particleHeight = ui->particleHeightLSpinBox->value();
     m_histSize = ui->histogramSizespinBox->value();
+    m_stepSize = ui->stepSizeSizeSpinBox->value();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     ui->histogramSizespinBox->setValue(m_histSize);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
@@ -26,7 +29,8 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     layout->addWidget(m_predictor);
     ui->predictorFrame->setLayout(layout);
 
-    readSettings();
+    // used for conf map with default values
+    m_TargetROI = QRect(0,0,m_particleWidth,m_particleHeight);
 }
 
 void ParticleFilterWidgetGui::closeEvent(QCloseEvent *event)
@@ -97,8 +101,6 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
         b = QPoint(int(b.x() * sx), int(b.y() * sy));
         m_TargetROI = QRect(a, b);
         setConfidence();
-        if(!m_dragging)
-            dispConfMap();
     }
 }
 
@@ -281,6 +283,11 @@ void ParticleFilterWidgetGui::onHistSizeChanged(int value)
     m_histSize = value;
 }
 
+void ParticleFilterWidgetGui::onStepSizeChanged(int value)
+{
+    m_stepSize = value;
+}
+
 void ParticleFilterWidgetGui::writeSettings()
 {
     QSettings settings("VVGLab", "PFilterGUI");
@@ -291,6 +298,8 @@ void ParticleFilterWidgetGui::writeSettings()
     settings.setValue("particleWidthLSpinBox", ui->particleWidthLSpinBox->value());
     settings.setValue("particleHeightLSpinBox", ui->particleHeightLSpinBox->value());
     settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
+
+    settings.setValue("stepSizeSizeSpinBox", ui->stepSizeSizeSpinBox->value());
     settings.endGroup();
 
     settings.beginGroup("video");
@@ -308,6 +317,7 @@ void ParticleFilterWidgetGui::readSettings()
     ui->particleWidthLSpinBox->setValue(settings.value("particleWidthLSpinBox",64).toInt());
     ui->particleHeightLSpinBox->setValue(settings.value("particleHeightLSpinBox",128).toInt());
     ui->histogramSizespinBox->setValue(settings.value("histogramSizespinBox",12).toInt());
+    ui->stepSizeSizeSpinBox->setValue(settings.value("stepSizeSizeSpinBox",15).toInt());
     settings.endGroup();
 
     settings.beginGroup("video");
@@ -370,11 +380,12 @@ void ParticleFilterWidgetGui::setConfidence()
     ui->roi_class->repaint();
 }
 
-void ParticleFilterWidgetGui::dispConfMap()
+void ParticleFilterWidgetGui::onActionDispConfMap()
 {
-    if(!m_svm)
+    m_svm = m_predictor->getSvm();
+    if(!m_svm || !m_VideoLodaded || m_isPlaying)
         return;
-    QImage confMap = m_predictor->getConfMap(m_originalPix, m_TargetROI);
+    QImage confMap = m_predictor->getConfMap(m_originalPix, m_particleWidth, m_particleHeight, m_stepSize);
     QImage img = m_originalPix.toImage();
 
     QPainter p(&img);
