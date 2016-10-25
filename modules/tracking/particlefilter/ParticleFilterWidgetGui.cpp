@@ -25,6 +25,14 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(m_predictor);
     ui->predictorFrame->setLayout(layout);
+
+    readSettings();
+}
+
+void ParticleFilterWidgetGui::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    event->accept();
 }
 
 void ParticleFilterWidgetGui::mouseMoveEvent(QMouseEvent *event)
@@ -88,15 +96,19 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
         b = QPoint(int(b.x() * sx), int(b.y() * sy));
         m_TargetROI = QRect(a, b);
         setConfidence();
+        if(!m_dragging)
+            dispConfMap();
     }
 }
 
 void ParticleFilterWidgetGui::onActionSaveTarget()
 {
+    if(!m_originalPix)
+        return;
     m_RubberBand->hide();
     Target *currTarget;
-    QPixmap OriginalPix(*ui->display_label->pixmap());
-    QPixmap targetPixMap = OriginalPix.copy(m_TargetROI);
+//    m_originalPix = ui->display_label->pixmap();
+    QPixmap targetPixMap = m_originalPix.copy(m_TargetROI);
     QString labelno = QString::number(m_TargetCount).rightJustified(4, '0');
     bool isOkPressed{};
     QString labelName = "Human_" + labelno;
@@ -160,7 +172,9 @@ void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
                     QPixmap::fromImage(img).scaled(ui->display_label->size()));
         //        , Qt::KeepAspectRatio, Qt::FastTransformation)
         //        );
+
         ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
+        m_originalPix = ui->display_label->pixmap()->copy();
     }
 //    int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());
 //    ui->top_n_ratio_label->setText(QString::number(ratio));
@@ -259,6 +273,33 @@ void ParticleFilterWidgetGui::onHistSizeChanged(int value)
     m_histSize = value;
 }
 
+void ParticleFilterWidgetGui::writeSettings()
+{
+    QSettings settings("VVGLab", "PFilter");
+
+    settings.beginGroup("PFSettings");
+    settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
+    settings.setValue("iterCountSpinBox", ui->iterCountSpinBox->value());
+    settings.setValue("particleWidthLSpinBox", ui->particleWidthLSpinBox->value());
+    settings.setValue("particleHeightLSpinBox", ui->particleHeightLSpinBox->value());
+    settings.setValue("histogramSizespinBox", ui->histogramSizespinBox->value());
+    settings.endGroup();
+}
+
+void ParticleFilterWidgetGui::readSettings()
+{
+    QSettings settings("VVGLab", "PFilter");
+
+    settings.beginGroup("PFSettings");
+    ui->particleCountSpinBox->setValue(settings.value("particleCountSpinBox",100).toInt());
+
+    ui->iterCountSpinBox->setValue(settings.value("iterCountSpinBox",3).toInt());
+    ui->particleWidthLSpinBox->setValue(settings.value("particleWidthLSpinBox",64).toInt());
+    ui->particleHeightLSpinBox->setValue(settings.value("particleHeightLSpinBox",128).toInt());
+    ui->histogramSizespinBox->setValue(settings.value("histogramSizespinBox",12).toInt());
+    settings.endGroup();
+}
+
 
 void ParticleFilterWidgetGui::onActionPlay()
 {
@@ -293,8 +334,7 @@ void ParticleFilterWidgetGui::setConfidence()
     if(!m_RubberBand->isVisible() || !m_svm)
         return;
 
-    QPixmap OriginalPix(*ui->display_label->pixmap());
-    QPixmap targetPixMap = OriginalPix.copy(m_TargetROI);
+    QPixmap targetPixMap = m_originalPix.copy(m_TargetROI);
     QImage q_roi = targetPixMap.toImage();
     cv::Mat roi = Util::toCv(q_roi, CV_8UC4);
     cv::cvtColor(roi, roi, CV_RGB2GRAY);
@@ -313,4 +353,19 @@ void ParticleFilterWidgetGui::setConfidence()
     ui->roi_class->setText(QString::number(decision/std::abs(decision)));
     ui->roi_confidence->repaint();
     ui->roi_class->repaint();
+}
+
+void ParticleFilterWidgetGui::dispConfMap()
+{
+    if(!m_svm)
+        return;
+    QImage confMap = m_predictor->getConfMap(m_originalPix, m_TargetROI);
+    QImage img = m_originalPix.toImage();
+
+    QPainter p(&img);
+    p.setCompositionMode(QPainter::CompositionMode_Overlay);
+    p.setOpacity(0.9);
+    p.drawImage(0,0,confMap);
+    p.end();
+    ui->display_label->setPixmap(QPixmap::fromImage(img));
 }

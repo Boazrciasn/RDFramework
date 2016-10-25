@@ -15,6 +15,7 @@ class PredictorGui : public QWidget
 public:
     explicit PredictorGui(QWidget *parent = 0);
     inline cv::Ptr<cv::ml::SVM> getSvm(){return m_svm;}
+    QImage getConfMap(const QPixmap src, QRect win);
     ~PredictorGui();
 
 private slots:

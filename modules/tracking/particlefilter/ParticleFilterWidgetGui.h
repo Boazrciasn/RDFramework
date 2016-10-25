@@ -27,6 +27,9 @@ class ParticleFilterWidgetGui : public QWidget
 {
     Q_OBJECT
 
+protected:
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+
   public:
     explicit ParticleFilterWidgetGui(QWidget *parent = 0);
     void mouseMoveEvent(QMouseEvent *event);
@@ -59,6 +62,7 @@ class ParticleFilterWidgetGui : public QWidget
   private:
     Ui::ParticleFilterWidgetGui *ui;
     VideoPlayer *m_VideoPlayer;
+    QPixmap m_originalPix;
     PredictorGui *m_predictor{};
     ParticleFilter *m_PF{};
     cv::Ptr<cv::ml::SVM> m_svm;
@@ -85,8 +89,11 @@ class ParticleFilterWidgetGui : public QWidget
     quint32 m_TargetCount = 0 ;
     int m_currFrame;
 
+    void writeSettings();
+    void readSettings();
     void setPFSettingsEnabled(bool state);
     void setConfidence();
+    void dispConfMap();
 };
 
 #endif // PARTICLEFILTERWIDGETGUI_H
