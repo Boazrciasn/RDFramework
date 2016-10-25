@@ -225,8 +225,15 @@ void ParticleFilterWidgetGui::onSetParticleCountSliderMoved(int position)
 
 void ParticleFilterWidgetGui::onActionOpen()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open a File", "", "Video File (*.*)");
+    m_videoFile = QFileDialog::getOpenFileName(this, "Open a File", m_videoFile, "Video File (*.*)");
+    loadVideo(m_videoFile);
+}
+
+void ParticleFilterWidgetGui::loadVideo(QString filename)
+{
     QFileInfo name = filename;
+    if(!name.exists())
+        return;
     if (!m_VideoPlayer->loadVideo(filename.toStdString()))
     {
         QMessageBox msgBox;
@@ -282,7 +289,9 @@ void ParticleFilterWidgetGui::writeSettings()
     settings.setValue("iterCountSpinBox", ui->iterCountSpinBox->value());
     settings.setValue("particleWidthLSpinBox", ui->particleWidthLSpinBox->value());
     settings.setValue("particleHeightLSpinBox", ui->particleHeightLSpinBox->value());
-    settings.setValue("histogramSizespinBox", ui->histogramSizespinBox->value());
+    settings.setValue("m_videoFile", m_videoFile);
+
+    settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
     settings.endGroup();
 }
 
@@ -292,11 +301,11 @@ void ParticleFilterWidgetGui::readSettings()
 
     settings.beginGroup("PFSettings");
     ui->particleCountSpinBox->setValue(settings.value("particleCountSpinBox",100).toInt());
-
     ui->iterCountSpinBox->setValue(settings.value("iterCountSpinBox",3).toInt());
     ui->particleWidthLSpinBox->setValue(settings.value("particleWidthLSpinBox",64).toInt());
     ui->particleHeightLSpinBox->setValue(settings.value("particleHeightLSpinBox",128).toInt());
     ui->histogramSizespinBox->setValue(settings.value("histogramSizespinBox",12).toInt());
+    m_videoFile = settings.value("m_videoFile","").toString();
     settings.endGroup();
 }
 

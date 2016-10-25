@@ -62,6 +62,7 @@ protected:
   private:
     Ui::ParticleFilterWidgetGui *ui;
     VideoPlayer *m_VideoPlayer;
+    QString m_videoFile{};
     QPixmap m_originalPix;
     PredictorGui *m_predictor{};
     ParticleFilter *m_PF{};
@@ -94,6 +95,7 @@ protected:
     void setPFSettingsEnabled(bool state);
     void setConfidence();
     void dispConfMap();
+    void loadVideo(QString filename);
 };
 
 #endif // PARTICLEFILTERWIDGETGUI_H
