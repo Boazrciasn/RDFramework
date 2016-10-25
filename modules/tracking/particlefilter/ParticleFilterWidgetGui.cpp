@@ -32,6 +32,7 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
 void ParticleFilterWidgetGui::closeEvent(QCloseEvent *event)
 {
     writeSettings();
+    m_predictor->writeSettings();
     event->accept();
 }
 
@@ -282,22 +283,24 @@ void ParticleFilterWidgetGui::onHistSizeChanged(int value)
 
 void ParticleFilterWidgetGui::writeSettings()
 {
-    QSettings settings("VVGLab", "PFilter");
+    QSettings settings("VVGLab", "PFilterGUI");
 
     settings.beginGroup("PFSettings");
     settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
     settings.setValue("iterCountSpinBox", ui->iterCountSpinBox->value());
     settings.setValue("particleWidthLSpinBox", ui->particleWidthLSpinBox->value());
     settings.setValue("particleHeightLSpinBox", ui->particleHeightLSpinBox->value());
-    settings.setValue("m_videoFile", m_videoFile);
-
     settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
+    settings.endGroup();
+
+    settings.beginGroup("video");
+    settings.setValue("m_videoFile", m_videoFile);
     settings.endGroup();
 }
 
 void ParticleFilterWidgetGui::readSettings()
 {
-    QSettings settings("VVGLab", "PFilter");
+    QSettings settings("VVGLab", "PFilterGUI");
 
     settings.beginGroup("PFSettings");
     ui->particleCountSpinBox->setValue(settings.value("particleCountSpinBox",100).toInt());
@@ -305,6 +308,9 @@ void ParticleFilterWidgetGui::readSettings()
     ui->particleWidthLSpinBox->setValue(settings.value("particleWidthLSpinBox",64).toInt());
     ui->particleHeightLSpinBox->setValue(settings.value("particleHeightLSpinBox",128).toInt());
     ui->histogramSizespinBox->setValue(settings.value("histogramSizespinBox",12).toInt());
+    settings.endGroup();
+
+    settings.beginGroup("video");
     m_videoFile = settings.value("m_videoFile","").toString();
     settings.endGroup();
 }

@@ -9,6 +9,7 @@ PredictorGui::PredictorGui(QWidget *parent) :
     ui(new Ui::PredictorGui)
 {
     ui->setupUi(this);
+    readSettings();
 }
 
 QImage PredictorGui::getConfMap(const QPixmap src, QRect win)
@@ -65,32 +66,32 @@ PredictorGui::~PredictorGui()
 
 void PredictorGui::load()
 {
-    QString svmFile = QFileDialog::getOpenFileName(this, QObject::tr("Open Trained SVM"),
-                                                        QDir::currentPath(),QObject::tr("Trained SVM (*.xml)"));
+    m_svmFile = QFileDialog::getOpenFileName(this, QObject::tr("Open Trained SVM"),
+                                                        m_svmFile,QObject::tr("Trained SVM (*.xml)"));
 
-    if(svmFile.contains(".xml"))
-        m_svm = cv::ml::SVM::load<cv::ml::SVM>(svmFile.toStdString());
+    if(m_svmFile.contains(".xml"))
+        m_svm = cv::ml::SVM::load<cv::ml::SVM>(m_svmFile.toStdString());
 }
 
 void PredictorGui::train()
 {
-    QString posDes = QFileDialog::getOpenFileName(nullptr,
-                                               QObject::tr("Open pos data"),QDir::currentPath(), QObject::tr("(*.yml)"));
+    m_posDes = QFileDialog::getOpenFileName(nullptr,
+                                               QObject::tr("Open pos data"),m_posDes, QObject::tr("(*.yml)"));
 
-    if(!posDes.contains(".yml"))
+    if(!m_posDes.contains(".yml"))
         return;
     cv::Mat posData, negData, allData, labels;
-    cv::FileStorage file(posDes.toStdString(), cv::FileStorage::READ);
+    cv::FileStorage file(m_posDes.toStdString(), cv::FileStorage::READ);
     file["data"] >> posData;
     file.release();
 
-    QString negDes = QFileDialog::getOpenFileName(nullptr,
-                                               QObject::tr("Open neg data"), QDir::currentPath(), QObject::tr("(*.yml)"));
+    m_negDes = QFileDialog::getOpenFileName(nullptr,
+                                               QObject::tr("Open neg data"), m_negDes, QObject::tr("(*.yml)"));
 
-    if(!negDes.contains(".yml"))
+    if(!m_negDes.contains(".yml"))
         return;
 
-    file.open(negDes.toStdString(),cv::FileStorage::READ);
+    file.open(m_negDes.toStdString(),cv::FileStorage::READ);
     file["data"] >> negData;
     file.release();
 
@@ -129,4 +130,26 @@ void PredictorGui::extractHOGFeatures()
     }
 
     delete hogExtr;
+}
+
+void PredictorGui::writeSettings()
+{
+    QSettings settings("VVGLab", "PredictorGui");
+
+    settings.beginGroup("svm_path");
+    settings.setValue("m_posDes", m_posDes);
+    settings.setValue("m_negDes", m_negDes);
+    settings.setValue("m_svmFile", m_svmFile);
+    settings.endGroup();
+}
+
+void PredictorGui::readSettings()
+{
+    QSettings settings("VVGLab", "PredictorGui");
+
+    settings.beginGroup("svm_path");
+    m_posDes = settings.value("m_posDes","").toString();
+    m_negDes = settings.value("m_negDes","").toString();
+    m_svmFile = settings.value("m_svmFile","").toString();
+    settings.endGroup();
 }

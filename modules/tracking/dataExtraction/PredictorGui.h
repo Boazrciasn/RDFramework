@@ -16,6 +16,7 @@ public:
     explicit PredictorGui(QWidget *parent = 0);
     inline cv::Ptr<cv::ml::SVM> getSvm(){return m_svm;}
     QImage getConfMap(const QPixmap src, QRect win);
+    void writeSettings();
     ~PredictorGui();
 
 private slots:
@@ -27,6 +28,12 @@ private slots:
 private:
     Ui::PredictorGui *ui;
     cv::Ptr<cv::ml::SVM> m_svm;
+
+    QString m_posDes;
+    QString m_negDes;
+    QString m_svmFile;
+
+    void readSettings();
 };
 
 #endif // PREDICTORGUI_H
