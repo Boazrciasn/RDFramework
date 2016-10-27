@@ -13,10 +13,12 @@ DataExtractorGui::DataExtractorGui(QWidget *parent) :
     m_dataExtractMoG = new DataExtractor<BackgroundSubMoG, int>(m_bgsubMoG, 10);
     ui->setupUi(this);
     m_testWin = new VideoPlayerGui(this);
+    m_predictSet = new PredictorGui(this);
     ui->main_gridLayout->addWidget(m_testWin, 0, 0);
+    ui->Settings_groupBox_layout->addWidget(m_predictSet);
     m_testWin->setProcess(m_dataExtractMoG);
     m_dataExtractMoG->setBBoxSizeConstraints(ui->min_spinBox->value(), ui->max_spinBox->value());
-    ui->classificationInfo_text->setText("OpenCV default people detector.");
+    ui->classificationInfo_text->setText("Default");
 
 }
 

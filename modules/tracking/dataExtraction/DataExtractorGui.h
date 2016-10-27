@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "DisplayImagesWidgetGui.h"
+#include "PredictorGui.h"
 #include "BackgroundSubtractors.h"
 #include "tracking/videoplayer/VideoPlayerGui.h"
 #include <opencv2/objdetect.hpp>
@@ -27,9 +28,10 @@ class DataExtractorGui : public QWidget
   private:
     DataExtractor<BackgroundSubMoG, int> *m_dataExtractMoG;
     BackgroundSubMoG m_bgsubMoG;
-    cv::HOGDescriptor m_hog;
+
     Ui::DataExtractorGui *ui;
     VideoPlayerGui *m_testWin;
+    PredictorGui *m_predictSet;
 };
 
 #endif // DATAEXTRACTORGUI_H

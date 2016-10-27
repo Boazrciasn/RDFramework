@@ -4,12 +4,12 @@
 #include "modules/tracking/videoplayer/VideoProcess.h"
 #include "util.h"
 
-template <typename BSubtractor, typename PFinder>
+template <typename BSubtractor, typename Detector>
 class DataExtractor : public VideoProcess
 {
   public:
-    DataExtractor(BSubtractor &bsubtract, const PFinder &pfinder) :
-        m_bsubtractor(bsubtract), m_pfinder(pfinder)
+    DataExtractor(BSubtractor &bsubtract, const Detector &detector) :
+        m_bsubtractor(bsubtract), m_detector(detector)
     {
     }
 
@@ -33,9 +33,10 @@ class DataExtractor : public VideoProcess
 
   private:
     BSubtractor &m_bsubtractor;
-    const PFinder &m_pfinder;
+    const Detector &m_detector;
     quint16 m_BBoxMinSize;
     quint16 m_BBoxMaxSize;
+
 };
 
 #endif // DATAEXTRACTOR_H
