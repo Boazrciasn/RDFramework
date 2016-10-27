@@ -480,7 +480,7 @@ std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inp
 void Util::drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes)
 {
     cv::RNG rng(12345);
-    for (size_t i = 0; i < boundingBoxes.size() ; i++)
+    for (size_t i = 0; i < boundingBoxes.size() ; ++i)
     {
         cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
         rectangle(inputImg, boundingBoxes[i].tl(), boundingBoxes[i].br(), color, 2, 8, 0);

@@ -22,7 +22,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="main_gridLayout" rowstretch="0,0" columnstretch="1,0">
+  <layout class="QGridLayout" name="main_gridLayout" rowstretch="0" columnstretch="1,0">
    <property name="sizeConstraint">
     <enum>QLayout::SetDefaultConstraint</enum>
    </property>
@@ -214,16 +214,37 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="setup_pushButton">
+        <property name="font">
+         <font>
+          <family>Helvetica Neue</family>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 0, 0);
+alternate-background-color: rgb(0, 255, 0);</string>
+        </property>
+        <property name="text">
+         <string>Setup Extractor</string>
+        </property>
+       </widget>
+      </item>
      </layout>
+     <zorder>BBoxSettings_groupBox</zorder>
+     <zorder>showPlayer_pushButton</zorder>
      <zorder></zorder>
-     <zorder>classification_infoLabel</zorder>
-     <zorder>classificationInfo_text</zorder>
-     <zorder></zorder>
+     <zorder>verticalSpacer</zorder>
+     <zorder>setup_pushButton</zorder>
     </widget>
    </item>
   </layout>
-  <zorder></zorder>
-  <zorder>settings_groupBox</zorder>
  </widget>
  <resources/>
  <connections>
@@ -234,8 +255,8 @@
    <slot>createNewWindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>694</x>
-     <y>501</y>
+     <x>887</x>
+     <y>597</y>
     </hint>
     <hint type="destinationlabel">
      <x>162</x>
@@ -250,8 +271,8 @@
    <slot>spinBoxesUpdate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>683</x>
-     <y>553</y>
+     <x>875</x>
+     <y>524</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -266,8 +287,8 @@
    <slot>spinBoxesUpdate()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>670</x>
-     <y>581</y>
+     <x>875</x>
+     <y>555</y>
     </hint>
     <hint type="destinationlabel">
      <x>667</x>
@@ -275,9 +296,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>setup_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>setupExtractor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>794</x>
+     <y>618</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>698</x>
+     <y>747</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createNewWindow()</slot>
   <slot>spinBoxesUpdate()</slot>
+  <slot>setupExtractor()</slot>
  </slots>
 </ui>

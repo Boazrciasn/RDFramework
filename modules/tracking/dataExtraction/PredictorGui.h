@@ -1,6 +1,7 @@
 #ifndef PREDICTORGUI_H
 #define PREDICTORGUI_H
 
+#include "util.h"
 #include <QWidget>
 #include <opencv2/ml.hpp>
 
@@ -17,6 +18,7 @@ class PredictorGui : public QWidget
     explicit PredictorGui(QWidget *parent = 0);
     inline cv::Ptr<cv::ml::SVM> getSvm() {return m_svm;}
     QImage getConfMap(const QPixmap src, int roi_width, int roi_height, int step);
+    QString svmFile() { return Util::fileNameWithoutPath(m_svmFile); }
     void writeSettings();
     ~PredictorGui();
 

@@ -7,19 +7,21 @@
 class HoGSVM
 {
   public:
-    HoGSVM() {}
+    HoGSVM()
+    {
+        m_hog = new cv::HOGDescriptor();
+    }
 
     void compute(const cv::Mat &inputImg, quint32 &decision, quint32 &confidence)
     {
         cv::Mat processed_img;
-        cv::cvtColor(processed_img, inputImg, CV_RGB2GRAY);
-
+        cv::cvtColor(inputImg, processed_img, CV_RGB2GRAY);
         //Todo : Sizes constant ?
-        cv::resize(roi,roi,cv::Size(64,128));
+        cv::resize(processed_img, processed_img, cv::Size(64, 128));
         std::vector<float> descriptor;
-        m_hog->compute(roi, descriptor, cv::Size(64, 128), cv::Size(16, 16));
+        m_hog->compute(processed_img, descriptor, cv::Size(64, 128), cv::Size(16, 16));
         cv::Mat_<float> desc(descriptor);
-        decision = m_svm->predict(desc.t(),cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
+        decision = m_svm->predict(desc.t(), cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
         confidence = 1.0 / (1.0 + exp(decision));
     }
 
@@ -29,6 +31,7 @@ class HoGSVM
     inline void setSVM(cv::Ptr<cv::ml::SVM> svm) {m_svm = svm;}
     inline cv::Ptr<cv::ml::SVM> getSVM() {return m_svm;}
 
+    void init() { m_hog = new cv::HOGDescriptor(); }
   private:
     cv::HOGDescriptor *m_hog;
     cv::Ptr<cv::ml::SVM> m_svm;

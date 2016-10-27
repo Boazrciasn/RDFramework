@@ -8,7 +8,7 @@ template <typename BSubtractor, typename Detector>
 class DataExtractor : public VideoProcess
 {
   public:
-    DataExtractor(BSubtractor &bsubtract, const Detector &detector) :
+    DataExtractor(BSubtractor &bsubtract, Detector &detector) :
         m_bsubtractor(bsubtract), m_detector(detector)
     {
     }
@@ -20,7 +20,15 @@ class DataExtractor : public VideoProcess
         m_bsubtractor.execute(m_img, fg_img);
         std::vector<cv::Rect>  bBox_vec;
         bBox_vec = Util::calculateBoundingBoxRect(fg_img, m_BBoxMinSize, m_BBoxMaxSize);
-
+        quint32 decision;
+        quint32 confidence;
+        for (size_t i = 0; i < bBox_vec.size() ; ++i)
+        {
+            cv::Mat roi(inputImg, bBox_vec[i]);
+            m_detector.compute(roi, decision, confidence);
+            if (decision == -1.0f)
+                bBox_vec.erase(bBox_vec.begin() + i);
+        }
         Util::drawBoundingBox(m_img, bBox_vec);
         outImg = m_img;
     }
@@ -33,7 +41,7 @@ class DataExtractor : public VideoProcess
 
   private:
     BSubtractor &m_bsubtractor;
-    const Detector &m_detector;
+    Detector &m_detector;
     quint16 m_BBoxMinSize;
     quint16 m_BBoxMaxSize;
 
