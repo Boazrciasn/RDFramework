@@ -6,37 +6,151 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>699</width>
-    <height>563</height>
+    <width>762</width>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="main_gridLayout">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetDefaultConstraint</enum>
-   </property>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="newWindow_pushButton">
-     <property name="text">
-      <string>Show player</string>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="Options_verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="classification_infoLabel">
+         <property name="font">
+          <font>
+           <family>Futura</family>
+          </font>
+         </property>
+         <property name="text">
+          <string>Classification Method : </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="classificationInfo_text">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="showPlayer_pushButton">
+       <property name="text">
+        <string>Show player</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="BBSettings_verticalLayout">
+       <item>
+        <widget class="QLabel" name="BB_Sizesettings_label">
+         <property name="text">
+          <string>BBox Size Constraints :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="BBMaxMin_gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="BBMin_label">
+           <property name="text">
+            <string>Min</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="min_spinBox">
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="singleStep">
+            <number>20</number>
+           </property>
+           <property name="value">
+            <number>300</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="BBMax_label">
+           <property name="text">
+            <string>Max</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="max_spinBox">
+           <property name="minimum">
+            <number>10</number>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="singleStep">
+            <number>50</number>
+           </property>
+           <property name="value">
+            <number>100000</number>
+           </property>
+           <property name="displayIntegerBase">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
+     <property name="sizeType">
+      <enum>QSizePolicy::Minimum</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>newWindow_pushButton</sender>
+   <sender>showPlayer_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>DataExtractorGui</receiver>
    <slot>createNewWindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>89</x>
-     <y>548</y>
+     <x>694</x>
+     <y>501</y>
     </hint>
     <hint type="destinationlabel">
      <x>162</x>
@@ -44,8 +158,41 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>min_spinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>683</x>
+     <y>553</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>463</x>
+     <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>max_spinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>670</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>667</x>
+     <y>725</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createNewWindow()</slot>
+  <slot>spinBoxesUpdate()</slot>
  </slots>
 </ui>
