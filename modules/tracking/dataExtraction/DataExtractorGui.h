@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include "DisplayImagesWidgetGui.h"
+#include "BackgroundSubtractors.h"
 #include "tracking/videoplayer/VideoPlayerGui.h"
+#include <opencv2/objdetect.hpp>
 
 namespace Ui
 {
@@ -20,8 +22,12 @@ class DataExtractorGui : public QWidget
 
   private slots :
     void createNewWindow();
+    void spinBoxesUpdate();
 
   private:
+    DataExtractor<BackgroundSubMoG, int> *m_dataExtractMoG;
+    BackgroundSubMoG m_bgsubMoG;
+    cv::HOGDescriptor m_hog;
     Ui::DataExtractorGui *ui;
     VideoPlayerGui *m_testWin;
 };
