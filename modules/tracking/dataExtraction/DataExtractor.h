@@ -39,11 +39,22 @@ class DataExtractor : public VideoProcess
         m_BBoxMinSize = minSize;
     }
 
+    void setAspectConstraints(double min, double max)
+    {
+        m_aspectMax = max;
+        m_aspectMin = min;
+    }
+
+    void setSaveDir(QString saveDir) { m_saveDir = saveDir; }
+
   private:
     BSubtractor &m_bsubtractor;
     Detector &m_detector;
     quint16 m_BBoxMinSize;
     quint16 m_BBoxMaxSize;
+    double m_aspectMax;
+    double m_aspectMin;
+    QString m_saveDir;
 
 };
 

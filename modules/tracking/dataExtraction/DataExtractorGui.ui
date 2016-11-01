@@ -98,20 +98,77 @@
           </property>
          </widget>
         </item>
+        <item>
+         <spacer name="Options_verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+       <widget class="QGroupBox" name="aspectRatio_groupBox">
+        <property name="title">
+         <string>Aspect Ratio Settings (width/ height)</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>418</height>
-         </size>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
-       </spacer>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="Aspect_label1">
+             <property name="toolTipDuration">
+              <number>0</number>
+             </property>
+             <property name="text">
+              <string>Min</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="aspectMin_SpinBox">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="Aspect_label2">
+             <property name="text">
+              <string>Max</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="aspectMax_SpinBox">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <widget class="QGroupBox" name="BBoxSettings_groupBox">
@@ -202,6 +259,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="Savedir_pushButton">
+        <property name="text">
+         <string>Save Dir</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="showPlayer_pushButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -240,12 +304,20 @@ alternate-background-color: rgb(0, 255, 0);</string>
      <zorder>BBoxSettings_groupBox</zorder>
      <zorder>showPlayer_pushButton</zorder>
      <zorder></zorder>
-     <zorder>verticalSpacer</zorder>
      <zorder>setup_pushButton</zorder>
+     <zorder>Savedir_pushButton</zorder>
+     <zorder>aspectRatio_groupBox</zorder>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>min_spinBox</tabstop>
+  <tabstop>max_spinBox</tabstop>
+  <tabstop>Savedir_pushButton</tabstop>
+  <tabstop>showPlayer_pushButton</tabstop>
+  <tabstop>setup_pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -256,7 +328,7 @@ alternate-background-color: rgb(0, 255, 0);</string>
    <hints>
     <hint type="sourcelabel">
      <x>887</x>
-     <y>597</y>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>162</x>
@@ -272,7 +344,7 @@ alternate-background-color: rgb(0, 255, 0);</string>
    <hints>
     <hint type="sourcelabel">
      <x>875</x>
-     <y>524</y>
+     <y>493</y>
     </hint>
     <hint type="destinationlabel">
      <x>463</x>
@@ -288,7 +360,7 @@ alternate-background-color: rgb(0, 255, 0);</string>
    <hints>
     <hint type="sourcelabel">
      <x>875</x>
-     <y>555</y>
+     <y>524</y>
     </hint>
     <hint type="destinationlabel">
      <x>667</x>
@@ -312,10 +384,27 @@ alternate-background-color: rgb(0, 255, 0);</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>Savedir_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>setSaveDir()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>767</x>
+     <y>555</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>556</x>
+     <y>671</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createNewWindow()</slot>
   <slot>spinBoxesUpdate()</slot>
   <slot>setupExtractor()</slot>
+  <slot>setSaveDir()</slot>
  </slots>
 </ui>

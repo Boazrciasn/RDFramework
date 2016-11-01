@@ -75,18 +75,17 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
     {
         dest = QImage((const unsigned char *)(src.data),
                       src.cols, src.rows, format);
-
-//        for(int i = 0; i < height; i++)
-//        {
-//            const quint8 *pSrc = src.ptr<quint8>(i);
-//            quint8 *pDest = dest.scanLine(i);
-//            for(int j = 0; j < width; j++)
-//            {
-//                *pDest++ = *pSrc++;
-//                *pDest++ = *pSrc++;
-//                *pDest++ = *pSrc++;
-//            }
-//        }
+        //        for(int i = 0; i < height; i++)
+        //        {
+        //            const quint8 *pSrc = src.ptr<quint8>(i);
+        //            quint8 *pDest = dest.scanLine(i);
+        //            for(int j = 0; j < width; j++)
+        //            {
+        //                *pDest++ = *pSrc++;
+        //                *pDest++ = *pSrc++;
+        //                *pDest++ = *pSrc++;
+        //            }
+        //        }
     }
     else if (src.type() == CV_8UC1)
     {
@@ -110,12 +109,12 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
 QImage Util::Mat2QImage(const cv::Mat3b &src)
 {
     QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
-    for (int y = 0; y < src.rows; ++y) {
+    for (int y = 0; y < src.rows; ++y)
+    {
         const cv::Vec3b *srcrow = src[y];
-        QRgb *destrow = (QRgb*)dest.scanLine(y);
-        for (int x = 0; x < src.cols; ++x) {
+        QRgb *destrow = (QRgb *)dest.scanLine(y);
+        for (int x = 0; x < src.cols; ++x)
             destrow[x] = qRgba(srcrow[x][2], srcrow[x][1], srcrow[x][0], 255);
-        }
     }
     return dest;
 }
@@ -470,8 +469,8 @@ std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inp
     {
         cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
         curr_boundingRect = cv::boundingRect(cv::Mat(contours_poly[i]));
-        quint16 area = curr_boundingRect.height * curr_boundingRect.width;
-        if (area > minSize && area < maxSize)
+        double aspectRat =  (double)curr_boundingRect.width / (double)curr_boundingRect.height;
+        if (curr_boundingRect.area() > minSize && curr_boundingRect.area() < maxSize && aspectRat > 0.1 && aspectRat < 1.3)
             boundRect.push_back(curr_boundingRect);
     }
     return boundRect;
