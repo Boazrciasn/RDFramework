@@ -213,7 +213,8 @@ class Util
     static void getWordWithConfidence(cv::Mat_<float> &mat, int nLabel, QString &word, float &conf);
     static int  countImagesInDir(QString dir);
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
-    static std::vector<cv::Rect> calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize = 0, quint16 maxSize = 0);
+    static std::vector<cv::Rect> calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize ,
+                                                          quint16 maxSize, double aspectMax, double aspectMin);
     static void drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes);
     static void Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {

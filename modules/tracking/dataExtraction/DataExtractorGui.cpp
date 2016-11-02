@@ -20,8 +20,7 @@ DataExtractorGui::DataExtractorGui(QWidget *parent) :
     m_player->setProcess(m_dataExtractMoG);
     m_dataExtractMoG->setBBoxSizeConstraints(ui->min_spinBox->value(), ui->max_spinBox->value());
     m_dataExtractMoG->setAspectConstraints(ui->aspectMin_SpinBox->value(), ui->aspectMax_SpinBox->value());
-
-
+    QObject::connect(m_predictSet, SIGNAL(svmChanged()), SLOT(setSVM()));
 }
 
 DataExtractorGui::~DataExtractorGui()
@@ -41,21 +40,22 @@ void DataExtractorGui::spinBoxesUpdate()
 {
     m_dataExtractMoG->setBBoxSizeConstraints(ui->min_spinBox->value(), ui->max_spinBox->value());
     m_dataExtractMoG->setAspectConstraints(ui->aspectMin_SpinBox->value(), ui->aspectMax_SpinBox->value());
-
 }
 
-void DataExtractorGui::setupExtractor()
-{
-    m_hogSVM.setSVM(m_predictSet->getSvm());
-    ui->classificationInfo_text->setText(m_predictSet->svmFile());
-    ui->setup_pushButton->setStyleSheet("background-color: green");
 
-}
 
 void DataExtractorGui::setSaveDir()
 {
     QString fileName = QFileDialog::getExistingDirectory(this, tr("Select Save Directory"), QDir::currentPath(),
                                                          QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    ui->SaveDir_label->setText(fileName);
     m_dataExtractMoG->setSaveDir(fileName);
-
 }
+
+void DataExtractorGui::setSVM()
+{
+    m_hogSVM.setSVM(m_predictSet->getSvm());
+    ui->classificationInfo_text->setText(m_predictSet->svmFile());
+    ui->setup_label->setStyleSheet("background-color: green");
+}
+

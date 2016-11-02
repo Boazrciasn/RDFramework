@@ -43,6 +43,12 @@
    </property>
    <item row="0" column="1">
     <widget class="QGroupBox" name="settings_groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string/>
      </property>
@@ -99,6 +105,25 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="SaveDirInfo_label">
+          <property name="font">
+           <font>
+            <family>Futura</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>Save Directory :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="SaveDir_label">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="Options_verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -140,7 +165,7 @@
               <double>0.100000000000000</double>
              </property>
              <property name="value">
-              <double>0.100000000000000</double>
+              <double>0.300000000000000</double>
              </property>
             </widget>
            </item>
@@ -161,7 +186,7 @@
               <double>0.100000000000000</double>
              </property>
              <property name="value">
-              <double>1.100000000000000</double>
+              <double>1.300000000000000</double>
              </property>
             </widget>
            </item>
@@ -229,7 +254,7 @@
             <number>50</number>
            </property>
            <property name="value">
-            <number>100000</number>
+            <number>10000</number>
            </property>
            <property name="displayIntegerBase">
             <number>10</number>
@@ -251,7 +276,7 @@
             <number>20</number>
            </property>
            <property name="value">
-            <number>300</number>
+            <number>700</number>
            </property>
           </widget>
          </item>
@@ -279,24 +304,22 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="setup_pushButton">
+       <widget class="QLabel" name="setup_label">
         <property name="font">
          <font>
-          <family>Helvetica Neue</family>
-          <pointsize>14</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
+          <family>Futura</family>
+          <pointsize>18</pointsize>
          </font>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(255, 0, 0);
 alternate-background-color: rgb(0, 255, 0);</string>
         </property>
         <property name="text">
-         <string>Setup Extractor</string>
+         <string>Ready</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -304,9 +327,9 @@ alternate-background-color: rgb(0, 255, 0);</string>
      <zorder>BBoxSettings_groupBox</zorder>
      <zorder>showPlayer_pushButton</zorder>
      <zorder></zorder>
-     <zorder>setup_pushButton</zorder>
      <zorder>Savedir_pushButton</zorder>
      <zorder>aspectRatio_groupBox</zorder>
+     <zorder>setup_label</zorder>
     </widget>
    </item>
   </layout>
@@ -316,7 +339,6 @@ alternate-background-color: rgb(0, 255, 0);</string>
   <tabstop>max_spinBox</tabstop>
   <tabstop>Savedir_pushButton</tabstop>
   <tabstop>showPlayer_pushButton</tabstop>
-  <tabstop>setup_pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -369,22 +391,6 @@ alternate-background-color: rgb(0, 255, 0);</string>
    </hints>
   </connection>
   <connection>
-   <sender>setup_pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>DataExtractorGui</receiver>
-   <slot>setupExtractor()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>794</x>
-     <y>618</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>698</x>
-     <y>747</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>Savedir_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>DataExtractorGui</receiver>
@@ -397,6 +403,38 @@ alternate-background-color: rgb(0, 255, 0);</string>
     <hint type="destinationlabel">
      <x>556</x>
      <y>671</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aspectMin_SpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>800</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>509</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aspectMax_SpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>776</x>
+     <y>407</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>484</x>
+     <y>426</y>
     </hint>
    </hints>
   </connection>

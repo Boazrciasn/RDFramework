@@ -458,7 +458,7 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
-std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize, quint16 maxSize)
+std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize, quint16 maxSize, double aspectMax, double aspectMin)
 {
     std::vector<std::vector<cv::Point> > contours;
     cv::findContours(inputImg, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
@@ -470,7 +470,7 @@ std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inp
         cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
         curr_boundingRect = cv::boundingRect(cv::Mat(contours_poly[i]));
         double aspectRat =  (double)curr_boundingRect.width / (double)curr_boundingRect.height;
-        if (curr_boundingRect.area() > minSize && curr_boundingRect.area() < maxSize && aspectRat > 0.1 && aspectRat < 1.3)
+        if (curr_boundingRect.area() > minSize && curr_boundingRect.area() < maxSize && aspectRat > aspectMin && aspectRat < aspectMax)
             boundRect.push_back(curr_boundingRect);
     }
     return boundRect;

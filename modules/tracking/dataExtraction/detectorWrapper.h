@@ -23,6 +23,7 @@ class HoGSVM
         cv::Mat_<float> desc(descriptor);
         decision = m_svm->predict(desc.t(), cv::noArray(), cv::ml::StatModel::RAW_OUTPUT);
         confidence = 1.0 / (1.0 + exp(decision));
+
     }
 
     inline void setHOGDescriptor(cv::HOGDescriptor *hog) {m_hog = hog;}

@@ -28,6 +28,9 @@ class PredictorGui : public QWidget
     void save();
     void extractHOGFeatures();
 
+  signals :
+    void svmChanged();
+
   private:
     Ui::PredictorGui *ui;
     cv::Ptr<cv::ml::SVM> m_svm;

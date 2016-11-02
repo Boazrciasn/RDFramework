@@ -26,8 +26,8 @@ class DataExtractorGui : public QWidget
   private slots :
     void createNewWindow();
     void spinBoxesUpdate();
-    void setupExtractor();
     void setSaveDir();
+    void setSVM();
 
   private:
     DataExtractor<BackgroundSubMoG, HoGSVM> *m_dataExtractMoG;

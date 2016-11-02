@@ -67,6 +67,7 @@ void PredictorGui::load()
                                              m_svmFile, QObject::tr("Trained SVM (*.xml)"));
     if (m_svmFile.contains(".xml"))
         m_svm = cv::ml::SVM::load<cv::ml::SVM>(m_svmFile.toStdString());
+    emit svmChanged();
 }
 
 void PredictorGui::train()
