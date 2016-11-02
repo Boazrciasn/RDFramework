@@ -30,10 +30,11 @@ ParticleFilter::ParticleFilter(
     m_RandomGen = std::mt19937(seed);
 }
 
-void ParticleFilter::exec(cv::Mat *img)
+void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 {
-    setImage(img);
+    m_img = inputImg;
     processImage();
+    imgOut = m_img;
 }
 
 int ParticleFilter::getRatioOfTop(int count)
@@ -83,7 +84,7 @@ void ParticleFilter::processImage()
 
         // update weights
         for(Particle *P : m_particles)
-            P->exec(*&m_img);
+            P->exec(&m_img);
 
         // sort descending
         std::sort(std::begin(m_particles), std::end(m_particles), [](Particle * P1, Particle * P2) {
@@ -184,11 +185,11 @@ void ParticleFilter::showParticles()
     int y_end = y + m_particle_height;
     int r = m_particle_width / 2;;
     if (getModelType() == CIRCLE)
-        circle(*m_img, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
+        circle(m_img, cvPoint(x + r, y + r), r, cvScalar(130, 0, 0), 1);
     else if (getModelType() == RECTANGLE)
-        rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     else
-        rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
 }
 
 void ParticleFilter::showTopNParticles(int count)
@@ -205,7 +206,7 @@ void ParticleFilter::showTopNParticles(int count)
         y = m_particles[i]->y();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_height;
-        rectangle(*m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
     }
 }
 

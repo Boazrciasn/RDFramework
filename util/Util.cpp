@@ -75,18 +75,17 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
     {
         dest = QImage((const unsigned char *)(src.data),
                       src.cols, src.rows, format);
-
-//        for(int i = 0; i < height; i++)
-//        {
-//            const quint8 *pSrc = src.ptr<quint8>(i);
-//            quint8 *pDest = dest.scanLine(i);
-//            for(int j = 0; j < width; j++)
-//            {
-//                *pDest++ = *pSrc++;
-//                *pDest++ = *pSrc++;
-//                *pDest++ = *pSrc++;
-//            }
-//        }
+        //        for(int i = 0; i < height; i++)
+        //        {
+        //            const quint8 *pSrc = src.ptr<quint8>(i);
+        //            quint8 *pDest = dest.scanLine(i);
+        //            for(int j = 0; j < width; j++)
+        //            {
+        //                *pDest++ = *pSrc++;
+        //                *pDest++ = *pSrc++;
+        //                *pDest++ = *pSrc++;
+        //            }
+        //        }
     }
     else if (src.type() == CV_8UC1)
     {
@@ -110,12 +109,12 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
 QImage Util::Mat2QImage(const cv::Mat3b &src)
 {
     QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
-    for (int y = 0; y < src.rows; ++y) {
+    for (int y = 0; y < src.rows; ++y)
+    {
         const cv::Vec3b *srcrow = src[y];
-        QRgb *destrow = (QRgb*)dest.scanLine(y);
-        for (int x = 0; x < src.cols; ++x) {
+        QRgb *destrow = (QRgb *)dest.scanLine(y);
+        for (int x = 0; x < src.cols; ++x)
             destrow[x] = qRgba(srcrow[x][2], srcrow[x][1], srcrow[x][0], 255);
-        }
     }
     return dest;
 }
@@ -459,7 +458,7 @@ void Util::covert32FCto8UC(cv::Mat &input, cv::Mat &output)
     input.convertTo(output, CV_8U, 255.0 / (Max - Min));
 }
 
-std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize)
+std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize, quint16 maxSize, double aspectMax, double aspectMin)
 {
     std::vector<std::vector<cv::Point> > contours;
     cv::findContours(inputImg, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
@@ -470,7 +469,8 @@ std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inp
     {
         cv::approxPolyDP(cv::Mat(contours[i]), contours_poly[i], 3, true);
         curr_boundingRect = cv::boundingRect(cv::Mat(contours_poly[i]));
-        if (curr_boundingRect.height * curr_boundingRect.width > minSize)
+        double aspectRat =  (double)curr_boundingRect.width / (double)curr_boundingRect.height;
+        if (curr_boundingRect.area() > minSize && curr_boundingRect.area() < maxSize && aspectRat > aspectMin && aspectRat < aspectMax)
             boundRect.push_back(curr_boundingRect);
     }
     return boundRect;
@@ -479,7 +479,7 @@ std::vector<cv::Rect> Util::calculateBoundingBoxRect(const cv::Mat_<quint8> &inp
 void Util::drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes)
 {
     cv::RNG rng(12345);
-    for (size_t i = 0; i < boundingBoxes.size() ; i++)
+    for (size_t i = 0; i < boundingBoxes.size() ; ++i)
     {
         cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
         rectangle(inputImg, boundingBoxes[i].tl(), boundingBoxes[i].br(), color, 2, 8, 0);

@@ -17,6 +17,10 @@ class VideoPlayerGui : public QWidget
 
   public:
     explicit VideoPlayerGui(QWidget *parent = 0);
+    inline void setProcess(VideoProcess *process)
+    {
+        m_VideoPlayer->setProcess(process);
+    }
     ~VideoPlayerGui();
 
   private:

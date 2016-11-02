@@ -2,41 +2,355 @@
 <ui version="4.0">
  <class>DataExtractorGui</class>
  <widget class="QWidget" name="DataExtractorGui">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>699</width>
-    <height>563</height>
+    <width>900</width>
+    <height>640</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="main_gridLayout">
+  <layout class="QGridLayout" name="main_gridLayout" rowstretch="0" columnstretch="1,0">
    <property name="sizeConstraint">
     <enum>QLayout::SetDefaultConstraint</enum>
    </property>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="newWindow_pushButton">
-     <property name="text">
-      <string>Show player</string>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="settings_groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QVBoxLayout" name="Settings_groupBox_layout">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <item>
+         <widget class="QLabel" name="classification_infoLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Futura</family>
+           </font>
+          </property>
+          <property name="lineWidth">
+           <number>-2</number>
+          </property>
+          <property name="text">
+           <string>Classification Method :</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="classificationInfo_text">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="SaveDirInfo_label">
+          <property name="font">
+           <font>
+            <family>Futura</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>Save Directory :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="SaveDir_label">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="Options_verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="aspectRatio_groupBox">
+        <property name="title">
+         <string>Aspect Ratio Settings (width/ height)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="Aspect_label1">
+             <property name="toolTipDuration">
+              <number>0</number>
+             </property>
+             <property name="text">
+              <string>Min</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="aspectMin_SpinBox">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.300000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="Aspect_label2">
+             <property name="text">
+              <string>Max</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="aspectMax_SpinBox">
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.300000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="BBoxSettings_groupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>BBox Settings</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="0">
+          <widget class="QLabel" name="BBMax_label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Max</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="BBMin_label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Min</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="max_spinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimum">
+            <number>10</number>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="singleStep">
+            <number>50</number>
+           </property>
+           <property name="value">
+            <number>10000</number>
+           </property>
+           <property name="displayIntegerBase">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="min_spinBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum">
+            <number>1000000000</number>
+           </property>
+           <property name="singleStep">
+            <number>20</number>
+           </property>
+           <property name="value">
+            <number>700</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Savedir_pushButton">
+        <property name="text">
+         <string>Save Dir</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="showPlayer_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Show player</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="setup_label">
+        <property name="font">
+         <font>
+          <family>Futura</family>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(255, 0, 0);
+alternate-background-color: rgb(0, 255, 0);</string>
+        </property>
+        <property name="text">
+         <string>Ready</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+     <zorder>BBoxSettings_groupBox</zorder>
+     <zorder>showPlayer_pushButton</zorder>
+     <zorder></zorder>
+     <zorder>Savedir_pushButton</zorder>
+     <zorder>aspectRatio_groupBox</zorder>
+     <zorder>setup_label</zorder>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>min_spinBox</tabstop>
+  <tabstop>max_spinBox</tabstop>
+  <tabstop>Savedir_pushButton</tabstop>
+  <tabstop>showPlayer_pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>newWindow_pushButton</sender>
+   <sender>showPlayer_pushButton</sender>
    <signal>clicked()</signal>
    <receiver>DataExtractorGui</receiver>
    <slot>createNewWindow()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>89</x>
-     <y>548</y>
+     <x>887</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>162</x>
@@ -44,8 +358,91 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>min_spinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>875</x>
+     <y>493</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>463</x>
+     <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>max_spinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>875</x>
+     <y>524</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>667</x>
+     <y>725</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Savedir_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>setSaveDir()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>767</x>
+     <y>555</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>556</x>
+     <y>671</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aspectMin_SpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>800</x>
+     <y>374</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>509</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>aspectMax_SpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>DataExtractorGui</receiver>
+   <slot>spinBoxesUpdate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>776</x>
+     <y>407</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>484</x>
+     <y>426</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>createNewWindow()</slot>
+  <slot>spinBoxesUpdate()</slot>
+  <slot>setupExtractor()</slot>
+  <slot>setSaveDir()</slot>
  </slots>
 </ui>

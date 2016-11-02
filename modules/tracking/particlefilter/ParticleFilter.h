@@ -28,7 +28,7 @@ class ParticleFilter : public VideoProcess
     Target *m_target;
 
     ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight, int histSize, Target *target);
-    void exec(cv::Mat *img) override;
+    void exec(const cv::Mat &inputImg, cv::Mat &imgOut);
     ~ParticleFilter();
 
     void initializeParticles();
