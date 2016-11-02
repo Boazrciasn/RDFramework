@@ -6,7 +6,7 @@
 #include "PredictorGui.h"
 #include "BackgroundSubtractors.h"
 #include "tracking/videoplayer/VideoPlayerGui.h"
-#include "DetectorWrapper.h"
+#include "detectorWrapper.h"
 
 #include <opencv2/objdetect.hpp>
 

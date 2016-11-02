@@ -2,7 +2,7 @@
 #include "precompiled.h"
 #include <opencv2/video/background_segm.hpp>
 
-#include "util.h"
+#include "Util.h"
 
 #ifndef BACKGROUNDSUBTRACTORS_H
 #define BACKGROUNDSUBTRACTORS_H

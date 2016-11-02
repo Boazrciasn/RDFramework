@@ -14,6 +14,8 @@
 
 int main(int argc, char *argv[])
 {
+    // TODO: Baris Fix case sensitivity
+
     //BOUNDING BOX TEST :
 //    cv::Mat src_gray;
 //    cv::Mat threshold_output;

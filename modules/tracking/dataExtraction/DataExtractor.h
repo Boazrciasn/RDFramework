@@ -2,7 +2,7 @@
 #define DATAEXTRACTOR_H
 
 #include "modules/tracking/videoplayer/VideoProcess.h"
-#include "util.h"
+#include "Util.h"
 
 template <typename BSubtractor, typename Detector>
 class DataExtractor : public VideoProcess

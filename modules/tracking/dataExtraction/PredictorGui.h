@@ -1,7 +1,7 @@
 #ifndef PREDICTORGUI_H
 #define PREDICTORGUI_H
 
-#include "util.h"
+#include "Util.h"
 #include <QWidget>
 #include <opencv2/ml.hpp>
 
