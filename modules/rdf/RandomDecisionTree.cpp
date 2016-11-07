@@ -88,13 +88,13 @@ void RandomDecisionTree::subSample()
             QString line = currAnnotateFile.readLine();
             QStringList currImage = line.split(' ');
             int imageId = currImage[0].split('.')[0].toInt();
-            if (!m_DF->m_DS.m_TrainHashTable.contains(imageId))
+            if (!m_DF->m_DS.m_trainHashTable.contains(imageId))
             {
                 QString imageFullPath  = m_DF->m_dir + "/" + currImage[0];
                 cv::Mat image = cv::imread(imageFullPath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
                 cv::copyMakeBorder(image, image, m_DF->m_params.probDistY, m_DF->m_params.probDistY, m_DF->m_params.probDistX,
                                    m_DF->m_params.probDistX, cv::BORDER_CONSTANT);
-                m_DF->m_DS.m_TrainHashTable.insert(imageId, image);
+                m_DF->m_DS.m_trainHashTable.insert(imageId, image);
             }
             else
             {

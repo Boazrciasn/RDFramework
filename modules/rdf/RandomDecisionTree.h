@@ -53,7 +53,7 @@ struct Node
 struct DataSet
 {
 
-    QHash<int, cv::Mat> m_TrainHashTable;
+    QHash<int, cv::Mat> m_trainHashTable;
     std::vector<cv::Mat> m_trainImagesVector;
     std::vector<cv::Mat> m_testImagesVector;
     std::vector<QString> m_testlabels;
@@ -195,7 +195,7 @@ class RandomDecisionTree : public QObject
         for (auto px : parentPixels)
         {
             //            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
-            auto img = DS.m_TrainHashTable.value(px->imgInfo->m_sampleId);
+            auto img = DS.m_trainHashTable.value(px->imgInfo->m_sampleId);
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }

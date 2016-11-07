@@ -13,7 +13,6 @@
 class MNIST
 {
 
-    using vMatSize = std::vector<cv::Mat>::size_type;
   public:
 
     typedef std::vector<cv::Mat> *ImageDataSet;
@@ -29,19 +28,19 @@ class MNIST
     LabelDataSet getTestLabels();
     ImageDataSet getTrainImages();
     LabelDataSet getTrainLabels();
-    inline void saveImage(QString &savedir, QImage img)
-    {
-        if(!img.save(savedir))
-        {
-            qDebug() << "Error Saving File !";
-            return;
-        }
-    }
     void extractDataSet(QString destdir);
     void saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSet imageLabels);
 
   private:
 
+    inline void saveImage(QString &savedir, QImage img)
+    {
+        if (!img.save(savedir))
+        {
+            qDebug() << "Error Saving File !";
+            return;
+        }
+    }
     void createSaveDirs(QString destdir, QString &trainpath, QString &testpath);
     QString m_testImagesFilename = "t10k-images.idx3-ubyte";
     QString m_testLabelsFilename = "t10k-labels.idx1-ubyte";

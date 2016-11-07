@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 
-#include "ocr/ReaderMNIST.h"
+#include "ReaderMNIST.h"
 
 
 // TODO: Paths must be input from UI
@@ -122,7 +122,7 @@ void MNIST::saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSe
     QString logDir = destdir + "/LogFiles/";
     createSaveFiles(logfiles, logDir);
     std::cout << imageDataSet->size() << std::endl;
-    for(vMatSize i = 0 ; i < imageDataSet->size(); ++i)
+    for(size_t i = 0 ; i < imageDataSet->size(); ++i)
     {
         int i_label = imageLabels->at(i);
         QString label = QString::number(i_label);
