@@ -216,12 +216,12 @@ class Util
     static std::vector<cv::Rect> calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize ,
                                                           quint16 maxSize, double aspectMax, double aspectMin);
     static void drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes);
-    static void Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
+    static void inline Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
         cv::erode(inputImg, outputImg, element);
     }
-    static void Dilation(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
+    static void inline Dilation(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
         cv::dilate(inputImg, outputImg, element);
