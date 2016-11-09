@@ -15,8 +15,6 @@ void RandomDecisionForest::readTrainingImageFiles()
 {
     // TODO :  make applicable to both MNIST and image folders
     std::vector<QString> fNames;
-    auto *reader = new Reader();
-    reader->findImages(m_dir, "", fNames, m_DS.m_trainlabels);
     m_numOfLetters = fNames.size();
     qDebug() << "NO OF LETTERS : " << m_numOfLetters;
     for (auto filePath : fNames)
@@ -37,8 +35,7 @@ void RandomDecisionForest::readTestImageFiles()
     m_DS.m_testImagesVector.clear();
     m_dir = m_params.testDir;
     std::vector<QString> fNames;
-    auto *reader = new Reader();
-    reader->findImages(m_dir, "", fNames, m_DS.m_testlabels);
+
     for (auto filePath : fNames)
     {
         //TODO: reads file with only
@@ -56,8 +53,7 @@ void RandomDecisionForest::readAndIdentifyWords()
 {
     m_dir = m_params.testDir;
     std::vector<QString> fNames;
-    auto *reader = new Reader();
-    reader->findImages(m_dir, "", fNames, m_DS.m_testlabels);
+
     // source file for average values
     QString lineOffsetFile = "./combined.txt";
     QFile input(lineOffsetFile);

@@ -1,3 +1,4 @@
+#include "precompiled.h"
 #include "RandomDecisionTree.h"
 #include "RandomDecisionForest.h"
 

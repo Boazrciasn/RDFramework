@@ -59,7 +59,7 @@ void DisplayImagesWidgetGui::browseButton_clicked()
                                               QDir::currentPath(),
                                               QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     m_fileIndex = 0;
-    m_reader->findImages(m_dir, m_fNames);
+
     if (!m_fNames.empty())
     {
         display();

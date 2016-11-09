@@ -1,6 +1,9 @@
-#include "precompiled.h"
+
 
 #include "Reader.h"
+
+#include "ReaderMNIST.h"
+
 
 void Reader::findImages(QString baseDir, QString query, std::vector<QString> &foundImages ,
                         std::vector<QString> &labels)
@@ -38,9 +41,36 @@ void Reader::findImages(QString baseDir, QString query, std::vector<QString> &fo
     }
 }
 
-void Reader::findImages(QString baseDir, std::vector<QString> &foundImages)
+void Reader::readImages(QString dir, std::vector<cv::Mat> &foundImages, int flags = Type_Standard)
 {
-    QDirIterator itFile(baseDir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files,
+    switch (flags)
+    {
+    case Type_Standard:
+    {
+        QDirIterator itFile(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files,
+                            QDirIterator::Subdirectories);
+        while (itFile.hasNext())
+        {
+            itFile.next();
+            cv::Mat image = cv::imread(itFile.filePath().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
+            foundImages.push_back(image);
+        }
+        break;
+    }
+    case Type_MNIST:
+    {
+        MNIST mnist;
+        mnist.readMINST(dir, foundImages);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void Reader::readImages(QString dir, std::vector<QString> &foundImages)
+{
+    QDirIterator itFile(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files,
                         QDirIterator::Subdirectories);
     while (itFile.hasNext())
     {

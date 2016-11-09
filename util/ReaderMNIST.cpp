@@ -5,169 +5,36 @@
 #include "ReaderMNIST.h"
 
 
-// TODO: Paths must be input from UI
-
-
-MNIST::MNIST(QString filepath) : m_rootPath(filepath) {}
-
-
-
 int MNIST::reverseInt(int i)
 {
     unsigned char ch1, ch2, ch3, ch4;
-    ch1 = (unsigned char) (i & 255);
-    ch2 = (unsigned char) ((i >> 8) & 255);
-    ch3 = (unsigned char) ((i >> 16) & 255);
-    ch4 = (unsigned char) ((i >> 24) & 255);
-    return((int) ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
-}
-
-MNIST::ImageDataSet MNIST::getTestImages()
-{
-    ImageDataSet vec = new std::vector<cv::Mat>();
-    readMINST(m_testImagesFilename, vec);
-    return vec;
-}
-
-MNIST::LabelDataSet MNIST::getTestLabels()
-{
-    LabelDataSet vec = new std::vector<int>();
-    readMINSTLabel(m_testLabelsFilename, vec);
-    return vec;
+    ch1 = (unsigned char)(i & 255);
+    ch2 = (unsigned char)((i >> 8) & 255);
+    ch3 = (unsigned char)((i >> 16) & 255);
+    ch4 = (unsigned char)((i >> 24) & 255);
+    return ((int) ch1 << 24) + ((int)ch2 << 16) + ((int)ch3 << 8) + ch4;
 }
 
 
-MNIST::ImageDataSet MNIST::getTrainImages()
+bool MNIST::readMINST(QString path, ImageDataSet &vec)
 {
-    ImageDataSet vec = new std::vector<cv::Mat>();
-    readMINST(m_trainImagesFilename, vec);
-    return vec;
-}
-
-MNIST::LabelDataSet MNIST::getTrainLabels()
-{
-    LabelDataSet vec = new std::vector<int>();
-    readMINSTLabel(m_trainLabelsFilename, vec);
-    return vec;
-}
-
-void MNIST::extractDataSet(QString destdir)
-{
-    QString testpath;
-    QString trainpath;
-    createSaveDirs(destdir, trainpath, testpath);
-    saveDataSet(trainpath, m_trainImagesVector, m_trainLabels);
-    saveDataSet(testpath, m_testImagesVector, m_testLabels);
-    qDebug() << "Dataset extraction done ! ";
-}
-
-void MNIST::writeHeader(QFile *logfile, int sampleCount, QString label)
-{
-    logfile->open(QIODevice::ReadWrite | QIODevice::Text);
-    QString s;
-    QTextStream t(logfile);
-    s += QString::number(16) + "\n";
-    s += QString::number(16) + "\n";
-    s += QString::number(sampleCount) + "\n";
-    s += QString::number(0) + "\n";
-    s += label + "\n";
-    int ctr = 0;
-    while(!t.atEnd())
-    {
-        QString line = t.readLine();
-        if(++ctr > 5)
-            s.append(line + "\n");
-    }
-    logfile->resize(0);
-    t << s;
-    logfile->flush();
-    logfile->close();
-}
-
-void MNIST::writeHeaders(QVector<QFile *> &logfiles, const QVector<int> &vec_samplecounts)
-{
-    for (quint8 i = 0 ; i < logfiles.size(); ++i)
-    {
-        writeHeader(logfiles[i], vec_samplecounts[i], QString::number(i));
-    }
-}
-
-void MNIST::writeEntries(QVector<QFile *> &logfiles, QVector<QString> &vec_logs)
-{
-    for(int i = 0 ; i < logfiles.size() ; ++i )
-    {
-        logfiles[i]->open(QIODevice::Append);
-        logfiles[i]->write(vec_logs[i].toUtf8());
-        logfiles[i]->flush();
-        logfiles[i]->close();
-    }
-}
-
-
-
-void MNIST::createSaveFiles(QVector<QFile *> &logfiles, QString path)
-{
-    for (quint8 i = 0 ; i < logfiles.size(); ++i)
-    {
-        logfiles[i] = new QFile(path + "/" + QString::number(i) + "_lastSession.txt");
-    }
-}
-
-
-void MNIST::saveDataSet(QString &destdir, ImageDataSet imageDataSet, LabelDataSet imageLabels)
-{
-    QVector<QFile *> logfiles(10);
-    QVector<int> vec_sampleCounts(10, 0);
-    QVector<QString> vec_logs(10, "");
-    QString logDir = destdir + "/LogFiles/";
-    createSaveFiles(logfiles, logDir);
-    std::cout << imageDataSet->size() << std::endl;
-    for(size_t i = 0 ; i < imageDataSet->size(); ++i)
-    {
-        int i_label = imageLabels->at(i);
-        QString label = QString::number(i_label);
-        vec_sampleCounts[i_label]++;
-        QString savedir = destdir + "/";
-        QString imageName = label + "_" + QString::number(vec_sampleCounts[i_label]) + ".jpg";
-        savedir += imageName;
-        cv::Mat  temp_img ;
-        Util::covert32FCto8UC(imageDataSet->at(i), temp_img);
-        QImage img = Util::toQt(temp_img, QImage::Format_RGB888);
-        saveImage(savedir, img);
-        vec_logs[i_label] += mergeLogEntry(imageName);
-    }
-    writeHeaders(logfiles, vec_sampleCounts);
-    writeEntries(logfiles, vec_logs);
-}
-
-
-void MNIST::createSaveDirs(QString destdir, QString &trainpath, QString &testpath)
-{
-    QDir dir(destdir);
-    dir.mkpath("MNIST_DataSet/Test");
-    dir.mkpath("MNIST_DataSet/Train");
-    dir.mkpath("MNIST_DataSet/Test/LogFiles");
-    dir.mkpath("MNIST_DataSet/Train/LogFiles");
-    testpath = destdir + "MNIST_DataSet/Test/";
-    trainpath = destdir + "MNIST_DataSet/Train/";
-}
-
-
-
-void MNIST::MNISTReader()
-{
-    m_testImagesVector = getTestImages();
-    m_trainImagesVector = getTrainImages();
-    m_testLabels = getTestLabels();
-    m_trainLabels = getTrainLabels();
-}
-
-
-void MNIST::readMINST(QString filename, ImageDataSet vec)
-{
-    QString path = m_rootPath + filename;
+    QFile f(path);
+    QFileInfo fileInfo(f.fileName());
+    QString filename(fileInfo.fileName());
     std::ifstream file(path.toStdString(), std::ios::binary);
-    if (file.is_open())
+    if (filename != m_testImagesFilename && filename != m_trainImagesFilename)
+    {
+        QMessageBox messageBox(QMessageBox::Warning, "Error", "This is not a MNIST compatible File !");
+        messageBox.exec();
+        return false;
+    }
+    else if (file.is_open())
+    {
+        QMessageBox messageBox(QMessageBox::Warning, "Error", "File can not be opened!");
+        messageBox.exec();
+        return false;
+    }
+    else
     {
         int magic_number = 0;
         int number_of_images = 0;
@@ -190,23 +57,34 @@ void MNIST::readMINST(QString filename, ImageDataSet vec)
                 {
                     unsigned char temp = 0;
                     file.read((char *) &temp, sizeof(temp));
-                    tp.at<float>(r, c) = (float) (1.0 - ((float) temp) / 255.0);
+                    tp.at<float>(r, c) = (float)(1.0 - ((float) temp) / 255.0);
                 }
             }
-            vec->push_back(tp);
+            vec.push_back(tp);
         }
-    }
-    else
-    {
-        qDebug() << filename << " not found !";
+        return true;
     }
 }
 
-void MNIST::readMINSTLabel(QString filename, LabelDataSet vec)
+bool MNIST::readMINSTLabel(QString path, LabelDataSet &vec)
 {
-    QString path = m_rootPath + filename;
+    QFile f(path);
+    QFileInfo fileInfo(f.fileName());
+    QString filename(fileInfo.fileName());
     std::ifstream file(path.toStdString(), std::ios::binary);
-    if (file.is_open())
+    if (filename != m_testLabelsFilename && filename != m_trainLabelsFilename)
+    {
+        QMessageBox messageBox(QMessageBox::Warning, "Error", "This is not a MNIST compatible File !");
+        messageBox.exec();
+        return false;
+    }
+    else if (file.is_open())
+    {
+        QMessageBox messageBox(QMessageBox::Warning, "Error", "File can not be opened !");
+        messageBox.exec();
+        return false;
+    }
+    else
     {
         int magic_number = 0;
         int number_of_images = 0;
@@ -218,14 +96,8 @@ void MNIST::readMINSTLabel(QString filename, LabelDataSet vec)
         {
             unsigned char temp = 0;
             file.read((char *) &temp, sizeof(temp));
-            vec->push_back((int) temp);
+            vec.push_back((int) temp);
         }
-    }
-    else
-    {
-        qDebug() << filename << " not found !";
+        return true;
     }
 }
-
-
-
