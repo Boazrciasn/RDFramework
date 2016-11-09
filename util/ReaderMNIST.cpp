@@ -28,7 +28,7 @@ bool MNIST::readMINST(QString path, ImageDataSet &vec)
         messageBox.exec();
         return false;
     }
-    else if (file.is_open())
+    else if (!file.is_open())
     {
         QMessageBox messageBox(QMessageBox::Warning, "Error", "File can not be opened!");
         messageBox.exec();
@@ -60,6 +60,7 @@ bool MNIST::readMINST(QString path, ImageDataSet &vec)
                     tp.at<float>(r, c) = (float)(1.0 - ((float) temp) / 255.0);
                 }
             }
+            tp.convertTo(tp,CV_8UC1,255);
             vec.push_back(tp);
         }
         return true;

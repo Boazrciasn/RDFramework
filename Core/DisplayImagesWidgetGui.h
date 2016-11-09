@@ -42,6 +42,7 @@ class DisplayImagesWidgetGui : public QWidget
     Reader *m_reader;
     int m_fileIndex;
     std::vector<QString> m_fNames;
+    std::vector<cv::Mat> m_images;
     QString m_dir;
     std::vector<QString> m_words;     // file names are stored
     std::vector<QString> m_coords;     // file names are stored

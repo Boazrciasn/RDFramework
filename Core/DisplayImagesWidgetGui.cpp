@@ -19,12 +19,11 @@ DisplayImagesWidgetGui::~DisplayImagesWidgetGui()
 
 void DisplayImagesWidgetGui::display()
 {
-    QImage image(m_fNames[m_fileIndex]);
-    cv::Mat img_bw = Util::toCv(image, CV_8UC4);
-    cv::cvtColor(img_bw, img_bw, CV_BGR2GRAY);
+    cv::Mat img = m_images[m_fileIndex];
+    QImage image = Util::toQt(img, QImage::Format_RGB888) ;
     QPixmap pixmap = QPixmap::fromImage(image);
-    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(),
-                                                 Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio,
+                                                 Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());
     QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
     ui->label->setScaledContents(true);
@@ -34,7 +33,6 @@ void DisplayImagesWidgetGui::display()
 
 void DisplayImagesWidgetGui::extractWords()
 {
-
     //TO DO : needs update.
     QString saveDir = QFileDialog::getExistingDirectory(this,
                                                         tr("Open Image Direrctory"), QDir::currentPath(),
@@ -55,15 +53,12 @@ void DisplayImagesWidgetGui::extractWords()
 
 void DisplayImagesWidgetGui::browseButton_clicked()
 {
-    m_dir = QFileDialog::getExistingDirectory(this, tr("Open Image Direrctory"),
-                                              QDir::currentPath(),
-                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    m_dir = QFileDialog::getOpenFileName(this, tr("Open Image Directory"),
+                                         QDir::currentPath());
+    m_reader->readImages(m_dir, m_images, Type_MNIST);
     m_fileIndex = 0;
-
-    if (!m_fNames.empty())
-    {
+    if (!m_images.empty())
         display();
-    }
 }
 
 void DisplayImagesWidgetGui::prevButton_clicked()
@@ -77,7 +72,7 @@ void DisplayImagesWidgetGui::prevButton_clicked()
 void DisplayImagesWidgetGui::nextButton_clicked()
 {
     m_fileIndex++;
-    if (m_fileIndex >= (int)m_fNames.size())
+    if (m_fileIndex >= (int)m_images.size())
         m_fileIndex--;
     display();
 }
