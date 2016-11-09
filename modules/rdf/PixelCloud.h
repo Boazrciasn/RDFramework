@@ -2,81 +2,57 @@
 #define PIXELCLOUD_H
 
 #include <memory>
+#include "precompiled.h"
 
 struct Coord
 {
-    int m_dx;
-    int m_dy;
+    quint16 m_dx{};
+    quint16 m_dy{};
 
-    Coord() : Coord(0, 0)
+    Coord()
     {
     }
 
-    Coord(int x, int y) : m_dx(x), m_dy(y)
+    Coord(quint16 x, quint16 y) : m_dx(x), m_dy(y)
     {
     }
 
     Coord(const Coord &c) : m_dx(c.m_dx), m_dy(c.m_dy)
     {
     }
-
-    ~Coord()
-    {
-    }
-
-    template<class Archive>
-    void serialize(Archive &archive)
-    {
-        archive( m_dx, m_dy ); // serialize things by passing them to the archive
-    }
 };
-
-struct ImageInfo
-{
-    QString m_label;
-    int m_sampleId;
-
-    ImageInfo() : ImageInfo("", 0)
-    {
-    }
-
-    ImageInfo(const QString &lbl, int smplId) : m_label(lbl), m_sampleId(smplId)
-    {
-    }
-
-    ImageInfo(const ImageInfo &ii) : m_label(ii.m_label), m_sampleId(ii.m_sampleId)
-    {
-    }
-
-    ~ImageInfo()
-    {
-    }
-};
-
-using imageinfo_ptr = std::shared_ptr<ImageInfo>;
 
 struct Pixel
 {
     Coord position;
     quint8 intensity;
-    imageinfo_ptr imgInfo;
+    quint32 sampleId;
+    QString sampleLabel;
 
-    Pixel(Coord crd, unsigned char intnsty, imageinfo_ptr imgInf): position(crd),
-        intensity(intnsty), imgInfo(imgInf)
+    Pixel(Coord pt, quint8 intnsty, quint32 id, QString label): position(pt),
+        intensity(intnsty), sampleId(id), sampleLabel(label)
     {
     }
 
     Pixel(const Pixel &px): position(px.position), intensity(px.intensity),
-        imgInfo(px.imgInfo)
-    {
-    }
-
-    ~Pixel()
+        sampleId(px.sampleId), sampleLabel(px.sampleLabel)
     {
     }
 };
 
+struct PixelCloud
+{
+    QVector<Pixel *> pixels{};
+
+    void swap(int indx1, int indx2)
+    {
+        Pixel *tmp = pixels.at(indx1);
+        pixels.replace(indx1,pixels.at(indx2));
+        pixels.replace(indx2,tmp);
+    }
+};
+
 using pixel_ptr = std::shared_ptr<Pixel>;
-using PixelCloud = std::vector<pixel_ptr>;
+//using PixelCloud = std::vector<pixel_ptr>;
 
 #endif // PIXELCLOUD_H
