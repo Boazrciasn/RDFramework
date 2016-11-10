@@ -3,8 +3,8 @@
 
 #include <memory>
 #include "precompiled.h"
-//#include <tbb/tbb.h>
-#include <vector>
+#include <tbb/tbb.h>
+//#include <vector>
 
 struct Coord
 {
@@ -44,9 +44,8 @@ struct Pixel
 
 struct PixelCloud
 {
-    //TODO:: when tbb fixed add
-    // tbb::concurrent_vector<Pixel *> pixels{};
-    std::vector<Pixel *> pixels{};
+    tbb::concurrent_vector<Pixel *> pixels{};
+//    std::vector<Pixel *> pixels{};
 
     void inline swap(int indx1, int indx2)
     {
