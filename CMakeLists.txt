@@ -21,6 +21,10 @@ find_package(Qt5Xml REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
 
+# TBB package
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
+find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+
 # NM Not tested yet
 find_package(Qt5PrintSupport REQUIRED)
 
@@ -59,7 +63,7 @@ add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${U
                 ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
 
 # NM Not tested yet
-target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
+target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
 
 qt5_use_modules("${project_name}" Core Gui Widgets)
 

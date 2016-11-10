@@ -3,6 +3,8 @@
 
 #include <memory>
 #include "precompiled.h"
+//#include <tbb/tbb.h>
+#include <vector>
 
 struct Coord
 {
@@ -42,17 +44,37 @@ struct Pixel
 
 struct PixelCloud
 {
-    QVector<Pixel *> pixels{};
+    //TODO:: when tbb fixed add
+    // tbb::concurrent_vector<Pixel *> pixels{};
+    std::vector<Pixel *> pixels{};
 
-    void swap(int indx1, int indx2)
+    void inline swap(int indx1, int indx2)
     {
         Pixel *tmp = pixels.at(indx1);
-        pixels.replace(indx1,pixels.at(indx2));
-        pixels.replace(indx2,tmp);
+        pixels[indx1] = pixels.at(indx2);
+        pixels[indx2] = tmp;
+    }
+
+    // L: false  R: true
+    void putInOrder(int start, QVector<bool> relation)
+    {
+        int count = relation.size();
+        bool terminate = false;
+        for(int i = 0; i < count-1; ++i)
+        {
+            if(relation[i]) // R detected
+                for(int j = i+1; j < count; ++j)
+                    if(!relation[j]) // L detected
+                    {
+                        swap(start+i,start+j);
+                        relation[j] = true;
+                        terminate = (j == count-1); // no need to search
+                        break;
+                    }
+            if(terminate)
+                break;
+        }
     }
 };
-
-using pixel_ptr = std::shared_ptr<Pixel>;
-//using PixelCloud = std::vector<pixel_ptr>;
 
 #endif // PIXELCLOUD_H
