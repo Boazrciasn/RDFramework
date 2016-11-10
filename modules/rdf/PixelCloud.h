@@ -4,7 +4,6 @@
 #include <memory>
 #include "precompiled.h"
 #include <tbb/tbb.h>
-//#include <vector>
 
 struct Coord
 {
@@ -45,7 +44,6 @@ struct Pixel
 struct PixelCloud
 {
     tbb::concurrent_vector<Pixel *> pixels{};
-//    std::vector<Pixel *> pixels{};
 
     void inline swap(int indx1, int indx2)
     {
@@ -55,7 +53,7 @@ struct PixelCloud
     }
 
     // L: false  R: true
-    void putInOrder(int start, QVector<bool> relation)
+    void inline putInOrder(int start, QVector<bool> relation)
     {
         int count = relation.size();
         bool terminate = false;
@@ -75,5 +73,7 @@ struct PixelCloud
         }
     }
 };
+
+using pixel_ptr = std::shared_ptr<Pixel>;
 
 #endif // PIXELCLOUD_H

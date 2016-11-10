@@ -61,7 +61,7 @@ class RandomDecisionForest : public QObject
     int pixelCloudSize();
     cv::Mat getPixelImage(pixel_ptr px);
     void imageToPixels(std::vector<pixel_ptr> &res, const cv::Mat &image,
-                       imageinfo_ptr img_inf);
+                       quint32 id, QString label);
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void trainForest();
     void test();

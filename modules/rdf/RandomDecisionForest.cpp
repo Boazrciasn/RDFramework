@@ -188,7 +188,7 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image,
 //img_Info : label of  test image & id of the image inside vector(optional)
 void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
-                                         const cv::Mat &image , imageinfo_ptr img_inf )
+                                         const cv::Mat &image , quint32 id, QString label )
 {
     int nRows = image.rows;
     int nCols = image.cols;
@@ -197,7 +197,7 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
         for(int j = 0; j < nCols; ++j)
         {
             auto intensity = image.at<uchar>(i, j);
-            pixel_ptr px(new Pixel(Coord(i, j), intensity, img_inf));
+            pixel_ptr px(new Pixel(Coord(i, j), intensity, id, label));
             res.push_back(px);
         }
     }
@@ -209,9 +209,9 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
 // returns the image the pixel belongs to
 cv::Mat RandomDecisionForest::getPixelImage(pixel_ptr px)
 {
-    QString path = m_dir + "/" + px->imgInfo->m_label + "/" + px->imgInfo->m_label +
+    QString path = m_dir + "/" + px->sampleLabel + "/" + px->sampleLabel +
                    "_"
-                   + QString::number(px->imgInfo->m_sampleId)  + ".jpg";
+                   + QString::number(px->sampleId)  + ".jpg";
     //qDebug()<<"IMAGE :"<< path;
     return cv::imread(path.toStdString());
 }
@@ -289,7 +289,6 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index,
     //typecheck
     cv::Mat layeredHist = cv::Mat(nRows - 2 * probDistY,
                                   (nCols - 2 * probDistX) * labelCount, CV_32FC1);
-    imageinfo_ptr img_Info(new ImageInfo(" ", index));
     int rangeRows = nRows - probDistY;
     int rangeCols = nCols - probDistX;
     for(int c = probDistX; c < rangeCols; ++c)
@@ -307,12 +306,12 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index,
             else
             {
                 ++fgPxCount;
-                pixel_ptr px(new Pixel(Coord(r, c), intensity, img_Info));
+                pixel_ptr px(new Pixel(Coord(r, c), intensity, index, " "));
                 auto nForest = m_forest.size();
                 for(unsigned int i = 0; i < nForest; ++i)
                 {
-                    node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
-                    probHist += leaf->m_hist;
+//                    node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
+//                    probHist += leaf->m_hist;
                 }
                 //Normalize the Histrograms
                 float sum = cv::sum(probHist)[0];
