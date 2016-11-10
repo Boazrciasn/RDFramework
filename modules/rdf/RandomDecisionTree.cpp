@@ -46,7 +46,7 @@ void RandomDecisionTree::constructTree( Node &cur_node, PixelCloud &pixels)
         m_depth = current_depth;
     //no more child construction
     // min etropy removed
-    if( current_depth >= m_maxDepth || pixels.size() <= m_minLeafPixelCount )
+    if( current_depth >= m_maxDepth || pixels.pixels.size() <= m_minLeafPixelCount )
     {
         m_nodes[cur_node.m_id - 1]->m_isLeaf = true;
         m_nodes[cur_node.m_id - 1]->m_hist = createHistogram(pixels,
@@ -54,7 +54,7 @@ void RandomDecisionTree::constructTree( Node &cur_node, PixelCloud &pixels)
         ++m_numOfLeaves;
         return;
     }
-    tuneParameters(pixels, cur_node);
+    tuneParameters(pixels.pixels, cur_node);
     std::vector<pixel_ptr> left;
     std::vector<pixel_ptr> right;
     divide(m_DF->m_DS, pixels, left, right, cur_node);
@@ -104,7 +104,7 @@ void RandomDecisionTree::subSample()
     for(auto &image : m_DF->m_DS.m_trainImagesVector)
     {
         auto label = m_DF->m_DS.m_trainlabels[sampleId];
-        imageinfo_ptr img_inf(new ImageInfo(label, sampleId++));
+        auto id = sampleId++;
         int nRows = image.rows;
         int nCols = image.cols;
         for(int k = 0; k < m_DF->m_params.pixelsPerImage; ++k)
@@ -118,14 +118,14 @@ void RandomDecisionTree::subSample()
                 j = (rand() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
                 intensity = image.at<uchar>(i, j);
             }
-            pixel_ptr px(new Pixel(Coord(i, j), intensity, img_inf));
-            m_pixelCloud.push_back(px);
+            pixel_ptr px(new Pixel(Coord(i, j), intensity, id,label));
+            m_pixelCloud.pixels.push_back(px);
         }
     }
 }
 
 // find best teta and taw parameters for the given node
-void RandomDecisionTree::tuneParameters(PixelCloud &parentPixels, Node &parent)
+void RandomDecisionTree::tuneParameters(tbb::concurrent_vector<pixel_ptr> &parentPixels, Node &parent)
 {
     std::vector<pixel_ptr> left;
     std::vector<pixel_ptr> right;

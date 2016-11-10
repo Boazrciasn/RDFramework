@@ -142,9 +142,9 @@ class RandomDecisionTree : public QObject
         m_minLeafPixelCount = min_leaf_pixel_count;
     }
 
-    void tuneParameters(std::vector<pixel_ptr> &parentPixels, Node &parent);
+    void tuneParameters(tbb::concurrent_vector<pixel_ptr> &parentPixels, Node &parent);
 
-    inline bool isLeft(pixel_ptr p, Node &node, cv::Mat &img)
+    inline bool isLeft(Pixel *p, Node &node, cv::Mat &img)
     {
         qint16 new_teta1R = node.m_teta1.m_dy + p->position.m_dy;
         qint16 new_teta1C = node.m_teta1.m_dx + p->position.m_dx;
@@ -164,7 +164,7 @@ class RandomDecisionTree : public QObject
             // qDebug()<<"LEAF REACHED :"<<root.id;
             return root;
         }
-        cv::Mat img = DS.m_testImagesVector[px->imgInfo->m_sampleId];
+        cv::Mat img = DS.m_testImagesVector[px->sampleId];
         int childId = root->m_id * 2 ;
         //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
         if(!isLeft(px, *root, img))
@@ -192,10 +192,10 @@ class RandomDecisionTree : public QObject
     inline void divide(const DataSet &DS, const PixelCloud &parentPixels,
                        std::vector<pixel_ptr> &left, std::vector<pixel_ptr> &right, Node &parent)
     {
-        for (auto px : parentPixels)
+        for (auto px : parentPixels.pixels)
         {
             //            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
-            auto img = DS.m_TrainHashTable.value(px->imgInfo->m_sampleId);
+            auto img = DS.m_TrainHashTable.value(px->sampleId);
             (isLeft(px, parent, img) ? left : right).push_back(px);
         }
     }
