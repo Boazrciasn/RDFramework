@@ -21,55 +21,15 @@
 
 #define MIN_ENTROPY 0.05
 
-struct Node
-{
-    qint16 m_tau;
-    Coord m_teta1, m_teta2;
-    quint32 m_id;
-    bool m_isLeaf;
-    cv::Mat_<float> m_hist;
-
-    Node() : Node(0, false)
-    {
-    }
-
-    Node(quint32 id, bool isLeaf): m_id(id), m_isLeaf(isLeaf)
-    {
-        m_hist.create(1, 1);
-        m_hist.setTo(0);
-    }
-
-    template<class Archive>
-    void serialize(Archive &archive)
-    {
-        archive( m_tau, m_teta1, m_teta2, m_id, m_isLeaf, m_hist);
-    }
-
-    ~Node()
-    {
-    }
-};
-
-struct DataSet
-{
-
-    QHash<int, cv::Mat> m_TrainHashTable;
-    std::vector<cv::Mat> m_trainImagesVector;
-    std::vector<cv::Mat> m_testImagesVector;
-    std::vector<QString> m_testlabels;
-    std::vector<QString> m_trainlabels;
-
-    ~DataSet()
-    {
-    }
-};
+#include "Node.h"
+#include "DataSet.h"
 
 class RandomDecisionForest;
 
-using node_ptr  = std::shared_ptr<Node>;
-using TreeNodes = std::vector<node_ptr>;
+
+using treeNodes = std::vector<node_ptr>;
 using rdfclock  = std::chrono::high_resolution_clock;
-using rdf_ptr   = std::shared_ptr<RandomDecisionForest>;
+
 
 
 class RandomDecisionTree : public QObject
@@ -77,32 +37,39 @@ class RandomDecisionTree : public QObject
     Q_OBJECT
 
   public:
-
-    ~RandomDecisionTree()
-    {
-    }
-
-    RandomDecisionTree(rdf_ptr DF);
     RandomDecisionTree(RandomDecisionForest *DF);
 
-    rdf_ptr m_sDF;
     RandomDecisionForest *m_DF;
-    int m_depth;
-    int m_numOfLeaves;
-    int m_maxDepth;
-    int m_probe_distanceX, m_probe_distanceY;
+    treeNodes m_nodes;
     quint32 m_minLeafPixelCount;
-    TreeNodes m_nodes;
+    int m_height{};
+    int m_numOfLeaves{};
+    int m_maxDepth{};
+    int m_probe_distanceX{};
+    int m_probe_distanceY{};
+
 
     void train();
-    void constructTree(Node &root, PixelCloud &pixels);
+    void constructTreeAtDepth(int height);
 
-    template<class Archive>
-    void serialize(Archive &archive)
-    {
-        archive( m_depth, m_numOfLeaves, m_maxDepth, m_probe_distanceX,
-                 m_probe_distanceY, m_minLeafPixelCount, m_nodes);
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     inline void generateTeta(Coord &crd, int probe_x, int probe_y)
     {
@@ -142,7 +109,7 @@ class RandomDecisionTree : public QObject
         m_minLeafPixelCount = min_leaf_pixel_count;
     }
 
-    void tuneParameters(tbb::concurrent_vector<pixel_ptr> &parentPixels, Node &parent);
+    void computeDivisionAt(Node &parent);
 
     inline bool isLeft(Pixel *p, Node &node, cv::Mat &img)
     {
@@ -157,26 +124,39 @@ class RandomDecisionTree : public QObject
 
     inline node_ptr getLeafNode(const DataSet &DS, pixel_ptr px, int nodeId)
     {
+        // TODO: modify
         node_ptr root = m_nodes[nodeId];
-        assert(root);
-        if(root->m_isLeaf)
-        {
-            // qDebug()<<"LEAF REACHED :"<<root.id;
-            return root;
-        }
-        cv::Mat img = DS.m_testImagesVector[px->sampleId];
-        int childId = root->m_id * 2 ;
-        //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
-        if(!isLeft(px, *root, img))
-            ++childId;
-        return getLeafNode(DS, px, childId - 1);
+//        assert(root);
+//        if(root->m_isLeaf)
+//        {
+//            // qDebug()<<"LEAF REACHED :"<<root.id;
+//            return root;
+//        }
+//        cv::Mat img = DS.m_testImagesVector[px->sampleId];
+//        int childId = root->m_id * 2 ;
+//        //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
+//        if(!isLeft(px, *root, img))
+//            ++childId;
+        return getLeafNode(DS, px, 1);
     }
 
     bool isPixelSizeConsistent();
     void toString();
     void printTree();
 
-  private:
+    ~RandomDecisionTree()
+    {
+        m_nodes.clear();
+    }
+
+    template<class Archive>
+    void serialize(Archive &archive)
+    {
+        archive( m_height, m_numOfLeaves, m_maxDepth, m_probe_distanceX,
+                 m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+    }
+
+private:
     PixelCloud m_pixelCloud;
     std::mt19937 generator;
     std::uniform_int_distribution<> m_disProbY;
@@ -192,13 +172,52 @@ class RandomDecisionTree : public QObject
     inline void divide(const DataSet &DS, const PixelCloud &parentPixels,
                        std::vector<pixel_ptr> &left, std::vector<pixel_ptr> &right, Node &parent)
     {
-        for (auto px : parentPixels.pixels)
-        {
-            //            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
-            auto img = DS.m_TrainHashTable.value(px->sampleId);
-            (isLeft(px, parent, img) ? left : right).push_back(px);
-        }
+//        for (auto px : parentPixels.pixels)
+//        {
+//            //            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
+//            auto img = DS.m_TrainHashTable.value(px->sampleId);
+//            (isLeft(px, parent, img) ? left : right).push_back(px);
+//        }
     }
+
+    void initNodes();
+    void constructTree();
+
+    inline void processNode(node_ptr node, Coord parentData, quint32 leftCount)
+    {
+        int mult = (node->m_id+1)%2; // 0 if left, 1 if right
+        node->m_tau = generateTau();
+        node->m_dataRange.m_dx = parentData.m_dx + mult*leftCount;
+        node->m_dataRange.m_dy = parentData.m_dy*mult + ((mult+1)%2)*(parentData.m_dx + leftCount - 1);
+        generateTeta(node->m_teta1, m_probe_distanceX, m_probe_distanceY);
+        generateTeta(node->m_teta2, m_probe_distanceX, m_probe_distanceY);
+
+        computeDivisionAt(*node);
+    }
+
+    inline int letterIndex(char letter)
+    {
+        return letter - 'a';
+    }
+
+    inline void createHistogram(node_ptr node, int labelCount)
+    {
+        node_ptr parent = m_nodes[(node->m_id+1)/2];
+        int mult = (node->m_id+1)%2; // 0 if left, 1 if right
+        auto start_index = parent->m_dataRange.m_dx + mult*parent->m_leftCount;
+        auto end_index = parent->m_dataRange.m_dy*mult + ((mult+1)%2)*(parent->m_dataRange.m_dx + parent->m_leftCount - 1);
+
+        cv::Mat_<float> hist(1, labelCount);
+        hist.setTo(0.0f);
+        for (int pxIndex = start_index; pxIndex <= end_index; ++pxIndex) {
+            pixel_ptr px = m_pixelCloud.pixels[pxIndex];
+            int index = letterIndex(px->sampleLabel.at(0).toLatin1());
+            ++hist.at<float>(0, index);
+        }
+
+        node->m_hist = hist;
+    }
+    void computeLeafHistograms();
 };
 
 using rdt_ptr = std::shared_ptr<RandomDecisionTree>;

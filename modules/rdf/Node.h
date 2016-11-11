@@ -2,13 +2,19 @@
 #define NODE_H
 
 #include "precompiled.h"
+#include "memory"
+#include "PixelCloud.h"
 
 struct Node
 {
+    bool m_isLeaf;
+    quint32 m_id;
     qint16 m_tau;
     Coord m_teta1, m_teta2;
-    quint32 m_id;
-    bool m_isLeaf;
+    Coord m_dataRange;
+    quint32 m_leftCount;
+
+
     cv::Mat_<float> m_hist;
 
     Node() : Node(0, false)
@@ -31,5 +37,7 @@ struct Node
     {
     }
 };
+
+using node_ptr  = std::shared_ptr<Node>;
 
 #endif // NODE_H

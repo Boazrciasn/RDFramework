@@ -114,6 +114,7 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
 
 inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
 {
+
     return calculateEntropy(createHistogram(pixels, labelCount));
 }
 

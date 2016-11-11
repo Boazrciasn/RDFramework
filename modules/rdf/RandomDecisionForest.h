@@ -140,4 +140,6 @@ void load(Archive &archive,
     }
 }
 
+using rdf_ptr   = std::shared_ptr<RandomDecisionForest>;
+
 #endif

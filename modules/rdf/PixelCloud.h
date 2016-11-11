@@ -41,13 +41,15 @@ struct Pixel
     }
 };
 
+using pixel_ptr = std::shared_ptr<Pixel>;
+
 struct PixelCloud
 {
-    tbb::concurrent_vector<Pixel *> pixels{};
+    tbb::concurrent_vector<pixel_ptr> pixels{};
 
     void inline swap(int indx1, int indx2)
     {
-        Pixel *tmp = pixels.at(indx1);
+        pixel_ptr tmp = pixels.at(indx1);
         pixels[indx1] = pixels.at(indx2);
         pixels[indx2] = tmp;
     }
@@ -73,7 +75,5 @@ struct PixelCloud
         }
     }
 };
-
-using pixel_ptr = std::shared_ptr<Pixel>;
 
 #endif // PIXELCLOUD_H
