@@ -27,7 +27,7 @@
 class RandomDecisionForest;
 
 
-using treeNodes = std::vector<node_ptr>;
+using treeNodes = tbb::concurrent_vector<node_ptr>;
 using rdfclock  = std::chrono::high_resolution_clock;
 
 
@@ -163,8 +163,10 @@ private:
             if(left)
                 leftCount++;
         }
-        node.m_leftCount = leftCount;
+
         m_pixelCloud.putInOrder(rng.m_dx,srtVals);
+        node.m_leftCount = leftCount;
+
     }
 
     void initNodes();

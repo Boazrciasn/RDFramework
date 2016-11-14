@@ -20,12 +20,18 @@ void RandomDecisionTree::initNodes()
     auto decision_node_count = tot_node_count - leaf_node_count;
 
     // Decision node
-    for (int node_id = 0; node_id < decision_node_count; ++node_id)
+//    for (int node_id = 0; node_id < decision_node_count; ++node_id)
+//        m_nodes[node_id] = node_ptr(new Node(node_id,false));
+    tbb::parallel_for(0,decision_node_count,1,[=](int node_id){
         m_nodes[node_id] = node_ptr(new Node(node_id,false));
+    });
 
     // Leaf Nodes
-    for (int node_id = decision_node_count; node_id < tot_node_count; ++node_id)
+//    for (int node_id = decision_node_count; node_id < tot_node_count; ++node_id)
+//        m_nodes[node_id] = node_ptr(new Node(node_id,true));
+    tbb::parallel_for(decision_node_count,tot_node_count,1,[=](int node_id){
         m_nodes[node_id] = node_ptr(new Node(node_id,true));
+    });
 }
 
 void RandomDecisionTree::subSample()
@@ -86,18 +92,24 @@ void RandomDecisionTree::constructTreeAtDepth(int height)
     // at the same level are independent of eachother
 
 
-    // TODO: base case is when we reach leaf nodes (when we reach m_maxDepth)
-    // TODO: add if base case compute hist for leafs
+    // base case is when we reach leaf nodes (when we reach m_maxDepth)
+    if(height == m_maxDepth) // base case
+        return;
 
     int level_nodes = 1<<height;            // Number of nodes at this level
     int tot_nodes   = 1<<(height+1) - 1;    // Number of nodes at this and previous levels
 
-    // TODO: make it concurent_for
-    for (int nodeIndex = (tot_nodes-level_nodes); nodeIndex < tot_nodes; ++nodeIndex) {
+//    for (int nodeIndex = (tot_nodes-level_nodes); nodeIndex < tot_nodes; ++nodeIndex) {
+//        int parentIndex = (nodeIndex+1)/2;
+//        node_ptr parent = m_nodes[parentIndex];
+//        processNode(m_nodes[nodeIndex], parent->m_dataRange, parent->m_leftCount);
+//    }
+
+    tbb::parallel_for(tot_nodes-level_nodes,tot_nodes,1,[=](int nodeIndex){
         int parentIndex = (nodeIndex+1)/2;
         node_ptr parent = m_nodes[parentIndex];
         processNode(m_nodes[nodeIndex], parent->m_dataRange, parent->m_leftCount);
-    }
+    });
 
     constructTreeAtDepth(++m_height);
 }
