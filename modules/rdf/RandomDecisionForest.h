@@ -121,7 +121,7 @@ void save(Archive &archive,
     archive( rdf.m_params );
     for(auto rdtPtr : rdf.m_forest)
     {
-        archive(*rdtPtr);
+//        archive(*rdtPtr); // TODO: fix RDT archive
     }
 }
 
@@ -135,7 +135,7 @@ void load(Archive &archive,
     for(auto i = 0; i < size; ++i)
     {
         rdt_ptr rdt(new RandomDecisionTree(&rdf));
-        archive(*rdt);
+//        archive(*rdt);    // TODO: fix RDT archive
         rdf.m_forest[i] = rdt;
     }
 }

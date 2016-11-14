@@ -52,25 +52,6 @@ class RandomDecisionTree : public QObject
     void train();
     void constructTreeAtDepth(int height);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     inline void generateTeta(Coord &crd, int probe_x, int probe_y)
     {
         // random number between -probe_distance, probe_distance
@@ -109,9 +90,9 @@ class RandomDecisionTree : public QObject
         m_minLeafPixelCount = min_leaf_pixel_count;
     }
 
-    void computeDivisionAt(Node &parent);
+    void computeDivisionAt(Node &node);
 
-    inline bool isLeft(Pixel *p, Node &node, cv::Mat &img)
+    inline bool isLeft(pixel_ptr p, Node &node, cv::Mat &img)
     {
         qint16 new_teta1R = node.m_teta1.m_dy + p->position.m_dy;
         qint16 new_teta1C = node.m_teta1.m_dx + p->position.m_dx;
@@ -169,15 +150,21 @@ private:
     void printNode(Node &node);
 
 
-    inline void divide(const DataSet &DS, const PixelCloud &parentPixels,
-                       std::vector<pixel_ptr> &left, std::vector<pixel_ptr> &right, Node &parent)
+    inline void divide(const DataSet &DS, QVector<bool> srtVals, Node &node)
     {
-//        for (auto px : parentPixels.pixels)
-//        {
-//            //            auto img = DS.m_trainImagesVector[px->imgInfo->m_sampleId];
-//            auto img = DS.m_TrainHashTable.value(px->sampleId);
-//            (isLeft(px, parent, img) ? left : right).push_back(px);
-//        }
+        auto rng = node.m_dataRange;
+        quint32 leftCount = 0;
+
+        for (int i = rng.m_dx; i < rng.m_dy; ++i) {
+            auto px = m_pixelCloud.pixels[i];
+            auto img = DS.m_trainImagesVector[px->sampleId];
+            auto left = isLeft(px, node, img);
+            srtVals[i-rng.m_dx] = left;
+            if(left)
+                leftCount++;
+        }
+        node.m_leftCount = leftCount;
+        m_pixelCloud.putInOrder(rng.m_dx,srtVals);
     }
 
     void initNodes();
@@ -185,10 +172,11 @@ private:
 
     inline void processNode(node_ptr node, Coord parentData, quint32 leftCount)
     {
+        quint32 rightCount = parentData.m_dy - parentData.m_dx - leftCount;
         int mult = (node->m_id+1)%2; // 0 if left, 1 if right
-        node->m_tau = generateTau();
         node->m_dataRange.m_dx = parentData.m_dx + mult*leftCount;
-        node->m_dataRange.m_dy = parentData.m_dy*mult + ((mult+1)%2)*(parentData.m_dx + leftCount - 1);
+        node->m_dataRange.m_dy = parentData.m_dy - ((mult+1)%2)*rightCount;
+        node->m_tau = generateTau();
         generateTeta(node->m_teta1, m_probe_distanceX, m_probe_distanceY);
         generateTeta(node->m_teta2, m_probe_distanceX, m_probe_distanceY);
 
@@ -200,23 +188,19 @@ private:
         return letter - 'a';
     }
 
-    inline void createHistogram(node_ptr node, int labelCount)
+    inline cv::Mat_<float> computeHistogram(Coord crd, int labelCount)
     {
-        node_ptr parent = m_nodes[(node->m_id+1)/2];
-        int mult = (node->m_id+1)%2; // 0 if left, 1 if right
-        auto start_index = parent->m_dataRange.m_dx + mult*parent->m_leftCount;
-        auto end_index = parent->m_dataRange.m_dy*mult + ((mult+1)%2)*(parent->m_dataRange.m_dx + parent->m_leftCount - 1);
-
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (int pxIndex = start_index; pxIndex <= end_index; ++pxIndex) {
+        for (int pxIndex = crd.m_dx; pxIndex < crd.m_dy; ++pxIndex) {
             pixel_ptr px = m_pixelCloud.pixels[pxIndex];
             int index = letterIndex(px->sampleLabel.at(0).toLatin1());
             ++hist.at<float>(0, index);
         }
 
-        node->m_hist = hist;
+        return hist;
     }
+
     void computeLeafHistograms();
 };
 

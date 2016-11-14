@@ -21,11 +21,11 @@ void RandomDecisionTree::initNodes()
 
     // Decision node
     for (int node_id = 0; node_id < decision_node_count; ++node_id)
-        m_nodes[node_id] = new Node(node_id,false);
+        m_nodes[node_id] = node_ptr(new Node(node_id,false));
 
     // Leaf Nodes
     for (int node_id = decision_node_count; node_id < tot_node_count; ++node_id)
-        m_nodes[node_id] = new Node(node_id,true);
+        m_nodes[node_id] = node_ptr(new Node(node_id,true));
 }
 
 void RandomDecisionTree::subSample()
@@ -95,9 +95,8 @@ void RandomDecisionTree::constructTreeAtDepth(int height)
     // TODO: make it concurent_for
     for (int nodeIndex = (tot_nodes-level_nodes); nodeIndex < tot_nodes; ++nodeIndex) {
         int parentIndex = (nodeIndex+1)/2;
-        Coord parentData = m_nodes[parentIndex]->m_dataRange;
-        quint32 mid = m_nodes[parentIndex]->m_mid;
-        processNode(m_nodes[nodeIndex], parentData, mid);
+        node_ptr parent = m_nodes[parentIndex];
+        processNode(m_nodes[nodeIndex], parent->m_dataRange, parent->m_leftCount);
     }
 
     constructTreeAtDepth(++m_height);
@@ -109,13 +108,23 @@ void RandomDecisionTree::computeLeafHistograms()
     auto leaf_node_count = 1 << (m_maxDepth-1) ;
 
     for (int node_id = (tot_node_count-leaf_node_count); node_id < tot_node_count; ++node_id)
-        createHistogram(m_nodes[node_id], m_DF->m_params.labelCount);
+    {
+        node_ptr parent = m_nodes[(node_id+1)/2];
+        quint32 leftCount = parent->m_leftCount;
+        quint32 rightCount = parent->m_dataRange.m_dy - parent->m_dataRange.m_dx - leftCount;
+
+        int mult = (node_id+1)%2; // 0 if left, 1 if right
+        auto x = parent->m_dataRange.m_dx + mult*leftCount;
+        auto y = parent->m_dataRange.m_dy - ((mult+1)%2)*rightCount;
+        Coord range(x,y);
+        m_nodes[node_id]->m_hist = computeHistogram(range, m_DF->m_params.labelCount);
+    }
 }
 
 void RandomDecisionTree::constructTree()
 {
-    Coord dataRange(0,m_pixelCloud.pixels.size()-1); // -1 because it is inclusive
-    processNode(m_nodes[0], dataRange, 0);
+    Coord dataRange(0,m_pixelCloud.pixels.size()); // [... , ...) because it is inclusive
+    processNode(m_nodes[0], dataRange, 0); // construct root
     constructTreeAtDepth(++m_height); // m_height is 0 initily at root
     computeLeafHistograms();
 }
@@ -130,60 +139,65 @@ void RandomDecisionTree::train()
 
 
 // find best teta and taw parameters for the given node
-void RandomDecisionTree::computeDivisionAt(Node &parent)
+void RandomDecisionTree::computeDivisionAt(Node &node)
 {
-    std::vector<pixel_ptr> left;
-    std::vector<pixel_ptr> right;
+    int px_count = node.m_dataRange.m_dy - node.m_dataRange.m_dx;
+    if(px_count == 0) return;
 
+    QVector<bool> srtVals(px_count);
 
-    int maxTau = -250;
-    Coord maxTeta1, maxTeta2;
-    float maxGain = 0;
-    int itr = 0;
+    auto maxItr = m_DF->m_params.maxIteration;
     auto nLabels = m_DF->m_params.labelCount;
 
+    int maxTau = -250;
+    float maxGain = 0;
+    Coord maxTeta1, maxTeta2;
+    int itr = 0;
 
-    while(itr < m_DF->m_params.maxIteration)
+    while(itr < maxItr)
     {
-//        //printNode(parent);
-//        divide(m_DF->m_DS, parentPixels, left, right, parent);
-//        //qDebug() << "Left " << left.size() << "Right " << right.size();
-//        float leftChildEntr = calculateEntropyOfVector(left, nLabels);
-//        //qDebug() << "EntLeft" << leftChildEntr ;
-//        float rightChildEntr = calculateEntropyOfVector(right, nLabels);
-//        //qDebug() << "EntRight" << rightChildEntr ;
-//        int sizeLeft  = left.size();
-//        int sizeRight = right.size();
-//        float totalsize = parentPixels.size() ;
-//        float avgEntropyChild  = (sizeLeft / totalsize) * leftChildEntr;
-//        avgEntropyChild += (sizeRight / totalsize) * rightChildEntr;
-//        float parentEntr = calculateEntropyOfVector(parentPixels, nLabels);
-//        float infoGain = parentEntr - avgEntropyChild;
-//        // qDebug() << "InfoGain" << infoGain ;
+        divide(m_DF->m_DS, srtVals, node);
+
+        auto sizeLeft  = node.m_leftCount;
+        auto sizeRight = node.m_dataRange.m_dy - node.m_dataRange.m_dx - sizeLeft;
+        qDebug() << "Left: " << sizeLeft << ", Right: " << sizeRight;
+
+        Coord lCrd(node.m_dataRange.m_dx,node.m_dataRange.m_dx+sizeLeft);
+        Coord rCrd(lCrd.m_dy,node.m_dataRange.m_dy);
+        float leftChildEntr = calculateEntropy(computeHistogram(lCrd ,nLabels));
+//        qDebug() << "EntLeft" << leftChildEntr ;
+        float rightChildEntr = calculateEntropy(computeHistogram(rCrd ,nLabels));
+//        qDebug() << "EntRight" << rightChildEntr ;
+
+        float avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
+        avgEntropyChild += (sizeRight / px_count) * rightChildEntr;
+        float parentEntr = calculateEntropy(computeHistogram(node.m_dataRange, nLabels));
+        float infoGain = parentEntr - avgEntropyChild;
+        // qDebug() << "InfoGain" << infoGain ;
 
 
-//        // Non-improving epoch :
-//        if(infoGain > maxGain)
-//        {
-//            maxTeta1 = parent.m_teta1;
-//            maxTeta2 = parent.m_teta2;
-//            maxTau   = parent.m_tau;
-//            maxGain  = infoGain;
-//            itr = 0 ;
-//        }
-//        else
-//        {
-//            ++itr;
-//        }
+        // Non-improving epoch :
+        if(infoGain > maxGain)
+        {
+            maxTeta1 = node.m_teta1;
+            maxTeta2 = node.m_teta2;
+            maxTau   = node.m_tau;
+            maxGain  = infoGain;
+            itr = 0 ;
+        }
+        else
+        {
+            ++itr;
+        }
 
-//        generateTeta(parent.m_teta1, m_probe_distanceX, m_probe_distanceY);
-//        generateTeta(parent.m_teta2, m_probe_distanceX, m_probe_distanceY);
-//        parent.m_tau = generateTau();
-//    }
+        generateTeta(node.m_teta1, m_probe_distanceX, m_probe_distanceY);
+        generateTeta(node.m_teta2, m_probe_distanceX, m_probe_distanceY);
+        node.m_tau = generateTau();
+    }
 
-//    parent.m_tau = maxTau;
-//    parent.m_teta1 = maxTeta1;
-//    parent.m_teta2 = maxTeta2;
+    node.m_tau = maxTau;
+    node.m_teta1 = maxTeta1;
+    node.m_teta2 = maxTeta2;
 }
 
 
@@ -229,7 +243,7 @@ void RandomDecisionTree::printPixel(pixel_ptr px)
     qDebug() << "Pixel{ Coor("    << px->position.m_dy     << ","     <<
              px->position.m_dx
              << ") Label("        << px->sampleLabel << ") Id(" <<
-             px->imgInfo->m_sampleId
+             px->sampleId
              << ") = "            << px->intensity << "}";
 }
 
