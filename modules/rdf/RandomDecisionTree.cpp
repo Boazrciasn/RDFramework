@@ -19,19 +19,14 @@ void RandomDecisionTree::initNodes()
     auto leaf_node_count = 1 << (m_maxDepth-1) ;
     auto decision_node_count = tot_node_count - leaf_node_count;
 
-    // Decision node
+//    // Decision node
 //    for (int node_id = 0; node_id < decision_node_count; ++node_id)
 //        m_nodes[node_id] = node_ptr(new Node(node_id,false));
-    tbb::parallel_for(0,decision_node_count,1,[=](int node_id){
-        m_nodes[node_id] = node_ptr(new Node(node_id,false));
-    });
 
-    // Leaf Nodes
+//    // Leaf Nodes
 //    for (int node_id = decision_node_count; node_id < tot_node_count; ++node_id)
 //        m_nodes[node_id] = node_ptr(new Node(node_id,true));
-    tbb::parallel_for(decision_node_count,tot_node_count,1,[=](int node_id){
-        m_nodes[node_id] = node_ptr(new Node(node_id,true));
-    });
+
 }
 
 void RandomDecisionTree::subSample()
@@ -86,32 +81,24 @@ void RandomDecisionTree::subSample()
     }
 }
 
-void RandomDecisionTree::constructTreeAtDepth(int height)
+void RandomDecisionTree::constructTreeAtDepth(std::vector<Pixel> &curr,
+                                              std::vector<Pixel> &next)
 {
-    // We can make node computation concurent at each level because nodes
-    // at the same level are independent of eachother
+    for (int height = 1; height < m_maxDepth; ++height) {
+        int level_nodes = 1<<height;            // Number of nodes at this level
+        int tot_nodes   = 1<<(height+1) - 1;    // Number of nodes at this and previous levels
 
+        tbb::parallel_for(tot_nodes-level_nodes,tot_nodes,1,[=](int nodeIndex){
+            int parentIndex = (nodeIndex+1)/2;
+            node_ptr parent = m_nodes[parentIndex];
+            processNode(m_nodes[nodeIndex], parent->m_dataRange, parent->m_leftCount);
+            rearrange(*m_nodes[nodeIndex],curr,next);
+        });
 
-    // base case is when we reach leaf nodes (when we reach m_maxDepth)
-    if(height == m_maxDepth) // base case
-        return;
-
-    int level_nodes = 1<<height;            // Number of nodes at this level
-    int tot_nodes   = 1<<(height+1) - 1;    // Number of nodes at this and previous levels
-
-//    for (int nodeIndex = (tot_nodes-level_nodes); nodeIndex < tot_nodes; ++nodeIndex) {
-//        int parentIndex = (nodeIndex+1)/2;
-//        node_ptr parent = m_nodes[parentIndex];
-//        processNode(m_nodes[nodeIndex], parent->m_dataRange, parent->m_leftCount);
-//    }
-
-    tbb::parallel_for(tot_nodes-level_nodes,tot_nodes,1,[=](int nodeIndex){
-        int parentIndex = (nodeIndex+1)/2;
-        node_ptr parent = m_nodes[parentIndex];
-        processNode(m_nodes[nodeIndex], parent->m_dataRange, parent->m_leftCount);
-    });
-
-    constructTreeAtDepth(++m_height);
+        auto tmp = next;
+        next = curr;
+        curr = tmp;
+    }
 }
 
 void RandomDecisionTree::computeLeafHistograms()
@@ -154,7 +141,8 @@ void RandomDecisionTree::train()
 void RandomDecisionTree::computeDivisionAt(Node &node)
 {
     int px_count = node.m_dataRange.m_dy - node.m_dataRange.m_dx;
-    if(px_count == 0) return;
+    if(px_count == 0)
+        return;
 
     QVector<bool> srtVals(px_count);
 
@@ -166,27 +154,45 @@ void RandomDecisionTree::computeDivisionAt(Node &node)
     Coord maxTeta1, maxTeta2;
     int itr = 0;
 
+    cv::Mat_<float> leftHist(1, labelCount);
+    cv::Mat_<float> rightHist(1, labelCount);
+
+    float leftChildEntr, rightChildEntr;
+    float avgEntropyChild, parentEntr;
+    float infoGain;
+
     while(itr < maxItr)
     {
-        divide(m_DF->m_DS, srtVals, node);
+        auto rng = node.m_dataRange;
+        leftHist.setTo(0.0f);
+        rightHist.setTo(0.0f);
+        int sizeLeft  = 0;
+        int sizeRight = 0;
 
-        auto sizeLeft  = node.m_leftCount;
-        auto sizeRight = node.m_dataRange.m_dy - node.m_dataRange.m_dx - sizeLeft;
-        qDebug() << "Left: " << sizeLeft << ", Right: " << sizeRight;
+        for (int i = rng.m_dx; i < rng.m_dy; ++i) {
+            auto px = m_pixelCloud.pixels[i];
+            auto img = DS.m_trainImagesVector[px->sampleId];
+            if(isLeft(px, node, img))
+            {
+                int index = letterIndex(px->sampleLabel.at(0).toLatin1()); // TODO: fix letterIndex
+                ++leftHist.at(index);
+                sizeLeft++;
+            }
+            else
+            {
+                int index = letterIndex(px->sampleLabel.at(0).toLatin1());
+                ++rightHist.at(index);
+                sizeRight++;
+            }
+        }
 
-        Coord lCrd(node.m_dataRange.m_dx,node.m_dataRange.m_dx+sizeLeft);
-        Coord rCrd(lCrd.m_dy,node.m_dataRange.m_dy);
-        float leftChildEntr = calculateEntropy(computeHistogram(lCrd ,nLabels));
-//        qDebug() << "EntLeft" << leftChildEntr ;
-        float rightChildEntr = calculateEntropy(computeHistogram(rCrd ,nLabels));
-//        qDebug() << "EntRight" << rightChildEntr ;
+        leftChildEntr = calculateEntropy(leftHist);
+        rightChildEntr = calculateEntropy(rightHist);
 
-        float avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
+        avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
         avgEntropyChild += (sizeRight / px_count) * rightChildEntr;
-        float parentEntr = calculateEntropy(computeHistogram(node.m_dataRange, nLabels));
-        float infoGain = parentEntr - avgEntropyChild;
-        // qDebug() << "InfoGain" << infoGain ;
-
+        parentEntr = calculateEntropy(computeHistogram(node.m_dataRange, nLabels));
+        infoGain = parentEntr - avgEntropyChild;
 
         // Non-improving epoch :
         if(infoGain > maxGain)
@@ -253,7 +259,7 @@ void RandomDecisionTree::printPixelCloud()
 void RandomDecisionTree::printPixel(pixel_ptr px)
 {
     qDebug() << "Pixel{ Coor("    << px->position.m_dy     << ","     <<
-             px->position.m_dx
+             px->position.x
              << ") Label("        << px->sampleLabel << ") Id(" <<
              px->sampleId
              << ") = "            << px->intensity << "}";

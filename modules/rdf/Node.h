@@ -7,37 +7,33 @@
 
 struct Node
 {
-    bool m_isLeaf;
-    quint32 m_id;
-    qint16 m_tau;
-    Coord m_teta1, m_teta2;
-    Coord m_dataRange;
-    quint32 m_leftCount;
+    quint32 id;
+    quint32 leftCount;
+    qint16 tau;
+    cv::Point teta1, teta2;
 
+    cv::Mat_<float> hist;
 
-    cv::Mat_<float> m_hist;
-
-    Node() : Node(0, false)
+    Node() : Node(0)
     {
     }
 
-    Node(quint32 id, bool isLeaf): m_id(id), m_isLeaf(isLeaf)
+    Node(quint32 nodeId): id(nodeId)
     {
-        m_hist.create(1, 1);
-        m_hist.setTo(0);
+        hist.create(1, 1);
+        hist.setTo(0);
+    }
+
+    ~Node()
+    {
+        hist.release();
     }
 
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive( m_tau, m_teta1, m_teta2, m_id, m_isLeaf, m_hist);
-    }
-
-    ~Node()
-    {
+        archive( tau, teta1, teta2, id, hist);
     }
 };
-
-using node_ptr  = std::shared_ptr<Node>;
 
 #endif // NODE_H

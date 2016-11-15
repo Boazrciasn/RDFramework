@@ -50,13 +50,14 @@ class RandomDecisionTree : public QObject
 
 
     void train();
-    void constructTreeAtDepth(int height);
+    void constructTreeAtDepth(std::vector<Pixel> &curr,
+                              std::vector<Pixel> &next);
 
     inline void generateTeta(Coord &crd, int probe_x, int probe_y)
     {
         // random number between -probe_distance, probe_distance
         crd.m_dy = m_disProbY(generator);
-        crd.m_dx = m_disProbX(generator) ;
+        crd.x = m_disProbX(generator) ;
     }
 
     inline int generateTau()
@@ -95,10 +96,10 @@ class RandomDecisionTree : public QObject
     inline bool isLeft(pixel_ptr p, Node &node, cv::Mat &img)
     {
         qint16 new_teta1R = node.m_teta1.m_dy + p->position.m_dy;
-        qint16 new_teta1C = node.m_teta1.m_dx + p->position.m_dx;
+        qint16 new_teta1C = node.m_teta1.m_dx + p->position.x;
         qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
         qint16 new_teta2R = node.m_teta2.m_dy + p->position.m_dy ;
-        qint16 new_teta2C = node.m_teta2.m_dx + p->position.m_dx ;
+        qint16 new_teta2C = node.m_teta2.m_dx + p->position.x ;
         qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
         return intensity1 - intensity2 <= node.m_tau;
     }
@@ -149,34 +150,37 @@ private:
     void printPixel(pixel_ptr px);
     void printNode(Node &node);
 
-
-    inline void divide(const DataSet &DS, QVector<bool> srtVals, Node &node)
+    inline void rearrange(Node &node, std::vector<Pixel> &curr,
+                          std::vector<Pixel> &next)
     {
         auto rng = node.m_dataRange;
-        quint32 leftCount = 0;
+        int dx = rng.m_dx;
+        int dy = rng.m_dy-1;
 
         for (int i = rng.m_dx; i < rng.m_dy; ++i) {
-            auto px = m_pixelCloud.pixels[i];
-            auto img = DS.m_trainImagesVector[px->sampleId];
-            auto left = isLeft(px, node, img);
-            srtVals[i-rng.m_dx] = left;
-            if(left)
+            auto px = curr[i];
+            auto img = DS.m_trainImagesVector[px->sampleId]; // TODO: might be to time consuming
+            if(isLeft(px, node, img))
+            {
+                next[dx++] = curr[i];
                 leftCount++;
+            }
+            else
+                next[dy--] = curr[i];
         }
 
-        m_pixelCloud.putInOrder(rng.m_dx,srtVals);
-        node.m_leftCount = leftCount;
+       node.m_leftCount = leftCount;
 
     }
 
     void initNodes();
     void constructTree();
 
-    inline void processNode(node_ptr node, Coord parentData, quint32 leftCount)
+    inline void processNode(node_ptr node, const Coord &parentData, quint32 leftCount)
     {
-        quint32 rightCount = parentData.m_dy - parentData.m_dx - leftCount;
+        quint32 rightCount = parentData.m_dy - parentData.x - leftCount;
         int mult = (node->m_id+1)%2; // 0 if left, 1 if right
-        node->m_dataRange.m_dx = parentData.m_dx + mult*leftCount;
+        node->m_dataRange.m_dx = parentData.x + mult*leftCount;
         node->m_dataRange.m_dy = parentData.m_dy - ((mult+1)%2)*rightCount;
         node->m_tau = generateTau();
         generateTeta(node->m_teta1, m_probe_distanceX, m_probe_distanceY);
@@ -194,7 +198,7 @@ private:
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (int pxIndex = crd.m_dx; pxIndex < crd.m_dy; ++pxIndex) {
+        for (int pxIndex = crd.x; pxIndex < crd.m_dy; ++pxIndex) {
             pixel_ptr px = m_pixelCloud.pixels[pxIndex];
             int index = letterIndex(px->sampleLabel.at(0).toLatin1());
             ++hist.at<float>(0, index);

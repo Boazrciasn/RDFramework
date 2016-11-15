@@ -5,74 +5,32 @@
 #include "precompiled.h"
 #include <tbb/tbb.h>
 
-struct Coord
-{
-    quint16 m_dx{};
-    quint16 m_dy{};
-
-    Coord()
-    {
-    }
-
-    Coord(quint16 x, quint16 y) : m_dx(x), m_dy(y)
-    {
-    }
-
-    Coord(const Coord &c) : m_dx(c.m_dx), m_dy(c.m_dy)
-    {
-    }
-};
-
 struct Pixel
 {
-    Coord position;
-    quint8 intensity;
-    quint32 sampleId;
-    QString sampleLabel;
+    cv::Point position;
+    quint32 id;
+    QString label;
 
-    Pixel(Coord pt, quint8 intnsty, quint32 id, QString label): position(pt),
-        intensity(intnsty), sampleId(id), sampleLabel(label)
+    Pixel(cv::Point pt, quint32 sampleId, QString sampleLabel): position(pt),
+        id(sampleId), label(sampleLabel)
     {
     }
 
-    Pixel(const Pixel &px): position(px.position), intensity(px.intensity),
-        sampleId(px.sampleId), sampleLabel(px.sampleLabel)
+    Pixel(const Pixel &px): position(px.position), id(px.id), label(px.label)
     {
     }
 };
-
-using pixel_ptr = std::shared_ptr<Pixel>;
 
 struct PixelCloud
 {
-    tbb::concurrent_vector<pixel_ptr> pixels{};
+    QVector<Pixel>  pixels1{};
+    QVector<Pixel>  pixels2{};
 
-    void inline swap(int indx1, int indx2)
+    void inline swap()
     {
-        pixel_ptr tmp = pixels.at(indx1);
-        pixels[indx1] = pixels.at(indx2);
-        pixels[indx2] = tmp;
-    }
-
-    // L: false  R: true
-    void inline putInOrder(int start, QVector<bool> relation)
-    {
-        int count = relation.size();
-        bool terminate = false;
-        for(int i = 0; i < count-1; ++i)
-        {
-            if(relation[i]) // R detected
-                for(int j = i+1; j < count; ++j)
-                    if(!relation[j]) // L detected
-                    {
-                        swap(start+i,start+j);
-                        relation[j] = true;
-                        terminate = (j == count-1); // no need to search
-                        break;
-                    }
-            if(terminate)
-                break;
-        }
+        auto tmp = pixels2;
+        pixels2 = pixels1;
+        pixels1 = pixels2;
     }
 };
 
