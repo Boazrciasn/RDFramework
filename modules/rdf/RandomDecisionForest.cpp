@@ -11,43 +11,7 @@
 // getLeafNode and Test  needs rework
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
-void RandomDecisionForest::readTrainingImageFiles()
-{
-    // TODO :  make applicable to both MNIST and image folders
-    std::vector<QString> fNames;
-    m_numOfLetters = fNames.size();
-    qDebug() << "NO OF LETTERS : " << m_numOfLetters;
-    for (auto filePath : fNames)
-    {
-        cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-        cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY,
-                           m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
-        m_DS.m_trainImagesVector.push_back(image);
-    }
-    qDebug() << "No of IMAGES : " << m_DS.m_trainImagesVector.size() << " NO of Fnames" << m_numOfLetters <<
-             "Images Vector Size : " << m_DS.m_trainImagesVector.size();
-    fNames.clear();
-}
 
-void RandomDecisionForest::readTestImageFiles()
-{
-    // TODO :  make applicable to both MNIST and image folders
-    m_DS.m_testImagesVector.clear();
-    m_dir = m_params.testDir;
-    std::vector<QString> fNames;
-
-    for (auto filePath : fNames)
-    {
-        //TODO: reads file with only
-        cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-        //pad image and save to vector
-        cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY,
-                           m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
-        m_DS.m_testImagesVector.push_back(image);
-    }
-    qDebug() << "No of test IMAGES : " << m_DS.m_testImagesVector.size();
-    fNames.clear();
-}
 
 void RandomDecisionForest::readAndIdentifyWords()
 {
@@ -73,7 +37,7 @@ void RandomDecisionForest::readAndIdentifyWords()
         QStringList myStringList = offsetLine.split(' ');
         int offsetX = myStringList[2].split('+')[1].toInt();
         int offsetY = myStringList[3].split('+')[1].toInt();
-        m_DS.m_testImagesVector.clear();
+        m_DS.m_ImagesVector.clear();
         cv::Mat image = cv::imread(filePath.toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
         // Call word extractor
         QVector<QRect> wordsRoi = TextRegionDetector::detectWordsFromLine(image,
@@ -81,10 +45,10 @@ void RandomDecisionForest::readAndIdentifyWords()
         //pad image and save to vector
         cv::copyMakeBorder(image, image, m_params.probDistY, m_params.probDistY,
                            m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
-        m_DS.m_testImagesVector.push_back(image);
+        m_DS.m_ImagesVector.push_back(image);
         //Note: index 0 because there is only one image at each step
         QVector<quint32> fgPxNumberPerCol;
-        cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[0], 0,
+        cv::Mat layeredImage = getLayeredHist(m_DS.m_ImagesVector[0], 0,
                                               fgPxNumberPerCol);
         for(QRect wordRoi : wordsRoi)
         {
@@ -183,8 +147,8 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image,
 //img_Info : label of  test image & id of the image inside vector(optional)
-void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
-                                         const cv::Mat &image , imageinfo_ptr img_inf )
+void RandomDecisionForest::imageToPixels(QVector<Pixel> &res,
+                                         const cv::Mat &image , quint32 id, int label )
 {
     int nRows = image.rows;
     int nCols = image.cols;
@@ -192,8 +156,7 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
     {
         for(int j = 0; j < nCols; ++j)
         {
-            auto intensity = image.at<uchar>(i, j);
-            pixel_ptr px(new Pixel(Coord(i, j), intensity, img_inf));
+            Pixel px(cv::Point(i, j), id, label);
             res.push_back(px);
         }
     }
@@ -203,11 +166,11 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
 // checks if a pixel will travel to the left of a given node
 // divide pixel vector into 2 parts according to the parameters of parent node
 // returns the image the pixel belongs to
-cv::Mat RandomDecisionForest::getPixelImage(pixel_ptr px)
+cv::Mat RandomDecisionForest::getPixelImage(Pixel &px)
 {
-    QString path = m_dir + "/" + px->imgInfo->m_label + "/" + px->imgInfo->m_label +
+    QString path = m_dir + "/" + px.label + "/" + px.label +
                    "_"
-                   + QString::number(px->imgInfo->m_sampleId)  + ".jpg";
+                   + QString::number(px.id)  + ".jpg";
     //qDebug()<<"IMAGE :"<< path;
     return cv::imread(path.toStdString());
 }
@@ -251,10 +214,10 @@ void RandomDecisionForest::trainForest()
         qDebug() << "Tree number " << QString::number(i + 1) << "is being trained" ;
         //        }
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
-        rdt_ptr trainedRDT(new RandomDecisionTree(this));
+        rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS));
         trainedRDT->setProbeDistanceX(m_params.probDistX);
         trainedRDT->setProbeDistanceY(m_params.probDistY);
-        trainedRDT->setMaxDepth(m_params.maxDepth);
+//        trainedRDT->initNodes(m_params.maxDepth); // TODO: Fix
         trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
         //#pragma omp critical (DEBUG)
         //        {
@@ -285,7 +248,6 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index,
     //typecheck
     cv::Mat layeredHist = cv::Mat(nRows - 2 * probDistY,
                                   (nCols - 2 * probDistX) * labelCount, CV_32FC1);
-    imageinfo_ptr img_Info(new ImageInfo(" ", index));
     int rangeRows = nRows - probDistY;
     int rangeCols = nCols - probDistX;
     for(int c = probDistX; c < rangeCols; ++c)
@@ -303,12 +265,12 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index,
             else
             {
                 ++fgPxCount;
-                pixel_ptr px(new Pixel(Coord(r, c), intensity, img_Info));
+                Pixel px(cv::Point(r, c), index, 0);
                 auto nForest = m_forest.size();
                 for(unsigned int i = 0; i < nForest; ++i)
                 {
-                    node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
-                    probHist += leaf->m_hist;
+//                    node_ptr leaf = m_forest[i]->getLeafNode(m_DS, px, 0);
+//                    probHist += leaf->m_hist;
                 }
                 //Normalize the Histrograms
                 float sum = cv::sum(probHist)[0];
@@ -356,12 +318,12 @@ cv::Mat_<float> RandomDecisionForest::createLetterConfidenceMatrix(const cv::Mat
 
 void RandomDecisionForest::test()
 {
-    int nImages = m_DS.m_testImagesVector.size();
+    int nImages = m_DS.m_ImagesVector.size();
     qDebug() << "Number of Test images:" << QString::number(nImages);
     for(auto i = 0; i < nImages; ++i)
     {
         QVector<quint32> fgPxNumberPerCol;
-        cv::Mat layeredImage = getLayeredHist(m_DS.m_testImagesVector[i], i,
+        cv::Mat layeredImage = getLayeredHist(m_DS.m_ImagesVector[i], i,
                                               fgPxNumberPerCol);
         cv::Mat_<float> confidenceMat = createLetterConfidenceMatrix(layeredImage, fgPxNumberPerCol);
         //        std::cout<<confidenceMat.row(0)<<std::endl;

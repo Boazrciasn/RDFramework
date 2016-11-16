@@ -1,6 +1,8 @@
 #ifndef RDFPARAMS_H
 #define RDFPARAMS_H
 
+#include "precompiled.h"
+
 struct RDFParams
 {
     QString trainImagesDir;
@@ -21,11 +23,6 @@ struct RDFParams
         archive(probDistX, probDistY, nTrees, maxDepth, pixelsPerImage, minLeafPixels,
                 labelCount, maxIteration);
     }
-
-    ~RDFParams()
-    {
-    }
-
 };
 
 #endif // RDFPARAMS_H

@@ -74,20 +74,14 @@ inline double sumall(const T &container, const FUNC &func)
     return sum;
 }
 
-inline int letterIndex(char letter)
-{
-    return letter - 'a';
-}
-
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
 inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 {
     cv::Mat_<float> hist(1, labelCount);
     hist.setTo(0.0f);
-    for (auto px : pixels)
+    for (auto px : pixels.pixels1)
     {
-        int index = letterIndex(px->imgInfo->m_label.at(0).toLatin1());
-        ++hist.at<float>(0, index);
+        ++hist.at<float>(0, px.label);
     }
     return hist;
 }
@@ -114,6 +108,7 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
 
 inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
 {
+
     return calculateEntropy(createHistogram(pixels, labelCount));
 }
 
@@ -216,12 +211,12 @@ class Util
     static std::vector<cv::Rect> calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize ,
                                                           quint16 maxSize, double aspectMax, double aspectMin);
     static void drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes);
-    static void Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
+    static void inline Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
         cv::erode(inputImg, outputImg, element);
     }
-    static void Dilation(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
+    static void inline Dilation(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
         cv::dilate(inputImg, outputImg, element);

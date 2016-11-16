@@ -2,7 +2,7 @@
 #define READERGUI_H
 #include "precompiled.h"
 #include "Reader.h"
-#include "modules/rdf/RandomDecisionTree.h"
+#include "modules/rdf/DataSet.h"
 #include <QWidget>
 
 namespace Ui

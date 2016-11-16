@@ -29,7 +29,7 @@ void RandomDecisionForestDialogGui::onTrainingBrowse()
 {
     PARAMS.trainImagesDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), QDir::currentPath(),
                                                               QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    m_forest->readTrainingImageFiles();
+    //FIX ME : add loader
     ui->textBrowser_train->append("Training images read");
     ui->textBrowser_train->setText(PARAMS.trainImagesDir);
 }
@@ -38,7 +38,7 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 {
     PARAMS.testDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), PARAMS.trainImagesDir,
                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    m_forest->readTestImageFiles();
+    //FIX ME : add loader
     ui->textBrowser_test->append("Test images read");
     ui->textBrowser_test->setText(PARAMS.testDir);
 }
@@ -54,7 +54,7 @@ void RandomDecisionForestDialogGui::onTrain()
     PARAMS.labelCount = ui->spinBox_LabelCount->value();
     PARAMS.maxIteration = ui->spinBox_MaxIteration->value();
     m_forest->setParams(PARAMS);
-    if(m_forest->params().trainImagesDir.isEmpty())
+    if (m_forest->params().trainImagesDir.isEmpty())
     {
         auto *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -65,7 +65,7 @@ void RandomDecisionForestDialogGui::onTrain()
     Util::calcWidthHeightStat(m_forest->params().trainImagesDir);
     m_treeid = 0;
     m_forest->trainForest();
-    ui->textBrowser_train->append(  "Forest Trained ! ");
+    ui->textBrowser_train->append("Forest Trained ! ");
     ui->textBrowser_train->repaint();
 }
 
@@ -73,7 +73,7 @@ void RandomDecisionForestDialogGui::onTest()
 {
     m_forest->params().testDir = PARAMS.testDir;
     //m_forest->readAndIdentifyWords();
-    if(m_forest->params().testDir.isEmpty())
+    if (m_forest->params().testDir.isEmpty())
     {
         QMessageBox *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -115,7 +115,7 @@ void RandomDecisionForestDialogGui::onLoad()
                         this,
                         tr("Load Forest Directory"),
                         QDir::currentPath(),
-                        tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)" ),
+                        tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)"),
                         &selfilter
                     );
     m_forest->loadForest(fname);

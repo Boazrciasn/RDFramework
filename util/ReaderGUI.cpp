@@ -25,7 +25,7 @@ void ReaderGUI::load()
     {
         QString dir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), QDir::currentPath(),
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-        if (!m_DS->m_testImagesVector.empty())
+        if (!m_DS->m_ImagesVector.empty())
         {
             ui->LoadedDataset_label->setText(dir);
             emit imagesLoaded(true);
@@ -37,15 +37,15 @@ void ReaderGUI::load()
         QString dir = QFileDialog::getOpenFileName(this, tr("Open Dataset File"), QDir::currentPath());
         if (!dir.isEmpty())
         {
-            m_reader->readImages(dir, m_DS->m_testImagesVector, m_dFlag);
-            if (!m_DS->m_testImagesVector.empty())
+            m_reader->readImages(dir, m_DS->m_ImagesVector, m_dFlag);
+            if (!m_DS->m_ImagesVector.empty())
             {
                 ui->LoadedDataset_label->setText(dir);
                 emit imagesLoaded(true);
             }
             dir.replace(QRegExp("images.idx3"), "labels.idx1");
-            m_reader->readLabels(dir, m_DS->m_testlabels, m_dFlag);
-            if (!m_DS->m_testlabels.empty())
+            m_reader->readLabels(dir, m_DS->m_labels, m_dFlag);
+            if (!m_DS->m_labels.empty())
             {
                 ui->labelFilepath_label->setText(dir);
                 emit labelsLoaded(true);
