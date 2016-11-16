@@ -41,7 +41,7 @@ void Reader::findImages(QString baseDir, QString query, std::vector<QString> &fo
     }
 }
 
-void Reader::readImages(QString dir, std::vector<cv::Mat> &foundImages, int flags = Type_Standard)
+void Reader::readImages(QString dir, std::vector<cv::Mat> &images, int flags = Type_Standard)
 {
     switch (flags)
     {
@@ -53,14 +53,14 @@ void Reader::readImages(QString dir, std::vector<cv::Mat> &foundImages, int flag
         {
             itFile.next();
             cv::Mat image = cv::imread(itFile.filePath().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-            foundImages.push_back(image);
+            images.push_back(image);
         }
         break;
     }
     case Type_MNIST:
     {
         MNIST mnist;
-        mnist.readMINST(dir, foundImages);
+        mnist.readMINST(dir, images);
         break;
     }
     default:
@@ -76,6 +76,26 @@ void Reader::readImages(QString dir, std::vector<QString> &foundImages)
     {
         itFile.next();
         foundImages.push_back(itFile.filePath());
+    }
+}
+
+void Reader::readLabels(QString dir, std::vector<int> &labels, int flags)
+{
+    switch (flags)
+    {
+    case Type_Standard:
+    {
+        // TO DO : Create a custom label storage type and its reader!
+        break;
+    }
+    case Type_MNIST:
+    {
+        MNIST mnist;
+        mnist.readMINSTLabel(dir, labels);
+        break;
+    }
+    default:
+        break;
     }
 }
 

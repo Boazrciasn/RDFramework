@@ -12,6 +12,7 @@
 #include "util/Reader.h"
 #include "ocr/MyDialogGui.h"
 #include "ocr/HistogramDialogGui.h"
+#include "util/ReaderGUI.h"
 #include "Util.h"
 
 namespace Ui
@@ -31,8 +32,8 @@ class DisplayImagesWidgetGui : public QWidget
     void display();
 
   private slots:
-    void extractWords();
-    void browseButton_clicked();
+    void imagesLoaded(bool loaded);
+    void labelsLoaded(bool loaded);
     void prevButton_clicked();
     void nextButton_clicked();
 
@@ -46,6 +47,9 @@ class DisplayImagesWidgetGui : public QWidget
     QString m_dir;
     std::vector<QString> m_words;     // file names are stored
     std::vector<QString> m_coords;     // file names are stored
+    ReaderGUI *m_readerGUI;
+    bool m_labelsLoaded = false;
+
 };
 
 #endif // DISPLAYIMAGESWIDGETGUI_H

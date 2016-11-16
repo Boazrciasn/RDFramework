@@ -63,6 +63,7 @@ bool MNIST::readMINST(QString path, ImageDataSet &vec)
             tp.convertTo(tp,CV_8UC1,255);
             vec.push_back(tp);
         }
+        file.close();
         return true;
     }
 }
@@ -79,7 +80,7 @@ bool MNIST::readMINSTLabel(QString path, LabelDataSet &vec)
         messageBox.exec();
         return false;
     }
-    else if (file.is_open())
+    else if (!file.is_open())
     {
         QMessageBox messageBox(QMessageBox::Warning, "Error", "File can not be opened !");
         messageBox.exec();
@@ -99,6 +100,9 @@ bool MNIST::readMINSTLabel(QString path, LabelDataSet &vec)
             file.read((char *) &temp, sizeof(temp));
             vec.push_back((int) temp);
         }
+        file.close();
         return true;
+
     }
+
 }

@@ -25,9 +25,9 @@ class Reader
     static void findImages(QString baseDir, QString query, std::vector<QString> &foundImages);
     static void readTextFiles(QString baseDir, std::vector<QString> &foundText);
     static void readTextFiles(QString baseDir, QString query, std::vector<QString> &foundText);
-    static void readImages(QString dir, std::vector<cv::Mat> &foundImages, int flags);
+    static void readImages(QString dir, std::vector<cv::Mat> &images, int flags);
     static void readImages(QString dir, std::vector<QString> &foundImages);
-
+    static void readLabels(QString dir, std::vector<int> &labels, int flags);
     inline void setReadDir(QString dir) { m_dir = dir; }
 
   private:

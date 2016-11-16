@@ -164,12 +164,9 @@ int main(int argc, char *argv[])
     //        std::cout << "distBhat " << " " << decision << "\n"; //<<" confidence: " <<confidence <<std::endl;
     //    }
     //    std::cout << "Rate: " << -100*rate/foundImages.size()<<std::endl;
-    QString MNIST_path = "/Users/barisozcan/Documents/MNIST_dataset/blahblah.xml";
-    std::vector<cv::Mat> test;
-    Reader reader;
+
     QApplication app(argc, argv);
     MainWindowGui w;
     w.show();
-    reader.readImages(MNIST_path, test, Type_MNIST);
     return app.exec();
 }
