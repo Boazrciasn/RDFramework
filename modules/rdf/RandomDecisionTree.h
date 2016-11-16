@@ -24,169 +24,126 @@
 #include "Node.h"
 #include "DataSet.h"
 
-class RandomDecisionForest;
-
-
-using treeNodes = tbb::concurrent_vector<node_ptr>;
 using rdfclock  = std::chrono::high_resolution_clock;
-
-
 
 class RandomDecisionTree : public QObject
 {
     Q_OBJECT
-
-  public:
-    RandomDecisionTree(RandomDecisionForest *DF);
-
-    RandomDecisionForest *m_DF;
-    treeNodes m_nodes;
+private:
     quint32 m_minLeafPixelCount;
-    int m_height{};
-    int m_numOfLeaves{};
-    int m_maxDepth{};
-    int m_probe_distanceX{};
-    int m_probe_distanceY{};
+    quint32 m_hight{};
+    quint32 m_probe_distanceX{};
+    quint32 m_probe_distanceY{};
 
+    QVector<Node> m_nodes;
+    PixelCloud m_pixelCloud;
+    DataSet *m_DS;
 
+    // Random number generators
+    std::mt19937 generator;
+    std::uniform_int_distribution<> m_yProbDistribution;
+    std::uniform_int_distribution<> m_xProbDistribution;
+    std::uniform_int_distribution<> m_tauProbDistribution;
+
+signals:
+  void treeConstructed();
+
+public:
+    RandomDecisionTree(DataSet *DS);
     void train();
-    void constructTreeAtDepth(std::vector<Pixel> &curr,
-                              std::vector<Pixel> &next);
-
-    inline void generateTeta(Coord &crd, int probe_x, int probe_y)
-    {
-        // random number between -probe_distance, probe_distance
-        crd.m_dy = m_disProbY(generator);
-        crd.x = m_disProbX(generator) ;
-    }
-
-    inline int generateTau()
-    {
-        // random number between -127, +128
-        return m_disProbTau(generator);
-    }
-
-    inline void setMaxDepth(int max_depth)
-    {
-        m_maxDepth = max_depth;
-        auto size = (1 << m_maxDepth) - 1 ;
-        m_nodes.resize(size);
-    }
+    void printTree();
 
     inline void setProbeDistanceX(int probe_distanceX )
     {
         m_probe_distanceX = probe_distanceX;
-        m_disProbX   = std::uniform_int_distribution<>(-m_probe_distanceX,
+        m_xProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceX,
                                                        m_probe_distanceX);
     }
+
     inline void setProbeDistanceY(int probe_distanceY )
     {
         m_probe_distanceY = probe_distanceY;
-        m_disProbY   = std::uniform_int_distribution<>(-m_probe_distanceY,
+        m_yProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceY,
                                                        m_probe_distanceY);
     }
 
-    inline void setMinimumLeafPixelCount(unsigned int min_leaf_pixel_count)
+    inline void setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
     {
         m_minLeafPixelCount = min_leaf_pixel_count;
-    }
-
-    void computeDivisionAt(Node &node);
-
-    inline bool isLeft(pixel_ptr p, Node &node, cv::Mat &img)
-    {
-        qint16 new_teta1R = node.m_teta1.m_dy + p->position.m_dy;
-        qint16 new_teta1C = node.m_teta1.m_dx + p->position.x;
-        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
-        qint16 new_teta2R = node.m_teta2.m_dy + p->position.m_dy ;
-        qint16 new_teta2C = node.m_teta2.m_dx + p->position.x ;
-        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
-        return intensity1 - intensity2 <= node.m_tau;
-    }
-
-    inline node_ptr getLeafNode(const DataSet &DS, pixel_ptr px, int nodeId)
-    {
-        // TODO: modify
-        node_ptr root = m_nodes[nodeId];
-//        assert(root);
-//        if(root->m_isLeaf)
-//        {
-//            // qDebug()<<"LEAF REACHED :"<<root.id;
-//            return root;
-//        }
-//        cv::Mat img = DS.m_testImagesVector[px->sampleId];
-//        int childId = root->m_id * 2 ;
-//        //qDebug()<<"LEAF SEARCH :"<<root.id << " is leaf : " << root.isLeaf;
-//        if(!isLeft(px, *root, img))
-//            ++childId;
-        return getLeafNode(DS, px, 1);
-    }
-
-    bool isPixelSizeConsistent();
-    void toString();
-    void printTree();
-
-    ~RandomDecisionTree()
-    {
-        m_nodes.clear();
     }
 
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive( m_height, m_numOfLeaves, m_maxDepth, m_probe_distanceX,
+        archive(m_hight, m_probe_distanceX,
                  m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 
+    ~RandomDecisionTree()
+    {
+        m_nodes.clear();
+    }
 private:
-    PixelCloud m_pixelCloud;
-    std::mt19937 generator;
-    std::uniform_int_distribution<> m_disProbY;
-    std::uniform_int_distribution<> m_disProbX;
-    std::uniform_int_distribution<> m_disProbTau;
+    void getSubSample();
 
-    void subSample();
+    void constructTree();
+    void constructRootNode();
+    void constructTreeDecisionNodes();
+    void computeLeafHistograms();
+    void computeDivisionAt(quint32 index);
+    void rearrange(quint32 index);
+    bool isPixelSizeConsistent();
+
+    void toString();
     void printPixelCloud();
-    void printPixel(pixel_ptr px);
+    void printPixel(Pixel &px);
     void printNode(Node &node);
 
-    inline void rearrange(Node &node, std::vector<Pixel> &curr,
-                          std::vector<Pixel> &next)
+    inline void initNodes()
     {
-        auto rng = node.m_dataRange;
-        int dx = rng.m_dx;
-        int dy = rng.m_dy-1;
-
-        for (int i = rng.m_dx; i < rng.m_dy; ++i) {
-            auto px = curr[i];
-            auto img = DS.m_trainImagesVector[px->sampleId]; // TODO: might be to time consuming
-            if(isLeft(px, node, img))
-            {
-                next[dx++] = curr[i];
-                leftCount++;
-            }
-            else
-                next[dy--] = curr[i];
-        }
-
-       node.m_leftCount = leftCount;
-
+        auto size = (1ul << m_hight) - 1 ;
+        m_nodes.resize(size);
     }
 
-    void initNodes();
-    void constructTree();
-
-    inline void processNode(node_ptr node, const Coord &parentData, quint32 leftCount)
+    inline void processNode(quint32 index)
     {
-        quint32 rightCount = parentData.m_dy - parentData.x - leftCount;
-        int mult = (node->m_id+1)%2; // 0 if left, 1 if right
-        node->m_dataRange.m_dx = parentData.x + mult*leftCount;
-        node->m_dataRange.m_dy = parentData.m_dy - ((mult+1)%2)*rightCount;
-        node->m_tau = generateTau();
-        generateTeta(node->m_teta1, m_probe_distanceX, m_probe_distanceY);
-        generateTeta(node->m_teta2, m_probe_distanceX, m_probe_distanceY);
+        int mult = (index+1)%2; // 0 if left, 1 if right
+        int parentId = (index+1)/2 - 1;
 
-        computeDivisionAt(*node);
+        quint32 leftCount = m_nodes[parentId].leftCount;
+        quint32 rightCount = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
+
+        m_nodes[index].id = index;
+        m_nodes[index].start = m_nodes[parentId].start + mult*leftCount;
+        m_nodes[index].end = m_nodes[parentId].end - ((mult+1)%2)*rightCount;
+
+        m_nodes[index].tau = generateTau();
+        generateTeta(m_nodes[index].teta1);
+        generateTeta(m_nodes[index].teta2);
+        computeDivisionAt(index);
+    }
+
+    inline bool isLeft(Pixel &p, Node &node, cv::Mat &img)
+    {
+        qint16 new_teta1R = node.teta1.y + p.position.y;
+        qint16 new_teta1C = node.teta1.x + p.position.x;
+        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
+        qint16 new_teta2R = node.teta2.y + p.position.y;
+        qint16 new_teta2C = node.teta2.x + p.position.x;
+        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
+        return (intensity1 - intensity2) <= node.tau;
+    }
+
+    inline void generateTeta(cv::Point &crd)
+    {
+        crd.y = m_yProbDistribution(generator);
+        crd.x = m_xProbDistribution(generator) ;
+    }
+
+    inline int generateTau()
+    {
+        // random number between -127, +128
+        return m_tauProbDistribution(generator);
     }
 
     inline int letterIndex(char letter)
@@ -194,20 +151,18 @@ private:
         return letter - 'a';
     }
 
-    inline cv::Mat_<float> computeHistogram(Coord crd, int labelCount)
+    inline cv::Mat_<float> computeHistogram(quint16 start, quint16 end, int labelCount)
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (int pxIndex = crd.x; pxIndex < crd.m_dy; ++pxIndex) {
-            pixel_ptr px = m_pixelCloud.pixels[pxIndex];
-            int index = letterIndex(px->sampleLabel.at(0).toLatin1());
+        for (int pxIndex = start; pxIndex < end; ++pxIndex) {
+            Pixel px = m_pixelCloud.pixels1[pxIndex];
+            int index = letterIndex(px.label.at(0).toLatin1());
             ++hist.at<float>(0, index);
         }
 
         return hist;
     }
-
-    void computeLeafHistograms();
 };
 
 using rdt_ptr = std::shared_ptr<RandomDecisionTree>;

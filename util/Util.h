@@ -84,9 +84,9 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 {
     cv::Mat_<float> hist(1, labelCount);
     hist.setTo(0.0f);
-    for (auto px : pixels.pixels)
+    for (auto px : pixels.pixels1)
     {
-        int index = letterIndex(px->sampleLabel.at(0).toLatin1());
+        int index = letterIndex(px.label.at(0).toLatin1());
         ++hist.at<float>(0, index);
     }
     return hist;

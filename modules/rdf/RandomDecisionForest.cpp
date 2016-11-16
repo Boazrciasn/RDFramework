@@ -187,7 +187,7 @@ void RandomDecisionForest::searchWords(QString query, int queryId)
 
 //FOR TEST PURPOSES ONLY : given the image path, fills the vector with in the pixels of the image,
 //img_Info : label of  test image & id of the image inside vector(optional)
-void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
+void RandomDecisionForest::imageToPixels(QVector<Pixel> &res,
                                          const cv::Mat &image , quint32 id, QString label )
 {
     int nRows = image.rows;
@@ -196,8 +196,7 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
     {
         for(int j = 0; j < nCols; ++j)
         {
-            auto intensity = image.at<uchar>(i, j);
-            pixel_ptr px(new Pixel(Coord(i, j), intensity, id, label));
+            Pixel px(cv::Point(i, j), id, label);
             res.push_back(px);
         }
     }
@@ -207,11 +206,11 @@ void RandomDecisionForest::imageToPixels(std::vector<pixel_ptr> &res,
 // checks if a pixel will travel to the left of a given node
 // divide pixel vector into 2 parts according to the parameters of parent node
 // returns the image the pixel belongs to
-cv::Mat RandomDecisionForest::getPixelImage(pixel_ptr px)
+cv::Mat RandomDecisionForest::getPixelImage(Pixel &px)
 {
-    QString path = m_dir + "/" + px->sampleLabel + "/" + px->sampleLabel +
+    QString path = m_dir + "/" + px.label + "/" + px.label +
                    "_"
-                   + QString::number(px->sampleId)  + ".jpg";
+                   + QString::number(px.id)  + ".jpg";
     //qDebug()<<"IMAGE :"<< path;
     return cv::imread(path.toStdString());
 }
@@ -255,10 +254,10 @@ void RandomDecisionForest::trainForest()
         qDebug() << "Tree number " << QString::number(i + 1) << "is being trained" ;
         //        }
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
-        rdt_ptr trainedRDT(new RandomDecisionTree(this));
+        rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS));
         trainedRDT->setProbeDistanceX(m_params.probDistX);
         trainedRDT->setProbeDistanceY(m_params.probDistY);
-        trainedRDT->setMaxDepth(m_params.maxDepth);
+//        trainedRDT->initNodes(m_params.maxDepth); // TODO: Fix
         trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
         //#pragma omp critical (DEBUG)
         //        {
@@ -306,7 +305,7 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat test_image, int index,
             else
             {
                 ++fgPxCount;
-                pixel_ptr px(new Pixel(Coord(r, c), intensity, index, " "));
+                Pixel px(cv::Point(r, c), index, " ");
                 auto nForest = m_forest.size();
                 for(unsigned int i = 0; i < nForest; ++i)
                 {

@@ -57,10 +57,10 @@ class RandomDecisionForest : public QObject
     void readTrainingImageFiles();
     void readTestImageFiles();
     void printPixelCloud();
-    void printPixel(pixel_ptr px);
+    void printPixel(Pixel &px);
     int pixelCloudSize();
-    cv::Mat getPixelImage(pixel_ptr px);
-    void imageToPixels(std::vector<pixel_ptr> &res, const cv::Mat &image,
+    cv::Mat getPixelImage(Pixel &px);
+    void imageToPixels(QVector<Pixel> &res, const cv::Mat &image,
                        quint32 id, QString label);
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void trainForest();
@@ -109,7 +109,6 @@ class RandomDecisionForest : public QObject
 
   signals:
     void classifiedImageAs(int image_no, char label);
-    void treeConstructed();
     void resultPercentage(double accuracy);
 
 };
@@ -134,7 +133,7 @@ void load(Archive &archive,
     rdf.m_forest.resize(size);
     for(auto i = 0; i < size; ++i)
     {
-        rdt_ptr rdt(new RandomDecisionTree(&rdf));
+        rdt_ptr rdt(new RandomDecisionTree(&rdf.m_DS));
 //        archive(*rdt);    // TODO: fix RDT archive
         rdf.m_forest[i] = rdt;
     }

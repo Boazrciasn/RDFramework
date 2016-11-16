@@ -7,10 +7,12 @@
 
 struct Node
 {
-    quint32 id;
-    quint32 leftCount;
-    qint16 tau;
-    cv::Point teta1, teta2;
+    quint32 id{};
+    quint32 start{};
+    quint32 end{};
+    quint32 leftCount{};
+    qint16 tau{};
+    cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
 
@@ -18,7 +20,7 @@ struct Node
     {
     }
 
-    Node(quint32 nodeId): id(nodeId)
+    Node(quint32 nodeId) : id(nodeId)
     {
         hist.create(1, 1);
         hist.setTo(0);

@@ -11,6 +11,10 @@ struct Pixel
     quint32 id;
     QString label;
 
+    Pixel() : Pixel(cv::Point(0,0),0,"")
+    {
+    }
+
     Pixel(cv::Point pt, quint32 sampleId, QString sampleLabel): position(pt),
         id(sampleId), label(sampleLabel)
     {
@@ -30,7 +34,7 @@ struct PixelCloud
     {
         auto tmp = pixels2;
         pixels2 = pixels1;
-        pixels1 = pixels2;
+        pixels1 = tmp;
     }
 };
 
