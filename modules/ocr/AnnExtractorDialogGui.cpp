@@ -138,7 +138,7 @@ bool AnnExtractorDialogGui::loadFiles()
                 QDir::currentPath(), QFileDialog::ShowDirsOnly |
                 QFileDialog::DontResolveSymlinks);
     m_fNames.clear();
-    m_reader.findImages(m_Loaddir, m_searchChar, m_fNames);
+
 
     if(m_fNames.size() == 0)
     {

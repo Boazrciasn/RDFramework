@@ -74,11 +74,6 @@ inline double sumall(const T &container, const FUNC &func)
     return sum;
 }
 
-inline int letterIndex(char letter)
-{
-    return letter - 'a';
-}
-
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
 inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 {
@@ -86,8 +81,7 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
     hist.setTo(0.0f);
     for (auto px : pixels.pixels1)
     {
-        int index = letterIndex(px.label.at(0).toLatin1());
-        ++hist.at<float>(0, index);
+        ++hist.at<float>(0, px.label);
     }
     return hist;
 }

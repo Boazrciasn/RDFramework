@@ -9,13 +9,13 @@ struct Pixel
 {
     cv::Point position;
     quint32 id;
-    QString label;
+    int label;
 
-    Pixel() : Pixel(cv::Point(0,0),0,"")
+    Pixel() : Pixel(cv::Point(0,0),0,0)
     {
     }
 
-    Pixel(cv::Point pt, quint32 sampleId, QString sampleLabel): position(pt),
+    Pixel(cv::Point pt, quint32 sampleId, int sampleLabel): position(pt),
         id(sampleId), label(sampleLabel)
     {
     }

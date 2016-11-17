@@ -44,8 +44,6 @@ void ResizeAllImagesDialogGui::on_pushButton_resizeall_clicked()
     }
 
     std::vector<QString> fNames;
-    auto *reader = new Reader();
-    reader->findImages(m_browseDir, "", fNames);
     int width = ui->spinBox_width->value();
     int height = ui->spinBox_height->value();
 

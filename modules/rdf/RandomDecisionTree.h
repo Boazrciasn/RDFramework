@@ -29,7 +29,7 @@ using rdfclock  = std::chrono::high_resolution_clock;
 class RandomDecisionTree : public QObject
 {
     Q_OBJECT
-private:
+  private:
     quint32 m_minLeafPixelCount;
     quint32 m_hight{};
     quint32 m_probe_distanceX{};
@@ -45,26 +45,26 @@ private:
     std::uniform_int_distribution<> m_xProbDistribution;
     std::uniform_int_distribution<> m_tauProbDistribution;
 
-signals:
-  void treeConstructed();
+  signals:
+    void treeConstructed();
 
-public:
+  public:
     RandomDecisionTree(DataSet *DS);
     void train();
     void printTree();
 
-    inline void setProbeDistanceX(int probe_distanceX )
+    inline void setProbeDistanceX(int probe_distanceX)
     {
         m_probe_distanceX = probe_distanceX;
         m_xProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceX,
-                                                       m_probe_distanceX);
+                                                                m_probe_distanceX);
     }
 
-    inline void setProbeDistanceY(int probe_distanceY )
+    inline void setProbeDistanceY(int probe_distanceY)
     {
         m_probe_distanceY = probe_distanceY;
         m_yProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceY,
-                                                       m_probe_distanceY);
+                                                                m_probe_distanceY);
     }
 
     inline void setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
@@ -76,14 +76,14 @@ public:
     void serialize(Archive &archive)
     {
         archive(m_hight, m_probe_distanceX,
-                 m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+                m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 
     ~RandomDecisionTree()
     {
         m_nodes.clear();
     }
-private:
+  private:
     void getSubSample();
 
     void constructTree();
@@ -107,16 +107,13 @@ private:
 
     inline void processNode(quint32 index)
     {
-        int mult = (index+1)%2; // 0 if left, 1 if right
-        int parentId = (index+1)/2 - 1;
-
+        int mult = (index + 1) % 2; // 0 if left, 1 if right
+        int parentId = (index + 1) / 2 - 1;
         quint32 leftCount = m_nodes[parentId].leftCount;
         quint32 rightCount = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
-
         m_nodes[index].id = index;
-        m_nodes[index].start = m_nodes[parentId].start + mult*leftCount;
-        m_nodes[index].end = m_nodes[parentId].end - ((mult+1)%2)*rightCount;
-
+        m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
+        m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
         m_nodes[index].tau = generateTau();
         generateTeta(m_nodes[index].teta1);
         generateTeta(m_nodes[index].teta2);
@@ -155,12 +152,11 @@ private:
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (int pxIndex = start; pxIndex < end; ++pxIndex) {
+        for (int pxIndex = start; pxIndex < end; ++pxIndex)
+        {
             Pixel px = m_pixelCloud.pixels1[pxIndex];
-            int index = letterIndex(px.label.at(0).toLatin1());
-            ++hist.at<float>(0, index);
+            ++hist.at<float>(0, px.label);
         }
-
         return hist;
     }
 };

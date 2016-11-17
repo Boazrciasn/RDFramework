@@ -51,13 +51,14 @@ file(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataEx
 
 
 # Create Qt MOC files
-QT5_WRAP_UI(UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui
+QT5_WRAP_UI(UISrcs  Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui
                     modules/ocr/AnnExtractorDialogGui.ui modules/ocr/ExtractedDialogGui.ui modules/ocr/HistogramDialogGui.ui modules/ocr/MyDialogGui.ui
                     modules/rdf/RandomDecisionForestDialogGui.ui
                     modules/tracking/particlefilter/ParticleFilterWidgetGui.ui
                     modules/tracking/dataExtraction/DataExtractorGui.ui
                     modules/tracking/dataExtraction/PredictorGui.ui
-                    modules/tracking/videoplayer/VideoPlayerGui.ui)
+                    modules/tracking/videoplayer/VideoPlayerGui.ui
+                    util/ReaderGUI.ui)
 
 add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
                 ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${3RDPARTY} ${DEXTRACT} ${UISrcs})

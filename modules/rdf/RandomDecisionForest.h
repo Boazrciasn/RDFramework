@@ -54,14 +54,12 @@ class RandomDecisionForest : public QObject
 
     void readAndIdentifyWords();
     void searchWords(QString query, int queryId);
-    void readTrainingImageFiles();
-    void readTestImageFiles();
     void printPixelCloud();
     void printPixel(Pixel &px);
     int pixelCloudSize();
     cv::Mat getPixelImage(Pixel &px);
     void imageToPixels(QVector<Pixel> &res, const cv::Mat &image,
-                       quint32 id, QString label);
+                       quint32 id, int label);
     cv::Mat colorCoder(const cv::Mat &labelImage, const cv::Mat &InputImage);
     void trainForest();
     void test();
