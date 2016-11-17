@@ -9,8 +9,6 @@
 #include "BufferQueue.h"
 #include "tracking/particlefilter/ParticleFilter.h"
 
-//#include "opencv2/opencv.hpp"  //TODO: move to precompiled
-
 class VideoReader : public QThread
 {
     Q_OBJECT

@@ -1,7 +1,7 @@
 #include "RandomDecisionTree.h"
 #include "RandomDecisionForest.h"
 
-RandomDecisionTree::RandomDecisionTree(DataSet *DS) : m_DS(DS)
+RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS), m_params(params)
 {
     //        rdfclock::time_point beginning = rdfclock::now();
     //        rdfclock::duration d = rdfclock::now()-beginning;
@@ -28,8 +28,8 @@ void RandomDecisionTree::getSubSample()
         auto id = sampleId++;
         int nRows = image.rows;
         int nCols = image.cols;
-        //        for(int k = 0; k < m_DF->m_params.pixelsPerImage; ++k)
-        for (int k = 0; k < 70; ++k) // TODO: fix replace 70 with proper param
+
+        for (int k = 0; k < m_params->pixelsPerImage; ++k)
         {
             int i;
             int j;
@@ -90,7 +90,7 @@ void RandomDecisionTree::computeLeafHistograms()
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto x = parent.start + mult * leftCount;
         auto y = parent.end - ((mult + 1) % 2) * rightCount;
-        m_nodes[node_id].hist = computeHistogram(x, y, 26); // TODO: fix replase 26 with m_DF->m_params.labelCount
+        m_nodes[node_id].hist = computeHistogram(x, y, m_params->labelCount);
     }
 }
 

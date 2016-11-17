@@ -214,10 +214,10 @@ void RandomDecisionForest::trainForest()
         qDebug() << "Tree number " << QString::number(i + 1) << "is being trained" ;
         //        }
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
-        rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS));
+        rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS, &m_params));
         trainedRDT->setProbeDistanceX(m_params.probDistX);
         trainedRDT->setProbeDistanceY(m_params.probDistY);
-//        trainedRDT->initNodes(m_params.maxDepth); // TODO: Fix
+        trainedRDT->setMaxDepth(m_params.maxDepth);
         trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
         //#pragma omp critical (DEBUG)
         //        {

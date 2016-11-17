@@ -131,7 +131,7 @@ void load(Archive &archive,
     rdf.m_forest.resize(size);
     for(auto i = 0; i < size; ++i)
     {
-        rdt_ptr rdt(new RandomDecisionTree(&rdf.m_DS));
+        rdt_ptr rdt(new RandomDecisionTree(&rdf.m_DS, &rdf.m_params));
 //        archive(*rdt);    // TODO: fix RDT archive
         rdf.m_forest[i] = rdt;
     }

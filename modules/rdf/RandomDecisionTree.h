@@ -15,7 +15,6 @@
 
 #include "Util.h"
 #include "rdf/PixelCloud.h"
-#include "RDFParams.h"
 #include "3rdparty/matcerealisation.hpp"
 #include "util/Reader.h"
 
@@ -23,6 +22,7 @@
 
 #include "Node.h"
 #include "DataSet.h"
+#include "RDFParams.h"
 
 using rdfclock  = std::chrono::high_resolution_clock;
 
@@ -38,6 +38,7 @@ class RandomDecisionTree : public QObject
     QVector<Node> m_nodes;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
+    RDFParams *m_params;
 
     // Random number generators
     std::mt19937 generator;
@@ -49,7 +50,7 @@ class RandomDecisionTree : public QObject
     void treeConstructed();
 
   public:
-    RandomDecisionTree(DataSet *DS);
+    RandomDecisionTree(DataSet *DS, RDFParams *params);
     void train();
     void printTree();
 
@@ -65,6 +66,11 @@ class RandomDecisionTree : public QObject
         m_probe_distanceY = probe_distanceY;
         m_yProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceY,
                                                                 m_probe_distanceY);
+    }
+
+    inline void setMaxDepth(int maxDepth)
+    {
+        m_hight = maxDepth;
     }
 
     inline void setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
