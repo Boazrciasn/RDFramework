@@ -89,9 +89,9 @@ class RandomDecisionTree : public QObject
     {
         m_nodes.clear();
     }
-  private:
-    void getSubSample();
 
+private:
+    void getSubSample();
     void constructTree();
     void constructRootNode();
     void constructTreeDecisionNodes();
@@ -104,6 +104,14 @@ class RandomDecisionTree : public QObject
     void printPixelCloud();
     void printPixel(Pixel &px);
     void printNode(Node &node);
+
+    inline void initParams()
+    {
+        setProbeDistanceX(m_params->probDistX);
+        setProbeDistanceY(m_params->probDistY);
+        setMaxDepth(m_params->maxDepth);
+        setMinimumLeafPixelCount(m_params->minLeafPixels);
+    }
 
     inline void initNodes()
     {
@@ -159,10 +167,7 @@ class RandomDecisionTree : public QObject
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
         for (int pxIndex = start; pxIndex < end; ++pxIndex)
-        {
-            Pixel px = m_pixelCloud.pixels1[pxIndex];
-            ++hist.at<float>(0, px.label);
-        }
+            ++hist.at<float>(0, m_pixelCloud.pixels1[pxIndex].label);
         return hist;
     }
 };

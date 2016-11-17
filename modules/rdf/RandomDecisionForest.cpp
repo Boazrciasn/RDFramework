@@ -215,10 +215,6 @@ void RandomDecisionForest::trainForest()
         //        }
         //rdt_ptr trainedRDT(new RandomDecisionTree(rdf_ptr(this)));
         rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS, &m_params));
-        trainedRDT->setProbeDistanceX(m_params.probDistX);
-        trainedRDT->setProbeDistanceY(m_params.probDistY);
-        trainedRDT->setMaxDepth(m_params.maxDepth);
-        trainedRDT->setMinimumLeafPixelCount(m_params.minLeafPixels);
         //#pragma omp critical (DEBUG)
         //        {
         qDebug() << "Train..." ;

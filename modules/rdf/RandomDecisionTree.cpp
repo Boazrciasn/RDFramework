@@ -11,8 +11,11 @@ RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS
     //generator = new std::mt19937(d.count());
 }
 
+
+
 void RandomDecisionTree::train()
 {
+    initParams();
     initNodes(); // initNodes, it alocates space for nodes
     getSubSample();
     constructTree();
@@ -21,27 +24,37 @@ void RandomDecisionTree::train()
 
 void RandomDecisionTree::getSubSample()
 {
-    int sampleId = 0;
-    for (auto &image : m_DS->m_ImagesVector)
+    quint32 imgCount = m_DS->m_ImagesVector.size();
+    quint32 pxPerImgCount = m_params->pixelsPerImage;
+
+    m_pixelCloud.pixels1.resize(imgCount*pxPerImgCount);
+    m_pixelCloud.pixels2.resize(imgCount*pxPerImgCount);
+
+
+    for (quint32 id = 0; id < imgCount; ++id)
     {
-        auto label = m_DS->m_labels[sampleId];
-        auto id = sampleId++;
+        auto &image = m_DS->m_ImagesVector[id];
+        auto label  = m_DS->m_labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
 
         for (int k = 0; k < m_params->pixelsPerImage; ++k)
         {
-            int i;
-            int j;
+            int row = 0;
+            int col = 0;
             quint8 intensity = 0 ;
             while (intensity == 0)
             {
-                i = (rand() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
-                j = (rand() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
-                intensity = image.at<uchar>(i, j);
+                row = (rand() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
+                col = (rand() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
+                intensity = image.at<uchar>(row, col);
             }
-            Pixel px(cv::Point(i, j), id, label);
-            m_pixelCloud.pixels1.push_back(px);
+
+            auto &px = m_pixelCloud.pixels1[id*pxPerImgCount + k];
+            px.id = id;
+            px.label = label;
+            px.position.x = row;
+            px.position.y = col;
         }
     }
 }
@@ -120,8 +133,8 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         auto end = m_nodes[index].end;
         for (auto i = m_nodes[index].start; i < end; ++i)
         {
-            auto px = m_pixelCloud.pixels1[i];
-            auto img = m_DS->m_ImagesVector[px.id];
+            auto &px = m_pixelCloud.pixels1[i];
+            auto &img = m_DS->m_ImagesVector[px.id];
             if (isLeft(px, m_nodes[index], img))
             {
                 ++leftHist.at<float>(px.label);
@@ -168,8 +181,8 @@ void RandomDecisionTree::rearrange(quint32 index)
     int leftCount = 0;
     for (auto i = start; i < end; ++i)
     {
-        auto px = m_pixelCloud.pixels1[i];
-        auto img = m_DS->m_ImagesVector[px.id]; // TODO: might be too time consuming
+        auto &px = m_pixelCloud.pixels1[i];
+        auto &img = m_DS->m_ImagesVector[px.id]; // TODO: might be too time consuming
         if (isLeft(px, m_nodes[index], img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];
@@ -213,7 +226,7 @@ void RandomDecisionTree::toString()
 
 void RandomDecisionTree::printPixelCloud()
 {
-    for (auto pPixel : m_pixelCloud.pixels1)
+    for (auto &pPixel : m_pixelCloud.pixels1)
         printPixel(pPixel);
 }
 
@@ -229,7 +242,7 @@ void RandomDecisionTree::printPixel(Pixel &px)
 void RandomDecisionTree::printTree()
 {
     qDebug() << "TREE {";
-    for (auto node : m_nodes)
+    for (auto &node : m_nodes)
         printNode(node);
     qDebug() << "}";
 }
