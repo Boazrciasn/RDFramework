@@ -12,6 +12,7 @@
 #include <3rdparty/cereal/types/memory.hpp>
 #include <3rdparty/cereal/types/vector.hpp>
 #include <3rdparty/cereal/types/string.hpp>
+#include <3rdparty/cereal/access.hpp>
 
 #include "Util.h"
 #include "rdf/PixelCloud.h"
@@ -35,7 +36,7 @@ class RandomDecisionTree : public QObject
     quint32 m_probe_distanceX{};
     quint32 m_probe_distanceY{};
 
-    QVector<Node> m_nodes;
+    std::vector<Node> m_nodes;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
     RDFParams *m_params;
@@ -76,13 +77,6 @@ class RandomDecisionTree : public QObject
     inline void setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
     {
         m_minLeafPixelCount = min_leaf_pixel_count;
-    }
-
-    template<class Archive>
-    void serialize(Archive &archive)
-    {
-        archive(m_hight, m_probe_distanceX,
-                m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 
     ~RandomDecisionTree()
@@ -169,6 +163,17 @@ private:
         for (int pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist.at<float>(0, m_pixelCloud.pixels1[pxIndex].label);
         return hist;
+    }
+
+
+private:
+    friend class cereal::access;
+
+    template<class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(m_hight, m_probe_distanceX,
+                m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 };
 

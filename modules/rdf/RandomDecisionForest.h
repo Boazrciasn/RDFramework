@@ -4,6 +4,7 @@
 #include "RandomDecisionTree.h"
 #include "Util.h"
 #include "ocr/TextRegionDetector.h"
+#include <3rdparty/cereal/access.hpp>
 
 class RandomDecisionForest : public QObject
 {
@@ -11,7 +12,7 @@ class RandomDecisionForest : public QObject
 
     friend class RandomDecisionTree;
 
-  public:
+public:
     RandomDecisionForest()
     {
         srand(time(nullptr));
@@ -93,7 +94,7 @@ class RandomDecisionForest : public QObject
     QWidget *m_parent;
     RDFParams m_params;
 
-  private:
+private:
     //    rdfclock::time_point m_begin;
 
     void placeHistogram(cv::Mat &output, const cv::Mat &pixelHist, int pos_row,
@@ -105,37 +106,22 @@ class RandomDecisionForest : public QObject
     QString m_dir;
     int m_numOfLetters = 0;
 
-  signals:
+signals:
     void classifiedImageAs(int image_no, char label);
     void resultPercentage(double accuracy);
 
+private:
+    friend class cereal::access;
+
+    template <class Archive>
+    void serialize( Archive & archive )
+    {
+        archive(m_params);
+        for(auto rdt : m_forest)
+            archive(*rdt);
+    }
+
 };
-
-template<class Archive>
-void save(Archive &archive,
-          RandomDecisionForest const &rdf)
-{
-    archive( rdf.m_params );
-    for(auto rdtPtr : rdf.m_forest)
-    {
-//        archive(*rdtPtr); // TODO: fix RDT archive
-    }
-}
-
-template<class Archive>
-void load(Archive &archive,
-          RandomDecisionForest &rdf)
-{
-    archive( rdf.m_params );
-    auto size = rdf.m_params.nTrees;
-    rdf.m_forest.resize(size);
-    for(auto i = 0; i < size; ++i)
-    {
-        rdt_ptr rdt(new RandomDecisionTree(&rdf.m_DS, &rdf.m_params));
-//        archive(*rdt);    // TODO: fix RDT archive
-        rdf.m_forest[i] = rdt;
-    }
-}
 
 using rdf_ptr   = std::shared_ptr<RandomDecisionForest>;
 
