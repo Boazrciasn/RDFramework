@@ -10,14 +10,12 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     ui(new Ui::RandomDecisionForestDialogGui)
 {
     ui->setupUi(this);
-    m_forest = rdf_ptr(new RandomDecisionForest());
-    m_forest->setParentWidget(parent);
-    QObject::connect(m_forest.get(), SIGNAL(treeConstructed()), this,
-                     SLOT(new_tree_constructed()));
-    QObject::connect(m_forest.get(), SIGNAL(classifiedImageAs(int, char)), this,
-                     SLOT(image_at_classified_as(int, char)));
-    QObject::connect(m_forest.get(), SIGNAL(resultPercentage(double)), this,
-                     SLOT(resultPercetange(double))) ;
+//    QObject::connect(m_forest.get(), SIGNAL(treeConstructed()), this,
+//                     SLOT(new_tree_constructed()));
+//    QObject::connect(m_forest.get(), SIGNAL(classifiedImageAs(int, char)), this,
+//                     SLOT(image_at_classified_as(int, char)));
+//    QObject::connect(m_forest.get(), SIGNAL(resultPercentage(double)), this,
+//                     SLOT(resultPercetange(double))) ;
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -53,8 +51,8 @@ void RandomDecisionForestDialogGui::onTrain()
     PARAMS.minLeafPixels = ui->spinBox_MinLeafPixels->value();
     PARAMS.labelCount = ui->spinBox_LabelCount->value();
     PARAMS.maxIteration = ui->spinBox_MaxIteration->value();
-    m_forest->setParams(PARAMS);
-    if (m_forest->params().trainImagesDir.isEmpty())
+    m_forest.setParams(PARAMS);
+    if (m_forest.params().trainImagesDir.isEmpty())
     {
         auto *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -62,18 +60,18 @@ void RandomDecisionForestDialogGui::onTrain()
         msgBox->show();
         return;
     }
-    Util::calcWidthHeightStat(m_forest->params().trainImagesDir);
+    Util::calcWidthHeightStat(m_forest.params().trainImagesDir);
     m_treeid = 0;
-    m_forest->trainForest();
+    m_forest.trainForest();
     ui->textBrowser_train->append("Forest Trained ! ");
     ui->textBrowser_train->repaint();
 }
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    m_forest->params().testDir = PARAMS.testDir;
+    m_forest.params().testDir = PARAMS.testDir;
     //m_forest->readAndIdentifyWords();
-    if (m_forest->params().testDir.isEmpty())
+    if (m_forest.params().testDir.isEmpty())
     {
         QMessageBox *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
@@ -81,7 +79,7 @@ void RandomDecisionForestDialogGui::onTest()
         msgBox->show();
         return;
     }
-    m_forest->test();
+//    m_forest->test(); // TODO: add test
 }
 
 void RandomDecisionForestDialogGui::new_tree_constructed()
@@ -118,7 +116,7 @@ void RandomDecisionForestDialogGui::onLoad()
                         tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)"),
                         &selfilter
                     );
-    m_forest->loadForest(fname);
+    m_forest.loadForest(fname);
     //    m_forest->printForest();
     qDebug() << "LOAD FOREST PRINTED" ;
 }
@@ -128,11 +126,11 @@ void RandomDecisionForestDialogGui::onSave()
     QString dirname = QFileDialog::getExistingDirectory(this,
                                                         tr("Open Save Directory"), PARAMS.trainImagesDir,
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    QString fname = "nT_" + QString::number(m_forest->params().nTrees) + "_D_" +
-                    QString::number(m_forest->params().maxDepth)
-                    + "_nTImg_" + QString::number(m_forest->m_imagesContainer.size())
-                    + "_nPxPI_" + QString::number(m_forest->params().pixelsPerImage)
+    QString fname = "nT_" + QString::number(m_forest.params().nTrees) + "_D_" +
+                    QString::number(m_forest.params().maxDepth)
+//                    + "_nTImg_" + QString::number(m_forest.m_imagesContainer.size()) // TODO: add later
+                    + "_nPxPI_" + QString::number(m_forest.params().pixelsPerImage)
                     + ".bin";
-    m_forest->saveForest(dirname + "/" + fname);
+    m_forest.saveForest(dirname + "/" + fname);
     qDebug() << "SAVED FOREST PRINTED" ;
 }

@@ -34,7 +34,7 @@ class RandomDecisionForestDialogGui : public QDialog
   private:
     RDFParams PARAMS;
     Ui::RandomDecisionForestDialogGui *ui;
-    rdf_ptr m_forest;
+    RandomDecisionForest m_forest;
     qint16 m_treeid;
 
 };
