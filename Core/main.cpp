@@ -14,6 +14,11 @@
 
 int main(int argc, char *argv[])
 {
+//    cv::Mat_<float> test = cv::Mat_<float>::zeros(1,10);
+//    test(cv::Range(0,1),cv::Range(2,5)) += cv::Mat_<float>::ones(1,3);
+//    test(cv::Range(0,1),cv::Range(2,5)) += cv::Mat_<float>::ones(1,3);
+//    std::cout << test << std::endl;
+
     // TODO: Baris Fix case sensitivity
     //BOUNDING BOX TEST :
     //    cv::Mat src_gray;

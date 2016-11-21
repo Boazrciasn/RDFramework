@@ -31,7 +31,40 @@ void RandomDecisionForest::trainForest()
     qDebug() << "Forest Size : " << m_forest.size();
 }
 
+cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat &roi)
+{
+    cv::Mat padded_roi;
+    cv::copyMakeBorder(roi, padded_roi, m_params.probDistY, m_params.probDistY,
+                       m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
 
+    int nRows = padded_roi.rows;
+    int nCols = padded_roi.cols;
+    auto nTrees = m_forest.size();
+    int labelCount = m_params.labelCount;
+
+    // for each pix we alocate LABEL_COUNT slots to keep hist
+    // therefore, ROW is the same COL is COL*LABEL_COUNT
+    cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols*labelCount);
+
+    for(int row = 0; row < nRows; ++row)
+        for(int col = 0; col < nCols; ++col)
+        {
+            if (roi.at<uchar>(row, col) == 0)
+                continue;
+
+            Pixel px;
+            // Since we are sending padded roi we should add probDistX & probDistY to px.position
+            px.position = cv::Point(row + m_params.probDistY, col + m_params.probDistX);
+
+            for(size_t i = 0; i < nTrees; ++i)
+                layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)))
+                        += m_forest[i]->getProbHist(px,padded_roi);
+        }
+
+    // normalize layeredHist
+    layeredHist /= nTrees;
+    return layeredHist;
+}
 
 //void RandomDecisionForest::getProbDistributionPerPixelMat(cv::Mat &roi, cv::Mat_<uchar> &labels,
 //                                              cv::Mat_<float> &confs, uchar &label, float &conf)

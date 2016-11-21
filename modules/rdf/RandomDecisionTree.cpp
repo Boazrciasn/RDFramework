@@ -36,7 +36,7 @@ void RandomDecisionTree::getSubSample()
         cv::Mat image;
         // Zero pad given image
         cv::copyMakeBorder(m_DS->m_ImagesVector[id],image,m_probe_distanceY, m_probe_distanceY,
-                           m_probe_distanceX,m_probe_distanceX, cv::BORDER_CONSTANT, cv::Scalar(0));
+                           m_probe_distanceX,m_probe_distanceX, cv::BORDER_CONSTANT);
 
 
         auto label  = m_DS->m_labels[id];
