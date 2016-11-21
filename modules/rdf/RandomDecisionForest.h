@@ -15,7 +15,9 @@ private:
 
 public:
     void trainForest();
-    cv::Mat getLayeredHist(cv::Mat &roi);
+    cv::Mat_<float> getLayeredHist(cv::Mat &roi);
+    void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
+                            cv::Mat_<uchar> &labels, cv::Mat_<float> &confs);
 
     void setParams(const RDFParams &params) { m_params = params; }
     RDFParams &params() { return m_params; }

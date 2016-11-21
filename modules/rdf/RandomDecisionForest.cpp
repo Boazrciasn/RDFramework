@@ -31,7 +31,7 @@ void RandomDecisionForest::trainForest()
     qDebug() << "Forest Size : " << m_forest.size();
 }
 
-cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat &roi)
+cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 {
     cv::Mat padded_roi;
     cv::copyMakeBorder(roi, padded_roi, m_params.probDistY, m_params.probDistY,
@@ -65,6 +65,28 @@ cv::Mat RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     layeredHist /= nTrees;
     return layeredHist;
 }
+
+
+void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
+                                              cv::Mat_<uchar> &labels, cv::Mat_<float> &confs)
+{
+    int labelCount = m_params.labelCount;
+    int nRows = layeredHist.rows;
+    int nCols = layeredHist.cols/labelCount;
+
+    for (int row = 0; row < nRows; ++row)
+        for (int col = 0; col < nCols; ++col) {
+            cv::Mat_<float> tmpProbHist = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)));
+            double max;
+            cv::Point max_loc;
+            cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
+
+            // Set Pixel label & confidance
+            labels(row,col) = max_loc.x;
+            confs(row,col) = max;
+        }
+}
+
 
 //void RandomDecisionForest::getProbDistributionPerPixelMat(cv::Mat &roi, cv::Mat_<uchar> &labels,
 //                                              cv::Mat_<float> &confs, uchar &label, float &conf)

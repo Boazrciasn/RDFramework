@@ -17,7 +17,17 @@ int main(int argc, char *argv[])
 //    cv::Mat_<float> test = cv::Mat_<float>::zeros(1,10);
 //    test(cv::Range(0,1),cv::Range(2,5)) += cv::Mat_<float>::ones(1,3);
 //    test(cv::Range(0,1),cv::Range(2,5)) += cv::Mat_<float>::ones(1,3);
-//    std::cout << test << std::endl;
+//    std::cout << "test: " << test << std::endl;
+
+//    cv::Mat_<float> tmpProbHist = test(cv::Range(0,1),cv::Range(2,5));
+//    tmpProbHist(2) ++;
+//    std::cout << "tmpProbHist: " << tmpProbHist << std::endl;
+
+//    double max;
+//    cv::Point max_loc;
+//    cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
+//    std::cout << "max: " << max << std::endl;
+//    std::cout << "max_loc: " << max_loc.x << std::endl;
 
     // TODO: Baris Fix case sensitivity
     //BOUNDING BOX TEST :
