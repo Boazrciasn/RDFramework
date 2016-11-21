@@ -15,6 +15,7 @@ private:
 
 public:
     void trainForest();
+    void detect(cv::Mat &roi, int &label, float &conf);
     cv::Mat_<float> getLayeredHist(cv::Mat &roi);
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                             cv::Mat_<uchar> &labels, cv::Mat_<float> &confs);

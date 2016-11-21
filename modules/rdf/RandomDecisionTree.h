@@ -184,6 +184,8 @@ private:
         hist.setTo(0.0f);
         for (int pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist.at<float>(0, m_pixelCloud.pixels1[pxIndex].label);
+
+        // TODO: might be better if we keep it normalized
         return hist;
     }
 

@@ -31,6 +31,34 @@ void RandomDecisionForest::trainForest()
     qDebug() << "Forest Size : " << m_forest.size();
 }
 
+void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
+{
+    int labelCount = m_params.labelCount;
+    int nRows = roi.rows;
+    int nCols = roi.cols;
+
+    cv::Mat_<float> layeredHist = getLayeredHist(roi);
+    cv::Mat_<float> probHist = cv::Mat_<float>::zeros(1, labelCount);
+
+    for (int row = 0; row < nRows; ++row)
+        for (int col = 0; col < nCols; ++col)
+            probHist += layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)));
+
+    // normalize
+    float sum = cv::sum(probHist)[0];
+    if( sum != 0 )
+        probHist /= sum;
+
+    double max;
+    cv::Point max_loc;
+    cv::minMaxLoc(probHist, NULL, &max, NULL, &max_loc);
+
+    // Set label & confidance
+    label = max_loc.x;
+    conf = max;
+}
+
+
 cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 {
     cv::Mat padded_roi;
@@ -61,7 +89,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
                         += m_forest[i]->getProbHist(px,padded_roi);
         }
 
-    // normalize layeredHist
+    // normalize layeredHist assuming leaf nodes are already normalized
     layeredHist /= nTrees;
     return layeredHist;
 }
@@ -86,72 +114,3 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
             confs(row,col) = max;
         }
 }
-
-
-//void RandomDecisionForest::getProbDistributionPerPixelMat(cv::Mat &roi, cv::Mat_<uchar> &labels,
-//                                              cv::Mat_<float> &confs, uchar &label, float &conf)
-//{
-//    conf = cv::Mat_<float>::zeros(roi.rows, roi.cols);
-//    labels = cv::Mat_<uchar>::zeros(roi.rows, roi.cols);
-
-//    cv::Mat padedRoi;
-
-//    // TODO: Add zero pading
-//    int nRows = roi.rows;
-//    int nCols = roi.cols;
-
-//    int rangeRows = nRows - m_params.probDistY;
-//    int rangeCols = nCols - m_params.probDistX;
-
-//    // probHist is used for ROI label & confidance computation
-//    cv::Mat probHist = cv::Mat::zeros(1, labelCount, CV_32FC1);
-
-//    for(int row = m_params.probDistY; row < rangeRows; ++row)
-//        for(int col = m_params.probDistX; col < rangeCols; ++col)
-//        {
-//            auto intensity = test_image.at<uchar>(row, col);
-//            if (intensity == 0)
-//                continue;
-
-//            Pixel px;
-//            px.position = cv::Point(row,col);
-//            // tmpProbHist is used for Pixel label & confidance computation
-//            cv::Mat tmpProbHist = cv::Mat::zeros(1, labelCount, CV_32FC1);
-
-//            auto nTrees = m_forest.size();
-//            for(auto i = 0; i < nTrees; ++i)
-//                tmpProbHist += m_forest[i]->getProbHist(px,roi);
-
-//            // Add to probHist
-//            // probHist is used for ROI label & confidance computation
-//            // tmpProbHist is used for Pixel label & confidance computation
-//            probHist += tmpProbHist;
-
-//            //Normalize the Histrograms
-//            float sum = cv::sum(tmpProbHist)[0];
-//            if( sum != 0 )
-//                tmpProbHist /= sum;
-
-//            double max;
-//            cv::Point max_loc;
-//            cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
-
-
-//            // Set Pixel label & confidance
-//            labels(row,col) = max_loc.y; // TODO: might be max_loc.x check it
-//            confs(rof,col) = max;
-//        }
-
-//    //Normalize the Histrograms
-//    float sum = cv::sum(probHist)[0];
-//    if( sum != 0 )
-//        probHist /= sum;
-
-//    double max;
-//    cv::Point max_loc;
-//    cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
-
-//    // Set ROI label & confidance
-//    label = max_loc.y; // TODO: might be max_loc.x check it
-//    conf = max;
-//}
