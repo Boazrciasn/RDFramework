@@ -33,7 +33,12 @@ void RandomDecisionTree::getSubSample()
 
     for (quint32 id = 0; id < imgCount; ++id)
     {
-        auto &image = m_DS->m_ImagesVector[id];
+        cv::Mat image;
+        // Zero pad given image
+        cv::copyMakeBorder(m_DS->m_ImagesVector[id],image,m_probe_distanceY, m_probe_distanceY,
+                           m_probe_distanceX,m_probe_distanceX, cv::BORDER_CONSTANT, cv::Scalar(0));
+
+
         auto label  = m_DS->m_labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
@@ -69,6 +74,7 @@ void RandomDecisionTree::constructTree()
 void RandomDecisionTree::constructRootNode()
 {
     quint32 rootId = 0;
+    m_nodes[rootId].id = rootId;
     m_nodes[rootId].end = m_pixelCloud.pixels1.size();
     m_nodes[rootId].tau = generateTau();
     generateTeta(m_nodes[rootId].teta1);
@@ -78,10 +84,10 @@ void RandomDecisionTree::constructRootNode()
 
 void RandomDecisionTree::constructTreeDecisionNodes()
 {
-    for (quint32 height = 1; height < m_hight; ++height)
+    for (quint32 depth = 1; depth < m_height-1; ++depth)
     {
-        int level_nodes = 1 << height;          // Number of nodes at this level
-        int tot_nodes   = (1 << (height + 1)) - 1; // Number of nodes at this and previous levels
+        int level_nodes = 1 << depth;          // Number of nodes at this level
+        int tot_nodes   = (1 << (depth + 1)) - 1; // Number of nodes at this and previous levels
         tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
         {
             processNode(nodeIndex);
@@ -93,8 +99,8 @@ void RandomDecisionTree::constructTreeDecisionNodes()
 
 void RandomDecisionTree::computeLeafHistograms()
 {
-    auto tot_node_count = (1 << m_hight) - 1 ;
-    auto leaf_node_count = 1 << (m_hight - 1) ;
+    auto tot_node_count = (1 << m_height) - 1 ;
+    auto leaf_node_count = 1 << (m_height - 1) ;
     for (int node_id = (tot_node_count - leaf_node_count); node_id < tot_node_count; ++node_id)
     {
         Node parent = m_nodes[(node_id + 1) / 2];
@@ -113,8 +119,8 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     int px_count = m_nodes[index].end - m_nodes[index].start;
     if (px_count == 0)
         return;
-    auto maxItr = 1000; // fix replace with m_DF->m_params.maxIteration;
-    auto nLabels = 26; // fix replace with m_DF->m_params.labelCount;
+    auto maxItr = m_params->maxIteration;
+    auto nLabels = m_params->labelCount;
     int maxTau = -250;
     float maxGain = 0;
     cv::Point maxTeta1, maxTeta2;
@@ -197,8 +203,8 @@ void RandomDecisionTree::rearrange(quint32 index)
 
 bool RandomDecisionTree::isPixelSizeConsistent()
 {
-    auto tot_node_count = (1 << m_hight) - 1 ;
-    auto leaf_node_count = 1 << (m_hight - 1) ;
+    auto tot_node_count = (1 << m_height) - 1 ;
+    auto leaf_node_count = 1 << (m_height - 1) ;
     auto decision_node_count = tot_node_count - leaf_node_count;
     auto nPixelsOnLeaves = 0;
     for (int nodeIndex = decision_node_count; nodeIndex < tot_node_count; ++nodeIndex)

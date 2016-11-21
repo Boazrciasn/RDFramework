@@ -2,22 +2,16 @@
 #define CPV_RANDOM_DECISION_FOREST
 
 #include "RandomDecisionTree.h"
-#include "Util.h"
-#include "ocr/TextRegionDetector.h"
 #include <3rdparty/cereal/access.hpp>
 
 class RandomDecisionForest : public QObject
 {
     Q_OBJECT
 
-public:
+private:
     std::vector<rdt_ptr> m_forest;
     RDFParams m_params;
     DataSet m_DS;
-
-private:
-    QString m_dir{};
-    int m_numOfLetters{};
 
 public:
     void trainForest();

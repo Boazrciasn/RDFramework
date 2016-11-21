@@ -32,7 +32,7 @@ class RandomDecisionTree : public QObject
     Q_OBJECT
   private:
     quint32 m_minLeafPixelCount;
-    quint32 m_hight{};
+    quint32 m_height{};
     quint32 m_probe_distanceX{};
     quint32 m_probe_distanceY{};
 
@@ -55,6 +55,17 @@ class RandomDecisionTree : public QObject
     void train();
     void printTree();
 
+    inline cv::Mat_<float> getProbHist(Pixel &px, cv::Mat &roi)
+    {
+        Node &curr = m_nodes[0];
+        for (quint32 depth = 1; depth < m_height; ++depth)
+            if(isLeft(px, curr, roi))
+                curr = m_nodes[2*curr.id + 1];
+            else
+                curr = m_nodes[2*curr.id + 2];
+        return curr.hist;
+    }
+
     inline void setProbeDistanceX(int probe_distanceX)
     {
         m_probe_distanceX = probe_distanceX;
@@ -71,7 +82,7 @@ class RandomDecisionTree : public QObject
 
     inline void setMaxDepth(int maxDepth)
     {
-        m_hight = maxDepth;
+        m_height = maxDepth;
     }
 
     inline void setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
@@ -109,7 +120,7 @@ private:
 
     inline void initNodes()
     {
-        auto size = (1ul << m_hight) - 1 ;
+        auto size = (1ul << m_height) - 1 ;
         m_nodes.resize(size);
     }
 
@@ -125,7 +136,15 @@ private:
         m_nodes[index].tau = generateTau();
         generateTeta(m_nodes[index].teta1);
         generateTeta(m_nodes[index].teta2);
-        computeDivisionAt(index);
+
+        if(isLeaf(m_nodes[index].start, m_nodes[index].end))
+        {
+            // propagate everything to the left until leaf node
+            m_nodes[index].leftCount = m_nodes[index].end - m_nodes[index].start;
+            m_nodes[index].tau = 500; // To send any coming node to the left during prediction
+        }
+        else
+            computeDivisionAt(index);
     }
 
     inline bool isLeft(Pixel &p, Node &node, cv::Mat &img)
@@ -139,6 +158,18 @@ private:
         return (intensity1 - intensity2) <= node.tau;
     }
 
+    inline bool isLeaf(quint32 start, quint32 end)
+    {
+        int label = m_pixelCloud.pixels1[start].label;
+        int sum = 0;
+        for(auto i = start; i < end; ++i)
+            sum += std::abs(m_pixelCloud.pixels1[i].label - label);
+
+        bool isPureNode = (sum == 0);
+        bool isMinPixReached = (end - start) <= m_minLeafPixelCount;
+        return isMinPixReached || isPureNode;
+    }
+
     inline void generateTeta(cv::Point &crd)
     {
         crd.y = m_yProbDistribution(generator);
@@ -149,11 +180,6 @@ private:
     {
         // random number between -127, +128
         return m_tauProbDistribution(generator);
-    }
-
-    inline int letterIndex(char letter)
-    {
-        return letter - 'a';
     }
 
     inline cv::Mat_<float> computeHistogram(quint16 start, quint16 end, int labelCount)
@@ -172,7 +198,7 @@ private:
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive(m_hight, m_probe_distanceX,
+        archive(m_height, m_probe_distanceX,
                 m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 };
