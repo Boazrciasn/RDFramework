@@ -15,6 +15,9 @@ class RandomDecisionForestDialogGui : public QDialog
 {
     Q_OBJECT
 
+protected:
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+
   public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
@@ -31,6 +34,8 @@ class RandomDecisionForestDialogGui : public QDialog
   private slots:
     void onLoad();
     void onSave();
+    void writeSettings();
+    void readSettings();
 
   private:
     Ui::RandomDecisionForestDialogGui *ui;

@@ -10,6 +10,18 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     ui(new Ui::RandomDecisionForestDialogGui)
 {
     ui->setupUi(this);
+    readSettings();
+
+    ui->spinBox_NTrees->setValue(PARAMS.nTrees);
+    ui->spinBox_MaxDepth->setValue(PARAMS.maxDepth);
+    ui->spinBox_probX->setValue(PARAMS.probDistX);
+    ui->spinBox_probY->setValue(PARAMS.probDistY);
+    ui->spinBox_PixelsPerImage->setValue(PARAMS.pixelsPerImage);
+    ui->spinBox_MinLeafPixels->setValue(PARAMS.minLeafPixels);
+    ui->spinBox_MaxIteration->setValue(PARAMS.maxIteration);
+    ui->spinBox_LabelCount->setValue(PARAMS.labelCount);
+
+
 //    QObject::connect(m_forest.get(), SIGNAL(treeConstructed()), this,
 //                     SLOT(new_tree_constructed()));
 //    QObject::connect(m_forest.get(), SIGNAL(classifiedImageAs(int, char)), this,
@@ -23,6 +35,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
 
     ui->gridLayout_train->addWidget(m_readerGUI,2,0,3,4);
+
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -144,3 +157,44 @@ void RandomDecisionForestDialogGui::onSave()
     m_forest.saveForest(dirname + "/" + fname);
     qDebug() << "SAVED FOREST PRINTED" ;
 }
+
+void RandomDecisionForestDialogGui::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    event->accept();
+}
+
+void RandomDecisionForestDialogGui::writeSettings()
+{
+    QSettings settings("VVGLab", "RDFDialogGUI");
+    settings.beginGroup("PARAMS");
+
+    settings.setValue("nTrees", PARAMS.nTrees);
+    settings.setValue("maxDepth", PARAMS.maxDepth);
+    settings.setValue("probDistX", PARAMS.probDistX);
+    settings.setValue("probDistY", PARAMS.probDistY);
+    settings.setValue("pixelsPerImage", PARAMS.pixelsPerImage);
+    settings.setValue("minLeafPixels", PARAMS.minLeafPixels);
+    settings.setValue("maxIteration", PARAMS.maxIteration);
+    settings.setValue("labelCount", PARAMS.labelCount);
+
+    settings.endGroup();
+}
+
+void RandomDecisionForestDialogGui::readSettings()
+{
+    QSettings settings("VVGLab", "RDFDialogGUI");
+    settings.beginGroup("PARAMS");
+
+    PARAMS.nTrees = settings.value("nTrees", 12).toInt();
+    PARAMS.maxDepth = settings.value("maxDepth",20).toInt();
+    PARAMS.probDistX = settings.value("probDistX",30).toInt();
+    PARAMS.probDistY = settings.value("probDistY",30).toInt();
+    PARAMS.pixelsPerImage = settings.value("pixelsPerImage",200).toInt();
+    PARAMS.minLeafPixels = settings.value("minLeafPixels",5).toInt();
+    PARAMS.maxIteration = settings.value("maxIteration",100).toInt();
+    PARAMS.labelCount = settings.value("labelCount",26).toInt();
+
+    settings.endGroup();
+}
+
