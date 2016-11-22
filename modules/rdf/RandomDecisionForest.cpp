@@ -24,6 +24,7 @@ bool RandomDecisionForest::trainForest()
         rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS, &m_params));
         qDebug() << "Train..." ;
         trainedRDT->train();
+        trainedRDT->printTree();
         // TODO: save tree
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
 

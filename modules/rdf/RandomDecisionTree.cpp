@@ -80,6 +80,7 @@ void RandomDecisionTree::constructRootNode()
     generateTeta(m_nodes[rootId].teta1);
     generateTeta(m_nodes[rootId].teta2);
     computeDivisionAt(rootId);
+    rearrange(rootId);
 }
 
 void RandomDecisionTree::constructTreeDecisionNodes()
@@ -256,11 +257,7 @@ void RandomDecisionTree::printTree()
 
 void RandomDecisionTree::printNode(Node &node)
 {
-    qDebug() << "NODE {"
-             << " Id:"   << node.id
-             << " Tau: " << node.tau
-             << " Q1 {" << node.teta1.y << "," << node.teta1.x << "}"
-             << " Q2 {" << node.teta2.y << "," << node.teta2.x << "}";
-    printHistogram(node.hist);
-    qDebug() << "}";
+//    printHistogram(node.hist);
+    if(cv::sum(node.hist)[0] != 0)
+        std::cout << node.hist << std::endl;
 }

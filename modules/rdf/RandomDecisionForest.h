@@ -22,7 +22,17 @@ public:
                             cv::Mat_<uchar> &labels, cv::Mat_<float> &confs);
 
     void setParams(const RDFParams &params) { m_params = params; }
-    void setDataSet(const DataSet &DS) { m_DS = DS; }
+    void setDataSet(const DataSet &DS)
+    {
+        m_DS = DS;
+        preprocessDS();
+    }
+
+    inline void preprocessDS(){
+        for(auto &img : m_DS.m_ImagesVector)
+            img = 255 - img;
+    }
+
     RDFParams &params() { return m_params; }
     DataSet &DS() { return m_DS; }
 

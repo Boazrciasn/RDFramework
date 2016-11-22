@@ -186,6 +186,9 @@ private:
             ++hist.at<float>(0, m_pixelCloud.pixels1[pxIndex].label);
 
         // TODO: might be better if we keep it normalized
+        int tot = cv::sum(hist)[0];
+        if(tot != 0)
+            hist /= tot;
         return hist;
     }
 
