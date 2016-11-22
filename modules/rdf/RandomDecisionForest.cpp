@@ -10,8 +10,10 @@
 // read subsampled part of the images into pixel cloud
 
 
-void RandomDecisionForest::trainForest()
+bool RandomDecisionForest::trainForest()
 {
+    if(m_DS.m_ImagesVector.size() == 0)
+        return false;
     double cpu_time;
     //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
@@ -29,25 +31,14 @@ void RandomDecisionForest::trainForest()
         qDebug() << " Train time of the current Tree : " << cpu_time;
     }
     qDebug() << "Forest Size : " << m_forest.size();
+
+    return true;
 }
 
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
-    int labelCount = m_params.labelCount;
-    int nRows = roi.rows;
-    int nCols = roi.cols;
-
-    cv::Mat_<float> layeredHist = getLayeredHist(roi);
-    cv::Mat_<float> probHist = cv::Mat_<float>::zeros(1, labelCount);
-
-    for (int row = 0; row < nRows; ++row)
-        for (int col = 0; col < nCols; ++col)
-            probHist += layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)));
-
-    // normalize
-    float sum = cv::sum(probHist)[0];
-    if( sum != 0 )
-        probHist /= sum;
+    cv::Mat_<float> probHist;
+    getCumulativeProbHist(probHist, getLayeredHist(roi));
 
     double max;
     cv::Point max_loc;
@@ -94,6 +85,22 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     return layeredHist;
 }
 
+void RandomDecisionForest::getCumulativeProbHist(cv::Mat_<float> &probHist, const cv::Mat_<float> &layeredHist)
+{
+    int labelCount = m_params.labelCount;
+    int nRows = layeredHist.rows;
+    int nCols = layeredHist.cols/labelCount;
+    probHist = cv::Mat_<float>::zeros(1, labelCount);
+
+    for (int row = 0; row < nRows; ++row)
+        for (int col = 0; col < nCols; ++col)
+            probHist += layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)));
+
+    // normalize
+    float sum = cv::sum(probHist)[0];
+    if( sum != 0 )
+        probHist /= sum;
+}
 
 void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                                               cv::Mat_<uchar> &labels, cv::Mat_<float> &confs)

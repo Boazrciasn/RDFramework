@@ -4,6 +4,7 @@
 #include <QDialog>
 
 #include "RandomDecisionForest.h"
+#include "util/ReaderGUI.h"
 
 namespace Ui
 {
@@ -32,9 +33,10 @@ class RandomDecisionForestDialogGui : public QDialog
     void onSave();
 
   private:
-    RDFParams PARAMS;
     Ui::RandomDecisionForestDialogGui *ui;
     RandomDecisionForest m_forest;
+    RDFParams PARAMS;
+    ReaderGUI *m_readerGUI;
     qint16 m_treeid;
 
 };

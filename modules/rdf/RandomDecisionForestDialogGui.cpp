@@ -16,6 +16,13 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 //                     SLOT(image_at_classified_as(int, char)));
 //    QObject::connect(m_forest.get(), SIGNAL(resultPercentage(double)), this,
 //                     SLOT(resultPercetange(double))) ;
+
+    m_readerGUI = new ReaderGUI();
+
+    QObject::connect(m_readerGUI,SIGNAL(imagesLoaded(bool)), this, SLOT(imagesLoaded(bool)));
+    QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
+
+    ui->gridLayout_train->addWidget(m_readerGUI,2,0,3,4);
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -52,18 +59,21 @@ void RandomDecisionForestDialogGui::onTrain()
     PARAMS.labelCount = ui->spinBox_LabelCount->value();
     PARAMS.maxIteration = ui->spinBox_MaxIteration->value();
     m_forest.setParams(PARAMS);
-    if (m_forest.params().trainImagesDir.isEmpty())
-    {
-        auto *msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Error");
-        msgBox->setText("You Should First Choose a Training Data Folder");
-        msgBox->show();
-        return;
-    }
-    Util::calcWidthHeightStat(m_forest.params().trainImagesDir);
+    m_forest.setDataSet(*m_readerGUI->DS());
+//    if (m_forest.params().trainImagesDir.isEmpty())
+//    {
+//        auto *msgBox = new QMessageBox();
+//        msgBox->setWindowTitle("Error");
+//        msgBox->setText("You Should First Choose a Training Data Folder");
+//        msgBox->show();
+//        return;
+//    }
+//    Util::calcWidthHeightStat(m_forest.params().trainImagesDir);
     m_treeid = 0;
-    m_forest.trainForest();
-    ui->textBrowser_train->append("Forest Trained ! ");
+    if(m_forest.trainForest())
+        ui->textBrowser_train->append("Forest Trained ! ");
+    else
+        ui->textBrowser_train->append("Failed to Train Forest! (Forest DS is not set) ");
     ui->textBrowser_train->repaint();
 }
 

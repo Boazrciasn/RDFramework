@@ -10,18 +10,21 @@ class RandomDecisionForest : public QObject
 
 private:
     std::vector<rdt_ptr> m_forest;
-    RDFParams m_params;
-    DataSet m_DS;
+    RDFParams m_params{};
+    DataSet m_DS{};
 
 public:
-    void trainForest();
+    bool trainForest();
     void detect(cv::Mat &roi, int &label, float &conf);
     cv::Mat_<float> getLayeredHist(cv::Mat &roi);
+    void getCumulativeProbHist(cv::Mat_<float> &probHist, const cv::Mat_<float> &layeredHist);
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                             cv::Mat_<uchar> &labels, cv::Mat_<float> &confs);
 
     void setParams(const RDFParams &params) { m_params = params; }
+    void setDataSet(const DataSet &DS) { m_DS = DS; }
     RDFParams &params() { return m_params; }
+    DataSet &DS() { return m_DS; }
 
     inline void printForest()
     {
@@ -56,7 +59,7 @@ public:
         ar(*this);
         file.close();
     }
-
+    
 private:
     friend class cereal::access;
 
