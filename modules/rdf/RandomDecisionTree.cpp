@@ -104,7 +104,7 @@ void RandomDecisionTree::computeLeafHistograms()
     auto leaf_node_count = 1 << (m_height - 1) ;
     for (int node_id = (tot_node_count - leaf_node_count); node_id < tot_node_count; ++node_id)
     {
-        Node parent = m_nodes[(node_id + 1) / 2];
+        Node parent = m_nodes[(node_id + 1) / 2 - 1];
         quint32 leftCount = parent.leftCount;
         quint32 rightCount = parent.end - parent.start - leftCount;
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
@@ -210,7 +210,7 @@ bool RandomDecisionTree::isPixelSizeConsistent()
     auto leaf_node_count = 1 << (m_height - 1) ;
     auto decision_node_count = tot_node_count - leaf_node_count;
     auto nPixelsOnLeaves = 0;
-    for (int nodeIndex = decision_node_count; nodeIndex <= tot_node_count; ++nodeIndex)
+    for (int nodeIndex = decision_node_count; nodeIndex < tot_node_count; ++nodeIndex)
         nPixelsOnLeaves += (m_nodes[nodeIndex].end - m_nodes[nodeIndex].start);
     return m_pixelCloud.pixels1.size() == nPixelsOnLeaves;
 }
