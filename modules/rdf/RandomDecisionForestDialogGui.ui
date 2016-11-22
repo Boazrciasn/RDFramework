@@ -401,8 +401,8 @@
    <slot>onTrain()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>311</x>
-     <y>188</y>
+     <x>307</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>524</x>
@@ -417,8 +417,8 @@
    <slot>onTrainingBrowse()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>167</y>
+     <x>107</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>646</x>
@@ -490,6 +490,134 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>spinBox_NTrees</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onNTreesChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>181</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>201</x>
+     <y>-71</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_MaxDepth</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onMaxDepthChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>143</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>166</x>
+     <y>-57</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_probX</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onProbDistXChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>193</x>
+     <y>-16</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_probY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onProbDistYChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>156</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-20</x>
+     <y>62</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_PixelsPerImage</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onPixelsPerImageChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>38</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>531</x>
+     <y>44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_MinLeafPixels</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onMinLeafPixelsChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>377</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>590</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_MaxIteration</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onMaxIterationChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>383</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>587</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_LabelCount</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onLabelCountChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>565</x>
+     <y>128</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onTrain()</slot>
@@ -498,5 +626,13 @@
   <slot>onTest()</slot>
   <slot>onLoad()</slot>
   <slot>onSave()</slot>
+  <slot>onNTreesChanged(int)</slot>
+  <slot>onMaxDepthChanged(int)</slot>
+  <slot>onProbDistXChanged(int)</slot>
+  <slot>onProbDistYChanged(int)</slot>
+  <slot>onPixelsPerImageChanged(int)</slot>
+  <slot>onMinLeafPixelsChanged(int)</slot>
+  <slot>onMaxIterationChanged(int)</slot>
+  <slot>onLabelCountChanged(int)</slot>
  </slots>
 </ui>

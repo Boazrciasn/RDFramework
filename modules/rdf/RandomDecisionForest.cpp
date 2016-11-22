@@ -33,6 +33,7 @@ bool RandomDecisionForest::trainForest()
         // TODO: save tree
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
 
+        emit treeConstructed();
         m_forest.push_back(trainedRDT);
         qDebug() << " Train time of the current Tree : " << cpu_time;
     }

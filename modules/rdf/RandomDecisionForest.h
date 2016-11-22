@@ -48,8 +48,7 @@ public:
     ~RandomDecisionForest() { m_forest.clear(); }
 
 signals:
-    void classifiedImageAs(int image_no, char label);
-    void resultPercentage(double accuracy);
+    void treeConstructed();
 
 public:
     inline void saveForest(QString fname)

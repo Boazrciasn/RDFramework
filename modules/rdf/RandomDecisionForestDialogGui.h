@@ -40,11 +40,20 @@ public slots:
     void image_at_classified_as(int index, char label);
     void resultPercetange(double accuracy);
 
-private slots:
+public slots:
     void onLoad();
     void onSave();
     void writeSettings();
     void readSettings();
+
+    void onNTreesChanged(int value);
+    void onMaxDepthChanged(int value);
+    void onProbDistXChanged(int value);
+    void onProbDistYChanged(int value);
+    void onPixelsPerImageChanged(int value);
+    void onMinLeafPixelsChanged(int value);
+    void onMaxIterationChanged(int value);
+    void onLabelCountChanged(int value);
 };
 
 #endif // RDFDIALOGGUI_H

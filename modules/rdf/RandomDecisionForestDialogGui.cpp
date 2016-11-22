@@ -26,16 +26,14 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     initParamValues();
 
 
-//    QObject::connect(m_forest.get(), SIGNAL(treeConstructed()), this,
-//                     SLOT(new_tree_constructed()));
-//    QObject::connect(m_forest.get(), SIGNAL(classifiedImageAs(int, char)), this,
-//                     SLOT(image_at_classified_as(int, char)));
-//    QObject::connect(m_forest.get(), SIGNAL(resultPercentage(double)), this,
-//                     SLOT(resultPercetange(double))) ;
+    QObject::connect(&m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
+//    QObject::connect(&m_forest, SIGNAL(classifiedImageAs(int, char)), this, SLOT(image_at_classified_as(int, char)));
+//    QObject::connect(&m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
 
     m_readerGUI = new ReaderGUI();
-    QObject::connect(m_readerGUI,SIGNAL(imagesLoaded(bool)), this, SLOT(imagesLoaded(bool)));
-    QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
+    // TODO: create corresponding slots
+//    QObject::connect(m_readerGUI,SIGNAL(imagesLoaded(bool)), this, SLOT(imagesLoaded(bool)));
+//    QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
     ui->gridLayout_train->addWidget(m_readerGUI,2,0,3,4);
 
 }
@@ -184,3 +182,42 @@ void RandomDecisionForestDialogGui::readSettings()
     settings.endGroup();
 }
 
+void RandomDecisionForestDialogGui::onNTreesChanged(int value)
+{
+    PARAMS.nTrees = value;
+}
+
+void RandomDecisionForestDialogGui::onMaxDepthChanged(int value)
+{
+    PARAMS.maxDepth = value;
+}
+
+void RandomDecisionForestDialogGui::onProbDistXChanged(int value)
+{
+    PARAMS.probDistX = value;
+}
+
+void RandomDecisionForestDialogGui::onProbDistYChanged(int value)
+{
+    PARAMS.probDistY = value;
+}
+
+void RandomDecisionForestDialogGui::onPixelsPerImageChanged(int value)
+{
+    PARAMS.pixelsPerImage = value;
+}
+
+void RandomDecisionForestDialogGui::onMinLeafPixelsChanged(int value)
+{
+    PARAMS.minLeafPixels = value;
+}
+
+void RandomDecisionForestDialogGui::onMaxIterationChanged(int value)
+{
+    PARAMS.maxIteration = value;
+}
+
+void RandomDecisionForestDialogGui::onLabelCountChanged(int value)
+{
+    PARAMS.labelCount = value;
+}
