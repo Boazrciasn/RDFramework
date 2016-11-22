@@ -112,16 +112,6 @@ inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
     return calculateEntropy(createHistogram(pixels, labelCount));
 }
 
-
-inline int getTotalNumberOfPixels(const cv::Mat &hist)
-{
-    int totalSize = 0;
-    int nCols = hist.cols;
-    for (int i = 0; i < nCols; ++i)
-        totalSize += hist.at<float>(0, i);
-    return totalSize;
-}
-
 inline int getMaxLikelihoodIndex(const QVector<float> &hist)
 {
     using namespace std;

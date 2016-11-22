@@ -14,15 +14,24 @@ class RandomDecisionForestDialogGui;
 class RandomDecisionForestDialogGui : public QDialog
 {
     Q_OBJECT
+private:
+    Ui::RandomDecisionForestDialogGui *ui;
+    RandomDecisionForest m_forest;
+    RDFParams PARAMS;
+    ReaderGUI *m_readerGUI;
+    qint16 m_treeid;
 
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
-  public:
+private:
+    void initParamValues();
+
+public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
 
-  public slots:
+public slots:
     void onTrainingBrowse();
     void onTestBrowse();
     void onTrain();
@@ -31,19 +40,11 @@ protected:
     void image_at_classified_as(int index, char label);
     void resultPercetange(double accuracy);
 
-  private slots:
+private slots:
     void onLoad();
     void onSave();
     void writeSettings();
     void readSettings();
-
-  private:
-    Ui::RandomDecisionForestDialogGui *ui;
-    RandomDecisionForest m_forest;
-    RDFParams PARAMS;
-    ReaderGUI *m_readerGUI;
-    qint16 m_treeid;
-
 };
 
 #endif // RDFDIALOGGUI_H

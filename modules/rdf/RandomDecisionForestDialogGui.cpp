@@ -5,13 +5,8 @@
 #include "ui_RandomDecisionForestDialogGui.h"
 
 
-RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::RandomDecisionForestDialogGui)
+void RandomDecisionForestDialogGui::initParamValues()
 {
-    ui->setupUi(this);
-    readSettings();
-
     ui->spinBox_NTrees->setValue(PARAMS.nTrees);
     ui->spinBox_MaxDepth->setValue(PARAMS.maxDepth);
     ui->spinBox_probX->setValue(PARAMS.probDistX);
@@ -20,6 +15,15 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     ui->spinBox_MinLeafPixels->setValue(PARAMS.minLeafPixels);
     ui->spinBox_MaxIteration->setValue(PARAMS.maxIteration);
     ui->spinBox_LabelCount->setValue(PARAMS.labelCount);
+}
+
+RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::RandomDecisionForestDialogGui)
+{
+    ui->setupUi(this);
+    readSettings();
+    initParamValues();
 
 
 //    QObject::connect(m_forest.get(), SIGNAL(treeConstructed()), this,
@@ -30,10 +34,8 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 //                     SLOT(resultPercetange(double))) ;
 
     m_readerGUI = new ReaderGUI();
-
     QObject::connect(m_readerGUI,SIGNAL(imagesLoaded(bool)), this, SLOT(imagesLoaded(bool)));
     QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
-
     ui->gridLayout_train->addWidget(m_readerGUI,2,0,3,4);
 
 }
@@ -63,25 +65,9 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 
 void RandomDecisionForestDialogGui::onTrain()
 {
-    PARAMS.probDistX = ui->spinBox_probX->value();
-    PARAMS.probDistY = ui->spinBox_probY->value();
-    PARAMS.nTrees = ui->spinBox_NTrees->value();
-    PARAMS.maxDepth = ui->spinBox_MaxDepth->value();
-    PARAMS.pixelsPerImage = ui->spinBox_PixelsPerImage->value();
-    PARAMS.minLeafPixels = ui->spinBox_MinLeafPixels->value();
-    PARAMS.labelCount = ui->spinBox_LabelCount->value();
-    PARAMS.maxIteration = ui->spinBox_MaxIteration->value();
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_readerGUI->DS());
-//    if (m_forest.params().trainImagesDir.isEmpty())
-//    {
-//        auto *msgBox = new QMessageBox();
-//        msgBox->setWindowTitle("Error");
-//        msgBox->setText("You Should First Choose a Training Data Folder");
-//        msgBox->show();
-//        return;
-//    }
-//    Util::calcWidthHeightStat(m_forest.params().trainImagesDir);
+
     m_treeid = 0;
     if(m_forest.trainForest())
         ui->textBrowser_train->append("Forest Trained ! ");

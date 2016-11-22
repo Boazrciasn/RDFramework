@@ -54,6 +54,7 @@ class RandomDecisionTree : public QObject
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void train();
     void printTree();
+    bool isPixelSizeConsistent();
 
     inline cv::Mat_<float> getProbHist(Pixel &px, cv::Mat &roi)
     {
@@ -103,12 +104,6 @@ private:
     void computeLeafHistograms();
     void computeDivisionAt(quint32 index);
     void rearrange(quint32 index);
-    bool isPixelSizeConsistent();
-
-    void toString();
-    void printPixelCloud();
-    void printPixel(Pixel &px);
-    void printNode(Node &node);
 
     inline void initParams()
     {

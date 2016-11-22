@@ -25,6 +25,11 @@ bool RandomDecisionForest::trainForest()
         qDebug() << "Train..." ;
         trainedRDT->train();
         trainedRDT->printTree();
+
+        if(trainedRDT->isPixelSizeConsistent())
+            qDebug() << "Pixel size consistent at the leafs!" ;
+        else
+            qDebug() << "Pixel size is not consistent at the leafs!" ;
         // TODO: save tree
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
 

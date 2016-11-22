@@ -108,9 +108,11 @@ void RandomDecisionTree::computeLeafHistograms()
         quint32 leftCount = parent.leftCount;
         quint32 rightCount = parent.end - parent.start - leftCount;
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
-        auto x = parent.start + mult * leftCount;
-        auto y = parent.end - ((mult + 1) % 2) * rightCount;
-        m_nodes[node_id].hist = computeHistogram(x, y, m_params->labelCount);
+        auto start = parent.start + mult * leftCount;
+        auto end = parent.end - ((mult + 1) % 2) * rightCount;
+        m_nodes[node_id].start = start;
+        m_nodes[node_id].end = end;
+        m_nodes[node_id].hist = computeHistogram(start, end, m_params->labelCount);
     }
 }
 
@@ -208,56 +210,17 @@ bool RandomDecisionTree::isPixelSizeConsistent()
     auto leaf_node_count = 1 << (m_height - 1) ;
     auto decision_node_count = tot_node_count - leaf_node_count;
     auto nPixelsOnLeaves = 0;
-    for (int nodeIndex = decision_node_count; nodeIndex < tot_node_count; ++nodeIndex)
-        nPixelsOnLeaves += getTotalNumberOfPixels(m_nodes[nodeIndex].hist);
+    for (int nodeIndex = decision_node_count; nodeIndex <= tot_node_count; ++nodeIndex)
+        nPixelsOnLeaves += (m_nodes[nodeIndex].end - m_nodes[nodeIndex].start);
     return m_pixelCloud.pixels1.size() == nPixelsOnLeaves;
 }
 
-void RandomDecisionTree::toString()
-{
-    // TODO: convert or delete
-    //    qDebug() << "Size  : " << m_nodes.size() ;
-    //    qDebug() << "Depth : " << m_height;
-    //    qDebug() << "Leaves: " << m_numOfLeaves;
-    //    int count = 0 ;
-    //    for (Node node : m_nodes)
-    //    {
-    //        if(node->m_isLeaf)
-    //        {
-    //            ++count;
-    //            printHistogram(node->m_hist);
-    //        }
-    //    }
-    //    qDebug() << "Number of leaves : " << count ;
-}
-
-void RandomDecisionTree::printPixelCloud()
-{
-    for (auto &pPixel : m_pixelCloud.pixels1)
-        printPixel(pPixel);
-}
-
-void RandomDecisionTree::printPixel(Pixel &px)
-{
-    qDebug() << "Pixel{ Coor("    << px.position.y     << ","     <<
-             px.position.x
-             << ") Label("        << px.label << ") Id(" <<
-             px.id
-             << ") }";
-}
 
 void RandomDecisionTree::printTree()
 {
     qDebug() << "TREE {";
     for (auto &node : m_nodes)
-        printNode(node);
+        if(cv::sum(node.hist)[0] != 0)
+            std::cout << node.hist << std::endl;
     qDebug() << "}";
-}
-
-
-void RandomDecisionTree::printNode(Node &node)
-{
-//    printHistogram(node.hist);
-    if(cv::sum(node.hist)[0] != 0)
-        std::cout << node.hist << std::endl;
 }
