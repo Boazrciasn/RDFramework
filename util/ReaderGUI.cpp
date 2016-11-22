@@ -9,6 +9,7 @@ ReaderGUI::ReaderGUI(QWidget *parent) :
     m_reader = new Reader();
     m_DS = new DataSet();
     m_dFlag = ui->DatasetType_comboBox->currentIndex();
+    readSettings();
 }
 
 ReaderGUI::~ReaderGUI()
@@ -23,31 +24,31 @@ void ReaderGUI::load()
     {
     case Type_Standard:
     {
-        QString dir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), QDir::currentPath(),
+        m_dirStandard = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_dirStandard,
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
         if (!m_DS->m_ImagesVector.empty())
         {
-            ui->LoadedDataset_label->setText(dir);
+            ui->LoadedDataset_label->setText(m_dirStandard);
             emit imagesLoaded(true);
         }
         break;
     }
     case Type_MNIST:
     {
-        QString dir = QFileDialog::getOpenFileName(this, tr("Open Dataset File"), QDir::currentPath());
-        if (!dir.isEmpty())
+        m_dirMNIST = QFileDialog::getOpenFileName(this, tr("Open Dataset File"), m_dirMNIST);
+        if (!m_dirMNIST.isEmpty())
         {
-            m_reader->readImages(dir, m_DS->m_ImagesVector, m_dFlag);
+            m_reader->readImages(m_dirMNIST, m_DS->m_ImagesVector, m_dFlag);
             if (!m_DS->m_ImagesVector.empty())
             {
-                ui->LoadedDataset_label->setText(dir);
+                ui->LoadedDataset_label->setText(m_dirMNIST);
                 emit imagesLoaded(true);
             }
-            dir.replace(QRegExp("images.idx3"), "labels.idx1");
-            m_reader->readLabels(dir, m_DS->m_labels, m_dFlag);
+            m_dirMNIST.replace(QRegExp("images.idx3"), "labels.idx1");
+            m_reader->readLabels(m_dirMNIST, m_DS->m_labels, m_dFlag);
             if (!m_DS->m_labels.empty())
             {
-                ui->labelFilepath_label->setText(dir);
+                ui->labelFilepath_label->setText(m_dirMNIST);
                 emit labelsLoaded(true);
             }
         }
@@ -66,4 +67,22 @@ void ReaderGUI::dataTypeChanged(int index)
         ui->loadLabels_checkBox->show();
 
     m_dFlag = index;
+}
+
+void ReaderGUI::writeSettings()
+{
+    QSettings settings("VVGLab", "ReaderGUI");
+    settings.beginGroup("path");
+    settings.setValue("m_dirMNIST", m_dirMNIST);
+    settings.setValue("m_dirStandard", m_dirStandard);
+    settings.endGroup();
+}
+
+void ReaderGUI::readSettings()
+{
+    QSettings settings("VVGLab", "RDFDialogGUI");
+    settings.beginGroup("PARAMS");
+    m_dirMNIST = settings.value("m_dirMNIST", "").toString();
+    m_dirStandard = settings.value("m_dirStandard", "").toString();
+    settings.endGroup();
 }

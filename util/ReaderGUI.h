@@ -17,6 +17,7 @@ class ReaderGUI : public QWidget
   public:
     explicit ReaderGUI(QWidget *parent = 0);
     DataSet *DS() { return m_DS;}
+    void writeSettings();
     ~ReaderGUI();
 
   private:
@@ -24,6 +25,10 @@ class ReaderGUI : public QWidget
     DataSet *m_DS;
     Reader *m_reader;
     int m_dFlag;
+
+    QString m_dirStandard;
+    QString m_dirMNIST;
+    void readSettings();
 
 
   private slots:

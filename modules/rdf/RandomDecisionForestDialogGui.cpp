@@ -145,6 +145,7 @@ void RandomDecisionForestDialogGui::onSave()
 void RandomDecisionForestDialogGui::closeEvent(QCloseEvent *event)
 {
     writeSettings();
+    m_readerGUI->writeSettings();
     event->accept();
 }
 
