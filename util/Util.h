@@ -89,16 +89,15 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 inline float calculateEntropy(const cv::Mat_<float> &hist)
 {
     float entr{};
-    float totalSize{};
+    float totalNPixels = cv::sum(hist)[0];
+
     int nCols = hist.cols;
-    for (int i = 0; i < nCols; ++i)
-        totalSize += hist(0, i);
     for (int i = 0; i < nCols; ++i)
     {
         float nPixelsAt = hist(0, i);
         if (nPixelsAt > 0)
         {
-            float probability = nPixelsAt / totalSize;
+            float probability = nPixelsAt / totalNPixels;
             entr -= probability * (log(probability));
         }
     }

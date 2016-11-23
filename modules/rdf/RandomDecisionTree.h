@@ -59,12 +59,15 @@ class RandomDecisionTree : public QObject
     inline cv::Mat_<float> getProbHist(Pixel &px, cv::Mat &roi)
     {
         // FIXME: fix this method, it is not working properly
-        Node &curr = m_nodes[0];
+        Node curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
             if(isLeft(px, curr, roi))
                 curr = m_nodes[2*curr.id + 1];
             else
                 curr = m_nodes[2*curr.id + 2];
+
+//        std::cout<< "curr: " << curr.hist << std::endl;
+//        std::cout<< "nodes: " << m_nodes[curr.id].hist << std::endl;
         return curr.hist;
     }
 
@@ -152,6 +155,8 @@ private:
 
     inline bool isLeaf(quint32 start, quint32 end)
     {
+        if(start == end)
+            return true;
         int label = m_pixelCloud.pixels1[start].label;
         int sum = 0;
         for(auto i = start; i < end; ++i)
@@ -174,17 +179,18 @@ private:
         return m_tauProbDistribution(generator);
     }
 
-    inline cv::Mat_<float> computeHistogram(quint16 start, quint16 end, int labelCount)
+    inline cv::Mat_<float> computeHistogram(quint32 start, quint32 end, int labelCount)
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (int pxIndex = start; pxIndex < end; ++pxIndex)
-            ++hist.at<float>(0, m_pixelCloud.pixels1[pxIndex].label);
+        for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
+            ++hist(0, m_pixelCloud.pixels1[pxIndex].label);
 
         // TODO: might be better if we keep it normalized
-        int tot = cv::sum(hist)[0];
-        if(tot != 0)
-            hist /= tot;
+//        quint32 tot = cv::sum(hist)[0];
+        hist /= (end-start);
+//        std::cout<< "curr: " << hist << std::endl;
+
         return hist;
     }
 

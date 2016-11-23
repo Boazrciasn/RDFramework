@@ -9,7 +9,7 @@ class RandomDecisionForest : public QObject
     Q_OBJECT
 
 private:
-    std::vector<rdt_ptr> m_forest;
+    std::vector<rdt_ptr> m_trees;
     RDFParams m_params{};
     DataSet m_DS{};
 
@@ -39,13 +39,13 @@ public:
     inline void printForest()
     {
         qDebug() << "FOREST {";
-        for(rdt_ptr tree : m_forest)
+        for(rdt_ptr tree : m_trees)
             tree->printTree();
         qDebug() << "}";
     }
 
     RandomDecisionForest() { srand(time(nullptr)); }
-    ~RandomDecisionForest() { m_forest.clear(); }
+    ~RandomDecisionForest() { m_trees.clear(); }
 
 signals:
     void treeConstructed();
@@ -76,7 +76,7 @@ private:
     void serialize( Archive & archive )
     {
         archive(m_params);
-        for(auto rdt : m_forest)
+        for(auto rdt : m_trees)
             archive(*rdt);
     }
 

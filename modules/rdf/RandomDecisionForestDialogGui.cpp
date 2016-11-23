@@ -93,8 +93,10 @@ void RandomDecisionForestDialogGui::onTest()
 
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i) {
-        auto &img = DS->m_ImagesVector[i];
+        cv::Mat img = DS->m_ImagesVector[i].clone();
         img = 255 - img; // TODO: remove when preprocess fixed
+//        cv::imshow("input",img);
+//        cv::waitKey();
         int label{};
         float conf{};
         m_forest.detect(img,label,conf);

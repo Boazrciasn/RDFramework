@@ -7,7 +7,7 @@ RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS
     //        rdfclock::duration d = rdfclock::now()-beginning;
     std::random_device rd;
     generator = std::mt19937(rd());
-    m_tauProbDistribution = std::uniform_int_distribution<>(-127, 128);
+    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
     //generator = new std::mt19937(d.count());
 }
 
@@ -110,6 +110,11 @@ void RandomDecisionTree::computeLeafHistograms()
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
+
+        if(start == end)
+            continue;
+
+        m_nodes[node_id].id = node_id;
         m_nodes[node_id].start = start;
         m_nodes[node_id].end = end;
         m_nodes[node_id].hist = computeHistogram(start, end, m_params->labelCount);
@@ -124,14 +129,16 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         return;
     auto maxItr = m_params->maxIteration;
     auto nLabels = m_params->labelCount;
-    int maxTau = -250;
+    int maxTau = 500;
     float maxGain = 0;
     cv::Point maxTeta1, maxTeta2;
     int itr = 0;
     cv::Mat_<float> leftHist(1, nLabels);
     cv::Mat_<float> rightHist(1, nLabels);
+
+    float parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
     float leftChildEntr, rightChildEntr;
-    float avgEntropyChild, parentEntr;
+    float avgEntropyChild;
     float infoGain;
     while (itr < maxItr)
     {
@@ -159,10 +166,13 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         rightChildEntr = calculateEntropy(rightHist);
         avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
         avgEntropyChild += (sizeRight / px_count) * rightChildEntr;
-        parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+
         infoGain = parentEntr - avgEntropyChild;
         // Non-improving epoch :
-        if (infoGain > maxGain)
+
+        if(sizeLeft <= m_params->minLeafPixels || sizeRight <= m_params->minLeafPixels)
+            ++itr;
+        else if (infoGain > maxGain)
         {
             maxTeta1 = m_nodes[index].teta1;
             maxTeta2 = m_nodes[index].teta2;
@@ -220,7 +230,7 @@ void RandomDecisionTree::printTree()
 {
     qDebug() << "TREE {";
     for (auto &node : m_nodes)
-        if(cv::sum(node.hist)[0] != 0)
-            std::cout << node.hist << std::endl;
+        if((node.end - node.start) != 0)
+            std::cout << node.id << " " << node.hist << std::endl;
     qDebug() << "}";
 }

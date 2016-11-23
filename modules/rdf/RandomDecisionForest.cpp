@@ -34,10 +34,10 @@ bool RandomDecisionForest::trainForest()
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
 
         emit treeConstructed();
-        m_forest.push_back(trainedRDT);
+        m_trees.push_back(trainedRDT);
         qDebug() << " Train time of the current Tree : " << cpu_time;
     }
-    qDebug() << "Forest Size : " << m_forest.size();
+    qDebug() << "Forest Size : " << m_trees.size();
 
     return true;
 }
@@ -65,7 +65,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 
     int nRows = roi.rows;
     int nCols = roi.cols;
-    auto nTrees = m_forest.size();
+    auto nTrees = m_trees.size();
     int labelCount = m_params.labelCount;
 
     // for each pix we alocate LABEL_COUNT slots to keep hist
@@ -84,8 +84,8 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 
             for(size_t i = 0; i < nTrees; ++i)
             {
-                auto tmp = m_forest[i]->getProbHist(px,padded_roi);
-                std::cout<< "tmp: " << tmp << std::endl;
+                auto tmp = m_trees[i]->getProbHist(px,padded_roi);
+//                std::cout<< "tmp: " << tmp << std::endl;
                 for (int var = 0; var < labelCount; ++var) {
                    layeredHist(row,col*labelCount + var) += tmp(var);
                 }
@@ -108,9 +108,9 @@ void RandomDecisionForest::getCumulativeProbHist(cv::Mat_<float> &probHist, cons
         for (int col = 0; col < nCols; ++col)
         {
             auto tmp = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,(col+1)*labelCount));
-            std::cout<< "tmp: " << tmp << std::endl;
+//            std::cout<< "tmp: " << tmp << std::endl;
             probHist = probHist + tmp;
-            std::cout<< "probHist: " << probHist << std::endl;
+//            std::cout<< "probHist: " << probHist << std::endl;
         }
     // normalize
     float sum = cv::sum(probHist)[0];
