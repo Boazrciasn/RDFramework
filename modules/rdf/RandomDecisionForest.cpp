@@ -63,8 +63,8 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     cv::copyMakeBorder(roi, padded_roi, m_params.probDistY, m_params.probDistY,
                        m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
 
-    int nRows = padded_roi.rows;
-    int nCols = padded_roi.cols;
+    int nRows = roi.rows;
+    int nCols = roi.cols;
     auto nTrees = m_forest.size();
     int labelCount = m_params.labelCount;
 
@@ -83,8 +83,13 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
             px.position = cv::Point(row + m_params.probDistY, col + m_params.probDistX);
 
             for(size_t i = 0; i < nTrees; ++i)
-                layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)))
-                        += m_forest[i]->getProbHist(px,padded_roi);
+            {
+                auto tmp = m_forest[i]->getProbHist(px,padded_roi);
+                std::cout<< "tmp: " << tmp << std::endl;
+                for (int var = 0; var < labelCount; ++var) {
+                   layeredHist(row,col*labelCount + var) += tmp(var);
+                }
+            }
         }
 
     // normalize layeredHist assuming leaf nodes are already normalized
@@ -101,8 +106,12 @@ void RandomDecisionForest::getCumulativeProbHist(cv::Mat_<float> &probHist, cons
 
     for (int row = 0; row < nRows; ++row)
         for (int col = 0; col < nCols; ++col)
-            probHist += layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)));
-
+        {
+            auto tmp = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,(col+1)*labelCount));
+            std::cout<< "tmp: " << tmp << std::endl;
+            probHist = probHist + tmp;
+            std::cout<< "probHist: " << probHist << std::endl;
+        }
     // normalize
     float sum = cv::sum(probHist)[0];
     if( sum != 0 )

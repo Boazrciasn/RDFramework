@@ -30,12 +30,13 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 //    QObject::connect(&m_forest, SIGNAL(classifiedImageAs(int, char)), this, SLOT(image_at_classified_as(int, char)));
 //    QObject::connect(&m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
 
-    m_readerGUI = new ReaderGUI();
     // TODO: create corresponding slots
 //    QObject::connect(m_readerGUI,SIGNAL(imagesLoaded(bool)), this, SLOT(imagesLoaded(bool)));
 //    QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
-    ui->gridLayout_train->addWidget(m_readerGUI,2,0,3,4);
-
+    m_trainDataReaderGUI = new ReaderGUI();
+    m_testDataReaderGUI = new ReaderGUI();
+    ui->gridLayout_train->addWidget(m_trainDataReaderGUI,2,0,3,4);
+    ui->gridLayout_test->addWidget(m_testDataReaderGUI,2,0,3,2);
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -64,7 +65,7 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 void RandomDecisionForestDialogGui::onTrain()
 {
     m_forest.setParams(PARAMS);
-    m_forest.setDataSet(*m_readerGUI->DS());
+    m_forest.setDataSet(*m_trainDataReaderGUI->DS());
 
     m_treeid = 0;
     if(m_forest.trainForest())
@@ -76,17 +77,34 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    m_forest.params().testDir = PARAMS.testDir;
-    //m_forest->readAndIdentifyWords();
-    if (m_forest.params().testDir.isEmpty())
+    // FIX: fix preprocessing
+    // TODO: fix preprocessing
+    DataSet *DS = m_testDataReaderGUI->DS();
+    int totalImgs = DS->m_ImagesVector.size();
+
+    if (totalImgs == 0)
     {
         QMessageBox *msgBox = new QMessageBox();
         msgBox->setWindowTitle("Error");
-        msgBox->setText("You Should First Choose a Test Data Folder");
+        msgBox->setText("You Should Load Test Data First!");
         msgBox->show();
         return;
     }
-//    m_forest->test(); // TODO: add test
+
+    float accuracy = 0;
+    for (int i = 0; i < totalImgs; ++i) {
+        auto &img = DS->m_ImagesVector[i];
+        img = 255 - img; // TODO: remove when preprocess fixed
+        int label{};
+        float conf{};
+        m_forest.detect(img,label,conf);
+        if(label == DS->m_labels[i])
+            ++accuracy;
+    }
+
+    accuracy /= totalImgs;
+    qDebug() << "accuracy: " << accuracy;
+    //    m_forest->test(); // TODO: add test
 }
 
 void RandomDecisionForestDialogGui::new_tree_constructed()
@@ -115,7 +133,6 @@ void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
 void RandomDecisionForestDialogGui::onLoad()
 {
     QString selfilter = tr("BINARY (*.bin *.txt)");
-    //QString fname = QFileDialog::getExistingDirectory(this,tr("Load Forest Directory"), QDir::currentPath(), QFileDialog::AnyFile);
     QString fname = QFileDialog::getOpenFileName(
                         this,
                         tr("Load Forest Directory"),
@@ -145,7 +162,7 @@ void RandomDecisionForestDialogGui::onSave()
 void RandomDecisionForestDialogGui::closeEvent(QCloseEvent *event)
 {
     writeSettings();
-    m_readerGUI->writeSettings();
+    m_trainDataReaderGUI->writeSettings();
     event->accept();
 }
 

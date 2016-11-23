@@ -58,6 +58,7 @@ class RandomDecisionTree : public QObject
 
     inline cv::Mat_<float> getProbHist(Pixel &px, cv::Mat &roi)
     {
+        // FIXME: fix this method, it is not working properly
         Node &curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
             if(isLeft(px, curr, roi))

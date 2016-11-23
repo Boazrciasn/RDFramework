@@ -339,7 +339,7 @@
      <property name="title">
       <string>Test</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
+     <layout class="QGridLayout" name="gridLayout_test">
       <property name="leftMargin">
        <number>3</number>
       </property>

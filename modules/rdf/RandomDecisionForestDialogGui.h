@@ -18,7 +18,8 @@ private:
     Ui::RandomDecisionForestDialogGui *ui;
     RandomDecisionForest m_forest;
     RDFParams PARAMS;
-    ReaderGUI *m_readerGUI;
+    ReaderGUI *m_trainDataReaderGUI;
+    ReaderGUI *m_testDataReaderGUI;
     qint16 m_treeid;
 
 protected:
