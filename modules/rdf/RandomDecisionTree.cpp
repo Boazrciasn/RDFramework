@@ -5,8 +5,10 @@ RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS
 {
     //        rdfclock::time_point beginning = rdfclock::now();
     //        rdfclock::duration d = rdfclock::now()-beginning;
+    static int i = 0;
     std::random_device rd;
     generator = std::mt19937(rd());
+    generator.seed(++i);
     m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
     //generator = new std::mt19937(d.count());
 }
@@ -124,7 +126,7 @@ void RandomDecisionTree::computeLeafHistograms()
 void RandomDecisionTree::computeDivisionAt(quint32 index)
 {
     // find best teta and taw parameters for the given node
-    int px_count = m_nodes[index].end - m_nodes[index].start;
+    float px_count = m_nodes[index].end - m_nodes[index].start;
     if (px_count == 0)
         return;
     auto maxItr = m_params->maxIteration;
@@ -142,6 +144,10 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     float infoGain;
     while (itr < maxItr)
     {
+        generateTeta(m_nodes[index].teta1);
+        generateTeta(m_nodes[index].teta2);
+        m_nodes[index].tau = generateTau();
+
         leftHist.setTo(0.0f);
         rightHist.setTo(0.0f);
         int sizeLeft  = 0;
@@ -170,9 +176,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         infoGain = parentEntr - avgEntropyChild;
         // Non-improving epoch :
 
-        if(sizeLeft <= m_params->minLeafPixels || sizeRight <= m_params->minLeafPixels)
-            ++itr;
-        else if (infoGain > maxGain)
+        if (infoGain > maxGain)
         {
             maxTeta1 = m_nodes[index].teta1;
             maxTeta2 = m_nodes[index].teta2;
@@ -182,9 +186,6 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         }
         else
             ++itr;
-        generateTeta(m_nodes[index].teta1);
-        generateTeta(m_nodes[index].teta2);
-        m_nodes[index].tau = generateTau();
     }
     m_nodes[index].tau = maxTau;
     m_nodes[index].teta1 = maxTeta1;

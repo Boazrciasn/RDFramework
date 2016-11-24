@@ -3,12 +3,7 @@
 #include <vector>
 
 #include "Core/MainWindowGui.h"
-#include "util/Reader.h"
-#include "rdf/RandomDecisionForest.h"
 
-
-
-#include "Util.h"
 #include <opencv2/objdetect.hpp>
 #include <opencv2/ml.hpp>
 
@@ -28,7 +23,6 @@ int main(int argc, char *argv[])
 //    cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
 //    std::cout << "max: " << max << std::endl;
 //    std::cout << "max_loc: " << max_loc.x << std::endl;
-
     // TODO: Baris Fix case sensitivity
     //BOUNDING BOX TEST :
     //    cv::Mat src_gray;

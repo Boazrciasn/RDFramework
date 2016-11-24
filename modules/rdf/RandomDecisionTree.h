@@ -132,9 +132,6 @@ private:
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
-        m_nodes[index].tau = generateTau();
-        generateTeta(m_nodes[index].teta1);
-        generateTeta(m_nodes[index].teta2);
 
         if(isLeaf(m_nodes[index].start, m_nodes[index].end))
             m_nodes[index].tau = 500; // While rearenging makes pixels move to left

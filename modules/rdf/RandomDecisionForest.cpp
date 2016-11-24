@@ -24,7 +24,7 @@ bool RandomDecisionForest::trainForest()
         rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS, &m_params));
         qDebug() << "Train..." ;
         trainedRDT->train();
-        trainedRDT->printTree();
+//        trainedRDT->printTree();
 
         if(trainedRDT->isPixelSizeConsistent())
             qDebug() << "Pixel size consistent at the leafs!" ;
