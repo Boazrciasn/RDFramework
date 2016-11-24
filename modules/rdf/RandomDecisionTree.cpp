@@ -153,12 +153,12 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
             auto &img = m_DS->m_ImagesVector[px.id];
             if (isLeft(px, m_nodes[index], img))
             {
-                ++leftHist.at<float>(px.label);
+                ++leftHist(px.label);
                 sizeLeft++;
             }
             else
             {
-                ++rightHist.at<float>(px.label);
+                ++rightHist(px.label);
                 sizeRight++;
             }
         }

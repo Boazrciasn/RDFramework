@@ -184,7 +184,7 @@ private:
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
         for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
-            ++hist(0, m_pixelCloud.pixels1[pxIndex].label);
+            ++hist(m_pixelCloud.pixels1[pxIndex].label);
 
         // TODO: might be better if we keep it normalized
 //        quint32 tot = cv::sum(hist)[0];

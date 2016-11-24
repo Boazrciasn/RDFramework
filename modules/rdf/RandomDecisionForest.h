@@ -30,7 +30,10 @@ public:
 
     inline void preprocessDS(){
         for(auto &img : m_DS.m_ImagesVector)
+        {
             img = 255 - img;
+            cv::GaussianBlur(img,img,cv::Size(11,11),0);
+        }
     }
 
     RDFParams &params() { return m_params; }

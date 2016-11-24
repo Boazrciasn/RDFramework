@@ -95,6 +95,7 @@ void RandomDecisionForestDialogGui::onTest()
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
         img = 255 - img; // TODO: remove when preprocess fixed
+        cv::GaussianBlur(img,img,cv::Size(11,11),0);
 //        cv::imshow("input",img);
 //        cv::waitKey();
         int label{};
@@ -105,7 +106,7 @@ void RandomDecisionForestDialogGui::onTest()
     }
 
     accuracy /= totalImgs;
-    qDebug() << "accuracy: " << accuracy;
+    qDebug() << "accuracy: " << 100*accuracy;
     //    m_forest->test(); // TODO: add test
 }
 
