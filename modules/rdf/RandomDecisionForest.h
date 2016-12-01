@@ -12,6 +12,7 @@ private:
     std::vector<rdt_ptr> m_trees;
     RDFParams m_params{};
     DataSet m_DS{};
+    quint32 m_nTreesForDetection;
 
 public:
     bool trainForest();
@@ -47,11 +48,19 @@ public:
         qDebug() << "}";
     }
 
+    void inline setNTreesForDetection(quint32 count){
+        if(count > m_trees.size())
+            return;
+        m_nTreesForDetection = count;
+    }
+
     RandomDecisionForest() { srand(time(nullptr)); }
     ~RandomDecisionForest() { m_trees.clear(); }
 
 signals:
     void treeConstructed();
+    void printTrainMsg(QString);
+    void printDetectMsg(QString);
 
 public:
     inline void saveForest(QString fname)

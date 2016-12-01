@@ -42,7 +42,7 @@ class RandomDecisionTree : public QObject
     RDFParams *m_params;
 
     // Random number generators
-    std::mt19937 generator;
+    std::mt19937 m_generator;
     std::uniform_int_distribution<> m_yProbDistribution;
     std::uniform_int_distribution<> m_xProbDistribution;
     std::uniform_int_distribution<> m_tauProbDistribution;
@@ -52,11 +52,13 @@ class RandomDecisionTree : public QObject
 
   public:
     RandomDecisionTree(DataSet *DS, RDFParams *params);
+    void inline setGenerator(std::mt19937 &generator) {m_generator = generator;}
+    std::mt19937 inline getGenerator() {return m_generator;}
     void train();
     void printTree();
     bool isPixelSizeConsistent();
 
-    inline cv::Mat_<float> getProbHist(Pixel &px, cv::Mat &roi)
+    cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat &roi)
     {
         // FIXME: fix this method, it is not working properly
         Node curr = m_nodes[0];
@@ -71,26 +73,26 @@ class RandomDecisionTree : public QObject
         return curr.hist;
     }
 
-    inline void setProbeDistanceX(int probe_distanceX)
+    void inline setProbeDistanceX(int probe_distanceX)
     {
         m_probe_distanceX = probe_distanceX;
         m_xProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceX,
                                                                 m_probe_distanceX);
     }
 
-    inline void setProbeDistanceY(int probe_distanceY)
+    void inline setProbeDistanceY(int probe_distanceY)
     {
         m_probe_distanceY = probe_distanceY;
         m_yProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceY,
                                                                 m_probe_distanceY);
     }
 
-    inline void setMaxDepth(int maxDepth)
+    void inline setMaxDepth(int maxDepth)
     {
         m_height = maxDepth;
     }
 
-    inline void setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
+    void inline setMinimumLeafPixelCount(quint32 min_leaf_pixel_count)
     {
         m_minLeafPixelCount = min_leaf_pixel_count;
     }
@@ -109,7 +111,7 @@ private:
     void computeDivisionAt(quint32 index);
     void rearrange(quint32 index);
 
-    inline void initParams()
+    void inline initParams()
     {
         setProbeDistanceX(m_params->probDistX);
         setProbeDistanceY(m_params->probDistY);
@@ -117,13 +119,13 @@ private:
         setMinimumLeafPixelCount(m_params->minLeafPixels);
     }
 
-    inline void initNodes()
+    void inline initNodes()
     {
         auto size = (1ul << m_height) - 1 ;
         m_nodes.resize(size);
     }
 
-    inline void processNode(quint32 index)
+    void inline processNode(quint32 index)
     {
         int mult = (index + 1) % 2; // 0 if left, 1 if right
         int parentId = (index + 1) / 2 - 1;
@@ -139,7 +141,7 @@ private:
             computeDivisionAt(index);
     }
 
-    inline bool isLeft(Pixel &p, Node &node, cv::Mat &img)
+    bool inline isLeft(Pixel &p, Node &node, cv::Mat &img)
     {
         qint16 new_teta1R = node.teta1.y + p.position.y;
         qint16 new_teta1C = node.teta1.x + p.position.x;
@@ -150,7 +152,7 @@ private:
         return (intensity1 - intensity2) <= node.tau;
     }
 
-    inline bool isLeaf(quint32 start, quint32 end)
+    bool inline isLeaf(quint32 start, quint32 end)
     {
         if(start == end)
             return true;
@@ -164,19 +166,19 @@ private:
         return isMinPixReached || isPureNode;
     }
 
-    inline void generateTeta(cv::Point &crd)
+    void inline generateTeta(cv::Point &crd)
     {
-        crd.y = m_yProbDistribution(generator);
-        crd.x = m_xProbDistribution(generator) ;
+        crd.y = m_yProbDistribution(m_generator);
+        crd.x = m_xProbDistribution(m_generator) ;
     }
 
-    inline int generateTau()
+    int inline generateTau()
     {
         // random number between -127, +128
-        return m_tauProbDistribution(generator);
+        return m_tauProbDistribution(m_generator);
     }
 
-    inline cv::Mat_<float> computeHistogram(quint32 start, quint32 end, int labelCount)
+    cv::Mat_<float> inline computeHistogram(quint32 start, quint32 end, int labelCount)
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);

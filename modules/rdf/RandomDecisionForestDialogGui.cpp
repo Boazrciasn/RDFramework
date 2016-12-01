@@ -24,9 +24,11 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     ui->setupUi(this);
     readSettings();
     initParamValues();
-
+    m_nTreesForDetection = ui->spinBox_NTestTrees->value();
 
     QObject::connect(&m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
+    QObject::connect(&m_forest, SIGNAL(printTrainMsg(QString)), this, SLOT(printMsgToTrainScreen(QString)));
+    QObject::connect(&m_forest, SIGNAL(printDetectMsg(QString)), this, SLOT(printMsgToTestScreen(QString)));
 //    QObject::connect(&m_forest, SIGNAL(classifiedImageAs(int, char)), this, SLOT(image_at_classified_as(int, char)));
 //    QObject::connect(&m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
 
@@ -36,7 +38,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     m_trainDataReaderGUI = new ReaderGUI();
     m_testDataReaderGUI = new ReaderGUI();
     ui->gridLayout_train->addWidget(m_trainDataReaderGUI,2,0,3,4);
-    ui->gridLayout_test->addWidget(m_testDataReaderGUI,2,0,3,2);
+    ui->gridLayout_test->addWidget(m_testDataReaderGUI,3,0,3,2);
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -81,6 +83,7 @@ void RandomDecisionForestDialogGui::onTest()
     // TODO: fix preprocessing
     DataSet *DS = m_testDataReaderGUI->DS();
     int totalImgs = DS->m_ImagesVector.size();
+    m_forest.setNTreesForDetection(m_nTreesForDetection);
 
     if (totalImgs == 0)
     {
@@ -106,7 +109,7 @@ void RandomDecisionForestDialogGui::onTest()
     }
 
     accuracy /= totalImgs;
-    qDebug() << "accuracy: " << 100*accuracy;
+    printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100*accuracy));
     //    m_forest->test(); // TODO: add test
 }
 
@@ -130,6 +133,18 @@ void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
     std::cout << "gotcha!";
     ui->textBrowser_test->append(" Classification Accuracy : " + QString::number(
                                      accuracy) + "%");
+    ui->textBrowser_test->repaint();
+}
+
+void RandomDecisionForestDialogGui::printMsgToTrainScreen(QString msg)
+{
+    ui->textBrowser_train->append(msg);
+    ui->textBrowser_train->repaint();
+}
+
+void RandomDecisionForestDialogGui::printMsgToTestScreen(QString msg)
+{
+    ui->textBrowser_test->append(msg);
     ui->textBrowser_test->repaint();
 }
 
@@ -206,6 +221,12 @@ void RandomDecisionForestDialogGui::readSettings()
 void RandomDecisionForestDialogGui::onNTreesChanged(int value)
 {
     PARAMS.nTrees = value;
+    ui->spinBox_NTestTrees->setMaximum(value);
+}
+
+void RandomDecisionForestDialogGui::onNTestTreesChanged(int value)
+{
+    m_nTreesForDetection = value;
 }
 
 void RandomDecisionForestDialogGui::onMaxDepthChanged(int value)

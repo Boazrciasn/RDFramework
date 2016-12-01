@@ -21,6 +21,7 @@ private:
     ReaderGUI *m_trainDataReaderGUI;
     ReaderGUI *m_testDataReaderGUI;
     qint16 m_treeid;
+    quint32 m_nTreesForDetection;
 
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
@@ -40,14 +41,16 @@ public slots:
     void new_tree_constructed();
     void image_at_classified_as(int index, char label);
     void resultPercetange(double accuracy);
+    void printMsgToTrainScreen(QString msg);
+    void printMsgToTestScreen(QString msg);
 
-public slots:
     void onLoad();
     void onSave();
     void writeSettings();
     void readSettings();
 
     void onNTreesChanged(int value);
+    void onNTestTreesChanged(int value);
     void onMaxDepthChanged(int value);
     void onProbDistXChanged(int value);
     void onProbDistYChanged(int value);

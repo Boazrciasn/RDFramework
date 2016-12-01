@@ -5,10 +5,10 @@ RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS
 {
     //        rdfclock::time_point beginning = rdfclock::now();
     //        rdfclock::duration d = rdfclock::now()-beginning;
-    static int i = 0;
-    std::random_device rd;
-    generator = std::mt19937(rd());
-    generator.seed(++i);
+//    static int i = 0;
+//    std::random_device rd;
+//    m_generator = std::mt19937(rd());
+//    m_generator.seed(++i);
     m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
     //generator = new std::mt19937(d.count());
 }
