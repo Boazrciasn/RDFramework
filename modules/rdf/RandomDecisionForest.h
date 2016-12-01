@@ -34,6 +34,8 @@ public:
         {
             img = 255 - img;
             cv::GaussianBlur(img,img,cv::Size(11,11),0);
+            cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
+                               m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
         }
     }
 

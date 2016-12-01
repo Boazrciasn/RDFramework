@@ -3,22 +3,14 @@
 
 RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS), m_params(params)
 {
-    //        rdfclock::time_point beginning = rdfclock::now();
-    //        rdfclock::duration d = rdfclock::now()-beginning;
-//    static int i = 0;
-//    std::random_device rd;
-//    m_generator = std::mt19937(rd());
-//    m_generator.seed(++i);
     m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
-    //generator = new std::mt19937(d.count());
 }
-
 
 
 void RandomDecisionTree::train()
 {
     initParams();
-    initNodes(); // initNodes, it alocates space for nodes
+    initNodes();
     getSubSample();
     constructTree();
     emit treeConstructed();
@@ -35,12 +27,7 @@ void RandomDecisionTree::getSubSample()
 
     for (quint32 id = 0; id < imgCount; ++id)
     {
-        cv::Mat image;
-        // Zero pad given image
-        cv::copyMakeBorder(m_DS->m_ImagesVector[id],image,m_probe_distanceY, m_probe_distanceY,
-                           m_probe_distanceX,m_probe_distanceX, cv::BORDER_CONSTANT);
-
-
+        auto &image = m_DS->m_ImagesVector[id];
         auto label  = m_DS->m_labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
@@ -49,7 +36,7 @@ void RandomDecisionTree::getSubSample()
         {
             int row = 0;
             int col = 0;
-            quint8 intensity = 0 ;
+            quint8 intensity = 0;
             while (intensity == 0)
             {
                 row = (rand() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
@@ -78,9 +65,6 @@ void RandomDecisionTree::constructRootNode()
     quint32 rootId = 0;
     m_nodes[rootId].id = rootId;
     m_nodes[rootId].end = m_pixelCloud.pixels1.size();
-    m_nodes[rootId].tau = generateTau();
-    generateTeta(m_nodes[rootId].teta1);
-    generateTeta(m_nodes[rootId].teta2);
     computeDivisionAt(rootId);
     rearrange(rootId);
 }
@@ -157,6 +141,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         {
             auto &px = m_pixelCloud.pixels1[i];
             auto &img = m_DS->m_ImagesVector[px.id];
+
             if (isLeft(px, m_nodes[index], img))
             {
                 ++leftHist(px.label);
@@ -203,6 +188,7 @@ void RandomDecisionTree::rearrange(quint32 index)
     {
         auto &px = m_pixelCloud.pixels1[i];
         auto &img = m_DS->m_ImagesVector[px.id]; // TODO: might be too time consuming
+
         if (isLeft(px, m_nodes[index], img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];
