@@ -1,6 +1,11 @@
 #include "RandomDecisionTree.h"
 #include "RandomDecisionForest.h"
 
+RandomDecisionTree::RandomDecisionTree()
+{
+    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
+}
+
 RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS), m_params(params)
 {
     m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
@@ -13,7 +18,6 @@ void RandomDecisionTree::train()
     initNodes();
     getSubSample();
     constructTree();
-    emit treeConstructed();
 }
 
 void RandomDecisionTree::getSubSample()
@@ -210,14 +214,4 @@ bool RandomDecisionTree::isPixelSizeConsistent()
     for (int nodeIndex = decision_node_count; nodeIndex < tot_node_count; ++nodeIndex)
         nPixelsOnLeaves += (m_nodes[nodeIndex].end - m_nodes[nodeIndex].start);
     return m_pixelCloud.pixels1.size() == nPixelsOnLeaves;
-}
-
-
-void RandomDecisionTree::printTree()
-{
-    qDebug() << "TREE {";
-    for (auto &node : m_nodes)
-        if((node.end - node.start) != 0)
-            std::cout << node.id << " " << node.hist << std::endl;
-    qDebug() << "}";
 }

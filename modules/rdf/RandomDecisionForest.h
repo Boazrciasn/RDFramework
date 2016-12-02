@@ -9,7 +9,7 @@ class RandomDecisionForest : public QObject
     Q_OBJECT
 
 private:
-    std::vector<rdt_ptr> m_trees;
+    std::vector<RandomDecisionTree> m_trees{};
     RDFParams m_params{};
     DataSet m_DS{};
     quint32 m_nTreesForDetection;
@@ -22,7 +22,11 @@ public:
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                             cv::Mat_<uchar> &labels, cv::Mat_<float> &confs);
 
-    void setParams(const RDFParams &params) { m_params = params; }
+    void setParams(const RDFParams &params) {
+        m_params = params;
+        m_trees.resize(m_params.nTrees);
+        m_nTreesForDetection = m_params.nTrees;
+    }
     void setDataSet(const DataSet &DS)
     {
         m_DS = DS;
@@ -41,14 +45,6 @@ public:
 
     RDFParams &params() { return m_params; }
     DataSet &DS() { return m_DS; }
-
-    inline void printForest()
-    {
-        qDebug() << "FOREST {";
-        for(rdt_ptr tree : m_trees)
-            tree->printTree();
-        qDebug() << "}";
-    }
 
     void inline setNTreesForDetection(quint32 count){
         if(count > m_trees.size())
@@ -89,9 +85,9 @@ private:
     template <class Archive>
     void serialize( Archive & archive )
     {
-        archive(m_params);
-        for(auto rdt : m_trees)
-            archive(*rdt);
+        archive(m_params, m_trees);
+        for(auto &rdt : m_trees)
+            rdt.setParams(&m_params);
     }
 
 };

@@ -27,26 +27,24 @@ bool RandomDecisionForest::trainForest()
         clock_t start = clock();
 
         emit printTrainMsg("Tree number " + QString::number(i + 1) + " is being trained");
-        rdt_ptr trainedRDT(new RandomDecisionTree(&m_DS, &m_params));
-        emit printTrainMsg("Train...") ;
-        trainedRDT->setGenerator(generator);
-        trainedRDT->train();
-//        trainedRDT->printTree();
+        auto &rdt = m_trees[i];
+        rdt.setDataSet(&m_DS);
+        rdt.setParams(&m_params);
+        rdt.setGenerator(generator);
 
-        if(trainedRDT->isPixelSizeConsistent())
-            emit printTrainMsg("Pixel size consistent at the leafs!");
+        emit printTrainMsg("Train...") ;
+        rdt.train();
+
+        if(rdt.isPixelSizeConsistent())
+            emit printTrainMsg("Pixel size is consistent at the leafs!");
         else
             emit printTrainMsg("Pixel size is not consistent at the leafs!") ;
         // TODO: save tree
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
-
         emit treeConstructed();
-        m_trees.push_back(trainedRDT);
         emit printTrainMsg(" Train time of the current Tree : " + QString::number(cpu_time));
     }
     emit printTrainMsg("Forest Size : " + QString::number(m_trees.size()));
-
-    m_nTreesForDetection = m_trees.size();
     return true;
 }
 
@@ -91,7 +89,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 
             for(size_t i = 0; i < m_nTreesForDetection; ++i)
             {
-                auto tmp = m_trees[i]->getProbHist(px,padded_roi);
+                auto tmp = m_trees[i].getProbHist(px,padded_roi);
 //                std::cout<< "tmp: " << tmp << std::endl;
                 for (int var = 0; var < labelCount; ++var) {
                    layeredHist(row,col*labelCount + var) += tmp(var);

@@ -44,7 +44,7 @@ private:
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        archive( id , start, end, leftCount, tau, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, hist, x1, y1, x2, y2);
 
     }
 
@@ -52,11 +52,12 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        archive( id , start, end, leftCount, tau, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, hist, x1, y1, x2, y2);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
         teta2.y = y2;
+//        std::cout << hist << std::endl;
     }
 };
 

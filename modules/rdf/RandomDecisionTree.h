@@ -27,9 +27,8 @@
 
 using rdfclock  = std::chrono::high_resolution_clock;
 
-class RandomDecisionTree : public QObject
+class RandomDecisionTree
 {
-    Q_OBJECT
   private:
     quint32 m_minLeafPixelCount;
     quint32 m_height{};
@@ -47,15 +46,14 @@ class RandomDecisionTree : public QObject
     std::uniform_int_distribution<> m_xProbDistribution;
     std::uniform_int_distribution<> m_tauProbDistribution;
 
-  signals:
-    void treeConstructed();
-
   public:
+    RandomDecisionTree();
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(std::mt19937 &generator) {m_generator = generator;}
+    void inline setDataSet(DataSet *DS) {m_DS = DS;}
+    void inline setParams(RDFParams *params) {m_params = params;}
     std::mt19937 inline getGenerator() {return m_generator;}
     void train();
-    void printTree();
     bool isPixelSizeConsistent();
 
     cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat &roi)
@@ -205,6 +203,6 @@ private:
     }
 };
 
-using rdt_ptr = std::shared_ptr<RandomDecisionTree>;
+//using rdt_ptr = std::shared_ptr<RandomDecisionTree>;
 
 #endif // RANDOMDESICIONTREE_H
