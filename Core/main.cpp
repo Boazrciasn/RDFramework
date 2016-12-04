@@ -6,9 +6,43 @@
 
 #include <opencv2/objdetect.hpp>
 #include <opencv2/ml.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
 using namespace cv;
 
 cv::Mat get_hogdescriptor_visu(const cv::Mat& color_origImg, std::vector<float>& descriptorValues, const cv::Size & size );
+
+Mat src, src_gray;
+Mat dst, detected_edges;
+
+int lowThreshold;
+int const max_lowThreshold = 100;
+int ratio = 3;
+int kernel_size = 3;
+char* window_name = "Edge Map";
+
+/**
+ * @function CannyThreshold
+ * @brief Trackbar callback - Canny thresholds input with a ratio 1:3
+ */
+void CannyThreshold(int, void*)
+{
+  /// Reduce noise with a kernel 3x3
+  blur( src_gray, detected_edges, Size(3,3) );
+
+  /// Canny detector
+  Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
+
+  /// Using Canny's output as a mask, we display our result
+  dst = Scalar::all(0);
+
+  src.copyTo( dst, detected_edges);
+  imshow( window_name, dst );
+
+  imshow( "window_name", detected_edges );
+ }
+
 
 int main(int argc, char *argv[])
 {
@@ -177,27 +211,38 @@ int main(int argc, char *argv[])
     //    }
     //    std::cout << "Rate: " << -100*rate/foundImages.size()<<std::endl;
 
-    cv::HOGDescriptor hog;
-    cv::Mat img = cv::imread("/home/neko/Desktop/trackingData/INRIAPerson/70X134H96/Test/pos/crop001501a.png", CV_LOAD_IMAGE_GRAYSCALE);
-    cv::Mat grayImg = img(cv::Range(0,128),cv::Range(0,64));
 
 
-    std::vector<float> des1;
-    std::vector<float> des2;
-    hog.compute(img, des1);
-    hog.compute(grayImg, des2,cv::Size( 8, 8 ), cv::Size( 0, 0 ));
-    Mat visu = get_hogdescriptor_visu(grayImg,des2,Size(64,128));
-    imshow("visu", visu);
-    waitKey();
+//    cv::HOGDescriptor hog;
+//    cv::Mat img = cv::imread("/home/neko/Desktop/trackingData/INRIAPerson/70X134H96/Test/pos/crop001501a.png", CV_LOAD_IMAGE_GRAYSCALE);
+//    std::vector<float> des;
+//    hog.compute(img, des);
+//    Mat visu = get_hogdescriptor_visu(img,des,Size(64,128));
+//    imshow("visu", visu);
+//    waitKey();
+//    qDebug()<<img.rows << " " << img.cols << " " << des.size();
 
-    qDebug()<<img.rows << " " << img.cols << " " << des1.size();
-    qDebug()<<grayImg.rows << " " << grayImg.cols << " " << des2.size();
 
-    //    for(int i = 0; i < 30; ++i)
-    //        qDebug()<< (des1[i]-des2[i]);
+    src = cv::imread("/home/neko/Desktop/trackingData/INRIAPerson/70X134H96/Test/pos/crop001501b.png");
 
-    cv::imshow("img", grayImg);
-    cv::waitKey();
+    /// Create a matrix of the same type and size as src (for dst)
+    dst.create( src.size(), src.type() );
+
+    /// Convert the image to grayscale
+    cvtColor( src, src_gray, CV_BGR2GRAY );
+
+    /// Create a window
+    namedWindow( window_name, CV_WINDOW_AUTOSIZE );
+
+    lowThreshold = 20;
+    /// Create a Trackbar for user to enter threshold
+    createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+
+    /// Show the image
+    CannyThreshold(0, 0);
+
+    /// Wait until user exit program by pressing a key
+    waitKey(0);
 
     QApplication app(argc, argv);
     MainWindowGui w;

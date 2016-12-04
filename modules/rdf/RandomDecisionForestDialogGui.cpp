@@ -66,6 +66,19 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 
 void RandomDecisionForestDialogGui::onTrain()
 {
+    int lowThreshold = 50;
+    int ratio = 3;
+    int kernel_size = 3;
+
+
+    for(auto &img : m_trainDataReaderGUI->DS()->m_ImagesVector)
+    {
+        cv::blur( img, img, cv::Size(3,3) );
+        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
+//        cv::imshow( "window_name", img );
+//        cv::waitKey();
+    }
+
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_trainDataReaderGUI->DS());
 
@@ -94,10 +107,18 @@ void RandomDecisionForestDialogGui::onTest()
         return;
     }
 
+    int lowThreshold = 50;
+    int ratio = 3;
+    int kernel_size = 3;
+
+
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
-        img = 255 - img; // TODO: remove when preprocess fixed
+//        img = 255 - img; // TODO: remove when preprocess fixed
+        cv::blur( img, img, cv::Size(3,3) );
+        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
+
         cv::GaussianBlur(img,img,cv::Size(11,11),0);
 //        cv::imshow("input",img);
 //        cv::waitKey();

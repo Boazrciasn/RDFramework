@@ -26,6 +26,9 @@ void ReaderGUI::load()
     {
         m_dirStandard = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_dirStandard,
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        m_reader->readImages(m_dirStandard, m_DS->m_ImagesVector,m_dFlag);
+
         if (!m_DS->m_ImagesVector.empty())
         {
             ui->LoadedDataset_label->setText(m_dirStandard);
