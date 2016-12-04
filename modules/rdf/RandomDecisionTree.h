@@ -134,7 +134,11 @@ private:
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
 
         if(isLeaf(m_nodes[index].start, m_nodes[index].end))
+        {
+            generateTeta(m_nodes[index].teta1);
+            generateTeta(m_nodes[index].teta2);
             m_nodes[index].tau = 500; // While rearenging makes pixels move to left
+        }
         else
             computeDivisionAt(index);
     }

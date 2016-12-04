@@ -90,9 +90,9 @@ void RandomDecisionTree::constructTreeDecisionNodes()
 
 void RandomDecisionTree::computeLeafHistograms()
 {
-    auto tot_node_count = (1 << m_height) - 1 ;
-    auto leaf_node_count = 1 << (m_height - 1) ;
-    for (int node_id = (tot_node_count - leaf_node_count); node_id < tot_node_count; ++node_id)
+    auto tot_node_count = (1ul << m_height) - 1 ;
+    auto leaf_node_count = 1ul << (m_height - 1) ;
+    for (auto node_id = (tot_node_count - leaf_node_count); node_id < tot_node_count; ++node_id)
     {
         Node parent = m_nodes[(node_id + 1) / 2 - 1];
         quint32 leftCount = parent.leftCount;
