@@ -223,26 +223,26 @@ int main(int argc, char *argv[])
 //    qDebug()<<img.rows << " " << img.cols << " " << des.size();
 
 
-    src = cv::imread("/home/neko/Desktop/trackingData/INRIAPerson/70X134H96/Test/pos/crop001501b.png");
+//    src = cv::imread("/home/neko/Desktop/trackingData/INRIAPerson/70X134H96/Test/pos/crop001501b.png");
 
-    /// Create a matrix of the same type and size as src (for dst)
-    dst.create( src.size(), src.type() );
+//    /// Create a matrix of the same type and size as src (for dst)
+//    dst.create( src.size(), src.type() );
 
-    /// Convert the image to grayscale
-    cvtColor( src, src_gray, CV_BGR2GRAY );
+//    /// Convert the image to grayscale
+//    cvtColor( src, src_gray, CV_BGR2GRAY );
 
-    /// Create a window
-    namedWindow( window_name, CV_WINDOW_AUTOSIZE );
+//    /// Create a window
+//    namedWindow( window_name, CV_WINDOW_AUTOSIZE );
 
-    lowThreshold = 20;
-    /// Create a Trackbar for user to enter threshold
-    createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+//    lowThreshold = 20;
+//    /// Create a Trackbar for user to enter threshold
+//    createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
 
-    /// Show the image
-    CannyThreshold(0, 0);
+//    /// Show the image
+//    CannyThreshold(0, 0);
 
-    /// Wait until user exit program by pressing a key
-    waitKey(0);
+//    /// Wait until user exit program by pressing a key
+//    waitKey(0);
 
     QApplication app(argc, argv);
     MainWindowGui w;

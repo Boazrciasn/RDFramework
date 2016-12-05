@@ -66,18 +66,8 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 
 void RandomDecisionForestDialogGui::onTrain()
 {
-    int lowThreshold = 50;
-    int ratio = 3;
-    int kernel_size = 3;
-
-
-    for(auto &img : m_trainDataReaderGUI->DS()->m_ImagesVector)
-    {
-        cv::blur( img, img, cv::Size(3,3) );
-        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
-//        cv::imshow( "window_name", img );
-//        cv::waitKey();
-    }
+//    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
+    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
 
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_trainDataReaderGUI->DS());
@@ -92,6 +82,9 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
+//    applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
+    applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
+
     // FIX: fix preprocessing
     // TODO: fix preprocessing
     DataSet *DS = m_testDataReaderGUI->DS();
@@ -107,19 +100,11 @@ void RandomDecisionForestDialogGui::onTest()
         return;
     }
 
-    int lowThreshold = 50;
-    int ratio = 3;
-    int kernel_size = 3;
-
-
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
 //        img = 255 - img; // TODO: remove when preprocess fixed
-        cv::blur( img, img, cv::Size(3,3) );
-        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
-
-        cv::GaussianBlur(img,img,cv::Size(11,11),0);
+        cv::GaussianBlur(img,img,cv::Size(3,3),0);
 //        cv::imshow("input",img);
 //        cv::waitKey();
         int label{};
@@ -132,6 +117,54 @@ void RandomDecisionForestDialogGui::onTest()
     accuracy /= totalImgs;
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100*accuracy));
     //    m_forest->test(); // TODO: add test
+}
+
+void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
+{
+    int scale = 1;
+    int delta = 0;
+    int ddepth = CV_16S;
+
+    /// Generate grad_x and grad_y
+    cv::Mat grad_x, grad_y;
+    cv::Mat abs_grad_x, abs_grad_y;
+
+    for(auto &img : images)
+    {
+        cv::GaussianBlur(img,img,cv::Size(3,3),0);
+//        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
+
+        /// Gradient X
+        //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
+        cv::Sobel( img, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT );
+        cv::convertScaleAbs( grad_x, abs_grad_x );
+
+        /// Gradient Y
+        //Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+        cv::Sobel( img, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT );
+        cv::convertScaleAbs( grad_y, abs_grad_y );
+
+        /// Total Gradient (approximate)
+        cv::addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, img );
+
+//        cv::imshow( "window_name", img );
+//        cv::waitKey();
+    }
+}
+
+void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
+{
+    int lowThreshold = 50;
+    int ratio = 3;
+    int kernel_size = 3;
+
+    for(auto &img : images)
+    {
+        cv::GaussianBlur(img,img,cv::Size(3,3),0);
+        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
+//        cv::imshow( "window_name", img );
+//        cv::waitKey();
+    }
 }
 
 void RandomDecisionForestDialogGui::new_tree_constructed()

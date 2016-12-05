@@ -29,6 +29,10 @@ protected:
 private:
     void initParamValues();
 
+    void applySobel(std::vector<cv::Mat> &images);
+    void applyCanny(std::vector<cv::Mat> &images);
+
+
 public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
