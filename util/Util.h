@@ -199,7 +199,15 @@ class Util
     static void covert32FCto8UC(cv::Mat &input, cv::Mat &output);
     static std::vector<cv::Rect> calculateBoundingBoxRect(const cv::Mat_<quint8> &inputImg, quint16 minSize ,
                                                           quint16 maxSize, double aspectMax, double aspectMin);
-    static void drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes);
+    static void inline drawBoundingBox(cv::Mat &inputImg, const std::vector<cv::Rect> &boundingBoxes)
+    {
+        cv::RNG rng(12345);
+        for (size_t i = 0; i < boundingBoxes.size() ; ++i)
+        {
+            cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+            rectangle(inputImg, boundingBoxes[i].tl(), boundingBoxes[i].br(), color, 2, 8, 0);
+        }
+    }
     static void inline Erosion(const cv::Mat &inputImg, cv::Mat outputImg, quint16 size, cv::MorphShapes elementType)
     {
         cv::Mat element = cv::getStructuringElement(elementType, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));

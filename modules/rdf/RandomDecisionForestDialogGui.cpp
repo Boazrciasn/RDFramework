@@ -66,8 +66,8 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 
 void RandomDecisionForestDialogGui::onTrain()
 {
-//    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
-    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
+    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
+//    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
 
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_trainDataReaderGUI->DS());
@@ -82,8 +82,8 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-//    applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
-    applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
+    applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
+//    applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
 
     // FIX: fix preprocessing
     // TODO: fix preprocessing
@@ -131,7 +131,7 @@ void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
 
     for(auto &img : images)
     {
-        cv::GaussianBlur(img,img,cv::Size(3,3),0);
+        cv::GaussianBlur(img,img,cv::Size(11,11),0);
 //        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
 
         /// Gradient X
@@ -147,7 +147,7 @@ void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
         /// Total Gradient (approximate)
         cv::addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, img );
 
-//        cv::imshow( "window_name", img );
+//        cv::imshow( "window_name", img);
 //        cv::waitKey();
     }
 }
@@ -158,11 +158,15 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
     int ratio = 3;
     int kernel_size = 3;
 
+    int count = 0;
     for(auto &img : images)
     {
+//        cv::imshow( "window_fray", img);
         cv::GaussianBlur(img,img,cv::Size(3,3),0);
         cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
-//        cv::imshow( "window_name", img );
+
+//        std::cout << m_trainDataReaderGUI->DS()->m_labels[count] << std::endl;
+//        cv::imshow( "window_name", img);
 //        cv::waitKey();
     }
 }

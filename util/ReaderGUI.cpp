@@ -28,6 +28,15 @@ void ReaderGUI::load()
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
         m_reader->readImages(m_dirStandard, m_DS->m_ImagesVector,m_dFlag);
+        m_DS->m_labels = std::vector<int> (m_DS->m_ImagesVector.size(), 1);
+
+        // FIXME: convert to file traversal
+        QString dirNeg = "/home/neko/Desktop/trackingData/INRIAPerson/train_64x128_H96/neg";
+        m_reader->readImages(dirNeg, m_DS->m_ImagesVector,m_dFlag);
+        m_DS->m_labels.resize(m_DS->m_ImagesVector.size());
+
+        for(auto &img :  m_DS->m_ImagesVector)
+            cv::resize(img,img,cv::Size(64,128));
 
         if (!m_DS->m_ImagesVector.empty())
         {
