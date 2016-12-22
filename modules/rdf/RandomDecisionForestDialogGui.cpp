@@ -66,8 +66,10 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 
 void RandomDecisionForestDialogGui::onTrain()
 {
-    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
+
+//    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
 //    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
+
 
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_trainDataReaderGUI->DS());
@@ -82,9 +84,12 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
-//    applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
-
+    if(!isTestDataProcessed)
+    {
+//        applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
+//        applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
+        isTestDataProcessed = true;
+    }
     // FIX: fix preprocessing
     // TODO: fix preprocessing
     DataSet *DS = m_testDataReaderGUI->DS();
@@ -103,8 +108,8 @@ void RandomDecisionForestDialogGui::onTest()
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
-//        img = 255 - img; // TODO: remove when preprocess fixed
-        cv::GaussianBlur(img,img,cv::Size(3,3),0);
+        img = 255 - img; // TODO: remove when preprocess fixed
+        cv::GaussianBlur(img,img,cv::Size(5,5),0);
 //        cv::imshow("input",img);
 //        cv::waitKey();
         int label{};
@@ -112,11 +117,18 @@ void RandomDecisionForestDialogGui::onTest()
         m_forest.detect(img,label,conf);
         if(label == DS->m_labels[i])
             ++accuracy;
+
+        cv::Mat labelColorCode;
+        cv::Mat_<float> confMat;
+        cv::Mat_<float> layeredHist = m_forest.getLayeredHist(img);
+        m_forest.getLabelAndConfMat(layeredHist,labelColorCode,confMat);
+
+        cv::imshow("input",labelColorCode);
+        cv::waitKey();
     }
 
     accuracy /= totalImgs;
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100*accuracy));
-    //    m_forest->test(); // TODO: add test
 }
 
 void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)

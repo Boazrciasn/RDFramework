@@ -124,21 +124,27 @@ void RandomDecisionForest::getCumulativeProbHist(cv::Mat_<float> &probHist, cons
 }
 
 void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
-                                              cv::Mat_<uchar> &labels, cv::Mat_<float> &confs)
+                                              cv::Mat &labels, cv::Mat_<float> &confs)
 {
     int labelCount = m_params.labelCount;
     int nRows = layeredHist.rows;
     int nCols = layeredHist.cols/labelCount;
 
+    labels = cv::Mat(nRows,nCols,CV_8UC3);
+    labels.setTo(cv::Scalar(255,255,255));
+    confs = cv::Mat_<float>(nRows,nCols);
+
     for (int row = 0; row < nRows; ++row)
         for (int col = 0; col < nCols; ++col) {
-            cv::Mat_<float> tmpProbHist = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,col*(labelCount+1)));
+            cv::Mat_<float> tmpProbHist = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,(col+1)*labelCount));
             double max;
             cv::Point max_loc;
             cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
 
             // Set Pixel label & confidance
-            labels(row,col) = max_loc.x;
+            if(cv::sum(tmpProbHist)[0] == 0)
+                continue;
+            labels.at<cv::Vec3b>(row,col) = colorcode.colors[max_loc.x];
             confs(row,col) = max;
         }
 }

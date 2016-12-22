@@ -47,7 +47,7 @@ void Reader::readImages(QString dir, std::vector<cv::Mat> &images, int flags = T
     {
     case Type_Standard:
     {
-        QDirIterator itFile(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png", QDir::Files,
+        QDirIterator itFile(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png" << "*.pgm", QDir::Files,
                             QDirIterator::Subdirectories);
         while (itFile.hasNext())
         {

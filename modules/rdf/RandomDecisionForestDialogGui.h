@@ -22,6 +22,7 @@ private:
     ReaderGUI *m_testDataReaderGUI;
     qint16 m_treeid;
     quint32 m_nTreesForDetection;
+    bool isTestDataProcessed{};
 
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;

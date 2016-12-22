@@ -15,6 +15,7 @@ ReaderGUI::ReaderGUI(QWidget *parent) :
 ReaderGUI::~ReaderGUI()
 {
     delete ui;
+    delete m_DS;
 }
 
 
@@ -27,13 +28,22 @@ void ReaderGUI::load()
         m_dirStandard = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_dirStandard,
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-        m_reader->readImages(m_dirStandard, m_DS->m_ImagesVector,m_dFlag);
-        m_DS->m_labels = std::vector<int> (m_DS->m_ImagesVector.size(), 1);
+        QString pos_data = m_dirStandard + "/pos";
+        QString neg_data = m_dirStandard + "/neg";
 
-        // FIXME: convert to file traversal
-        QString dirNeg = "/home/neko/Desktop/trackingData/INRIAPerson/train_64x128_H96/neg";
-        m_reader->readImages(dirNeg, m_DS->m_ImagesVector,m_dFlag);
-        m_DS->m_labels.resize(m_DS->m_ImagesVector.size());
+        int tot_pos;
+        int tot_neg;
+
+        m_reader->readImages(pos_data, m_DS->m_ImagesVector,m_dFlag);
+        tot_pos = m_DS->m_ImagesVector.size();
+        for(auto i = 0; i < tot_pos; ++i)
+            m_DS->m_labels.push_back(0);
+
+        m_reader->readImages(neg_data, m_DS->m_ImagesVector,m_dFlag);
+        tot_neg = m_DS->m_ImagesVector.size() - tot_pos;
+        for(auto i = 0; i < tot_neg; ++i)
+            m_DS->m_labels.push_back(1);
+
 
         for(auto &img :  m_DS->m_ImagesVector)
             cv::resize(img,img,cv::Size(64,128));

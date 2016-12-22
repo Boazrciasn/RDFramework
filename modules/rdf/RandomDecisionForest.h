@@ -13,6 +13,7 @@ private:
     RDFParams m_params{};
     DataSet m_DS{};
     quint32 m_nTreesForDetection;
+    Colorcode colorcode;
 
 public:
     bool trainForest();
@@ -20,7 +21,7 @@ public:
     cv::Mat_<float> getLayeredHist(cv::Mat &roi);
     void getCumulativeProbHist(cv::Mat_<float> &probHist, const cv::Mat_<float> &layeredHist);
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
-                            cv::Mat_<uchar> &labels, cv::Mat_<float> &confs);
+                            cv::Mat &labels, cv::Mat_<float> &confs);
 
     void setParams(const RDFParams &params) {
         m_params = params;
@@ -37,7 +38,7 @@ public:
         for(auto &img : m_DS.m_ImagesVector)
         {
 //            img = 255 - img;  // TODO: uncomment for original images
-            cv::GaussianBlur(img,img,cv::Size(3,3),0);
+//            cv::GaussianBlur(img,img,cv::Size(5,5),0);
             cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
                                m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
         }
