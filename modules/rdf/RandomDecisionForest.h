@@ -37,8 +37,8 @@ public:
     inline void preprocessDS(){
         for(auto &img : m_DS.m_ImagesVector)
         {
-            img = 255 - img;  // TODO: uncomment for original images
-            cv::GaussianBlur(img,img,cv::Size(5,5),0);
+//            img = 255 - img;  // TODO: uncomment for original images
+//            cv::GaussianBlur(img,img,cv::Size(5,5),0);
             cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
                                m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
         }
@@ -53,7 +53,11 @@ public:
         m_nTreesForDetection = count;
     }
 
-    RandomDecisionForest() { srand(time(nullptr)); }
+    RandomDecisionForest()
+    {
+        srand(time(nullptr));
+        m_nTreesForDetection = 1;
+    }
     ~RandomDecisionForest() { m_trees.clear(); }
 
 signals:
