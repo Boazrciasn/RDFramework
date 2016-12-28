@@ -67,7 +67,7 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 void RandomDecisionForestDialogGui::onTrain()
 {
 
-//    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
+    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
 //    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
 
 
@@ -105,6 +105,18 @@ void RandomDecisionForestDialogGui::onTest()
         return;
     }
 
+//    cv::Mat lblColors;
+//    Colorcode colors;
+
+//    for (int lbl = 0; lbl < m_forest.params().labelCount; ++lbl) {
+//        cv::Mat curLbl(28,28,CV_8UC3);
+//        curLbl.setTo(colors.colors[lbl]);
+//        lblColors.push_back(curLbl);
+//    }
+
+//    cv::imshow("ColorCode", lblColors);
+//    cv::waitKey();
+
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
@@ -118,13 +130,16 @@ void RandomDecisionForestDialogGui::onTest()
         if(label == DS->m_labels[i])
             ++accuracy;
 
-        cv::Mat labelColorCode;
-        cv::Mat_<float> confMat;
-        cv::Mat_<float> layeredHist = m_forest.getLayeredHist(img);
-        m_forest.getLabelAndConfMat(layeredHist,labelColorCode,confMat);
+//        cv::Mat labelColorCode;
+//        cv::Mat_<float> confMat;
+//        cv::Mat_<float> layeredHist = m_forest.getLayeredHist(img);
+//        m_forest.getLabelAndConfMat(layeredHist,labelColorCode,confMat);
 
-        cv::imshow("input",labelColorCode);
-        cv::waitKey();
+//        if(DS->m_labels[i] == 1)
+//        {
+//            cv::imshow("input",labelColorCode);
+//            cv::waitKey();
+//        }
     }
 
     accuracy /= totalImgs;
@@ -143,7 +158,7 @@ void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
 
     for(auto &img : images)
     {
-        cv::GaussianBlur(img,img,cv::Size(11,11),0);
+        cv::GaussianBlur(img,img,cv::Size(3,3),0);
 //        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
 
         /// Gradient X
@@ -174,7 +189,7 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
     for(auto &img : images)
     {
 //        cv::imshow( "window_fray", img);
-        cv::GaussianBlur(img,img,cv::Size(3,3),0);
+        cv::GaussianBlur(img,img,cv::Size(11,11),0);
         cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
 
 //        std::cout << m_trainDataReaderGUI->DS()->m_labels[count] << std::endl;
