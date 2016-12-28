@@ -67,12 +67,18 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 void RandomDecisionForestDialogGui::onTrain()
 {
 
-    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
+//    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
 //    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
 
 
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_trainDataReaderGUI->DS());
+
+//    for(auto &img : m_forest.DS().m_ImagesVector)
+//    {
+//        cv::imshow("input",img);
+//        cv::waitKey();
+//    }
 
     m_treeid = 0;
     if(m_forest.trainForest())
@@ -121,7 +127,7 @@ void RandomDecisionForestDialogGui::onTest()
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
         img = 255 - img; // TODO: remove when preprocess fixed
-        cv::GaussianBlur(img,img,cv::Size(5,5),0);
+        cv::GaussianBlur(img,img,cv::Size(3,3),0);
 //        cv::imshow("input",img);
 //        cv::waitKey();
         int label{};
