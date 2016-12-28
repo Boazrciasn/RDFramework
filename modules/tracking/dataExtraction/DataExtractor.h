@@ -35,7 +35,7 @@ class DataExtractor : public VideoProcess
         for (size_t i = 0; i < bBox_vec.size() ; ++i)
         {
             cv::Mat roi(inputImg, bBox_vec[i]);
-            cv::Mat roi_gray(grayImg_fg, bBox_vec[i]); // TODO: related to previous to be deleted
+//            cv::Mat roi_gray(grayImg_fg, bBox_vec[i]); // TODO: related to previous to be deleted
 
             m_detector.compute(roi, decision, confidence);
             if (decision == -1.0f)
@@ -44,12 +44,12 @@ class DataExtractor : public VideoProcess
             {
                 QString sampleno = m_saveDir+"/" + QString::number(m_sampleCount).rightJustified(6, '0') + ".png";
                 cv::cvtColor(roi,roi, CV_RGB2BGR);
-//                cv::imwrite(sampleno.toStdString(), roi); //TODO: uncomment later
+                cv::imwrite(sampleno.toStdString(), roi); //TODO: uncomment later
                 ++m_sampleCount;
 
                 // TODO: remove later
-                QString sampleno_gray = m_saveDir+"/" + QString::number(m_sampleCount).rightJustified(6, '0') + "_gray.png";
-                cv::imwrite(sampleno_gray.toStdString(), roi_gray);
+//                QString sampleno_gray = m_saveDir+"/" + QString::number(m_sampleCount).rightJustified(6, '0') + "_gray.png";
+//                cv::imwrite(sampleno_gray.toStdString(), roi_gray);
             }
         }
 
