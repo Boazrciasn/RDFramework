@@ -14,9 +14,13 @@ RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS
 
 void RandomDecisionTree::train()
 {
+    std::cout << "initParams" << std::endl;
     initParams();
+    std::cout << "initNodes" << std::endl;
     initNodes();
+    std::cout << "getSubSample" << std::endl;
     getSubSample();
+    std::cout << "constructTree" << std::endl;
     constructTree();
 }
 
@@ -77,6 +81,7 @@ void RandomDecisionTree::constructTreeDecisionNodes()
 {
     for (quint32 depth = 1; depth < m_height-1; ++depth)
     {
+        std::cout << "Tree at depth " << depth << " being processed ... " << std::endl;
         int level_nodes = 1 << depth;          // Number of nodes at this level
         int tot_nodes   = (1 << (depth + 1)) - 1; // Number of nodes at this and previous levels
         tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
