@@ -12,11 +12,10 @@ struct Colorcode
     Colorcode()
     {
         colors.append(cv::Vec3b(0,0,255));
-        colors.append(cv::Vec3b(20,20,51));
-        colors.append(cv::Vec3b(41,102,66));
-        colors.append(cv::Vec3b(51,0,38));
-        colors.append(cv::Vec3b(0,0,204));
-        colors.append(cv::Vec3b(0,255,106));
+        colors.append(cv::Vec3b(0,0,51));
+        colors.append(cv::Vec3b(57,126,229));
+        colors.append(cv::Vec3b(0,255,0));
+        colors.append(cv::Vec3b(255,0,0));
         colors.append(cv::Vec3b(255,213,0));
         colors.append(cv::Vec3b(230,92,195));
         colors.append(cv::Vec3b(51,43,0));
