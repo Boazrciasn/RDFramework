@@ -143,6 +143,7 @@ void ParticleFilter::initializeParticles()
                                                    m_histSize);
         particle->setHOGDescriptor(hog);
         particle->setSVM(m_svm);
+        particle->setRDF(m_forest);
         m_particles.push_back(particle);
     }
 }

@@ -154,7 +154,8 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     ui->particleHeightLSpinBox->setValue(m_particleHeight);
     m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters,
                               m_particleWidth, m_particleHeight, m_histSize,m_TargetsVector[0]);
-    m_PF->setSVM(m_predictor->getSvm());
+//    m_PF->setSVM(m_predictor->getSvm());
+    m_PF->setRDF(m_predictor->getForest());
     m_PF->initializeParticles();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setProcess(m_PF);
@@ -383,9 +384,17 @@ void ParticleFilterWidgetGui::setConfidence()
 void ParticleFilterWidgetGui::onActionDispConfMap()
 {
     m_svm = m_predictor->getSvm();
-    if(!m_svm || !m_VideoLodaded || m_isPlaying)
+    RandomDecisionForest* rdf = m_predictor->getForest();
+    if(!m_VideoLodaded || m_isPlaying)
         return;
-    QImage confMap = m_predictor->getConfMap(m_originalPix, m_particleWidth, m_particleHeight, m_stepSize);
+
+    QImage confMap;
+    if(m_svm)
+        confMap = m_predictor->getConfMapSVM(m_originalPix, m_particleWidth, m_particleHeight, m_stepSize);
+    else if(rdf)
+        confMap = m_predictor->getConfMapRDF(m_originalPix, m_particleWidth, m_particleHeight, m_stepSize);
+    else
+        return;
     QImage img = m_originalPix.toImage();
 
     QPainter p(&img);

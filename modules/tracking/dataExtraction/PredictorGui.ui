@@ -48,6 +48,13 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="loadRDF">
+        <property name="text">
+         <string>load RDF</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -62,8 +69,8 @@
    <slot>train()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>59</y>
+     <x>298</x>
+     <y>54</y>
     </hint>
     <hint type="destinationlabel">
      <x>265</x>
@@ -78,8 +85,8 @@
    <slot>extractHOGFeatures()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>78</y>
+     <x>121</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
@@ -94,8 +101,8 @@
    <slot>save()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>82</y>
+     <x>298</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
      <x>235</x>
@@ -119,11 +126,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>loadRDF</sender>
+   <signal>clicked()</signal>
+   <receiver>PredictorGui</receiver>
+   <slot>loadRDF()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>95</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>extractHOGFeatures()</slot>
   <slot>save()</slot>
   <slot>train()</slot>
   <slot>load()</slot>
+  <slot>loadRDF()</slot>
  </slots>
 </ui>

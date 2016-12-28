@@ -46,7 +46,7 @@ void ReaderGUI::load()
 
 
         for(auto &img :  m_DS->m_ImagesVector)
-            cv::resize(img,img,cv::Size(64,128));
+            cv::resize(img,img,cv::Size(16,32));
 
         if (!m_DS->m_ImagesVector.empty())
         {
