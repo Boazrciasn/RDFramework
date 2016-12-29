@@ -2,6 +2,7 @@
 #include <ctime>
 
 #include "RandomDecisionForest.h"
+#include "UtilDataModifier.h"
 //#include <omp.h>
 
 // histogram normalize ?
@@ -29,6 +30,7 @@ bool RandomDecisionForest::trainForest()
         emit printTrainMsg("Tree number " + QString::number(i + 1) + " is being trained");
         auto &rdt = m_trees[i];
         rdt.setDataSet(&m_DS);
+        rdt.setImgMHOGF(m_imgMHOGF);
         rdt.setParams(&m_params);
         rdt.setGenerator(generator);
 
@@ -147,4 +149,27 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
             labels.at<cv::Vec3b>(row,col) = colorcode.colors[max_loc.x];
             confs(row,col) = max;
         }
+}
+
+void RandomDecisionForest::preprocessDS(){
+    cv::HOGDescriptor hog;
+    std::vector<float> des;
+
+    for(auto &img : m_DS.m_ImagesVector)
+    {
+        //            img = 255 - img;  // TODO: uncomment for original images
+        //            cv::GaussianBlur(img,img,cv::Size(3,3),0);
+
+        // Here we are assuming input data size is (64,128)
+        hog.compute(img, des);
+        cv::Mat_<float> feature = UtilDataModifier::get_hogdescriptor_mat(des,cv::Size(64,128));
+        m_imgMHOGF.push_back(feature.clone());
+
+        qDebug() << feature.rows << " " << feature.cols;
+        des.clear();
+        feature.release();
+
+        cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
+                           m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
+    }
 }

@@ -8,6 +8,7 @@
 #include <opencv2/ml.hpp>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "UtilDataModifier.h"
 
 using namespace cv;
 
@@ -218,8 +219,10 @@ int main(int argc, char *argv[])
 //    std::vector<float> des;
 //    hog.compute(img, des);
 //    Mat visu = get_hogdescriptor_visu(img,des,Size(64,128));
+//    cv::Mat_<float> feature = get_hogdescriptor_mat(des,Size(64,128));
 //    imshow("visu", visu);
 //    waitKey();
+//    std::cout << feature(cv::Range::all(),cv::Range(0,1)) << std::endl;
 //    qDebug()<<img.rows << " " << img.cols << " " << des.size();
 
 
@@ -350,6 +353,7 @@ cv::Mat get_hogdescriptor_visu(const cv::Mat& color_origImg, std::vector<float>&
     // draw cells
     for (celly=0; celly<cells_in_y_dir; celly++)
     {
+        qDebug() << gradientStrengths[celly][0][0];
         for (cellx=0; cellx<cells_in_x_dir; cellx++)
         {
             int drawX = cellx * cellSize;
@@ -406,3 +410,4 @@ cv::Mat get_hogdescriptor_visu(const cv::Mat& color_origImg, std::vector<float>&
 
     return visu;
 }
+

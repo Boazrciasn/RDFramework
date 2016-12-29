@@ -38,6 +38,7 @@ class RandomDecisionTree
     std::vector<Node> m_nodes;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
+    QVector<cv::Mat_<float>> m_imgMHOGF{};
     RDFParams *m_params;
 
     // Random number generators
@@ -51,6 +52,7 @@ class RandomDecisionTree
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(std::mt19937 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
+    void inline setImgMHOGF(QVector<cv::Mat_<float>> imgMHOGF) {m_imgMHOGF = imgMHOGF;}
     void inline setParams(RDFParams *params) {m_params = params;}
     std::mt19937 inline getGenerator() {return m_generator;}
     void train();

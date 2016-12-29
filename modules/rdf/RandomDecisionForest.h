@@ -12,6 +12,7 @@ private:
     std::vector<RandomDecisionTree> m_trees{};
     RDFParams m_params{};
     DataSet m_DS{};
+    QVector<cv::Mat_<float>> m_imgMHOGF{};  // Modified HOG Feature
     quint32 m_nTreesForDetection;
     Colorcode colorcode;
 
@@ -34,15 +35,7 @@ public:
         preprocessDS();
     }
 
-    inline void preprocessDS(){
-        for(auto &img : m_DS.m_ImagesVector)
-        {
-            img = 255 - img;  // TODO: uncomment for original images
-            cv::GaussianBlur(img,img,cv::Size(3,3),0);
-            cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
-                               m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
-        }
-    }
+    void preprocessDS();
 
     RDFParams &params() { return m_params; }
     DataSet &DS() { return m_DS; }
