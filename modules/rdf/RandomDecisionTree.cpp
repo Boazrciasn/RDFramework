@@ -3,12 +3,14 @@
 
 RandomDecisionTree::RandomDecisionTree()
 {
-    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
+//    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
+    m_tauProbDistribution = std::uniform_real_distribution<>(0, 1);
 }
 
 RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS), m_params(params)
 {
-    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
+    //    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
+    m_tauProbDistribution = std::uniform_real_distribution<>(0, 1);
 }
 
 
@@ -45,7 +47,7 @@ void RandomDecisionTree::getSubSample()
             int row = 0;
             int col = 0;
             quint8 intensity = 0;
-            while (intensity == 0)
+            while (intensity < 50)
             {
                 row = (rand() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
                 col = (rand() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
@@ -124,7 +126,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         return;
     auto maxItr = m_params->maxIteration;
     auto nLabels = m_params->labelCount;
-    int maxTau = 500;
+    double maxTau = 1;
     float maxGain = 0;
     cv::Point maxTeta1, maxTeta2;
     int itr = 0;
@@ -149,17 +151,17 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         for (auto i = m_nodes[index].start; i < end; ++i)
         {
             auto &px = m_pixelCloud.pixels1[i];
-            auto &img = m_DS->m_ImagesVector[px.id];
+            auto& feature = m_imgMHOGF[px.id];
 
-            if (isLeft(px, m_nodes[index], img))
+            if (isLeft(px, m_nodes[index], feature))
             {
                 ++leftHist(px.label);
-                sizeLeft++;
+                ++sizeLeft;
             }
             else
             {
                 ++rightHist(px.label);
-                sizeRight++;
+                ++sizeRight;
             }
         }
         leftChildEntr = calculateEntropy(leftHist);
@@ -196,9 +198,9 @@ void RandomDecisionTree::rearrange(quint32 index)
     for (auto i = start; i < end; ++i)
     {
         auto &px = m_pixelCloud.pixels1[i];
-        auto &img = m_DS->m_ImagesVector[px.id]; // TODO: might be too time consuming
+        auto& feature = m_imgMHOGF[px.id];
 
-        if (isLeft(px, m_nodes[index], img))
+        if (isLeft(px, m_nodes[index], feature))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];
             leftCount++;

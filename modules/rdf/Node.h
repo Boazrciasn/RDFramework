@@ -13,7 +13,7 @@ struct Node
     quint32 start{};
     quint32 end{};
     quint32 leftCount{};
-    qint16 tau{};
+    double tau{};
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;

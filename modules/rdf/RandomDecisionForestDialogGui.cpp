@@ -67,7 +67,7 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 void RandomDecisionForestDialogGui::onTrain()
 {
 
-//    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
+    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
 //    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
 
 
@@ -92,7 +92,7 @@ void RandomDecisionForestDialogGui::onTest()
 {
     if(!isTestDataProcessed)
     {
-//        applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
+        applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
 //        applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
         isTestDataProcessed = true;
     }
@@ -126,8 +126,8 @@ void RandomDecisionForestDialogGui::onTest()
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i) {
         cv::Mat img = DS->m_ImagesVector[i].clone();
-        img = 255 - img; // TODO: remove when preprocess fixed
-        cv::GaussianBlur(img,img,cv::Size(3,3),0);
+//        img = 255 - img; // TODO: remove when preprocess fixed
+//        cv::GaussianBlur(img,img,cv::Size(3,3),0);
 //        cv::imshow("input",img);
 //        cv::waitKey();
         int label{};
@@ -140,6 +140,9 @@ void RandomDecisionForestDialogGui::onTest()
 //        cv::Mat_<float> confMat;
 //        cv::Mat_<float> layeredHist = m_forest.getLayeredHist(img);
 //        m_forest.getLabelAndConfMat(layeredHist,labelColorCode,confMat);
+
+//        cv::imshow("input",labelColorCode);
+//        cv::waitKey();
 
 //        if(DS->m_labels[i] == 1)
 //        {

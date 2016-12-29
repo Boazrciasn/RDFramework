@@ -75,6 +75,11 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     int nCols = roi.cols;
     int labelCount = m_params.labelCount;
 
+    std::vector<float> des;
+    m_hog.compute(padded_roi, des);
+    cv::Mat_<float> feature = UtilDataModifier::get_hogdescriptor_mat(des,cv::Size(padded_roi.cols,padded_roi.rows));
+    des.clear();
+
     // for each pix we alocate LABEL_COUNT slots to keep hist
     // therefore, ROW is the same COL is COL*LABEL_COUNT
     cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols*labelCount);
@@ -82,7 +87,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     for(int row = 0; row < nRows; ++row)
         for(int col = 0; col < nCols; ++col)
         {
-            if (roi.at<uchar>(row, col) == 0)
+            if (roi.at<uchar>(row, col) < 50)
                 continue;
 
             Pixel px;
@@ -91,7 +96,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 
             for(size_t i = 0; i < m_nTreesForDetection; ++i)
             {
-                auto tmp = m_trees[i].getProbHist(px,padded_roi);
+                auto tmp = m_trees[i].getProbHist(px,feature);
 //                std::cout<< "tmp: " << tmp << std::endl;
                 for (int var = 0; var < labelCount; ++var) {
                    layeredHist(row,col*labelCount + var) += tmp(var);
@@ -152,7 +157,6 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
 }
 
 void RandomDecisionForest::preprocessDS(){
-    cv::HOGDescriptor hog;
     std::vector<float> des;
 
     for(auto &img : m_DS.m_ImagesVector)
@@ -160,16 +164,16 @@ void RandomDecisionForest::preprocessDS(){
         //            img = 255 - img;  // TODO: uncomment for original images
         //            cv::GaussianBlur(img,img,cv::Size(3,3),0);
 
-        // Here we are assuming input data size is (64,128)
-        hog.compute(img, des);
-        cv::Mat_<float> feature = UtilDataModifier::get_hogdescriptor_mat(des,cv::Size(64,128));
-        m_imgMHOGF.push_back(feature.clone());
-
-        qDebug() << feature.rows << " " << feature.cols;
-        des.clear();
-        feature.release();
-
         cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
                            m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
+
+        // Here we are assuming input data size is (64,128)
+        m_hog.compute(img, des);
+        cv::Mat_<float> feature = UtilDataModifier::get_hogdescriptor_mat(des,cv::Size(img.cols,img.rows));
+        m_imgMHOGF.push_back(feature.clone());
+
+//        qDebug() << feature.rows << " " << feature.cols;
+        des.clear();
+        feature.release();
     }
 }

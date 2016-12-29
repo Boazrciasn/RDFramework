@@ -45,7 +45,8 @@ class RandomDecisionTree
     std::mt19937 m_generator;
     std::uniform_int_distribution<> m_yProbDistribution;
     std::uniform_int_distribution<> m_xProbDistribution;
-    std::uniform_int_distribution<> m_tauProbDistribution;
+//    std::uniform_int_distribution<> m_tauProbDistribution;
+    std::uniform_real_distribution<> m_tauProbDistribution;
 
   public:
     RandomDecisionTree();
@@ -58,12 +59,12 @@ class RandomDecisionTree
     void train();
     bool isPixelSizeConsistent();
 
-    cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat &roi)
+    cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat_<float>& feature)
     {
         // FIXME: fix this method, it is not working properly
         Node curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
-            if(isLeft(px, curr, roi))
+            if(isLeft(px, curr, feature))
                 curr = m_nodes[2*curr.id + 1];
             else
                 curr = m_nodes[2*curr.id + 2];
@@ -145,15 +146,34 @@ private:
             computeDivisionAt(index);
     }
 
-    bool inline isLeft(Pixel &p, Node &node, cv::Mat &img)
+//    bool inline isLeft(Pixel &p, Node &node, cv::Mat &img)
+//    {
+//        qint16 new_teta1R = node.teta1.y + p.position.y;
+//        qint16 new_teta1C = node.teta1.x + p.position.x;
+//        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
+//        qint16 new_teta2R = node.teta2.y + p.position.y;
+//        qint16 new_teta2C = node.teta2.x + p.position.x;
+//        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
+//        return (intensity1 - intensity2) <= node.tau;
+//    }
+
+    bool inline isLeft(Pixel &p, Node &node, cv::Mat_<float>& feature)
     {
-        qint16 new_teta1R = node.teta1.y + p.position.y;
-        qint16 new_teta1C = node.teta1.x + p.position.x;
-        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
-        qint16 new_teta2R = node.teta2.y + p.position.y;
-        qint16 new_teta2C = node.teta2.x + p.position.x;
-        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
-        return (intensity1 - intensity2) <= node.tau;
+        // 8 comes from cell size which is (8x8), 9 is binSize
+        // FIXME: for point we use (x,y) as (row, col); however for cells teta (col,row)
+        qint16 cellx = (node.teta1.y + p.position.x) / 8;
+        qint16 celly = (node.teta1.x + p.position.y) / 8;
+
+        qint16 cellx_ = (node.teta2.y + p.position.x) / 8;
+        qint16 celly_ = (node.teta2.x + p.position.y) / 8;
+
+        if(cellx == -1 || cellx_ == -1)
+            qDebug() << "helllo";
+
+        cv::Mat_<float> hist1 = feature(cv::Range(celly,celly+1),cv::Range(cellx,cellx+9));
+        cv::Mat_<float> hist2 = feature(cv::Range(celly_,celly_+1),cv::Range(cellx_,cellx_+9));
+        double dist = cv::compareHist(hist1,hist2,CV_COMP_BHATTACHARYYA);
+        return dist <= node.tau;
     }
 
     bool inline isLeaf(quint32 start, quint32 end)
@@ -176,9 +196,15 @@ private:
         crd.x = m_xProbDistribution(m_generator) ;
     }
 
-    int inline generateTau()
+//    int inline generateTau()
+//    {
+//        // random number between -127, +128
+//        return m_tauProbDistribution(m_generator);
+//    }
+
+    double inline generateTau()
     {
-        // random number between -127, +128
+        // random number between (0,1)
         return m_tauProbDistribution(m_generator);
     }
 

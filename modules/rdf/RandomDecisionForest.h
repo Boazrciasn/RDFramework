@@ -15,6 +15,7 @@ private:
     QVector<cv::Mat_<float>> m_imgMHOGF{};  // Modified HOG Feature
     quint32 m_nTreesForDetection;
     Colorcode colorcode;
+    cv::HOGDescriptor m_hog;
 
 public:
     bool trainForest();

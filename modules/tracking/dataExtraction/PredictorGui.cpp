@@ -81,7 +81,7 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
         for (int j = step / 2; j < map.cols - 1; j += step)
         {
             cv::Mat roi(srcGray, cv::Rect(j, i, roi_width, roi_height));
-            cv::resize(roi, roi, cv::Size(16, 32));
+            cv::resize(roi, roi, cv::Size(64, 128));
 
             cv::Sobel( roi, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT );
             cv::convertScaleAbs( grad_x, abs_grad_x );

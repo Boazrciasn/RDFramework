@@ -62,7 +62,7 @@ public:
 //        descriptor.clear();
 
 
-        cv::resize(roi,roi,cv::Size(16,32));
+        cv::resize(roi,roi,cv::Size(64,128));
         cv::GaussianBlur(roi,roi,cv::Size(3,3),0);
 
 //        int lowThreshold = 50;
