@@ -161,14 +161,20 @@ private:
     {
         // 8 comes from cell size which is (8x8), 9 is binSize
         // FIXME: for point we use (x,y) as (row, col); however for cells teta (col,row)
-        qint16 cellx = (node.teta1.y + p.position.x) / 8;
-        qint16 celly = (node.teta1.x + p.position.y) / 8;
+        qint16 cellx = (node.teta1.x + p.position.x) / 8;
+        qint16 celly = (node.teta1.y + p.position.y) / 8;
 
-        qint16 cellx_ = (node.teta2.y + p.position.x) / 8;
-        qint16 celly_ = (node.teta2.x + p.position.y) / 8;
+        qint16 cellx_ = (node.teta2.x + p.position.x) / 8;
+        qint16 celly_ = (node.teta2.y + p.position.y) / 8;
 
-        if(cellx == -1 || cellx_ == -1)
-            qDebug() << "helllo";
+        // since each hists length is 9 bin
+        cellx = cellx*9;
+        cellx_ = cellx_*9;
+
+        if(cellx < 0 || (cellx+8) > feature.cols)
+            return false;
+        else if(cellx_ < 0 || (cellx_+8) > feature.cols)
+            return false;
 
         cv::Mat_<float> hist1 = feature(cv::Range(celly,celly+1),cv::Range(cellx,cellx+9));
         cv::Mat_<float> hist2 = feature(cv::Range(celly_,celly_+1),cv::Range(cellx_,cellx_+9));

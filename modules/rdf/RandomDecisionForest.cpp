@@ -92,7 +92,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 
             Pixel px;
             // Since we are sending padded roi we should add probDistX & probDistY to px.position
-            px.position = cv::Point(row + m_params.probDistY, col + m_params.probDistX);
+            px.position = cv::Point(col + m_params.probDistX, row + m_params.probDistY);
 
             for(size_t i = 0; i < m_nTreesForDetection; ++i)
             {
