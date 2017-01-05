@@ -55,8 +55,8 @@ void RandomDecisionTree::getSubSample()
             auto &px = m_pixelCloud.pixels1[id*pxPerImgCount + k];
             px.id = id;
             px.label = label;
-            px.position.x = row;
-            px.position.y = col;
+            px.position.x = col;
+            px.position.y = row;
         }
     }
 }

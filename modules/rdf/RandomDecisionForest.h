@@ -37,8 +37,8 @@ public:
     inline void preprocessDS(){
         for(auto &img : m_DS.m_ImagesVector)
         {
-            img = 255 - img;  // TODO: uncomment for original images
-            cv::GaussianBlur(img,img,cv::Size(3,3),0);
+//            img = 255 - img;  // TODO: uncomment for original images
+//            cv::GaussianBlur(img,img,cv::Size(3,3),0);
             cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
                                m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
         }
