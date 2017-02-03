@@ -54,12 +54,27 @@ public:
                 for (int bin = 0; bin < binSize; bin++)
                     out(celly, cellx * binSize + bin) /= (float)cellUpdateCounter[celly][cellx];
 
+        // compute dominant angle
+        cv::Mat_<float> outNew = cv::Mat_<float>::zeros(cells_y,cells_x);
+
+        for (celly = 0; celly < cells_y; celly++)
+            for (cellx = 0; cellx < cells_x; cellx++)
+            {
+                int maxIndx = 0;
+                for (int bin = 1; bin < binSize; bin++)
+                    if(out(celly, cellx* binSize + bin) > out(celly, cellx* binSize + maxIndx))
+                        maxIndx = bin;
+
+                if( out(celly, cellx* binSize + maxIndx) > 0.30)
+                    outNew(celly, cellx) = out(celly, cellx* binSize + maxIndx); //(maxIndx+1)*20;
+            }
+
 
         // free memory allocated
         for (int y = 0; y < cells_y; y++)
             delete[] cellUpdateCounter[y];
         delete[] cellUpdateCounter;
-        return out;
+        return outNew;
     }
 };
 
