@@ -1,19 +1,46 @@
-#include "precompiled.h"
+#ifndef TESTANDGARBAGECODE_H
+#define TESTANDGARBAGECODE_H
 
-#include <vector>
+#include <opencv2/objdetect.hpp>
+#include <opencv2/ml.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
-#include "Core/MainWindowGui.h"
+using namespace cv;
 
+cv::Mat get_hogdescriptor_visu(const cv::Mat& color_origImg, std::vector<float>& descriptorValues, const cv::Size & size );
 
+Mat src, src_gray;
+Mat dst, detected_edges;
 
-int main(int argc, char *argv[])
+int lowThreshold;
+int const max_lowThreshold = 100;
+int ratio = 3;
+int kernel_size = 3;
+char* window_name = "Edge Map";
+
+/**
+ * @function CannyThreshold
+ * @brief Trackbar callback - Canny thresholds input with a ratio 1:3
+ */
+void CannyThreshold(int, void*)
 {
+  /// Reduce noise with a kernel 3x3
+  blur( src_gray, detected_edges, Size(3,3) );
 
-    QApplication app(argc, argv);
-    MainWindowGui w;
-    w.show();
-    return app.exec();
-}
+  /// Canny detector
+  Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
+
+  /// Using Canny's output as a mask, we display our result
+  dst = Scalar::all(0);
+
+  src.copyTo( dst, detected_edges);
+  imshow( window_name, dst );
+
+  imshow( "window_name", detected_edges );
+ }
+
+
 
 cv::Mat get_hogdescriptor_visu(const cv::Mat& color_origImg, std::vector<float>& descriptorValues, const cv::Size & size )
 {
@@ -171,3 +198,6 @@ cv::Mat get_hogdescriptor_visu(const cv::Mat& color_origImg, std::vector<float>&
 
     return visu;
 }
+
+
+#endif // TESTANDGARBAGECODE_H

@@ -65,6 +65,8 @@ signals:
     void printTrainMsg(QString);
     void printDetectMsg(QString);
 
+
+// Cereal serialize code:
 public:
     inline void saveForest(QString fname)
     {
