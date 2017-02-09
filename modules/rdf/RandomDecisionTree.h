@@ -18,6 +18,8 @@
 #include "rdf/PixelCloud.h"
 #include "3rdparty/matcerealisation.hpp"
 #include "util/Reader.h"
+#include "util/SignalSenderInterface.h"
+#include "StatisticsLogger.h"
 
 #define MIN_ENTROPY 0.05
 
@@ -39,6 +41,13 @@ class RandomDecisionTree
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
     RDFParams *m_params;
+    StatisticsLogger m_statLog;
+
+    // stat var's :
+    quint32 m_nonLeafpxCount;
+    quint32 m_leafCount{};
+
+    void calculateImpurity(quint32 d);
 
     // Random number generators
     std::mt19937 m_generator;
@@ -46,12 +55,16 @@ class RandomDecisionTree
     std::uniform_int_distribution<> m_xProbDistribution;
     std::uniform_int_distribution<> m_tauProbDistribution;
 
+
   public:
-    RandomDecisionTree();
+    SignalSenderInterface *m_signalsender;
+    RandomDecisionTree() {m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);}
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(std::mt19937 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
     void inline setParams(RDFParams *params) {m_params = params;}
+    //TODO: signal interface is garbage atm.
+    void setSignalInterface(SignalSenderInterface *signalsender) {m_signalsender = signalsender;}
     std::mt19937 inline getGenerator() {return m_generator;}
     void train();
     bool isPixelSizeConsistent();
@@ -61,13 +74,12 @@ class RandomDecisionTree
         // FIXME: fix this method, it is not working properly
         Node curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
-            if(isLeft(px, curr, roi))
-                curr = m_nodes[2*curr.id + 1];
+            if (isLeft(px, curr, roi))
+                curr = m_nodes[2 * curr.id + 1];
             else
-                curr = m_nodes[2*curr.id + 2];
-
-//        std::cout<< "curr: " << curr.hist << std::endl;
-//        std::cout<< "nodes: " << m_nodes[curr.id].hist << std::endl;
+                curr = m_nodes[2 * curr.id + 2];
+        //        std::cout<< "curr: " << curr.hist << std::endl;
+        //        std::cout<< "nodes: " << m_nodes[curr.id].hist << std::endl;
         return curr.hist;
     }
 
@@ -100,7 +112,7 @@ class RandomDecisionTree
         m_nodes.clear();
     }
 
-private:
+  private:
     void getSubSample();
     void constructTree();
     void constructRootNode();
@@ -132,15 +144,28 @@ private:
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
-
-        if(isLeaf(m_nodes[index].start, m_nodes[index].end))
+        auto pxCount = m_nodes[index].end - m_nodes[index].start;
+        if (m_nodes[parentId].tau == 500)
         {
+            ++m_leafCount;
+            m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
             generateTeta(m_nodes[index].teta1);
             generateTeta(m_nodes[index].teta2);
             m_nodes[index].tau = 500; // While rearenging makes pixels move to left
         }
         else
-            computeDivisionAt(index);
+        {
+            if (isLeaf(m_nodes[index].start, m_nodes[index].end))
+            {
+                ++m_leafCount;
+                m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
+                generateTeta(m_nodes[index].teta1);
+                generateTeta(m_nodes[index].teta2);
+                m_nodes[index].tau = 500; // While rearenging makes pixels move to left
+            }
+            else
+                computeDivisionAt(index);
+        }
     }
 
     bool inline isLeft(Pixel &p, Node &node, cv::Mat &img)
@@ -156,13 +181,12 @@ private:
 
     bool inline isLeaf(quint32 start, quint32 end)
     {
-        if(start == end)
+        if (start == end)
             return true;
         int label = m_pixelCloud.pixels1[start].label;
         int sum = 0;
-        for(auto i = start; i < end; ++i)
+        for (auto i = start; i < end; ++i)
             sum += std::abs(m_pixelCloud.pixels1[i].label - label);
-
         bool isPureNode = (sum == 0);
         bool isMinPixReached = (end - start) <= m_minLeafPixelCount;
         return isMinPixReached || isPureNode;
@@ -186,17 +210,14 @@ private:
         hist.setTo(0.0f);
         for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist(m_pixelCloud.pixels1[pxIndex].label);
-
-        // TODO: might be better if we keep it normalized
-//        quint32 tot = cv::sum(hist)[0];
-        hist /= (end-start);
-//        std::cout<< "curr: " << hist << std::endl;
-
+        hist /= (end - start);
+        //        std::cout<< "curr: " << hist << std::endl;
         return hist;
     }
 
 
-private:
+
+  private:
     friend class cereal::access;
 
     template<class Archive>

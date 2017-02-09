@@ -5,6 +5,7 @@
 
 #include "RandomDecisionForest.h"
 #include "util/ReaderGUI.h"
+#include "SignalSenderInterface.h"
 
 namespace Ui
 {
@@ -24,6 +25,7 @@ private:
     quint32 m_nTreesForDetection;
     bool isTestDataProcessed{};
 
+
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
@@ -37,6 +39,7 @@ private:
 public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
+
 
 public slots:
     void onTrainingBrowse();

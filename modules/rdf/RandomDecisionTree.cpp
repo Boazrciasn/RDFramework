@@ -1,45 +1,53 @@
 #include "RandomDecisionTree.h"
-#include "RandomDecisionForest.h"
+#include <QApplication>
 
-RandomDecisionTree::RandomDecisionTree()
+void RandomDecisionTree::calculateImpurity(quint32 d)
 {
-    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
-}
+    quint32 impurity = 0;
+    int level_node_count = 1 << d;          // Number of nodes at this level
+    int tot_node_count   = (1 << (d + 1)) - 1; // Number of nodes at this and previous levels
 
-RandomDecisionTree::RandomDecisionTree(DataSet *DS, RDFParams *params) : m_DS(DS), m_params(params)
-{
-    m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);
+    for (auto node_id = (tot_node_count - level_node_count); node_id < tot_node_count; ++node_id)
+    {
+        float entropy = calculateEntropy(computeHistogram(m_nodes[node_id].start, m_nodes[node_id].end, m_params->labelCount));
+        impurity += (m_nodes[node_id].end-m_nodes[node_id].start)*entropy;
+    }
+    m_statLog.logImpurity(impurity,d);
 }
-
 
 void RandomDecisionTree::train()
 {
-    std::cout << "initParams" << std::endl;
+    double cpu_time;
+    clock_t start = clock();
+    SignalSenderInterface::instance().printsend("Initializing Parameters...");
     initParams();
-    std::cout << "initNodes" << std::endl;
+    SignalSenderInterface::instance().printsend("Initializing nodes...");
     initNodes();
-    std::cout << "getSubSample" << std::endl;
+    m_statLog.setDepth(m_params->maxDepth - 1);
+    SignalSenderInterface::instance().printsend("Sub-sampling...");
     getSubSample();
-    std::cout << "constructTree" << std::endl;
+
+    SignalSenderInterface::instance().printsend("Constructing tree...");
+    qApp->processEvents();
     constructTree();
+    cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
+    m_statLog.logTrainingTime(cpu_time);
+    m_statLog.dump();
+    qApp->processEvents();
 }
 
 void RandomDecisionTree::getSubSample()
 {
     quint32 imgCount = m_DS->m_ImagesVector.size();
     quint32 pxPerImgCount = m_params->pixelsPerImage;
-
-    m_pixelCloud.pixels1.resize(imgCount*pxPerImgCount);
-    m_pixelCloud.pixels2.resize(imgCount*pxPerImgCount);
-
-
+    m_pixelCloud.pixels1.resize(imgCount * pxPerImgCount);
+    m_pixelCloud.pixels2.resize(imgCount * pxPerImgCount);
     for (quint32 id = 0; id < imgCount; ++id)
     {
         auto &image = m_DS->m_ImagesVector[id];
         auto label  = m_DS->m_labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
-
         for (int k = 0; k < m_params->pixelsPerImage; ++k)
         {
             int row = 0;
@@ -51,8 +59,7 @@ void RandomDecisionTree::getSubSample()
                 col = (rand() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
                 intensity = image.at<uchar>(row, col);
             }
-
-            auto &px = m_pixelCloud.pixels1[id*pxPerImgCount + k];
+            auto &px = m_pixelCloud.pixels1[id * pxPerImgCount + k];
             px.id = id;
             px.label = label;
             px.position.x = col;
@@ -73,15 +80,21 @@ void RandomDecisionTree::constructRootNode()
     quint32 rootId = 0;
     m_nodes[rootId].id = rootId;
     m_nodes[rootId].end = m_pixelCloud.pixels1.size();
+    m_nonLeafpxCount = m_pixelCloud.pixels1.size();
+    m_statLog.logPxCount(m_nonLeafpxCount, 0);
+    m_statLog.logLeafCount(0, 0);
     computeDivisionAt(rootId);
     rearrange(rootId);
+    calculateImpurity(0);
 }
 
 void RandomDecisionTree::constructTreeDecisionNodes()
 {
-    for (quint32 depth = 1; depth < m_height-1; ++depth)
+    for (quint32 depth = 1; depth < m_height - 1; ++depth)
     {
-        std::cout << "Tree at depth " << depth << " being processed ... " << std::endl;
+        SignalSenderInterface::instance().printsend("Tree at depth " + QString::number(depth) + " being processed...");
+        m_leafCount = 0;
+        m_nonLeafpxCount = m_pixelCloud.pixels1.size();
         int level_nodes = 1 << depth;          // Number of nodes at this level
         int tot_nodes   = (1 << (depth + 1)) - 1; // Number of nodes at this and previous levels
         tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
@@ -90,6 +103,10 @@ void RandomDecisionTree::constructTreeDecisionNodes()
             rearrange(nodeIndex);
         });
         m_pixelCloud.swap();
+        calculateImpurity(depth);
+        m_statLog.logPxCount(m_nonLeafpxCount, depth);
+        m_statLog.logLeafCount(m_leafCount, depth);
+        qApp->processEvents();
     }
 }
 
@@ -105,10 +122,8 @@ void RandomDecisionTree::computeLeafHistograms()
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
-
-        if(start == end)
+        if (start == end)
             continue;
-
         m_nodes[node_id].id = node_id;
         m_nodes[node_id].start = start;
         m_nodes[node_id].end = end;
@@ -130,7 +145,6 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     int itr = 0;
     cv::Mat_<float> leftHist(1, nLabels);
     cv::Mat_<float> rightHist(1, nLabels);
-
     float parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
     float leftChildEntr, rightChildEntr;
     float avgEntropyChild;
@@ -140,7 +154,6 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         generateTeta(m_nodes[index].teta1);
         generateTeta(m_nodes[index].teta2);
         m_nodes[index].tau = generateTau();
-
         leftHist.setTo(0.0f);
         rightHist.setTo(0.0f);
         int sizeLeft  = 0;
@@ -150,7 +163,6 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         {
             auto &px = m_pixelCloud.pixels1[i];
             auto &img = m_DS->m_ImagesVector[px.id];
-
             if (isLeft(px, m_nodes[index], img))
             {
                 ++leftHist(px.label);
@@ -166,10 +178,8 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         rightChildEntr = calculateEntropy(rightHist);
         avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
         avgEntropyChild += (sizeRight / px_count) * rightChildEntr;
-
         infoGain = parentEntr - avgEntropyChild;
         // Non-improving epoch :
-
         if (infoGain > maxGain)
         {
             maxTeta1 = m_nodes[index].teta1;
@@ -197,7 +207,6 @@ void RandomDecisionTree::rearrange(quint32 index)
     {
         auto &px = m_pixelCloud.pixels1[i];
         auto &img = m_DS->m_ImagesVector[px.id]; // TODO: might be too time consuming
-
         if (isLeft(px, m_nodes[index], img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];

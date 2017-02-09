@@ -2,6 +2,10 @@
 #define CPV_RANDOM_DECISION_FOREST
 
 #include "RandomDecisionTree.h"
+#include "util/SignalSenderInterface.h"
+#include "StatisticsLogger.h"
+
+
 #include <3rdparty/cereal/access.hpp>
 
 class RandomDecisionForest : public QObject
@@ -14,6 +18,7 @@ private:
     DataSet m_DS{};
     quint32 m_nTreesForDetection;
     Colorcode colorcode;
+    StatisticsLogger m_statLog;
 
 public:
     bool trainForest();
@@ -58,6 +63,7 @@ public:
         srand(time(nullptr));
         m_nTreesForDetection = 1;
     }
+    SignalSenderInterface m_signalInterface;
     ~RandomDecisionForest() { m_trees.clear(); }
 
 signals:
@@ -85,7 +91,7 @@ public:
         ar(*this);
         file.close();
     }
-    
+
 private:
     friend class cereal::access;
 

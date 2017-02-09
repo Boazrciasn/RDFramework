@@ -31,6 +31,7 @@ bool RandomDecisionForest::trainForest()
         rdt.setDataSet(&m_DS);
         rdt.setParams(&m_params);
         rdt.setGenerator(generator);
+        rdt.setSignalInterface(&m_signalInterface);
 
         emit printTrainMsg("Train...") ;
         rdt.train();
@@ -148,3 +149,5 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
             confs(row,col) = max;
         }
 }
+
+
