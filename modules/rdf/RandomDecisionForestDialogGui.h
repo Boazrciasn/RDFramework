@@ -21,7 +21,6 @@ private:
     RDFParams PARAMS;
     ReaderGUI *m_trainDataReaderGUI;
     ReaderGUI *m_testDataReaderGUI;
-    qint16 m_treeid;
     quint32 m_nTreesForDetection;
     bool isTestDataProcessed{};
 
@@ -46,7 +45,6 @@ public slots:
     void onTestBrowse();
     void onTrain();
     void onTest();
-    void new_tree_constructed();
     void image_at_classified_as(int index, char label);
     void resultPercetange(double accuracy);
     void printMsgToTrainScreen(QString msg);

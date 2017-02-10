@@ -8,11 +8,12 @@
 
 #include <3rdparty/cereal/access.hpp>
 
-class RandomDecisionForest : public QObject
-{
-    Q_OBJECT
 
-private:
+
+class RandomDecisionForest
+{
+
+  private:
     std::vector<RandomDecisionTree> m_trees{};
     RDFParams m_params{};
     DataSet m_DS{};
@@ -20,7 +21,7 @@ private:
     Colorcode colorcode;
     StatisticsLogger m_statLog;
 
-public:
+  public:
     bool trainForest();
     void detect(cv::Mat &roi, int &label, float &conf);
     cv::Mat_<float> getLayeredHist(cv::Mat &roi);
@@ -28,7 +29,8 @@ public:
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                             cv::Mat &labels, cv::Mat_<float> &confs);
 
-    void setParams(const RDFParams &params) {
+    void setParams(const RDFParams &params)
+    {
         m_params = params;
         m_trees.resize(m_params.nTrees);
         m_nTreesForDetection = m_params.nTrees;
@@ -39,21 +41,23 @@ public:
         preprocessDS();
     }
 
-    inline void preprocessDS(){
-        for(auto &img : m_DS.m_ImagesVector)
+    inline void preprocessDS()
+    {
+        for (auto &img : m_DS.m_ImagesVector)
         {
-//            img = 255 - img;  // TODO: uncomment for original images
-//            cv::GaussianBlur(img,img,cv::Size(3,3),0);
-            cv::copyMakeBorder(img,img,m_params.probDistY, m_params.probDistY,
-                               m_params.probDistX,m_params.probDistX, cv::BORDER_CONSTANT);
+            //            img = 255 - img;  // TODO: uncomment for original images
+            //            cv::GaussianBlur(img,img,cv::Size(3,3),0);
+            cv::copyMakeBorder(img, img, m_params.probDistY, m_params.probDistY,
+                               m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
         }
     }
 
     RDFParams &params() { return m_params; }
     DataSet &DS() { return m_DS; }
 
-    void inline setNTreesForDetection(quint32 count){
-        if(count > m_trees.size())
+    void inline setNTreesForDetection(quint32 count)
+    {
+        if (count > m_trees.size())
             return;
         m_nTreesForDetection = count;
     }
@@ -66,14 +70,8 @@ public:
     SignalSenderInterface m_signalInterface;
     ~RandomDecisionForest() { m_trees.clear(); }
 
-signals:
-    void treeConstructed();
-    void printTrainMsg(QString);
-    void printDetectMsg(QString);
-
-
-// Cereal serialize code:
-public:
+    // Cereal serialize code:
+  public:
     inline void saveForest(QString fname)
     {
         std::ofstream file(fname.toStdString(), std::ios::binary);
@@ -92,14 +90,14 @@ public:
         file.close();
     }
 
-private:
+  private:
     friend class cereal::access;
 
     template <class Archive>
-    void serialize( Archive & archive )
+    void serialize(Archive &archive)
     {
         archive(m_params, m_trees);
-        for(auto &rdt : m_trees)
+        for (auto &rdt : m_trees)
             rdt.setParams(&m_params);
     }
 

@@ -1,5 +1,6 @@
 #include "precompiled.h"
 #include <ctime>
+#include <QApplication>
 
 #include "RandomDecisionForest.h"
 //#include <omp.h>
@@ -12,40 +13,35 @@
 
 bool RandomDecisionForest::trainForest()
 {
-    if(m_DS.m_ImagesVector.size() == 0)
+    if (m_DS.m_ImagesVector.size() == 0)
         return false;
     double cpu_time;
-
     static int i = 0;
     std::random_device rd;
     std::mt19937 generator = std::mt19937(rd());
     generator.seed(++i);
-
     //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
         clock_t start = clock();
-
-        emit printTrainMsg("Tree number " + QString::number(i + 1) + " is being trained");
+        SignalSenderInterface::instance().printsend("Tree number " + QString::number(i + 1) + " is being trained");
         auto &rdt = m_trees[i];
         rdt.setDataSet(&m_DS);
         rdt.setParams(&m_params);
         rdt.setGenerator(generator);
         rdt.setSignalInterface(&m_signalInterface);
-
-        emit printTrainMsg("Train...") ;
+        SignalSenderInterface::instance().printsend("Train...") ;
         rdt.train();
-
-        if(rdt.isPixelSizeConsistent())
-            emit printTrainMsg("Pixel size is consistent at the leafs!");
+        if (rdt.isPixelSizeConsistent())
+            SignalSenderInterface::instance().printsend("Pixel size is consistent at the leafs!");
         else
-            emit printTrainMsg("Pixel size is not consistent at the leafs!") ;
+            SignalSenderInterface::instance().printsend("Pixel size is not consistent at the leafs!") ;
         // TODO: save tree
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
-        emit treeConstructed();
-        emit printTrainMsg(" Train time of the current Tree : " + QString::number(cpu_time));
+        SignalSenderInterface::instance().printsend("Tree " + QString::number(i+1) + " Constructed.") ;
+        qApp->processEvents();
     }
-    emit printTrainMsg("Forest Size : " + QString::number(m_trees.size()));
+    SignalSenderInterface::instance().printsend("Forest Size : " + QString::number(m_trees.size()));
     return true;
 }
 
@@ -53,11 +49,9 @@ void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
     cv::Mat_<float> probHist;
     getCumulativeProbHist(probHist, getLayeredHist(roi));
-
     double max;
     cv::Point max_loc;
     cv::minMaxLoc(probHist, NULL, &max, NULL, &max_loc);
-
     // Set label & confidance
     label = max_loc.x;
     conf = max;
@@ -69,35 +63,28 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     cv::Mat padded_roi;
     cv::copyMakeBorder(roi, padded_roi, m_params.probDistY, m_params.probDistY,
                        m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
-
     int nRows = roi.rows;
     int nCols = roi.cols;
     int labelCount = m_params.labelCount;
-
     // for each pix we alocate LABEL_COUNT slots to keep hist
     // therefore, ROW is the same COL is COL*LABEL_COUNT
-    cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols*labelCount);
-
-    for(int row = 0; row < nRows; ++row)
-        for(int col = 0; col < nCols; ++col)
+    cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols * labelCount);
+    for (int row = 0; row < nRows; ++row)
+        for (int col = 0; col < nCols; ++col)
         {
             if (roi.at<uchar>(row, col) == 0)
                 continue;
-
             Pixel px;
             // Since we are sending padded roi we should add probDistX & probDistY to px.position
             px.position = cv::Point(col + m_params.probDistX, row + m_params.probDistY);
-
-            for(size_t i = 0; i < m_nTreesForDetection; ++i)
+            for (size_t i = 0; i < m_nTreesForDetection; ++i)
             {
-                auto tmp = m_trees[i].getProbHist(px,padded_roi);
-//                std::cout<< "tmp: " << tmp << std::endl;
-                for (int var = 0; var < labelCount; ++var) {
-                   layeredHist(row,col*labelCount + var) += tmp(var);
-                }
+                auto tmp = m_trees[i].getProbHist(px, padded_roi);
+                //                std::cout<< "tmp: " << tmp << std::endl;
+                for (int var = 0; var < labelCount; ++var)
+                    layeredHist(row, col * labelCount + var) += tmp(var);
             }
         }
-
     // normalize layeredHist assuming leaf nodes are already normalized
     layeredHist /= m_nTreesForDetection;
     return layeredHist;
@@ -107,20 +94,19 @@ void RandomDecisionForest::getCumulativeProbHist(cv::Mat_<float> &probHist, cons
 {
     int labelCount = m_params.labelCount;
     int nRows = layeredHist.rows;
-    int nCols = layeredHist.cols/labelCount;
+    int nCols = layeredHist.cols / labelCount;
     probHist = cv::Mat_<float>::zeros(1, labelCount);
-
     for (int row = 0; row < nRows; ++row)
         for (int col = 0; col < nCols; ++col)
         {
-            auto tmp = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,(col+1)*labelCount));
-//            std::cout<< "tmp: " << tmp << std::endl;
+            auto tmp = layeredHist(cv::Range(row, row + 1), cv::Range(col * labelCount, (col + 1) * labelCount));
+            //            std::cout<< "tmp: " << tmp << std::endl;
             probHist = probHist + tmp;
-//            std::cout<< "probHist: " << probHist << std::endl;
+            //            std::cout<< "probHist: " << probHist << std::endl;
         }
     // normalize
     float sum = cv::sum(probHist)[0];
-    if( sum != 0 )
+    if (sum != 0)
         probHist /= sum;
 }
 
@@ -129,25 +115,21 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
 {
     int labelCount = m_params.labelCount;
     int nRows = layeredHist.rows;
-    int nCols = layeredHist.cols/labelCount;
-
-    labels = cv::Mat(nRows,nCols,CV_8UC3);
-    labels.setTo(cv::Scalar(255,255,255));
-    confs = cv::Mat_<float>(nRows,nCols);
-
+    int nCols = layeredHist.cols / labelCount;
+    labels = cv::Mat(nRows, nCols, CV_8UC3);
+    labels.setTo(cv::Scalar(255, 255, 255));
+    confs = cv::Mat_<float>(nRows, nCols);
     for (int row = 0; row < nRows; ++row)
-        for (int col = 0; col < nCols; ++col) {
-            cv::Mat_<float> tmpProbHist = layeredHist(cv::Range(row,row + 1),cv::Range(col*labelCount,(col+1)*labelCount));
+        for (int col = 0; col < nCols; ++col)
+        {
+            cv::Mat_<float> tmpProbHist = layeredHist(cv::Range(row, row + 1), cv::Range(col * labelCount, (col + 1) * labelCount));
             double max;
             cv::Point max_loc;
             cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
-
             // Set Pixel label & confidance
-            if(cv::sum(tmpProbHist)[0] == 0)
+            if (cv::sum(tmpProbHist)[0] == 0)
                 continue;
-            labels.at<cv::Vec3b>(row,col) = colorcode.colors[max_loc.x];
-            confs(row,col) = max;
+            labels.at<cv::Vec3b>(row, col) = colorcode.colors[max_loc.x];
+            confs(row, col) = max;
         }
 }
-
-

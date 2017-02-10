@@ -26,9 +26,6 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     readSettings();
     initParamValues();
     m_nTreesForDetection = ui->spinBox_NTestTrees->value();
-    QObject::connect(&m_forest, SIGNAL(treeConstructed()), this, SLOT(new_tree_constructed()));
-    QObject::connect(&m_forest, SIGNAL(printTrainMsg(QString)), this, SLOT(printMsgToTrainScreen(QString)));
-    QObject::connect(&m_forest, SIGNAL(printDetectMsg(QString)), this, SLOT(printMsgToTestScreen(QString)));
     QObject::connect(&SignalSenderInterface::instance(), SIGNAL(printsend(QString)), this, SLOT(printMsgToTrainScreen(QString)));
     //    QObject::connect(&m_forest, SIGNAL(classifiedImageAs(int, char)), this, SLOT(image_at_classified_as(int, char)));
     //    QObject::connect(&m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
@@ -60,8 +57,8 @@ void RandomDecisionForestDialogGui::onTestBrowse()
     PARAMS.testDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), PARAMS.trainImagesDir,
                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     //FIX ME : add loader
-    ui->textBrowser_test->append("Test images read");
-    ui->textBrowser_test->setText(PARAMS.testDir);
+    ui->textBrowser_train->append("Test images read");
+    ui->textBrowser_train->setText(PARAMS.testDir);
 }
 
 void RandomDecisionForestDialogGui::onTrain()
@@ -75,7 +72,6 @@ void RandomDecisionForestDialogGui::onTrain()
     //        cv::imshow("input",img);
     //        cv::waitKey();
     //    }
-    m_treeid = 0;
     if ( m_forest.trainForest())
         ui->textBrowser_train->append("Forest Trained ! ");
     else
@@ -184,27 +180,18 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
     }
 }
 
-void RandomDecisionForestDialogGui::new_tree_constructed()
-{
-    ++m_treeid;
-    ui->textBrowser_train->append("Tree " + QString::number(
-                                      m_treeid) + " constructed");
-    ui->textBrowser_train->repaint();
-}
-
 void RandomDecisionForestDialogGui::image_at_classified_as(int index, char label)
 {
-    ui->textBrowser_test->append("Image " + QString::number(
+    ui->textBrowser_train->append("Image " + QString::number(
                                      index) + " is classified as " + label);
-    ui->textBrowser_test->repaint();
+    ui->textBrowser_train->repaint();
 }
 
 void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
 {
-    std::cout << "gotcha!";
-    ui->textBrowser_test->append(" Classification Accuracy : " + QString::number(
+    ui->textBrowser_train->append(" Classification Accuracy : " + QString::number(
                                      accuracy) + "%");
-    ui->textBrowser_test->repaint();
+    ui->textBrowser_train->repaint();
 }
 
 void RandomDecisionForestDialogGui::printMsgToTrainScreen(QString msg)
@@ -215,8 +202,8 @@ void RandomDecisionForestDialogGui::printMsgToTrainScreen(QString msg)
 
 void RandomDecisionForestDialogGui::printMsgToTestScreen(QString msg)
 {
-    ui->textBrowser_test->append(msg);
-    ui->textBrowser_test->repaint();
+    ui->textBrowser_train->append(msg);
+    ui->textBrowser_train->repaint();
 }
 
 void RandomDecisionForestDialogGui::onLoad()
