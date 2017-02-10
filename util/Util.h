@@ -80,9 +80,7 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
     cv::Mat_<float> hist(1, labelCount);
     hist.setTo(0.0f);
     for (auto px : pixels.pixels1)
-    {
         ++hist.at<float>(0, px.label);
-    }
     return hist;
 }
 
@@ -90,7 +88,24 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
 {
     float entr{};
     float totalNPixels = cv::sum(hist)[0];
+    int nCols = hist.cols;
+    for (int i = 0; i < nCols; ++i)
+    {
+        float nPixelsAt = hist(0, i);
+        if (nPixelsAt > 0)
+        {
+            //            float probability = nPixelsAt / totalNPixels;
+            //            entr -= probability * (log(probability));
+            entr -= nPixelsAt * log(nPixelsAt);
+        }
+    }
+    return entr + totalNPixels * log(totalNPixels);
+}
 
+inline float calculateEntropyProb(const cv::Mat_<float> &hist)
+{
+    float entr{};
+    float totalNPixels = cv::sum(hist)[0];
     int nCols = hist.cols;
     for (int i = 0; i < nCols; ++i)
     {
@@ -101,13 +116,11 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
             entr -= probability * (log(probability));
         }
     }
-    //cout << "ENTROPY : " << entr;
     return entr;
 }
 
 inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
 {
-
     return calculateEntropy(createHistogram(pixels, labelCount));
 }
 

@@ -33,9 +33,9 @@ bool RandomDecisionForest::trainForest()
         SignalSenderInterface::instance().printsend("Train...") ;
         rdt.train();
         if (rdt.isPixelSizeConsistent())
-            SignalSenderInterface::instance().printsend("Pixel size is consistent at the leafs!");
+            SignalSenderInterface::instance().printsend("Pixel size is consistent at the leaves!");
         else
-            SignalSenderInterface::instance().printsend("Pixel size is not consistent at the leafs!") ;
+            SignalSenderInterface::instance().printsend("Pixel size is not consistent at the leaves!") ;
         // TODO: save tree
         cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
         SignalSenderInterface::instance().printsend("Tree " + QString::number(i+1) + " Constructed.") ;

@@ -204,14 +204,21 @@ class RandomDecisionTree
         return m_tauProbDistribution(m_generator);
     }
 
-    cv::Mat_<float> inline computeHistogram(quint32 start, quint32 end, int labelCount)
+    cv::Mat_<float> inline computeHistogramNorm(quint32 start, quint32 end, int labelCount)
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
         for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist(m_pixelCloud.pixels1[pxIndex].label);
         hist /= (end - start);
-        //        std::cout<< "curr: " << hist << std::endl;
+        return hist;
+    }
+    cv::Mat_<float> inline computeHistogram(quint32 start, quint32 end, int labelCount)
+    {
+        cv::Mat_<float> hist(1, labelCount);
+        hist.setTo(0.0f);
+        for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
+            ++hist(m_pixelCloud.pixels1[pxIndex].label);
         return hist;
     }
 

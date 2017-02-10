@@ -1,5 +1,5 @@
 #include "RandomDecisionTree.h"
-#include <QApplication>
+
 
 void RandomDecisionTree::calculateImpurity(quint32 d)
 {
@@ -9,7 +9,7 @@ void RandomDecisionTree::calculateImpurity(quint32 d)
 
     for (auto node_id = (tot_node_count - level_node_count); node_id < tot_node_count; ++node_id)
     {
-        float entropy = calculateEntropy(computeHistogram(m_nodes[node_id].start, m_nodes[node_id].end, m_params->labelCount));
+        float entropy = calculateEntropyProb(computeHistogramNorm(m_nodes[node_id].start, m_nodes[node_id].end, m_params->labelCount));
         impurity += (m_nodes[node_id].end-m_nodes[node_id].start)*entropy;
     }
     m_statLog.logImpurity(impurity,d);
@@ -127,7 +127,7 @@ void RandomDecisionTree::computeLeafHistograms()
         m_nodes[node_id].id = node_id;
         m_nodes[node_id].start = start;
         m_nodes[node_id].end = end;
-        m_nodes[node_id].hist = computeHistogram(start, end, m_params->labelCount);
+        m_nodes[node_id].hist = computeHistogramNorm(start, end, m_params->labelCount);
     }
 }
 
