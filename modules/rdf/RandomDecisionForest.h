@@ -47,8 +47,8 @@ class RandomDecisionForest
         {
             //            img = 255 - img;  // TODO: uncomment for original images
             //            cv::GaussianBlur(img,img,cv::Size(3,3),0);
-            cv::copyMakeBorder(img, img, m_params.probDistY, m_params.probDistY,
-                               m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
+            cv::copyMakeBorder(img, img, m_params.probDistY, m_params.probDistY, m_params.probDistX, m_params.probDistX,
+                               cv::BORDER_CONSTANT);
         }
     }
 

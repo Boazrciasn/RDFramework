@@ -55,8 +55,8 @@ void RandomDecisionTree::getSubSample()
             quint8 intensity = 0;
             while (intensity == 0)
             {
-                row = (rand() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
-                col = (rand() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
+                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
+                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
                 intensity = image.at<uchar>(row, col);
             }
             auto &px = m_pixelCloud.pixels1[id * pxPerImgCount + k];

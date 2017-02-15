@@ -26,12 +26,8 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     readSettings();
     initParamValues();
     m_nTreesForDetection = ui->spinBox_NTestTrees->value();
-    QObject::connect(&SignalSenderInterface::instance(), SIGNAL(printsend(QString)), this, SLOT(printMsgToTrainScreen(QString)));
-    //    QObject::connect(&m_forest, SIGNAL(classifiedImageAs(int, char)), this, SLOT(image_at_classified_as(int, char)));
-    //    QObject::connect(&m_forest, SIGNAL(resultPercentage(double)), this, SLOT(resultPercetange(double))) ;
-    // TODO: create corresponding slots
-    //    QObject::connect(m_readerGUI,SIGNAL(imagesLoaded(bool)), this, SLOT(imagesLoaded(bool)));
-    //    QObject::connect(m_readerGUI,SIGNAL(labelsLoaded(bool)), this, SLOT(labelsLoaded(bool)));
+    QObject::connect(&SignalSenderInterface::instance(), SIGNAL(printsend(QString)), this,
+                     SLOT(printMsgToTrainScreen(QString)));
     m_trainDataReaderGUI = new ReaderGUI();
     m_testDataReaderGUI = new ReaderGUI();
     ui->gridLayout_train->addWidget(m_trainDataReaderGUI, 2, 0, 3, 4);
@@ -63,16 +59,9 @@ void RandomDecisionForestDialogGui::onTestBrowse()
 
 void RandomDecisionForestDialogGui::onTrain()
 {
-    applySobel(m_trainDataReaderGUI->DS()->m_ImagesVector);
-    //    applyCanny(m_trainDataReaderGUI->DS()->m_ImagesVector);
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_trainDataReaderGUI->DS());
-    //    for(auto &img : m_forest.DS().m_ImagesVector)
-    //    {
-    //        cv::imshow("input",img);
-    //        cv::waitKey();
-    //    }
-    if ( m_forest.trainForest())
+    if (m_forest.trainForest())
         ui->textBrowser_train->append("Forest Trained ! ");
     else
         ui->textBrowser_train->append("Failed to Train Forest! (Forest DS is not set) ");
@@ -81,12 +70,8 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    if (!isTestDataProcessed)
-    {
-        applySobel(m_testDataReaderGUI->DS()->m_ImagesVector);
-        //        applyCanny(m_testDataReaderGUI->DS()->m_ImagesVector);
-        isTestDataProcessed = true;
-    }
+    if (!m_isTestDataProcessed)
+        m_isTestDataProcessed = true;
     // FIX: fix preprocessing
     // TODO: fix preprocessing
     DataSet *DS = m_testDataReaderGUI->DS();
@@ -100,15 +85,6 @@ void RandomDecisionForestDialogGui::onTest()
         msgBox->show();
         return;
     }
-    //    cv::Mat lblColors;
-    //    Colorcode colors;
-    //    for (int lbl = 0; lbl < m_forest.params().labelCount; ++lbl) {
-    //        cv::Mat curLbl(28,28,CV_8UC3);
-    //        curLbl.setTo(colors.colors[lbl]);
-    //        lblColors.push_back(curLbl);
-    //    }
-    //    cv::imshow("ColorCode", lblColors);
-    //    cv::waitKey();
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i)
     {
@@ -183,14 +159,14 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
 void RandomDecisionForestDialogGui::image_at_classified_as(int index, char label)
 {
     ui->textBrowser_train->append("Image " + QString::number(
-                                     index) + " is classified as " + label);
+                                      index) + " is classified as " + label);
     ui->textBrowser_train->repaint();
 }
 
 void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
 {
     ui->textBrowser_train->append(" Classification Accuracy : " + QString::number(
-                                     accuracy) + "%");
+                                      accuracy) + "%");
     ui->textBrowser_train->repaint();
 }
 

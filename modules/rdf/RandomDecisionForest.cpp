@@ -1,8 +1,10 @@
 #include "precompiled.h"
 #include <ctime>
 #include <QApplication>
+#include <random>
 
 #include "RandomDecisionForest.h"
+#include "3rdparty/pcg-cpp-0.98/include/pcg_random.hpp"
 //#include <omp.h>
 
 // histogram normalize ?
@@ -16,19 +18,20 @@ bool RandomDecisionForest::trainForest()
     if (m_DS.m_ImagesVector.size() == 0)
         return false;
     double cpu_time;
-    static int i = 0;
-    std::random_device rd;
-    std::mt19937 generator = std::mt19937(rd());
-    generator.seed(++i);
+
+    pcg_extras::seed_seq_from<std::random_device> seed_source;
     //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
+        //PCG random generator :
+        //Seed with a real random value, if available ?!
+        pcg32 rng(seed_source);
         clock_t start = clock();
         SignalSenderInterface::instance().printsend("Tree number " + QString::number(i + 1) + " is being trained");
         auto &rdt = m_trees[i];
         rdt.setDataSet(&m_DS);
         rdt.setParams(&m_params);
-        rdt.setGenerator(generator);
+        rdt.setGenerator(rng);
         rdt.setSignalInterface(&m_signalInterface);
         SignalSenderInterface::instance().printsend("Train...") ;
         rdt.train();

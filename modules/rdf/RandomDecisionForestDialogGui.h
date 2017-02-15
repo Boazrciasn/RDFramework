@@ -15,32 +15,32 @@ class RandomDecisionForestDialogGui;
 class RandomDecisionForestDialogGui : public QDialog
 {
     Q_OBJECT
-private:
+  private:
     Ui::RandomDecisionForestDialogGui *ui;
     RandomDecisionForest m_forest;
     RDFParams PARAMS;
     ReaderGUI *m_trainDataReaderGUI;
     ReaderGUI *m_testDataReaderGUI;
     quint32 m_nTreesForDetection;
-    bool isTestDataProcessed{};
+    bool m_isTestDataProcessed{};
 
 
-protected:
+  protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
-private:
+  private:
     void initParamValues();
 
     void applySobel(std::vector<cv::Mat> &images);
     void applyCanny(std::vector<cv::Mat> &images);
 
 
-public:
+  public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
 
 
-public slots:
+  public slots:
     void onTrainingBrowse();
     void onTestBrowse();
     void onTrain();

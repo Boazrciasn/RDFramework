@@ -45,6 +45,7 @@ file(GLOB QCUSTOMPLOT 3rdparty/qcustomplot/*.ui 3rdparty/qcustomplot/*.cpp
                       3rdparty/qcustomplot/*.h 3rdparty/qcustomplot/*.hpp)
 file(GLOB CEREAL 3rdparty/cereal/*)
 file(GLOB 3RDPARTY 3rdparty/*.ui 3rdparty/*.cpp 3rdparty/*.h 3rdparty/*.hpp)
+file(GLOB PCG 3rdparty/pcg-cpp-0.98/include/*.hpp)
 file(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataExtraction/*.hpp
                    modules/tracking/dataExtraction/*.h modules/tracking/dataExtraction/*.ui)
 
@@ -61,7 +62,7 @@ QT5_WRAP_UI(UISrcs  Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/Re
                     util/ReaderGUI.ui)
 
 add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
-                ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
+                ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
 
 # NM Not tested yet
 target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)

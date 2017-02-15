@@ -13,6 +13,7 @@
 #include <3rdparty/cereal/types/vector.hpp>
 #include <3rdparty/cereal/types/string.hpp>
 #include <3rdparty/cereal/access.hpp>
+#include "3rdparty/pcg-cpp-0.98/include/pcg_random.hpp"
 
 #include "Util.h"
 #include "rdf/PixelCloud.h"
@@ -50,7 +51,7 @@ class RandomDecisionTree
     void calculateImpurity(quint32 d);
 
     // Random number generators
-    std::mt19937 m_generator;
+    pcg32 m_generator;
     std::uniform_int_distribution<> m_yProbDistribution;
     std::uniform_int_distribution<> m_xProbDistribution;
     std::uniform_int_distribution<> m_tauProbDistribution;
@@ -60,12 +61,12 @@ class RandomDecisionTree
     SignalSenderInterface *m_signalsender;
     RandomDecisionTree() {m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);}
     RandomDecisionTree(DataSet *DS, RDFParams *params);
-    void inline setGenerator(std::mt19937 &generator) {m_generator = generator;}
+    void inline setGenerator(pcg32 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
     void inline setParams(RDFParams *params) {m_params = params;}
     //TODO: signal interface is garbage atm.
     void setSignalInterface(SignalSenderInterface *signalsender) {m_signalsender = signalsender;}
-    std::mt19937 inline getGenerator() {return m_generator;}
+    pcg32 inline getGenerator() {return m_generator;}
     void train();
     bool isPixelSizeConsistent();
 
@@ -93,8 +94,7 @@ class RandomDecisionTree
     void inline setProbeDistanceY(int probe_distanceY)
     {
         m_probe_distanceY = probe_distanceY;
-        m_yProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceY,
-                                                                m_probe_distanceY);
+        m_yProbDistribution   = std::uniform_int_distribution<>(-m_probe_distanceY, m_probe_distanceY);
     }
 
     void inline setMaxDepth(int maxDepth)
