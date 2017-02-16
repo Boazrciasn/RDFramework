@@ -1,10 +1,10 @@
 #include "precompiled.h"
 #include <ctime>
 #include <QApplication>
-#include <random>
 
 #include "RandomDecisionForest.h"
 #include "3rdparty/pcg-cpp-0.98/include/pcg_random.hpp"
+#include "3rdparty/pcg-cpp-0.98/include/randutils.hpp"
 //#include <omp.h>
 
 // histogram normalize ?
@@ -17,16 +17,14 @@ bool RandomDecisionForest::trainForest()
 {
     if (m_DS.m_ImagesVector.size() == 0)
         return false;
-    double cpu_time;
-
-    pcg_extras::seed_seq_from<std::random_device> seed_source;
     //#pragma omp parallel for num_threads(8)
+
     for (int i = 0; i < m_params.nTrees; ++i)
     {
-        //PCG random generator :
-        //Seed with a real random value, if available ?!
-        pcg32 rng(seed_source);
-        clock_t start = clock();
+        uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        randutils::seed_seq_fe128 seeder{seed};
+        pcg32 rng;
+        rng.seed(seeder);
         SignalSenderInterface::instance().printsend("Tree number " + QString::number(i + 1) + " is being trained");
         auto &rdt = m_trees[i];
         rdt.setDataSet(&m_DS);
@@ -39,9 +37,7 @@ bool RandomDecisionForest::trainForest()
             SignalSenderInterface::instance().printsend("Pixel size is consistent at the leaves!");
         else
             SignalSenderInterface::instance().printsend("Pixel size is not consistent at the leaves!") ;
-        // TODO: save tree
-        cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
-        SignalSenderInterface::instance().printsend("Tree " + QString::number(i+1) + " Constructed.") ;
+        SignalSenderInterface::instance().printsend("Tree " + QString::number(i + 1) + " Constructed.") ;
         qApp->processEvents();
     }
     SignalSenderInterface::instance().printsend("Forest Size : " + QString::number(m_trees.size()));
@@ -51,11 +47,11 @@ bool RandomDecisionForest::trainForest()
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
     cv::Mat_<float> probHist;
+    roi = 255 - roi;
     getCumulativeProbHist(probHist, getLayeredHist(roi));
     double max;
     cv::Point max_loc;
     cv::minMaxLoc(probHist, NULL, &max, NULL, &max_loc);
-    // Set label & confidance
     label = max_loc.x;
     conf = max;
 }
@@ -64,6 +60,7 @@ void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
 {
     cv::Mat padded_roi;
+    //FIX ME: refactor code.
     cv::copyMakeBorder(roi, padded_roi, m_params.probDistY, m_params.probDistY,
                        m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
     int nRows = roi.rows;
@@ -83,7 +80,6 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
             for (size_t i = 0; i < m_nTreesForDetection; ++i)
             {
                 auto tmp = m_trees[i].getProbHist(px, padded_roi);
-                //                std::cout<< "tmp: " << tmp << std::endl;
                 for (int var = 0; var < labelCount; ++var)
                     layeredHist(row, col * labelCount + var) += tmp(var);
             }

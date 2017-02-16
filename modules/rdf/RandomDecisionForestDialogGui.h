@@ -64,6 +64,7 @@ class RandomDecisionForestDialogGui : public QDialog
     void onMinLeafPixelsChanged(int value);
     void onMaxIterationChanged(int value);
     void onLabelCountChanged(int value);
+    void onTauRangeChanged(int value);
 };
 
 #endif // RDFDIALOGGUI_H

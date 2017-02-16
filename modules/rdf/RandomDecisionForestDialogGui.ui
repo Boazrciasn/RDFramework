@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="Train_tab">
       <property name="sizePolicy">
@@ -72,21 +72,8 @@
           <property name="spacing">
            <number>1</number>
           </property>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="spinBox_NTrees">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Number of trees:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Bla bla.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="value">
-             <number>12</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_NTrees">
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_MaxIteration">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -94,23 +81,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Number of Trees</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_ProbX_2">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Probe Distance X</string>
+             <string>Max Iteration</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -124,42 +95,6 @@
             </property>
             <property name="value">
              <number>30</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QSpinBox" name="spinBox_MinLeafPixels">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="value">
-             <number>5</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_MaxDepth">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Max Depth</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="spinBox_MaxDepth">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="value">
-             <number>20</number>
             </property>
            </widget>
           </item>
@@ -179,8 +114,8 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="label_MaxIteration">
+          <item row="4" column="2">
+           <widget class="QLabel" name="label_LabelCount">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -188,7 +123,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Max Iteration</string>
+             <string>Label Count</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -208,22 +143,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label_MinLeafPixels">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Min Leaf Pixels</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="3">
            <widget class="QSpinBox" name="spinBox_MaxIteration">
             <property name="alignment">
@@ -237,6 +156,84 @@
             </property>
             <property name="value">
              <number>100</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_NTrees">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Number of Trees</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLabel" name="label_TauRange">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Tau Range</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QSpinBox" name="spinBox_LabelCount">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="value">
+             <number>26</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="spinBox_probY">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="value">
+             <number>30</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QSpinBox" name="spinBox_TauRange">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum">
+             <number>256</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_MinLeafPixels">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Min Leaf Pixels</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -256,18 +253,21 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QSpinBox" name="spinBox_probY">
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="spinBox_NTrees">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Number of trees:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Bla bla.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="value">
-             <number>30</number>
+             <number>12</number>
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
-           <widget class="QLabel" name="label_LabelCount">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_ProbX_2">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -275,20 +275,46 @@
              </font>
             </property>
             <property name="text">
-             <string>Label Count</string>
+             <string>Probe Distance X</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="3">
-           <widget class="QSpinBox" name="spinBox_LabelCount">
+          <item row="2" column="3">
+           <widget class="QSpinBox" name="spinBox_MinLeafPixels">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="value">
-             <number>26</number>
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QSpinBox" name="spinBox_MaxDepth">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_MaxDepth">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Max Depth</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -458,8 +484,8 @@
    <slot>onTrain()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>307</x>
-     <y>194</y>
+     <x>398</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>524</x>
@@ -474,8 +500,8 @@
    <slot>onTrainingBrowse()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>107</x>
-     <y>194</y>
+     <x>118</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>646</x>
@@ -490,8 +516,8 @@
    <slot>onTestBrowse()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>519</y>
+     <x>111</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel">
      <x>573</x>
@@ -506,8 +532,8 @@
    <slot>onTest()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>307</x>
-     <y>519</y>
+     <x>524</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel">
      <x>561</x>
@@ -522,8 +548,8 @@
    <slot>onLoad()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>187</x>
-     <y>179</y>
+     <x>271</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>533</x>
@@ -538,8 +564,8 @@
    <slot>onSave()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>178</y>
+     <x>524</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>609</x>
@@ -554,8 +580,8 @@
    <slot>onNTreesChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>181</x>
-     <y>38</y>
+     <x>271</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>201</x>
@@ -570,8 +596,8 @@
    <slot>onMaxDepthChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>143</x>
-     <y>72</y>
+     <x>271</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>166</x>
@@ -586,8 +612,8 @@
    <slot>onProbDistXChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>170</x>
-     <y>103</y>
+     <x>271</x>
+     <y>133</y>
     </hint>
     <hint type="destinationlabel">
      <x>193</x>
@@ -602,8 +628,8 @@
    <slot>onProbDistYChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>156</x>
-     <y>119</y>
+     <x>271</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
      <x>-20</x>
@@ -618,8 +644,8 @@
    <slot>onPixelsPerImageChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>365</x>
-     <y>38</y>
+     <x>524</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>531</x>
@@ -634,8 +660,8 @@
    <slot>onMinLeafPixelsChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>377</x>
-     <y>71</y>
+     <x>524</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>590</x>
@@ -650,8 +676,8 @@
    <slot>onMaxIterationChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>383</x>
-     <y>103</y>
+     <x>524</x>
+     <y>133</y>
     </hint>
     <hint type="destinationlabel">
      <x>587</x>
@@ -666,8 +692,8 @@
    <slot>onLabelCountChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>374</x>
-     <y>123</y>
+     <x>524</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
      <x>565</x>
@@ -682,12 +708,28 @@
    <slot>onNTestTreesChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>352</x>
-     <y>560</y>
+     <x>524</x>
+     <y>200</y>
     </hint>
     <hint type="destinationlabel">
      <x>575</x>
      <y>547</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_TauRange</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onTauRangeChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>474</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>606</x>
+     <y>249</y>
     </hint>
    </hints>
   </connection>
@@ -708,5 +750,6 @@
   <slot>onMaxIterationChanged(int)</slot>
   <slot>onLabelCountChanged(int)</slot>
   <slot>onNTestTreesChanged(int)</slot>
+  <slot>onTauRangeChanged(int)</slot>
  </slots>
 </ui>

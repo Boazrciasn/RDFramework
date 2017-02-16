@@ -122,7 +122,8 @@ void RandomDecisionTree::computeLeafHistograms()
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
-        if (start == end)
+        auto pxCount = start-end;
+        if (pxCount <= m_params->minLeafPixels)
             continue;
         m_nodes[node_id].id = node_id;
         m_nodes[node_id].start = start;
@@ -133,19 +134,19 @@ void RandomDecisionTree::computeLeafHistograms()
 
 void RandomDecisionTree::computeDivisionAt(quint32 index)
 {
-    // find best teta and taw parameters for the given node
+    // find best teta and tau parameters for the given node
     float px_count = m_nodes[index].end - m_nodes[index].start;
     if (px_count == 0)
         return;
     auto maxItr = m_params->maxIteration;
     auto nLabels = m_params->labelCount;
     int maxTau = 500;
-    float maxGain = 0;
+    float maxGain = -100000000;
     cv::Point maxTeta1, maxTeta2;
     int itr = 0;
     cv::Mat_<float> leftHist(1, nLabels);
     cv::Mat_<float> rightHist(1, nLabels);
-    float parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+    float parentEntr = calculateEntropy(computeHistogramNorm(m_nodes[index].start, m_nodes[index].end, nLabels));
     float leftChildEntr, rightChildEntr;
     float avgEntropyChild;
     float infoGain;
@@ -206,7 +207,7 @@ void RandomDecisionTree::rearrange(quint32 index)
     for (auto i = start; i < end; ++i)
     {
         auto &px = m_pixelCloud.pixels1[i];
-        auto &img = m_DS->m_ImagesVector[px.id]; // TODO: might be too time consuming
+        auto &img = m_DS->m_ImagesVector[px.id];
         if (isLeft(px, m_nodes[index], img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];

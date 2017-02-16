@@ -16,6 +16,7 @@ void RandomDecisionForestDialogGui::initParamValues()
     ui->spinBox_MinLeafPixels->setValue(PARAMS.minLeafPixels);
     ui->spinBox_MaxIteration->setValue(PARAMS.maxIteration);
     ui->spinBox_LabelCount->setValue(PARAMS.labelCount);
+    ui->spinBox_TauRange->setValue(PARAMS.tauRange);
 }
 
 RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
@@ -72,7 +73,6 @@ void RandomDecisionForestDialogGui::onTest()
 {
     if (!m_isTestDataProcessed)
         m_isTestDataProcessed = true;
-    // FIX: fix preprocessing
     // TODO: fix preprocessing
     DataSet *DS = m_testDataReaderGUI->DS();
     int totalImgs = DS->m_ImagesVector.size();
@@ -89,24 +89,11 @@ void RandomDecisionForestDialogGui::onTest()
     for (int i = 0; i < totalImgs; ++i)
     {
         cv::Mat img = DS->m_ImagesVector[i].clone();
-        //        img = 255 - img; // TODO: remove when preprocess fixed
-        //        cv::GaussianBlur(img,img,cv::Size(3,3),0);
-        //        cv::imshow("input",img);
-        //        cv::waitKey();
         int label{};
         float conf{};
         m_forest.detect(img, label, conf);
         if (label == DS->m_labels[i])
             ++accuracy;
-        //        cv::Mat labelColorCode;
-        //        cv::Mat_<float> confMat;
-        //        cv::Mat_<float> layeredHist = m_forest.getLayeredHist(img);
-        //        m_forest.getLabelAndConfMat(layeredHist,labelColorCode,confMat);
-        //        if(DS->m_labels[i] == 1)
-        //        {
-        //            cv::imshow("input",labelColorCode);
-        //            cv::waitKey();
-        //        }
     }
     accuracy /= totalImgs;
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
@@ -232,6 +219,7 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("minLeafPixels", PARAMS.minLeafPixels);
     settings.setValue("maxIteration", PARAMS.maxIteration);
     settings.setValue("labelCount", PARAMS.labelCount);
+    settings.setValue("tauRange", PARAMS.tauRange);
     settings.endGroup();
 }
 
@@ -247,6 +235,7 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.minLeafPixels = settings.value("minLeafPixels", 5).toInt();
     PARAMS.maxIteration = settings.value("maxIteration", 100).toInt();
     PARAMS.labelCount = settings.value("labelCount", 26).toInt();
+    PARAMS.tauRange = settings.value("tauRange", 127).toInt();
     settings.endGroup();
 }
 
@@ -294,4 +283,9 @@ void RandomDecisionForestDialogGui::onMaxIterationChanged(int value)
 void RandomDecisionForestDialogGui::onLabelCountChanged(int value)
 {
     PARAMS.labelCount = value;
+}
+
+void RandomDecisionForestDialogGui::onTauRangeChanged(int value)
+{
+    PARAMS.tauRange = value;
 }

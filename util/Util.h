@@ -94,12 +94,13 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
         float nPixelsAt = hist(0, i);
         if (nPixelsAt > 0)
         {
-            //            float probability = nPixelsAt / totalNPixels;
-            //            entr -= probability * (log(probability));
-            entr -= nPixelsAt * log(nPixelsAt);
+            float probability = nPixelsAt / totalNPixels;
+            entr -= probability * (log(probability));
+            //TODO: Commenting out for bugfix.
+//            entr -= nPixelsAt * log(nPixelsAt);
         }
     }
-    return entr + totalNPixels * log(totalNPixels);
+    return entr /* + totalNPixels * log(totalNPixels)*/;
 }
 
 inline float calculateEntropyProb(const cv::Mat_<float> &hist)

@@ -59,12 +59,11 @@ class RandomDecisionTree
 
   public:
     SignalSenderInterface *m_signalsender;
-    RandomDecisionTree() {m_tauProbDistribution = std::uniform_int_distribution<>(-255, 255);}
+    RandomDecisionTree() {}
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(pcg32 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
     void inline setParams(RDFParams *params) {m_params = params;}
-    //TODO: signal interface is garbage atm.
     void setSignalInterface(SignalSenderInterface *signalsender) {m_signalsender = signalsender;}
     pcg32 inline getGenerator() {return m_generator;}
     void train();
@@ -79,8 +78,6 @@ class RandomDecisionTree
                 curr = m_nodes[2 * curr.id + 1];
             else
                 curr = m_nodes[2 * curr.id + 2];
-        //        std::cout<< "curr: " << curr.hist << std::endl;
-        //        std::cout<< "nodes: " << m_nodes[curr.id].hist << std::endl;
         return curr.hist;
     }
 
@@ -107,6 +104,11 @@ class RandomDecisionTree
         m_minLeafPixelCount = min_leaf_pixel_count;
     }
 
+    void inline setTauRange(int tauRange)
+    {
+        m_tauProbDistribution = std::uniform_int_distribution<>(-tauRange, tauRange);
+    }
+
     ~RandomDecisionTree()
     {
         m_nodes.clear();
@@ -127,6 +129,7 @@ class RandomDecisionTree
         setProbeDistanceY(m_params->probDistY);
         setMaxDepth(m_params->maxDepth);
         setMinimumLeafPixelCount(m_params->minLeafPixels);
+        setTauRange(m_params->tauRange);
     }
 
     void inline initNodes()
@@ -145,13 +148,20 @@ class RandomDecisionTree
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
         auto pxCount = m_nodes[index].end - m_nodes[index].start;
-        if (m_nodes[parentId].tau == 500)
+        if (pxCount == 0)
+        {
+            if (mult == 0)
+                m_nodes[parentId].tau = -500; // Supress all nodes to right if left node is empty
+            else
+                m_nodes[parentId].tau = 500;
+        }
+        else if (m_nodes[parentId].tau == 500)
         {
             ++m_leafCount;
             m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
             generateTeta(m_nodes[index].teta1);
             generateTeta(m_nodes[index].teta2);
-            m_nodes[index].tau = 500; // While rearenging makes pixels move to left
+            m_nodes[index].tau = 500;
         }
         else
         {
@@ -161,7 +171,7 @@ class RandomDecisionTree
                 m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
                 generateTeta(m_nodes[index].teta1);
                 generateTeta(m_nodes[index].teta2);
-                m_nodes[index].tau = 500; // While rearenging makes pixels move to left
+                m_nodes[index].tau = 500;
             }
             else
                 computeDivisionAt(index);
@@ -181,8 +191,6 @@ class RandomDecisionTree
 
     bool inline isLeaf(quint32 start, quint32 end)
     {
-        if (start == end)
-            return true;
         int label = m_pixelCloud.pixels1[start].label;
         int sum = 0;
         for (auto i = start; i < end; ++i)

@@ -145,12 +145,6 @@ QString Util::cleanNumberAndPunctuation(QString toClean)
     //check if the word starts or ends with a number or a whole number
     bool isNumber;
     toReturn.toInt(&isNumber);
-    /* FIXME: if there is a number, return "Numbers/number/.. */
-    /*  if (!isNumber)
-        {
-            return toReturn.toLower();
-        }
-    */
     if (toReturn[i].isDigit() || toReturn[j].isDigit())
     {
         toReturn = "Numbers/" + toReturn;
