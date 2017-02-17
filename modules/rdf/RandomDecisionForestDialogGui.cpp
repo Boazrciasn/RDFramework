@@ -31,10 +31,21 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
                      SLOT(printMsgToTrainScreen(QString)));
     m_trainDataReaderGUI = new ReaderGUI();
     m_testDataReaderGUI = new ReaderGUI();
-    m_displayImagesGUI = new DisplayImagesWidgetGui();
+    m_displayImagesGUI = new DisplayGUI();
+    m_splitterVert = new QSplitter(this);
+    m_splitterHori = new QSplitter(this);
 
-    ui->gridLayout_train->addWidget(m_trainDataReaderGUI, 2, 0, 3, 4);
-    ui->gridLayout_test->addWidget(m_testDataReaderGUI, 3, 0, 3, 2);
+    //Configure layout :
+    m_splitterHori->addWidget(ui->LeftContainerWidget);
+    m_splitterHori->addWidget(m_displayImagesGUI);
+
+    m_splitterVert->addWidget(ui->tabWidget);
+    m_splitterVert->addWidget(m_trainDataReaderGUI);
+    m_splitterVert->addWidget(ui->textBrowser_train);
+    m_splitterVert->setOrientation(Qt::Vertical);
+    QObject::connect(m_trainDataReaderGUI, SIGNAL(imagesLoaded(bool)), this, SLOT(onImagesLoaded(bool)));
+    ui->verticalLayout_LeftContainer->addWidget(m_splitterVert);
+    ui->gridLayout_RDFGUI->addWidget(m_splitterHori, 1,0);
 
 }
 
@@ -43,16 +54,12 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
     delete ui;
 }
 
-void RandomDecisionForestDialogGui::onTrainingBrowse()
+void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
-    PARAMS.trainImagesDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), QDir::currentPath(),
-                                                              QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    //FIX ME : add loader
-    ui->textBrowser_train->append("Training images read");
-    ui->textBrowser_train->setText(PARAMS.trainImagesDir);
+    m_displayImagesGUI->setImageSet(m_trainDataReaderGUI->DS()->m_ImagesVector);
 }
 
-void RandomDecisionForestDialogGui::onTestBrowse()
+void RandomDecisionForestDialogGui::onLabelsLoaded()
 {
     PARAMS.testDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), PARAMS.trainImagesDir,
                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);

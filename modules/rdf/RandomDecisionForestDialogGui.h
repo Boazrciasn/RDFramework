@@ -2,10 +2,11 @@
 #define RDFDIALOGGUI_H
 
 #include <QDialog>
+#include <QSplitter>
 
 #include "RandomDecisionForest.h"
 #include "util/ReaderGUI.h"
-#include "Core/DisplayImagesWidgetGui.h"
+#include "Core/DisplayGUI.h"
 #include "SignalSenderInterface.h"
 
 namespace Ui
@@ -22,7 +23,9 @@ class RandomDecisionForestDialogGui : public QDialog
     RDFParams PARAMS;
     ReaderGUI *m_trainDataReaderGUI;
     ReaderGUI *m_testDataReaderGUI;
-    DisplayImagesWidgetGui *m_displayImagesGUI;
+    DisplayGUI *m_displayImagesGUI;
+    QSplitter *m_splitterVert{};
+    QSplitter *m_splitterHori{};
     quint32 m_nTreesForDetection;
     bool m_isTestDataProcessed{};
 
@@ -43,8 +46,8 @@ class RandomDecisionForestDialogGui : public QDialog
 
 
   public slots:
-    void onTrainingBrowse();
-    void onTestBrowse();
+    void onImagesLoaded(bool);
+    void onLabelsLoaded();
     void onTrain();
     void onTest();
     void image_at_classified_as(int index, char label);
