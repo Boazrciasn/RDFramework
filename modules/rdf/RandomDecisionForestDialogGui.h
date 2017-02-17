@@ -5,6 +5,7 @@
 
 #include "RandomDecisionForest.h"
 #include "util/ReaderGUI.h"
+#include "Core/DisplayImagesWidgetGui.h"
 #include "SignalSenderInterface.h"
 
 namespace Ui
@@ -21,6 +22,7 @@ class RandomDecisionForestDialogGui : public QDialog
     RDFParams PARAMS;
     ReaderGUI *m_trainDataReaderGUI;
     ReaderGUI *m_testDataReaderGUI;
+    DisplayImagesWidgetGui *m_displayImagesGUI;
     quint32 m_nTreesForDetection;
     bool m_isTestDataProcessed{};
 

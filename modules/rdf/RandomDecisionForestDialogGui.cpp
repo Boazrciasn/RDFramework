@@ -31,8 +31,11 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
                      SLOT(printMsgToTrainScreen(QString)));
     m_trainDataReaderGUI = new ReaderGUI();
     m_testDataReaderGUI = new ReaderGUI();
+    m_displayImagesGUI = new DisplayImagesWidgetGui();
+
     ui->gridLayout_train->addWidget(m_trainDataReaderGUI, 2, 0, 3, 4);
     ui->gridLayout_test->addWidget(m_testDataReaderGUI, 3, 0, 3, 2);
+
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
