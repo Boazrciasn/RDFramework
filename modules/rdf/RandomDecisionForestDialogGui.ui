@@ -31,8 +31,26 @@
      <layout class="QVBoxLayout" name="verticalLayout_LeftContainer">
       <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::North</enum>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
+        </property>
+        <property name="tabsClosable">
+         <bool>false</bool>
+        </property>
+        <property name="movable">
+         <bool>false</bool>
         </property>
         <widget class="QWidget" name="Train_tab">
          <property name="sizePolicy">
@@ -380,7 +398,7 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_Test">
           <item>
-           <widget class="QGroupBox" name="groupBox_2">
+           <widget class="QGroupBox" name="groupBox_TestTab">
             <property name="title">
              <string>Test</string>
             </property>
@@ -414,7 +432,7 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_NTrees_2">
+              <widget class="QLabel" name="label_NTrees_Test">
                <property name="font">
                 <font>
                  <weight>75</weight>
