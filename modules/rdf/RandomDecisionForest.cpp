@@ -21,10 +21,8 @@ bool RandomDecisionForest::trainForest()
 
     for (int i = 0; i < m_params.nTrees; ++i)
     {
-        uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-        randutils::seed_seq_fe128 seeder{seed};
         pcg32 rng;
-        rng.seed(seeder);
+        rng.seed(randutils::auto_seed_128());
         SignalSenderInterface::instance().printsend("Tree number " + QString::number(i + 1) + " is being trained");
         auto &rdt = m_trees[i];
         rdt.setDataSet(&m_DS);
@@ -47,7 +45,7 @@ bool RandomDecisionForest::trainForest()
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
     cv::Mat_<float> probHist;
-    roi = 255 - roi;
+//    roi = 255 - roi;
     getCumulativeProbHist(probHist, getLayeredHist(roi));
     double max;
     cv::Point max_loc;

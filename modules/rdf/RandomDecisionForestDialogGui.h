@@ -21,8 +21,7 @@ class RandomDecisionForestDialogGui : public QDialog
     Ui::RandomDecisionForestDialogGui *ui;
     RandomDecisionForest m_forest;
     RDFParams PARAMS;
-    ReaderGUI *m_trainDataReaderGUI;
-    ReaderGUI *m_testDataReaderGUI;
+    ReaderGUI *m_dataReaderGUI;
     DisplayGUI *m_displayImagesGUI;
     QSplitter *m_splitterVert{};
     QSplitter *m_splitterHori{};

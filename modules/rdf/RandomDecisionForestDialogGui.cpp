@@ -29,8 +29,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     m_nTreesForDetection = ui->spinBox_NTestTrees->value();
     QObject::connect(&SignalSenderInterface::instance(), SIGNAL(printsend(QString)), this,
                      SLOT(printMsgToTrainScreen(QString)));
-    m_trainDataReaderGUI = new ReaderGUI();
-    m_testDataReaderGUI = new ReaderGUI();
+    m_dataReaderGUI = new ReaderGUI();
     m_displayImagesGUI = new DisplayGUI();
     m_splitterVert = new QSplitter(this);
     m_splitterHori = new QSplitter(this);
@@ -40,13 +39,12 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     m_splitterHori->addWidget(m_displayImagesGUI);
 
     m_splitterVert->addWidget(ui->tabWidget);
-    m_splitterVert->addWidget(m_trainDataReaderGUI);
+    m_splitterVert->addWidget(m_dataReaderGUI);
     m_splitterVert->addWidget(ui->textBrowser_train);
     m_splitterVert->setOrientation(Qt::Vertical);
-    QObject::connect(m_trainDataReaderGUI, SIGNAL(imagesLoaded(bool)), this, SLOT(onImagesLoaded(bool)));
+    QObject::connect(m_dataReaderGUI, SIGNAL(imagesLoaded(bool)), this, SLOT(onImagesLoaded(bool)));
     ui->verticalLayout_LeftContainer->addWidget(m_splitterVert);
     ui->gridLayout_RDFGUI->addWidget(m_splitterHori, 1,0);
-
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -56,7 +54,7 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
-    m_displayImagesGUI->setImageSet(m_trainDataReaderGUI->DS()->m_ImagesVector);
+    m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
@@ -71,7 +69,7 @@ void RandomDecisionForestDialogGui::onLabelsLoaded()
 void RandomDecisionForestDialogGui::onTrain()
 {
     m_forest.setParams(PARAMS);
-    m_forest.setDataSet(*m_trainDataReaderGUI->DS());
+    m_forest.setDataSet(*m_dataReaderGUI->DS());
     if (m_forest.trainForest())
         ui->textBrowser_train->append("Forest Trained ! ");
     else
@@ -84,7 +82,7 @@ void RandomDecisionForestDialogGui::onTest()
     if (!m_isTestDataProcessed)
         m_isTestDataProcessed = true;
     // TODO: fix preprocessing
-    DataSet *DS = m_testDataReaderGUI->DS();
+    DataSet *DS = m_dataReaderGUI->DS();
     int totalImgs = DS->m_ImagesVector.size();
     m_forest.setNTreesForDetection(m_nTreesForDetection);
     if (totalImgs == 0)
@@ -213,7 +211,7 @@ void RandomDecisionForestDialogGui::onSave()
 void RandomDecisionForestDialogGui::closeEvent(QCloseEvent *event)
 {
     writeSettings();
-    m_trainDataReaderGUI->writeSettings();
+    m_dataReaderGUI->writeSettings();
     event->accept();
 }
 

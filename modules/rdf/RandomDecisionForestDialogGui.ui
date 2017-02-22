@@ -32,7 +32,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="Train_tab">
          <property name="sizePolicy">
@@ -44,7 +44,7 @@
          <attribute name="title">
           <string>Train</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QVBoxLayout" name="verticalLayout_Train">
           <item>
            <widget class="QGroupBox" name="gbParameters">
             <property name="font">
@@ -378,7 +378,7 @@
          <attribute name="title">
           <string>Test</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QVBoxLayout" name="verticalLayout_Test">
           <item>
            <widget class="QGroupBox" name="groupBox_2">
             <property name="title">
