@@ -40,7 +40,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 
     m_splitterVert->addWidget(ui->tabWidget);
     m_splitterVert->addWidget(m_dataReaderGUI);
-    m_splitterVert->addWidget(ui->textBrowser_train);
+    m_splitterVert->addWidget(ui->console);
     m_splitterVert->setOrientation(Qt::Vertical);
     QObject::connect(m_dataReaderGUI, SIGNAL(imagesLoaded(bool)), this, SLOT(onImagesLoaded(bool)));
     ui->verticalLayout_LeftContainer->addWidget(m_splitterVert);
@@ -62,8 +62,8 @@ void RandomDecisionForestDialogGui::onLabelsLoaded()
     PARAMS.testDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), PARAMS.trainImagesDir,
                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     //FIX ME : add loader
-    ui->textBrowser_train->append("Test images read");
-    ui->textBrowser_train->setText(PARAMS.testDir);
+    ui->console->append("Test images read");
+    ui->console->setText(PARAMS.testDir);
 }
 
 void RandomDecisionForestDialogGui::onTrain()
@@ -71,10 +71,10 @@ void RandomDecisionForestDialogGui::onTrain()
     m_forest.setParams(PARAMS);
     m_forest.setDataSet(*m_dataReaderGUI->DS());
     if (m_forest.trainForest())
-        ui->textBrowser_train->append("Forest Trained ! ");
+        ui->console->append("Forest Trained ! ");
     else
-        ui->textBrowser_train->append("Failed to Train Forest! (Forest DS is not set) ");
-    ui->textBrowser_train->repaint();
+        ui->console->append("Failed to Train Forest! (Forest DS is not set) ");
+    ui->console->repaint();
 }
 
 void RandomDecisionForestDialogGui::onTest()
@@ -153,28 +153,28 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
 
 void RandomDecisionForestDialogGui::image_at_classified_as(int index, char label)
 {
-    ui->textBrowser_train->append("Image " + QString::number(
+    ui->console->append("Image " + QString::number(
                                       index) + " is classified as " + label);
-    ui->textBrowser_train->repaint();
+    ui->console->repaint();
 }
 
 void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
 {
-    ui->textBrowser_train->append(" Classification Accuracy : " + QString::number(
+    ui->console->append(" Classification Accuracy : " + QString::number(
                                       accuracy) + "%");
-    ui->textBrowser_train->repaint();
+    ui->console->repaint();
 }
 
 void RandomDecisionForestDialogGui::printMsgToTrainScreen(QString msg)
 {
-    ui->textBrowser_train->append(msg);
-    ui->textBrowser_train->repaint();
+    ui->console->append(msg);
+    ui->console->repaint();
 }
 
 void RandomDecisionForestDialogGui::printMsgToTestScreen(QString msg)
 {
-    ui->textBrowser_train->append(msg);
-    ui->textBrowser_train->repaint();
+    ui->console->append(msg);
+    ui->console->repaint();
 }
 
 void RandomDecisionForestDialogGui::onLoad()

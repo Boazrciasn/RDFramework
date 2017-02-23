@@ -17,8 +17,8 @@ bool RandomDecisionForest::trainForest()
 {
     if (m_DS.m_ImagesVector.size() == 0)
         return false;
-    //#pragma omp parallel for num_threads(8)
 
+    //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
         pcg32 rng;
@@ -45,7 +45,6 @@ bool RandomDecisionForest::trainForest()
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
     cv::Mat_<float> probHist;
-//    roi = 255 - roi;
     getCumulativeProbHist(probHist, getLayeredHist(roi));
     double max;
     cv::Point max_loc;
