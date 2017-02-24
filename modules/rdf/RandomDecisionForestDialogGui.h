@@ -49,6 +49,7 @@ class RandomDecisionForestDialogGui : public QDialog
     void onLabelsLoaded();
     void onTrain();
     void onTest();
+    void onPreProcess();
     void image_at_classified_as(int index, char label);
     void resultPercetange(double accuracy);
     void printMsgToTrainScreen(QString msg);

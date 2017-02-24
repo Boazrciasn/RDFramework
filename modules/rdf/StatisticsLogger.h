@@ -30,6 +30,7 @@ class StatisticsLogger
         m_leafCount.resize(d);
         m_pxRatio.resize(d);
         m_impurity.resize(d);
+        m_impurityRatio.resize(d);
     }
     void inline logTrainingTime(double time) {m_trainingTime  = time;}
     void dump()

@@ -4,6 +4,9 @@
 #include "ocr/HistogramDialogGui.h"
 #include "rdf/PixelCloud.h"
 
+using Width = quint16;
+using Height = quint16;
+
 class Animal
 {
   public:
@@ -11,13 +14,14 @@ class Animal
     virtual void execute() { qDebug() <<  "No cats or dogs" ;}
 };
 
+
 template<class T>
 class Cat : public Animal
 {
   public :
     T m_param;
     Cat(T param) { m_param = param;}
-    void execute() { qDebug() << m_param << " Cats" ;}
+    void execute() override { qDebug() << m_param << " Cats" ;}
 };
 
 template<class T>
@@ -25,9 +29,54 @@ class Dog : public Animal
 {
   public :
     T m_param;
-    Dog(T param) {m_param = param;}
+    Dog(T param)
+    {
+        m_param = param;
+    }
     void execute() { qDebug() << m_param << " Cats";}
 };
+
+
+//Curiously recurring template pattern :
+template <typename DERIVED>
+class Base
+{
+  public :
+    Base() {}
+    void process()
+    {
+        static_cast<DERIVED *>(this)->run();
+    }
+protected:
+    void trythisout()
+    {
+        std::cout<< "check this out " << std::endl;
+    }
+};
+
+class GaussianProcess : public Base<GaussianProcess>
+{
+  public :
+    GaussianProcess(int a, int b) : m_a(a), m_b(b){}
+    int m_a;
+    int m_b;
+    void run()
+    {
+        trythisout();
+        std::cout << " Gaussian Hello!?!? "<< m_a << m_b << std::endl;
+    }
+};
+
+class LaplacianProcess : public Base<GaussianProcess>
+{
+  public:
+    void run()
+    {
+        std::cout << "Laplacian Hello!?!?" << std::endl;
+    }
+};
+
+
 
 template <typename T, typename FUNC>
 void doForAllPixels(const cv::Mat_<T> &M, const FUNC &func)
@@ -46,12 +95,12 @@ void doForAllPixels(const cv::Mat_<T> &M, const FUNC &func)
 template <typename T, typename FUNC>
 void setForAllPixels(cv::Mat_<T> &M, const FUNC &func)
 {
-    int nRows = M.rows;
-    int nCols = M.cols;
-    for (int i = 0; i < nRows; ++i)
+    Height nRows = M.rows;
+    Width nCols = M.cols;
+    for (Height i = 0; i < nRows; ++i)
     {
         auto *pRow = (T *)M.ptr(i);
-        for (int j = 0; j < nCols; ++j, ++pRow)
+        for (Width j = 0; j < nCols; ++j, ++pRow)
             *pRow = func(*pRow, i, j);
     }
 }
@@ -97,7 +146,7 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
             float probability = nPixelsAt / totalNPixels;
             entr -= probability * (log(probability));
             //TODO: Commenting out for bugfix.
-//            entr -= nPixelsAt * log(nPixelsAt);
+            //            entr -= nPixelsAt * log(nPixelsAt);
         }
     }
     return entr /* + totalNPixels * log(totalNPixels)*/;

@@ -4,6 +4,7 @@
 #include "RandomDecisionTree.h"
 #include "util/SignalSenderInterface.h"
 #include "StatisticsLogger.h"
+#include "PreProcess.h"
 
 
 #include <3rdparty/cereal/access.hpp>
@@ -43,13 +44,12 @@ class RandomDecisionForest
 
     inline void preprocessDS()
     {
-        for (auto &img : m_DS.m_ImagesVector)
-        {
-            img = 255 - img;  // TODO: ORGANIZE PREPROCESS STEP
-            //            cv::GaussianBlur(img,img,cv::Size(3,3),0);
-            cv::copyMakeBorder(img, img, m_params.probDistY, m_params.probDistY, m_params.probDistX, m_params.probDistX,
-                               cv::BORDER_CONSTANT);
-        }
+        InverseImage invImg;
+        MakeBorder mBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT);
+        Gaussian gg(3,3,0);
+        invImg.process(m_DS.m_ImagesVector);
+        gg.process(m_DS.m_ImagesVector);
+        mBorder.process(m_DS.m_ImagesVector);
     }
 
     RDFParams &params() { return m_params; }

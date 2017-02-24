@@ -2,7 +2,6 @@
 #define RDFPARAMS_H
 
 #include "precompiled.h"
-
 struct RDFParams
 {
     QString trainImagesDir;

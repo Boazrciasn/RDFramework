@@ -55,6 +55,7 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
+    m_forest.setDataSet(*m_dataReaderGUI->DS());
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
@@ -105,6 +106,11 @@ void RandomDecisionForestDialogGui::onTest()
     }
     accuracy /= totalImgs;
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
+}
+
+void RandomDecisionForestDialogGui::onPreProcess()
+{
+    m_forest.preprocessDS();
 }
 
 void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
