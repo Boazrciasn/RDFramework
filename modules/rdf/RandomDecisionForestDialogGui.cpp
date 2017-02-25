@@ -54,15 +54,15 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
-    m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
     m_forest.setDataSet(*m_dataReaderGUI->DS());
+    m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
+
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
 {
     PARAMS.testDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), PARAMS.trainImagesDir,
                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    //FIX ME : add loader
     ui->console->append("Test images read");
     ui->console->setText(PARAMS.testDir);
 }
@@ -111,6 +111,8 @@ void RandomDecisionForestDialogGui::onTest()
 void RandomDecisionForestDialogGui::onPreProcess()
 {
     m_forest.preprocessDS();
+    m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
+    m_forest.DS().m_isProcessed = true;
 }
 
 void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)

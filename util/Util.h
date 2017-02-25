@@ -78,6 +78,7 @@ class LaplacianProcess : public Base<GaussianProcess>
 
 
 
+
 template <typename T, typename FUNC>
 void doForAllPixels(const cv::Mat_<T> &M, const FUNC &func)
 {

@@ -39,17 +39,19 @@ class RandomDecisionForest
     void setDataSet(const DataSet &DS)
     {
         m_DS = DS;
-        preprocessDS();
+        if (!m_DS.m_isProcessed)
+            preprocessDS();
     }
 
     inline void preprocessDS()
     {
+        // TODO: PROCESS IMAGE HERE
         InverseImage invImg;
         MakeBorder mBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT);
-        Gaussian gg(3,3,0);
-        invImg.process(m_DS.m_ImagesVector);
-        gg.process(m_DS.m_ImagesVector);
-        mBorder.process(m_DS.m_ImagesVector);
+        Gaussian gg(3, 3, 0);
+        AggregateProcessor<InverseImage,Gaussian> processor(invImg,gg);
+        PreProcessor preprocessor;
+        preprocessor.doBatchPreProcess(m_DS.m_ImagesVector,processor);
     }
 
     RDFParams &params() { return m_params; }

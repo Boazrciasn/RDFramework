@@ -7,6 +7,7 @@ struct DataSet
 {
     std::vector<cv::Mat> m_ImagesVector;
     std::vector<int> m_labels;
+    bool m_isProcessed{};
 
     ~DataSet()
     {

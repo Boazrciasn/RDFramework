@@ -10,9 +10,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fopenmp")
 
 # OpenCV package
 FIND_PACKAGE(OpenCV 3 REQUIRED)
+#Boost find package
+find_package(Boost)
+
+
 
 #add OpenCV directories
-include_directories(${OpenCV_INCLUDE_DIRS}  Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
+include_directories(${OpenCV_INCLUDE_DIRS}
+                    ${Boost_INCLUDE_DIRS} Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
                                             modules/    util/)
 
 # Qt5 package
@@ -65,7 +70,7 @@ add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${U
                 ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
 
 # NM Not tested yet
-target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${QT_LIBRARIES} tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
+target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES} tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
 
 qt5_use_modules("${project_name}" Core Gui Widgets)
 
