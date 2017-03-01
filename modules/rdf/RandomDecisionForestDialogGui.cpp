@@ -31,6 +31,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
                      SLOT(printMsgToTrainScreen(QString)));
     m_dataReaderGUI = new ReaderGUI();
     m_displayImagesGUI = new DisplayGUI();
+    m_preprocessGUI = new PreProcessGUI();
     m_splitterVert = new QSplitter(this);
     m_splitterHori = new QSplitter(this);
 
@@ -40,6 +41,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 
     m_splitterVert->addWidget(ui->tabWidget);
     m_splitterVert->addWidget(m_dataReaderGUI);
+    m_splitterVert->addWidget(m_preprocessGUI);
     m_splitterVert->addWidget(ui->console);
     m_splitterVert->setOrientation(Qt::Vertical);
     QObject::connect(m_dataReaderGUI, SIGNAL(imagesLoaded(bool)), this, SLOT(onImagesLoaded(bool)));

@@ -45,13 +45,7 @@ class RandomDecisionForest
 
     inline void preprocessDS()
     {
-        // TODO: PROCESS IMAGE HERE
-        InverseImage invImg;
-        MakeBorder mBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT);
-        Gaussian gg(3, 3, 0);
-        AggregateProcessor<InverseImage,Gaussian> processor(invImg,gg);
-        PreProcessor preprocessor;
-        preprocessor.doBatchPreProcess(m_DS.m_ImagesVector,processor);
+
     }
 
     RDFParams &params() { return m_params; }

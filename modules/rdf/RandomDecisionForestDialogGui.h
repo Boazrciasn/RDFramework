@@ -7,6 +7,7 @@
 #include "RandomDecisionForest.h"
 #include "util/ReaderGUI.h"
 #include "Core/DisplayGUI.h"
+#include "Core/PreProcessGUI.h"
 #include "SignalSenderInterface.h"
 
 namespace Ui
@@ -23,10 +24,13 @@ class RandomDecisionForestDialogGui : public QDialog
     RDFParams PARAMS;
     ReaderGUI *m_dataReaderGUI;
     DisplayGUI *m_displayImagesGUI;
+    PreProcessGUI *m_preprocessGUI;
     QSplitter *m_splitterVert{};
     QSplitter *m_splitterHori{};
     quint32 m_nTreesForDetection;
     bool m_isTestDataProcessed{};
+    //Pre processses in order :
+    std::vector<Process> m_preprocesses;
 
 
   protected:
