@@ -21,9 +21,10 @@ class RandomDecisionForest
     quint32 m_nTreesForDetection;
     Colorcode colorcode;
     StatisticsLogger m_statLog;
-
+    PreProcess m_preProcess;
   public:
     bool trainForest();
+    float testForest();
     void detect(cv::Mat &roi, int &label, float &conf);
     cv::Mat_<float> getLayeredHist(cv::Mat &roi);
     void getCumulativeProbHist(cv::Mat_<float> &probHist, const cv::Mat_<float> &layeredHist);
@@ -40,14 +41,23 @@ class RandomDecisionForest
     {
         m_DS = DS;
         if (!m_DS.m_isProcessed)
+        {
             preprocessDS();
+            m_DS.m_isProcessed = true;
+        }
     }
 
     inline void preprocessDS()
     {
-
+        m_preProcess.doBatchPreProcess(m_DS.m_ImagesVector);
     }
 
+    inline void setPreProcess(std::vector<Process*> preprocess)
+    {
+        preprocess.push_back(new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT));
+        m_preProcess.setPreProcess(preprocess);
+        m_DS.m_isProcessed = true;
+    }
     RDFParams &params() { return m_params; }
     DataSet &DS() { return m_DS; }
 

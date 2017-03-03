@@ -34,11 +34,9 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     m_preprocessGUI = new PreProcessGUI();
     m_splitterVert = new QSplitter(this);
     m_splitterHori = new QSplitter(this);
-
     //Configure layout :
     m_splitterHori->addWidget(ui->LeftContainerWidget);
     m_splitterHori->addWidget(m_displayImagesGUI);
-
     m_splitterVert->addWidget(ui->tabWidget);
     m_splitterVert->addWidget(m_dataReaderGUI);
     m_splitterVert->addWidget(m_preprocessGUI);
@@ -46,7 +44,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     m_splitterVert->setOrientation(Qt::Vertical);
     QObject::connect(m_dataReaderGUI, SIGNAL(imagesLoaded(bool)), this, SLOT(onImagesLoaded(bool)));
     ui->verticalLayout_LeftContainer->addWidget(m_splitterVert);
-    ui->gridLayout_RDFGUI->addWidget(m_splitterHori, 1,0);
+    ui->gridLayout_RDFGUI->addWidget(m_splitterHori, 1, 0);
 }
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
@@ -58,7 +56,6 @@ void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
     m_forest.setDataSet(*m_dataReaderGUI->DS());
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
-
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
@@ -72,6 +69,7 @@ void RandomDecisionForestDialogGui::onLabelsLoaded()
 void RandomDecisionForestDialogGui::onTrain()
 {
     m_forest.setParams(PARAMS);
+    m_forest.setPreProcess(m_preprocessGUI->preprocesses());
     m_forest.setDataSet(*m_dataReaderGUI->DS());
     if (m_forest.trainForest())
         ui->console->append("Forest Trained ! ");
@@ -82,37 +80,13 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    if (!m_isTestDataProcessed)
-        m_isTestDataProcessed = true;
-    // TODO: fix preprocessing
-    DataSet *DS = m_dataReaderGUI->DS();
-    int totalImgs = DS->m_ImagesVector.size();
-    m_forest.setNTreesForDetection(m_nTreesForDetection);
-    if (totalImgs == 0)
-    {
-        QMessageBox *msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Error");
-        msgBox->setText("You Should Load Test Data First!");
-        msgBox->show();
-        return;
-    }
-    float accuracy = 0;
-    for (int i = 0; i < totalImgs; ++i)
-    {
-        cv::Mat img = DS->m_ImagesVector[i].clone();
-        int label{};
-        float conf{};
-        m_forest.detect(img, label, conf);
-        if (label == DS->m_labels[i])
-            ++accuracy;
-    }
-    accuracy /= totalImgs;
+    auto accuracy = m_forest.testForest();
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()
 {
-    m_forest.preprocessDS();
+    PreProcess::doBatchPreProcess(m_dataReaderGUI->DS()->m_ImagesVector, m_preprocessGUI->preprocesses());
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
     m_forest.DS().m_isProcessed = true;
 }
@@ -164,14 +138,14 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
 void RandomDecisionForestDialogGui::image_at_classified_as(int index, char label)
 {
     ui->console->append("Image " + QString::number(
-                                      index) + " is classified as " + label);
+                            index) + " is classified as " + label);
     ui->console->repaint();
 }
 
 void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
 {
     ui->console->append(" Classification Accuracy : " + QString::number(
-                                      accuracy) + "%");
+                            accuracy) + "%");
     ui->console->repaint();
 }
 

@@ -42,6 +42,40 @@ bool RandomDecisionForest::trainForest()
     return true;
 }
 
+float RandomDecisionForest::testForest()
+{
+    //TODO: migrate this to random decision forest class
+    if (!m_DS.m_isProcessed)
+    {
+        m_preProcess.doBatchPreProcess(m_DS.m_ImagesVector);
+        m_DS.m_isProcessed = true;
+    }
+    // TODO: fix preprocessing
+
+    int totalImgs = m_DS.m_ImagesVector.size();
+    setNTreesForDetection(m_nTreesForDetection);
+    if (totalImgs == 0)
+    {
+        QMessageBox *msgBox = new QMessageBox();
+        msgBox->setWindowTitle("Error");
+        msgBox->setText("You Should Load Test Data First!");
+        msgBox->show();
+        return 0;
+    }
+    float accuracy = 0;
+    for (int i = 0; i < totalImgs; ++i)
+    {
+        cv::Mat img = m_DS.m_ImagesVector[i].clone();
+        int label{};
+        float conf{};
+        detect(img, label, conf);
+        if (label == m_DS.m_labels[i])
+            ++accuracy;
+    }
+    accuracy /= totalImgs;
+    return accuracy;
+}
+
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
     cv::Mat_<float> probHist;

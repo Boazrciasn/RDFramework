@@ -8,12 +8,13 @@ struct DataSet
     std::vector<cv::Mat> m_ImagesVector;
     std::vector<int> m_labels;
     bool m_isProcessed{};
-
     ~DataSet()
     {
         m_ImagesVector.clear();
         m_labels.clear();
     }
+
+
 };
 
 #endif // DATASET_H

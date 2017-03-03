@@ -37,6 +37,9 @@ class Dog : public Animal
 };
 
 
+
+
+
 //Curiously recurring template pattern :
 template <typename DERIVED>
 class Base
@@ -47,23 +50,23 @@ class Base
     {
         static_cast<DERIVED *>(this)->run();
     }
-protected:
+  protected:
     void trythisout()
     {
-        std::cout<< "check this out " << std::endl;
+        std::cout << "check this out " << std::endl;
     }
 };
 
 class GaussianProcess : public Base<GaussianProcess>
 {
   public :
-    GaussianProcess(int a, int b) : m_a(a), m_b(b){}
+    GaussianProcess(int a, int b) : m_a(a), m_b(b) {}
     int m_a;
     int m_b;
     void run()
     {
         trythisout();
-        std::cout << " Gaussian Hello!?!? "<< m_a << m_b << std::endl;
+        std::cout << " Gaussian Hello!?!? " << m_a << m_b << std::endl;
     }
 };
 
@@ -73,6 +76,26 @@ class LaplacianProcess : public Base<GaussianProcess>
     void run()
     {
         std::cout << "Laplacian Hello!?!?" << std::endl;
+    }
+};
+
+template<typename DERIVED>
+class NodeTest
+{
+  public:
+    NodeTest() {}
+    void doprocess()
+    {
+        static_cast<DERIVED *>(this)->runFeature();
+    }
+};
+
+class HAARNode : public NodeTest<HAARNode>
+{
+  public :
+    void runFeature()
+    {
+        std::cout<<"Selecting best HAAR"<< std::endl;
     }
 };
 

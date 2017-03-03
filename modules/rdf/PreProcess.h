@@ -8,24 +8,24 @@ typedef std::vector<cv::Mat> images;
 class Process
 {
   public:
-    virtual void processImg(cv::Mat img) {}
+    virtual void processImg(cv::Mat &img) = 0;
 };
 
 
 //Inverse Background :
-class InverseImage : private Process
+class InverseImage : public Process
 {
   public :
     InverseImage() {}
     InverseImage(InverseImage &refObj) {}
-    void processImg(cv::Mat img)
+    void processImg(cv::Mat &img)
     {
         img = 255 - img;
     }
 };
 
 //Gaussian Blur :
-class Gaussian : private Process
+class Gaussian : public Process
 {
   public :
     //init with values :
@@ -46,7 +46,7 @@ class Gaussian : private Process
         m_gSize = cv::Size(kSizeX, kSizeY);
     }
 
-    void processImg(cv::Mat img)
+    void processImg(cv::Mat &img)
     {
         cv::GaussianBlur(img, img, m_gSize, m_gSigma);
     }
@@ -59,7 +59,7 @@ class Gaussian : private Process
 };
 
 //Extend borders for RDF vectors :
-class MakeBorder : private Process
+class MakeBorder : public Process
 {
   public:
     //init with values :
@@ -93,24 +93,33 @@ class PreProcess
 {
 
   public:
-    void setPreProcess(std::vector<Process> &p) { m_processes = p;}
+    void setPreProcess(std::vector<Process *> &p) { m_processes = p;}
+
+    static void doBatchPreProcess(images &inputImg, std::vector<Process *> processes)
+    {
+        for (auto &img : inputImg)
+            for (auto &p : processes)
+                p->processImg(img);
+    }
 
     void doBatchPreProcess(images &inputImg)
     {
         for (auto &img : inputImg)
             for (auto &p : m_processes)
-                p.processImg(img);
+                p->processImg(img);
     }
 
     void doPreProcess(cv::Mat &img)
     {
         for (auto &p : m_processes)
-            p.processImg(img);
+            p->processImg(img);
     }
 
   private:
-    std::vector<Process> m_processes;
+    std::vector<Process *> m_processes;
 };
+
+
 
 
 //typedef std::vector<cv::Mat> images;

@@ -16,7 +16,15 @@ class PreProcessGUI : public QWidget
 
   public:
     explicit PreProcessGUI(QWidget *parent = 0);
+    inline std::vector<Process*> preprocesses()
+    {
+        createPreProcesses();
+        return m_processes;
+    }
     ~PreProcessGUI();
+
+  private slots:
+    void onKernelChanged();
 
   private:
     enum ProcessTypes
@@ -25,11 +33,11 @@ class PreProcessGUI : public QWidget
         MAKEBORDER,
         GAUSS
     };
+    void createPreProcesses();
     Ui::PreProcessGUI *ui;
     //List of PreProcess types :
-    std::vector<Process> m_processList(InverseImage(), Gaussian(), MakeBorder());
-    //Pre processses in order :
-    std::vector<Process> m_preprocesses;
+    std::vector<Process*> m_processes;
+
 
 };
 

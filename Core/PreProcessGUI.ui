@@ -6,65 +6,214 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>526</width>
-    <height>340</height>
+    <width>433</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Pre Process</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_main" rowstretch="0,0,0,0" columnstretch="0,1" rowminimumheight="0,0,0,0">
-   <item row="1" column="0">
-    <widget class="QTableView" name="tableView"/>
+  <layout class="QGridLayout" name="gridLayout_main" rowstretch="0,0,0,0,0" columnstretch="0">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Pre Processes : </string>
+     </property>
+    </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QWidget" name="params_container_widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout">
+   <item row="1" column="0">
+    <widget class="QFrame" name="frame_processes">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="title">
-         <string>Parameters</string>
+       <widget class="QCheckBox" name="checkBox_InverseImg">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Inverse Image</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>PushButton</string>
+       <widget class="QGroupBox" name="groupBox_Gaussian_Blur">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
         </property>
+        <property name="title">
+         <string notr="true">Gaussian Blur</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="labelAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_KernelX">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Kernel X:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="spinBox_KernelX">
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="singleStep">
+            <number>2</number>
+           </property>
+           <property name="value">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="spinBox_KernelY">
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="singleStep">
+            <number>2</number>
+           </property>
+           <property name="value">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_Sigma">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Sigma: </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QSpinBox" name="spinBox_Sigma">
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="singleStep">
+            <number>2</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_KernelY">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Kernel Y:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QComboBox" name="comboBox">
-     <item>
-      <property name="text">
-       <string>Inverse Image</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Make Border</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Gaussian</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Pre Processing</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>spinBox_KernelY</sender>
+   <signal>editingFinished()</signal>
+   <receiver>PreProcessGUI</receiver>
+   <slot>onKernelChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>246</x>
+     <y>122</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>243</x>
+     <y>392</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_KernelX</sender>
+   <signal>editingFinished()</signal>
+   <receiver>PreProcessGUI</receiver>
+   <slot>onKernelChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>305</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>383</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onKernelChanged()</slot>
+ </slots>
 </ui>
