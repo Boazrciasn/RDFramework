@@ -74,7 +74,7 @@ class RandomDecisionTree
         // FIXME: fix this method, it is not working properly
         Node curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
-            if (isLeft(px, curr, roi))
+            if (curr.isLeft(px, roi))
                 curr = m_nodes[2 * curr.id + 1];
             else
                 curr = m_nodes[2 * curr.id + 2];
@@ -176,17 +176,6 @@ class RandomDecisionTree
             else
                 computeDivisionAt(index);
         }
-    }
-
-    bool inline isLeft(Pixel &p, Node &node, cv::Mat &img)
-    {
-        qint16 new_teta1R = node.teta1.y + p.position.y;
-        qint16 new_teta1C = node.teta1.x + p.position.x;
-        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
-        qint16 new_teta2R = node.teta2.y + p.position.y;
-        qint16 new_teta2C = node.teta2.x + p.position.x;
-        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
-        return (intensity1 - intensity2) <= node.tau;
     }
 
     bool inline isLeaf(quint32 start, quint32 end)

@@ -33,6 +33,17 @@ struct Node
         hist.release();
     }
 
+    bool inline isLeft(Pixel &p, cv::Mat &img)
+    {
+        qint16 new_teta1R = teta1.y + p.position.y;
+        qint16 new_teta1C = teta1.x + p.position.x;
+        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
+        qint16 new_teta2R = teta2.y + p.position.y;
+        qint16 new_teta2C = teta2.x + p.position.x;
+        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
+        return (intensity1 - intensity2) <= tau;
+    }
+
 private:
     friend class cereal::access;
 

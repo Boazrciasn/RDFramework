@@ -141,7 +141,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     auto maxItr = m_params->maxIteration;
     auto nLabels = m_params->labelCount;
     int maxTau = 500;
-    float maxGain = -100000000;
+    float maxGain = std::numeric_limits<float>::lowest();
     cv::Point maxTeta1, maxTeta2;
     int itr = 0;
     cv::Mat_<float> leftHist(1, nLabels);
@@ -164,7 +164,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         {
             auto &px = m_pixelCloud.pixels1[i];
             auto &img = m_DS->m_ImagesVector[px.id];
-            if (isLeft(px, m_nodes[index], img))
+            if (m_nodes[index].isLeft(px, img))
             {
                 ++leftHist(px.label);
                 sizeLeft++;
@@ -208,7 +208,7 @@ void RandomDecisionTree::rearrange(quint32 index)
     {
         auto &px = m_pixelCloud.pixels1[i];
         auto &img = m_DS->m_ImagesVector[px.id];
-        if (isLeft(px, m_nodes[index], img))
+        if (m_nodes[index].isLeft(px, img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];
             leftCount++;
