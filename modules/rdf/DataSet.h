@@ -5,13 +5,15 @@
 
 struct DataSet
 {
-    std::vector<cv::Mat> m_ImagesVector;
-    std::vector<int> m_labels;
-    bool m_isProcessed{};
+    std::vector<cv::Mat> images{};
+    std::vector<int> labels{};
+    bool isProcessed{};
+    bool isBordered{};
+
     ~DataSet()
     {
-        m_ImagesVector.clear();
-        m_labels.clear();
+        images.clear();
+        labels.clear();
     }
 
 

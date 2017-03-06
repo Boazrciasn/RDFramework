@@ -36,7 +36,7 @@ void DisplayImagesWidgetGui::display()
     ui->label->setPixmap(*newScaledPixmap);
     ui->label->resize(ui->label->pixmap()->size());
     if(m_labelsLoaded)
-        ui->Image_label->setText(QString::number(m_readerGUI->DS()->m_labels[m_fileIndex]));
+        ui->Image_label->setText(QString::number(m_readerGUI->DS()->labels[m_fileIndex]));
 
 }
 
@@ -46,7 +46,7 @@ void DisplayImagesWidgetGui::imagesLoaded(bool loaded)
     if (loaded)
     {
         m_fileIndex = 0;
-        m_images = m_readerGUI->DS()->m_ImagesVector;
+        m_images = m_readerGUI->DS()->images;
         display();
     }
 }
@@ -54,7 +54,7 @@ void DisplayImagesWidgetGui::imagesLoaded(bool loaded)
 void DisplayImagesWidgetGui::labelsLoaded(bool loaded)
 {
     m_labelsLoaded = loaded;
-    ui->Image_label->setText(QString::number(m_readerGUI->DS()->m_labels[m_fileIndex]));
+    ui->Image_label->setText(QString::number(m_readerGUI->DS()->labels[m_fileIndex]));
 
 }
 

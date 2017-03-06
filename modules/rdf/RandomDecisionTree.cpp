@@ -38,14 +38,14 @@ void RandomDecisionTree::train()
 
 void RandomDecisionTree::getSubSample()
 {
-    quint32 imgCount = m_DS->m_ImagesVector.size();
+    quint32 imgCount = m_DS->images.size();
     quint32 pxPerImgCount = m_params->pixelsPerImage;
     m_pixelCloud.pixels1.resize(imgCount * pxPerImgCount);
     m_pixelCloud.pixels2.resize(imgCount * pxPerImgCount);
     for (quint32 id = 0; id < imgCount; ++id)
     {
-        auto &image = m_DS->m_ImagesVector[id];
-        auto label  = m_DS->m_labels[id];
+        auto &image = m_DS->images[id];
+        auto label  = m_DS->labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
         for (int k = 0; k < m_params->pixelsPerImage; ++k)
@@ -163,7 +163,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         for (auto i = m_nodes[index].start; i < end; ++i)
         {
             auto &px = m_pixelCloud.pixels1[i];
-            auto &img = m_DS->m_ImagesVector[px.id];
+            auto &img = m_DS->images[px.id];
             if (m_nodes[index].isLeft(px, img))
             {
                 ++leftHist(px.label);
@@ -207,7 +207,7 @@ void RandomDecisionTree::rearrange(quint32 index)
     for (auto i = start; i < end; ++i)
     {
         auto &px = m_pixelCloud.pixels1[i];
-        auto &img = m_DS->m_ImagesVector[px.id];
+        auto &img = m_DS->images[px.id];
         if (m_nodes[index].isLeft(px, img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];

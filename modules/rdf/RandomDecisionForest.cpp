@@ -15,9 +15,9 @@
 
 bool RandomDecisionForest::trainForest()
 {
-    if (m_DS->m_ImagesVector.size() == 0)
+    if (m_DS->images.size() == 0)
         return false;
-    SignalSenderInterface::instance().printsend("Number of Training Images:" + QString::number(m_DS->m_ImagesVector.size()));
+    SignalSenderInterface::instance().printsend("Number of Training Images:" + QString::number(m_DS->images.size()));
     //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
@@ -44,38 +44,31 @@ bool RandomDecisionForest::trainForest()
 
 float RandomDecisionForest::testForest()
 {
-    if (!m_DS->m_isProcessed)
+    // TODO: it should be removed from here
+    if (!m_DS->isProcessed)
     {
         SignalSenderInterface::instance().printsend("Images are not processed! processing images..." );
         qApp->processEvents();
-        m_preProcess.doBatchPreProcess(m_DS->m_ImagesVector);
-        m_DS->m_isProcessed = true;
+        preprocessDS();
     }
 
-    int totalImgs = m_DS->m_ImagesVector.size();
+    int totalImgs = m_DS->images.size();
     SignalSenderInterface::instance().printsend("Number of Images:" + QString::number(totalImgs));
     qApp->processEvents();
     setNTreesForDetection(m_nTreesForDetection);
-    if (totalImgs == 0)
+    if (totalImgs == 0) return 0;
+
+    std::atomic<int> posCounter(0);
+    tbb::parallel_for(0, totalImgs, 1, [ =, &posCounter ](int nodeIndex)
     {
-        QMessageBox *msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Error");
-        msgBox->setText("You Should Load Test Data First!");
-        msgBox->show();
-        return 0;
-    }
-    float accuracy = 0;
-    for (int i = 0; i < totalImgs; ++i)
-    {
-        cv::Mat img = m_DS->m_ImagesVector[i].clone();
         int label{};
         float conf{};
-        detect(img, label, conf);
-        if (label == m_DS->m_labels[i])
-            ++accuracy;
-    }
-    accuracy /= totalImgs;
-    return accuracy;
+        detect(m_DS->images[nodeIndex], label, conf);
+        if (label == m_DS->labels[nodeIndex])
+            ++posCounter;
+    });
+
+    return ((float) posCounter) / ((float)totalImgs);
 }
 
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)

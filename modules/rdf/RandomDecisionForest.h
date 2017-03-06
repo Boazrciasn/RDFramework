@@ -37,24 +37,27 @@ class RandomDecisionForest
         m_trees.resize(m_params.nTrees);
         m_nTreesForDetection = m_params.nTrees;
     }
+
+    void addBorder()
+    {
+        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT)};
+        PreProcess::doBatchPreProcess(m_DS->images, preprocess);
+    }
+
     void setDataSet(DataSet *DS)
     {
         m_DS = DS;
-        if (!m_DS->m_isProcessed)
+        if (!m_DS->isBordered)
         {
-            preprocessDS();
-            m_DS->m_isProcessed = true;
+            addBorder();
+            m_DS->isBordered = true;
         }
-
-        // add border :
-        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT)};
-        PreProcess::doBatchPreProcess(m_DS->m_ImagesVector, preprocess);
     }
 
     inline void preprocessDS()
     {
-        m_preProcess.doBatchPreProcess(m_DS->m_ImagesVector);
-        m_DS->m_isProcessed = true;
+        m_preProcess.doBatchPreProcess(m_DS->images);
+        m_DS->isProcessed = true;
     }
 
     inline void setPreProcess(std::vector<Process*> preprocess)
