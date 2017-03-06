@@ -15,9 +15,9 @@
 
 bool RandomDecisionForest::trainForest()
 {
-    if (m_DS.m_ImagesVector.size() == 0)
+    if (m_DS->m_ImagesVector.size() == 0)
         return false;
-
+    SignalSenderInterface::instance().printsend("Number of Training Images:" + QString::number(m_DS->m_ImagesVector.size()));
     //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
@@ -25,7 +25,7 @@ bool RandomDecisionForest::trainForest()
         rng.seed(randutils::auto_seed_128());
         SignalSenderInterface::instance().printsend("Tree number " + QString::number(i + 1) + " is being trained");
         auto &rdt = m_trees[i];
-        rdt.setDataSet(&m_DS);
+        rdt.setDataSet(m_DS);
         rdt.setParams(&m_params);
         rdt.setGenerator(rng);
         rdt.setSignalInterface(&m_signalInterface);
@@ -44,15 +44,17 @@ bool RandomDecisionForest::trainForest()
 
 float RandomDecisionForest::testForest()
 {
-    //TODO: migrate this to random decision forest class
-    if (!m_DS.m_isProcessed)
+    if (!m_DS->m_isProcessed)
     {
-        m_preProcess.doBatchPreProcess(m_DS.m_ImagesVector);
-        m_DS.m_isProcessed = true;
+        SignalSenderInterface::instance().printsend("Images are not processed! processing images..." );
+        qApp->processEvents();
+        m_preProcess.doBatchPreProcess(m_DS->m_ImagesVector);
+        m_DS->m_isProcessed = true;
     }
-    // TODO: fix preprocessing
 
-    int totalImgs = m_DS.m_ImagesVector.size();
+    int totalImgs = m_DS->m_ImagesVector.size();
+    SignalSenderInterface::instance().printsend("Number of Images:" + QString::number(totalImgs));
+    qApp->processEvents();
     setNTreesForDetection(m_nTreesForDetection);
     if (totalImgs == 0)
     {
@@ -65,11 +67,11 @@ float RandomDecisionForest::testForest()
     float accuracy = 0;
     for (int i = 0; i < totalImgs; ++i)
     {
-        cv::Mat img = m_DS.m_ImagesVector[i].clone();
+        cv::Mat img = m_DS->m_ImagesVector[i].clone();
         int label{};
         float conf{};
         detect(img, label, conf);
-        if (label == m_DS.m_labels[i])
+        if (label == m_DS->m_labels[i])
             ++accuracy;
     }
     accuracy /= totalImgs;

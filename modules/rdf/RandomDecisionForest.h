@@ -17,7 +17,7 @@ class RandomDecisionForest
   private:
     std::vector<RandomDecisionTree> m_trees{};
     RDFParams m_params{};
-    DataSet m_DS{};
+    DataSet *m_DS;
     quint32 m_nTreesForDetection;
     Colorcode colorcode;
     StatisticsLogger m_statLog;
@@ -37,29 +37,34 @@ class RandomDecisionForest
         m_trees.resize(m_params.nTrees);
         m_nTreesForDetection = m_params.nTrees;
     }
-    void setDataSet(const DataSet &DS)
+    void setDataSet(DataSet *DS)
     {
         m_DS = DS;
-        if (!m_DS.m_isProcessed)
+        if (!m_DS->m_isProcessed)
         {
             preprocessDS();
-            m_DS.m_isProcessed = true;
+            m_DS->m_isProcessed = true;
         }
+
+        // add border :
+        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT)};
+        PreProcess::doBatchPreProcess(m_DS->m_ImagesVector, preprocess);
     }
 
     inline void preprocessDS()
     {
-        m_preProcess.doBatchPreProcess(m_DS.m_ImagesVector);
+        m_preProcess.doBatchPreProcess(m_DS->m_ImagesVector);
+        m_DS->m_isProcessed = true;
     }
 
     inline void setPreProcess(std::vector<Process*> preprocess)
     {
         preprocess.push_back(new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT));
         m_preProcess.setPreProcess(preprocess);
-        m_DS.m_isProcessed = true;
     }
+
     RDFParams &params() { return m_params; }
-    DataSet &DS() { return m_DS; }
+    DataSet *DS() { return m_DS; }
 
     void inline setNTreesForDetection(quint32 count)
     {

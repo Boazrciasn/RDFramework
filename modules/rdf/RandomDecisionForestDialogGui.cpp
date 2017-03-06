@@ -54,7 +54,6 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
-    m_forest.setDataSet(*m_dataReaderGUI->DS());
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
 }
 
@@ -70,7 +69,7 @@ void RandomDecisionForestDialogGui::onTrain()
 {
     m_forest.setParams(PARAMS);
     m_forest.setPreProcess(m_preprocessGUI->preprocesses());
-    m_forest.setDataSet(*m_dataReaderGUI->DS());
+    m_forest.setDataSet(m_dataReaderGUI->DS());
     if (m_forest.trainForest())
         ui->console->append("Forest Trained ! ");
     else
@@ -88,7 +87,7 @@ void RandomDecisionForestDialogGui::onPreProcess()
 {
     PreProcess::doBatchPreProcess(m_dataReaderGUI->DS()->m_ImagesVector, m_preprocessGUI->preprocesses());
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->m_ImagesVector);
-    m_forest.DS().m_isProcessed = true;
+    m_dataReaderGUI->DS()->m_isProcessed = true;
 }
 
 void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)

@@ -21,6 +21,9 @@ ReaderGUI::~ReaderGUI()
 
 void ReaderGUI::load()
 {
+    delete m_DS;
+    m_DS = new DataSet();
+
     switch (m_dFlag)
     {
     case Type_Standard:

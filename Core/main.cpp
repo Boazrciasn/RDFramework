@@ -6,11 +6,10 @@
 
 #include <random>
 #include "Util.h"
-
+#include "rdf/Node.h"
 
 int main(int argc, char *argv[])
 {
-
     QApplication app(argc, argv);
     MainWindowGui w;
     w.show();
