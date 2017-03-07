@@ -19,6 +19,16 @@ ReaderGUI::~ReaderGUI()
 }
 
 
+void ReaderGUI::countLabels()
+{
+    int total = m_DS->labels.size();
+    for (int i = 0; i < total; ++i)
+        if(m_DS->map_dataPerLabel.find(m_DS->labels[i]) == m_DS->map_dataPerLabel.end())
+            m_DS->map_dataPerLabel[m_DS->labels[i]] = 1;
+        else
+            ++m_DS->map_dataPerLabel[m_DS->labels[i]];
+}
+
 void ReaderGUI::load()
 {
     delete m_DS;
@@ -46,7 +56,6 @@ void ReaderGUI::load()
         tot_neg = m_DS->images.size() - tot_pos;
         for(auto i = 0; i < tot_neg; ++i)
             m_DS->labels.push_back(1);
-
 
         for(auto &img :  m_DS->images)
             cv::resize(img,img,cv::Size(16,32));
@@ -82,6 +91,8 @@ void ReaderGUI::load()
     default:
         break;
     }
+
+    countLabels();
 }
 
 void ReaderGUI::dataTypeChanged(int index)

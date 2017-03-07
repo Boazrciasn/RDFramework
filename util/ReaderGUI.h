@@ -31,7 +31,9 @@ class ReaderGUI : public QWidget
     void readSettings();
 
 
-  private slots:
+    void countLabels();
+
+private slots:
     void load();
     void dataTypeChanged(int index);
 

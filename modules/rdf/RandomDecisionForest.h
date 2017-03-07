@@ -18,6 +18,7 @@ class RandomDecisionForest
     std::vector<RandomDecisionTree> m_trees{};
     RDFParams m_params{};
     DataSet *m_DS;
+    std::map<quint16,quint16> m_map_pxPerLabel;
     quint32 m_nTreesForDetection;
     Colorcode colorcode;
     StatisticsLogger m_statLog;
@@ -42,6 +43,8 @@ class RandomDecisionForest
     {
         std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT)};
         PreProcess::doBatchPreProcess(m_DS->images, preprocess);
+
+        // TODO: move to another method
     }
 
     void setDataSet(DataSet *DS)
@@ -104,7 +107,7 @@ class RandomDecisionForest
         file.close();
     }
 
-  private:
+private:
     friend class cereal::access;
 
     template <class Archive>
@@ -115,5 +118,6 @@ class RandomDecisionForest
             rdt.setParams(&m_params);
     }
 
+    void printDataInfo();
 };
 #endif

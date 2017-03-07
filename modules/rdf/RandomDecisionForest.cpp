@@ -17,7 +17,7 @@ bool RandomDecisionForest::trainForest()
 {
     if (m_DS->images.size() == 0)
         return false;
-    SignalSenderInterface::instance().printsend("Number of Training Images:" + QString::number(m_DS->images.size()));
+    SignalSenderInterface::instance().printsend(m_DS->toString());
     //#pragma omp parallel for num_threads(8)
     for (int i = 0; i < m_params.nTrees; ++i)
     {
