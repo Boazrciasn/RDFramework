@@ -85,6 +85,11 @@ void RandomDecisionForestDialogGui::onTest()
 
 void RandomDecisionForestDialogGui::onPreProcess()
 {
+    // TODO: find proper place for this operation
+    for(auto &img :  m_dataReaderGUI->DS()->images)
+        cv::resize(img,img,cv::Size(128,256));
+
+
     PreProcess::doBatchPreProcess(m_dataReaderGUI->DS()->images, m_preprocessGUI->preprocesses());
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->images);
     m_dataReaderGUI->DS()->isProcessed = true;

@@ -31,6 +31,10 @@ void ReaderGUI::countLabels()
 
 void ReaderGUI::load()
 {
+    double cpu_time;
+    clock_t start = clock();
+
+
     delete m_DS;
     m_DS = new DataSet();
 
@@ -56,9 +60,6 @@ void ReaderGUI::load()
         tot_neg = m_DS->images.size() - tot_pos;
         for(auto i = 0; i < tot_neg; ++i)
             m_DS->labels.push_back(1);
-
-        for(auto &img :  m_DS->images)
-            cv::resize(img,img,cv::Size(16,32));
 
         if (!m_DS->images.empty())
         {
@@ -92,6 +93,9 @@ void ReaderGUI::load()
         break;
     }
 
+
+    cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
+    qDebug() << "Load Time: " << cpu_time;
     countLabels();
 }
 
