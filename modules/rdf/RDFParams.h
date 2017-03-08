@@ -4,6 +4,7 @@
 #include "precompiled.h"
 struct RDFParams
 {
+    std::map<quint16,quint16> pixelsPerLabelImage;
     QString trainImagesDir;
     QString trainAnnotationsDir;
     QString testDir;

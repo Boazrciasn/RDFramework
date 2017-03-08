@@ -48,7 +48,8 @@ void RandomDecisionTree::getSubSample()
         auto label  = m_DS->labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
-        for (int k = 0; k < m_params->pixelsPerImage; ++k)
+        quint16 pxCount = m_params->pixelsPerLabelImage[label];
+        for (int k = 0; k < pxCount; ++k)
         {
             int row = 0;
             int col = 0;
