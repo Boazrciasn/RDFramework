@@ -24,6 +24,7 @@ class InverseImage : public Process
     }
 };
 
+
 //Gaussian Blur :
 class Gaussian : public Process
 {
@@ -57,6 +58,65 @@ class Gaussian : public Process
     int m_gSigma;
     cv::Size m_gSize;
 };
+
+//Sobel :
+class Sobel : public Process
+{
+  public :
+    //init with values :
+    Sobel(int kSizeX, int kSizeY, int sigma) : m_sigma(sigma)
+    {
+        m_size = cv::Size(kSizeX, kSizeY);
+    }
+
+    //init with reference object :
+    Sobel(Sobel &refObj) : m_sigma(refObj.m_sigma), m_size(refObj.m_size) {}
+
+    //Default constructor :
+    Sobel() {}
+
+    void setParam(int kSizeX, int kSizeY, int sigma)
+    {
+        m_sigma = sigma;
+        m_size = cv::Size(kSizeX, kSizeY);
+    }
+
+    void setKSize(int ksize)
+    {
+        m_ksize = ksize; // CV_SCHARR for Scharr
+    }
+
+    void processImg(cv::Mat &img)
+    {
+        m_ksize = CV_SCHARR;
+        /// Generate grad_x and grad_y
+        cv::Mat grad_x, grad_y;
+        cv::Mat abs_grad_x, abs_grad_y;
+
+        cv::GaussianBlur(img, img, m_size, m_sigma);
+        /// Gradient X
+        cv::Sobel(img, grad_x, m_ddepth, 1, 0, m_ksize, m_scale, m_delta, cv::BORDER_DEFAULT);
+        cv::convertScaleAbs(grad_x, abs_grad_x);
+        /// Gradient Y
+        cv::Sobel(img, grad_y, m_ddepth, 0, 1, m_ksize, m_scale, m_delta, cv::BORDER_DEFAULT);
+        cv::convertScaleAbs(grad_y, abs_grad_y);
+        /// Total Gradient (approximate)
+        cv::addWeighted(abs_grad_x, m_alpha, abs_grad_y, m_beta, m_gamma, img);
+    }
+
+  private :
+    int m_sigma;
+    cv::Size m_size;
+
+    double m_alpha = 0.5;
+    double m_beta = 0.5;
+    double m_gamma = 0;
+    int m_ksize = 3;
+    int m_scale = 1;
+    int m_delta = 0;
+    int m_ddepth = CV_16S;
+};
+
 
 //Extend borders for RDF vectors :
 class MakeBorder : public Process
