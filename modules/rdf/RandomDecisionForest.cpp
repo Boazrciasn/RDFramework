@@ -55,7 +55,6 @@ float RandomDecisionForest::testForest()
     int totalImgs = m_DS->images.size();
     SignalSenderInterface::instance().printsend("Number of Images:" + QString::number(totalImgs));
     qApp->processEvents();
-    setNTreesForDetection(m_nTreesForDetection);
     if (totalImgs == 0) return 0;
 
     std::atomic<int> posCounter(0);

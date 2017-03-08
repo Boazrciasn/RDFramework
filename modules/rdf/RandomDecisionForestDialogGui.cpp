@@ -79,6 +79,7 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
+    m_forest.setNTreesForDetection(m_nTreesForDetection);
     auto accuracy = m_forest.testForest();
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
 }
