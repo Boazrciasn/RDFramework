@@ -5,7 +5,7 @@
 
 DisplayGUI::DisplayGUI(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::DisplayGUI)
+    ui(std::make_unique<Ui::DisplayGUI>())
 {
     ui->setupUi(this);
     ui->horizontalScrollBar_imageIndex->setEnabled(false);
@@ -29,7 +29,6 @@ void DisplayGUI::setImageSet(std::vector<cv::Mat> &images)
 
 DisplayGUI::~DisplayGUI()
 {
-    delete ui;
 }
 
 void DisplayGUI::display()
@@ -40,7 +39,7 @@ void DisplayGUI::display()
     QImage scaledImage = pixmap.toImage().scaled(pixmap.size() * devicePixelRatio(), Qt::IgnoreAspectRatio,
                                                  Qt::SmoothTransformation);
     scaledImage.setDevicePixelRatio(devicePixelRatio());
-    QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
+    auto *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
     ui->label_Display->setScaledContents(true);
     ui->label_Display->setPixmap(*newScaledPixmap);
     ui->label_Display->resize(ui->label_Display->pixmap()->size());

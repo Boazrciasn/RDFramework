@@ -55,7 +55,8 @@ void Reader::readImages(QString dir, std::vector<cv::Mat> &images, int flags = T
             auto src = cv::imread(filenames[i], CV_LOAD_IMAGE_GRAYSCALE);
             if(!src.data)
                 std::cerr << "Problem loading image!!!" << std::endl;
-            images.push_back(src);
+            else
+                images.push_back(src);
         }
 
         break;

@@ -79,6 +79,7 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
+    m_forest.setNTreesForDetection(m_nTreesForDetection);
     auto accuracy = m_forest.testForest();
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
 }
@@ -86,8 +87,8 @@ void RandomDecisionForestDialogGui::onTest()
 void RandomDecisionForestDialogGui::onPreProcess()
 {
     // TODO: find proper place for this operation
-    for(auto &img :  m_dataReaderGUI->DS()->images)
-        cv::resize(img,img,cv::Size(128,256));
+//    for(auto &img :  m_dataReaderGUI->DS()->images)
+//        cv::resize(img,img,cv::Size(128,256));
 
 
     PreProcess::doBatchPreProcess(m_dataReaderGUI->DS()->images, m_preprocessGUI->preprocesses());

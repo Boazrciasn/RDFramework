@@ -9,6 +9,17 @@
 
 #include <3rdparty/cereal/access.hpp>
 
+//void deneme()
+//{
+//    std::array<int> A{1, 5, 8};
+//    auto B = std::get<0>(A) + std::get<1>(A);
+
+//    std::vector<int> X;
+
+//    A naber;
+//    naber.f = 3.0f;
+//    naber.i
+//}
 
 
 class RandomDecisionForest
@@ -23,7 +34,8 @@ class RandomDecisionForest
     Colorcode colorcode;
     StatisticsLogger m_statLog;
     PreProcess m_preProcess;
-  public:
+
+public:
     bool trainForest();
     float testForest();
     void detect(cv::Mat &roi, int &label, float &conf);
@@ -60,7 +72,7 @@ class RandomDecisionForest
 //                        it->second*m_params.pixelsPerLabelImage[it->first];
     }
 
-    inline void setDataSet(DataSet *DS)
+    inline void setDataSet(DataSet* DS)
     {
         m_DS = DS;
         if (!m_DS->isBordered)
@@ -83,8 +95,11 @@ class RandomDecisionForest
         m_preProcess.setPreProcess(preprocess);
     }
 
-    RDFParams &params() { return m_params; }
-    DataSet *DS() { return m_DS; }
+    inline auto params()       -> RDFParams &
+    { return m_params; }
+
+    inline auto DS()           -> DataSet *
+    { return m_DS; }
 
     void inline setNTreesForDetection(quint32 count)
     {

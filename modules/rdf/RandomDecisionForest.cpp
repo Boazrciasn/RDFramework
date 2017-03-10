@@ -55,7 +55,6 @@ float RandomDecisionForest::testForest()
     int totalImgs = m_DS->images.size();
     SignalSenderInterface::instance().printsend("Number of Images:" + QString::number(totalImgs));
     qApp->processEvents();
-    setNTreesForDetection(m_nTreesForDetection);
     if (totalImgs == 0) return 0;
 
     std::atomic<int> posCounter(0);
@@ -145,6 +144,7 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
     labels.setTo(cv::Scalar(255, 255, 255));
     confs = cv::Mat_<float>(nRows, nCols);
     for (int row = 0; row < nRows; ++row)
+    {
         for (int col = 0; col < nCols; ++col)
         {
             cv::Mat_<float> tmpProbHist = layeredHist(cv::Range(row, row + 1), cv::Range(col * labelCount, (col + 1) * labelCount));
@@ -157,4 +157,5 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
             labels.at<cv::Vec3b>(row, col) = colorcode.colors[max_loc.x];
             confs(row, col) = max;
         }
+    }
 }

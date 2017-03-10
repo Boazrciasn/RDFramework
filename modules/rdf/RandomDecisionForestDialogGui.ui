@@ -112,7 +112,7 @@
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
                <property name="maximum">
-                <number>300</number>
+                <number>1000</number>
                </property>
                <property name="value">
                 <number>200</number>
@@ -289,6 +289,9 @@
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
+               <property name="maximum">
+                <number>500</number>
+               </property>
                <property name="value">
                 <number>30</number>
                </property>
@@ -330,6 +333,9 @@
               <widget class="QSpinBox" name="spinBox_probY">
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="maximum">
+                <number>500</number>
                </property>
                <property name="value">
                 <number>30</number>

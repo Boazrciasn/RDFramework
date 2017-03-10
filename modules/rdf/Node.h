@@ -17,6 +17,7 @@ struct Node
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
+    cv::Mat_<char> feature;// = cv::Mat::ones(3,,3,CV_32SC1);
 
     Node() : Node(0)
     {
@@ -32,6 +33,20 @@ struct Node
     {
         hist.release();
     }
+
+//    bool inline isLeft(Pixel &p, cv::Mat &img)
+//    {
+//        qint16 fr1_x = teta1.x - p.position.x;
+//        qint16 fr1_y = teta1.y - p.position.y;
+//        auto tmp = feature.mul(img(cv::Rect(fr1_x,fr1_y, feature.cols, feature.rows)));
+//        auto fr1 = cv::sum(tmp)[0];
+
+//        qint16 fr2_x = teta2.x - p.position.x;
+//        qint16 fr2_y = teta2.y - p.position.y;
+//        tmp = feature.mul(img(cv::Rect(fr2_x,fr2_y, feature.cols, feature.rows)));
+//        auto fr2 = cv::sum(tmp)[0];;
+//        return (fr1 - fr2) <= tau;
+//    }
 
     bool inline isLeft(Pixel &p, cv::Mat &img)
     {

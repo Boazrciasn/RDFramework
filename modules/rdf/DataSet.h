@@ -19,11 +19,11 @@ struct DataSet
         labels.clear();
     }
 
-    QString toString()
+    QString toString() const
     {
-        QString res = QString("<<<< DataSet >>>>\n   images: ") + QString::number(images.size())
+        auto res = QString("<<<< DataSet >>>>\n   images: ") + QString::number(images.size())
                 + QString("\n   Images per Label: \n");
-        for (auto it = map_dataPerLabel.begin(); it != map_dataPerLabel.end(); ++it)
+        for (auto it = std::begin(map_dataPerLabel); it != std::end(map_dataPerLabel); ++it)
             res += QString("      ") + QString::number(it->first)
                     + QString(" => ") + QString::number(it->second) + QString(" \n");
 
@@ -31,4 +31,7 @@ struct DataSet
     }
 };
 
+//std::ostream& operator<<(std::ostream &strm, const DataSet &a) {
+//  return strm << "A(" << a.toString().toStdString() << ")";
+//}
 #endif // DATASET_H
