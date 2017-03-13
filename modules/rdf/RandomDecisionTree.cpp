@@ -6,13 +6,13 @@ void RandomDecisionTree::calculateImpurity(quint32 d)
     quint32 impurity = 0;
     int level_node_count = 1 << d;          // Number of nodes at this level
     int tot_node_count   = (1 << (d + 1)) - 1; // Number of nodes at this and previous levels
-
     for (auto node_id = (tot_node_count - level_node_count); node_id < tot_node_count; ++node_id)
     {
-        float entropy = calculateEntropyProb(computeHistogramNorm(m_nodes[node_id].start, m_nodes[node_id].end, m_params->labelCount));
-        impurity += (m_nodes[node_id].end-m_nodes[node_id].start)*entropy;
+        float entropy = calculateEntropyProb(computeHistogramNorm(m_nodes[node_id].start, m_nodes[node_id].end,
+                                                                  m_params->labelCount));
+        impurity += (m_nodes[node_id].end - m_nodes[node_id].start) * entropy;
     }
-    m_statLog.logImpurity(impurity,d);
+    m_statLog.logImpurity(impurity, d);
 }
 
 void RandomDecisionTree::train()
@@ -26,7 +26,6 @@ void RandomDecisionTree::train()
     m_statLog.setDepth(m_params->maxDepth - 1);
     SignalSenderInterface::instance().printsend("Sub-sampling...");
     getSubSample();
-
     SignalSenderInterface::instance().printsend("Constructing tree...");
     qApp->processEvents();
     constructTree();
@@ -40,18 +39,13 @@ void RandomDecisionTree::getSubSample()
 {
     quint32 imgCount = m_DS->images.size();
     quint32 pxPerImgCount = m_params->pixelsPerImage;
-
     // Set Proper size
     auto size = 0;
-
     for (auto it = std::begin(m_DS->map_dataPerLabel); it != std::end(m_DS->map_dataPerLabel); ++it)
         size += (it->second * m_params->pixelsPerLabelImage[it->first]);
-
     m_pixelCloud.pixels1.resize(size);
     m_pixelCloud.pixels2.resize(size);
-
     quint32 last{};
-
     for (quint32 id = 0; id < imgCount; ++id)
     {
         auto &image = m_DS->images[id];
@@ -136,7 +130,7 @@ void RandomDecisionTree::computeLeafHistograms()
         int mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
-        auto pxCount = start-end;
+        auto pxCount = start - end;
         if (pxCount <= m_params->minLeafPixels)
             continue;
         m_nodes[node_id].id = node_id;
@@ -160,17 +154,15 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     cv::Point maxTeta1, maxTeta2;
     cv::Mat_<float> leftHist(1, nLabels);
     cv::Mat_<float> rightHist(1, nLabels);
-    float parentEntr = calculateEntropy(computeHistogramNorm(m_nodes[index].start, m_nodes[index].end, nLabels));
+    float parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
     float leftChildEntr, rightChildEntr;
     float avgEntropyChild;
     float infoGain;
-
-
     auto totalFeatures = m_features.size();
     int itr;
-    for (int feature = 0; feature < totalFeatures; ++feature) {
+    for (int feature = 0; feature < totalFeatures; ++feature)
+    {
         m_nodes[index].feature = m_features[feature].clone();
-
         itr = 0;
         while (itr < maxItr)
         {
@@ -199,8 +191,8 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
             }
             leftChildEntr = calculateEntropy(leftHist);
             rightChildEntr = calculateEntropy(rightHist);
-            avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
-            avgEntropyChild += (sizeRight / px_count) * rightChildEntr;
+            avgEntropyChild  = leftChildEntr;
+            avgEntropyChild += rightChildEntr;
             infoGain = parentEntr - avgEntropyChild;
             // Non-improving epoch :
             if (infoGain > maxGain)
@@ -215,9 +207,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
             else
                 ++itr;
         }
-
     }
-
     m_nodes[index].tau = maxTau;
     m_nodes[index].teta1 = maxTeta1;
     m_nodes[index].teta2 = maxTeta2;
@@ -261,22 +251,18 @@ bool RandomDecisionTree::isPixelSizeConsistent()
 void RandomDecisionTree::createFeatures()
 {
     // point
-    Feature pnt = Feature::ones(1,1);
-
+    Feature pnt = Feature::ones(1, 1);
     // edges
-    Feature edge = Feature::ones(6,6);
-    edge(cv::Range(edge.rows/2,edge.rows),cv::Range::all()) = -1;
-
+    Feature edge = Feature::ones(6, 6);
+    edge(cv::Range(edge.rows / 2, edge.rows), cv::Range::all()) = -1;
     // lines
-    Feature line = Feature::ones(6,6);
-    line(cv::Range(line.rows/3,line.rows/2),cv::Range::all()) = -1;
-
+    Feature line = Feature::ones(6, 6);
+    line(cv::Range(line.rows / 3, line.rows / 2), cv::Range::all()) = -1;
     // four-rectangle
-    Feature rect = Feature::ones(6,6);
-    rect(cv::Range(0, rect.rows/2),cv::Range(rect.cols/2,rect.cols)) = -1;
-    rect(cv::Range(rect.rows/2,rect.rows),cv::Range(0,rect.cols/2)) = -1;
-
-//    m_features.push_back(pnt);
+    Feature rect = Feature::ones(6, 6);
+    rect(cv::Range(0, rect.rows / 2), cv::Range(rect.cols / 2, rect.cols)) = -1;
+    rect(cv::Range(rect.rows / 2, rect.rows), cv::Range(0, rect.cols / 2)) = -1;
+    //    m_features.push_back(pnt);
     m_features.push_back(edge);
     m_features.push_back(edge.t());
     m_features.push_back(line);

@@ -95,7 +95,7 @@ class HAARNode : public NodeTest<HAARNode>
   public :
     void runFeature()
     {
-        std::cout<<"Selecting best HAAR"<< std::endl;
+        std::cout << "Selecting best HAAR" << std::endl;
     }
 };
 
@@ -160,6 +160,7 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 inline float calculateEntropy(const cv::Mat_<float> &hist)
 {
     float entr{};
+    float temp{};
     float totalNPixels = cv::sum(hist)[0];
     int nCols = hist.cols;
     for (int i = 0; i < nCols; ++i)
@@ -167,13 +168,11 @@ inline float calculateEntropy(const cv::Mat_<float> &hist)
         float nPixelsAt = hist(0, i);
         if (nPixelsAt > 0)
         {
-            float probability = nPixelsAt / totalNPixels;
-            entr -= probability * (log(probability));
-            //TODO: Commenting out for bugfix.
-            //            entr -= nPixelsAt * log(nPixelsAt);
+            temp += nPixelsAt*log(nPixelsAt);
         }
     }
-    return entr /* + totalNPixels * log(totalNPixels)*/;
+    entr = -1 * (temp - totalNPixels*log(totalNPixels));
+    return entr;
 }
 
 inline float calculateEntropyProb(const cv::Mat_<float> &hist)
