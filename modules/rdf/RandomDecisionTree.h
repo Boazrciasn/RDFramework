@@ -72,8 +72,7 @@ class RandomDecisionTree
 
     cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat &roi)
     {
-        // FIXME: fix this method, it is not working properly
-        Node curr = m_nodes[0];
+        auto curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
             if (curr.isLeft(px, roi))
                 curr = m_nodes[2 * curr.id + 1];

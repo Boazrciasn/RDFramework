@@ -66,9 +66,9 @@ void RandomDecisionTree::getSubSample()
             quint8 intensity = 0;
             while (intensity == 0)
             {
-                // FIXME: take into acount feature pading
-                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
-                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
+                // FIXME: take into acount feature pading (replace 6)
+                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY + 6;
+                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX + 6;
                 intensity = image.at<uchar>(row, col);
             }
             auto &px = m_pixelCloud.pixels1[last + k];
@@ -276,7 +276,7 @@ void RandomDecisionTree::createFeatures()
     rect(cv::Range(0, rect.rows/2),cv::Range(rect.cols/2,rect.cols)) = -1;
     rect(cv::Range(rect.rows/2,rect.rows),cv::Range(0,rect.cols/2)) = -1;
 
-    m_features.push_back(pnt);
+//    m_features.push_back(pnt);
     m_features.push_back(edge);
     m_features.push_back(edge.t());
     m_features.push_back(line);
