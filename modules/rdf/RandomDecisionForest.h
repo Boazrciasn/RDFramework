@@ -35,6 +35,10 @@ class RandomDecisionForest
     StatisticsLogger m_statLog;
     PreProcess m_preProcess;
 
+    int m_feature_padding_x = 6;
+    int m_feature_padding_y = 6;
+
+
 public:
     bool trainForest();
     float testForest();
@@ -53,7 +57,7 @@ public:
 
     inline void addBorder()
     {
-        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX, m_params.probDistY, cv::BORDER_CONSTANT)};
+        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX + m_feature_padding_x, m_params.probDistY + m_feature_padding_x, cv::BORDER_CONSTANT)};
         PreProcess::doBatchPreProcess(m_DS->images, preprocess);
     }
 

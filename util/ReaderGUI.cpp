@@ -21,12 +21,28 @@ ReaderGUI::~ReaderGUI()
 
 void ReaderGUI::countLabels()
 {
+    int avgW{};
+    int avgH{};
+    int counter{};
     int total = m_DS->labels.size();
-    for (int i = 0; i < total; ++i)
+    for (int i = 0; i < total; ++i){
         if(m_DS->map_dataPerLabel.find(m_DS->labels[i]) == m_DS->map_dataPerLabel.end())
             m_DS->map_dataPerLabel[m_DS->labels[i]] = 1;
         else
             ++m_DS->map_dataPerLabel[m_DS->labels[i]];
+
+        if(m_DS->labels[i] == 0)
+        {
+            avgW += m_DS->images[i].cols;
+            avgH += m_DS->images[i].rows;
+            ++counter;
+        }
+
+    }
+
+    avgW /= counter;
+    avgH /= counter;
+    qDebug() << "Average w/h for label  0: " << avgW << " " << avgH;
 }
 
 void ReaderGUI::load()
@@ -55,6 +71,10 @@ void ReaderGUI::load()
         tot_pos = m_DS->images.size();
         for(auto i = 0; i < tot_pos; ++i)
             m_DS->labels.push_back(0);
+
+        // TODO: move resize to proper place
+        for(auto& img : m_DS->images)
+            cv::resize(img,img,cv::Size(196,196));
 
         m_reader->readImages(neg_data, m_DS->images,m_dFlag);
         tot_neg = m_DS->images.size() - tot_pos;

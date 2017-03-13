@@ -39,6 +39,7 @@ class RandomDecisionTree
     quint32 m_probe_distanceY{};
 
     std::vector<Node> m_nodes;
+    std::vector<Feature> m_features;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
     RDFParams *m_params;
@@ -59,7 +60,7 @@ class RandomDecisionTree
 
   public:
     SignalSenderInterface *m_signalsender;
-    RandomDecisionTree() {}
+    RandomDecisionTree() { createFeatures(); }
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(pcg32 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
@@ -114,7 +115,9 @@ class RandomDecisionTree
         m_nodes.clear();
     }
 
+
   private:
+    void createFeatures();
     void getSubSample();
     void constructTree();
     void constructRootNode();
@@ -147,6 +150,8 @@ class RandomDecisionTree
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
+        m_nodes[index].feature = m_features[0];
+
         auto pxCount = m_nodes[index].end - m_nodes[index].start;
         if (pxCount == 0)
         {
@@ -163,6 +168,7 @@ class RandomDecisionTree
             generateTeta(m_nodes[index].teta2);
             m_nodes[index].tau = 500;
         }
+
         else
         {
             if (isLeaf(m_nodes[index].start, m_nodes[index].end))
@@ -231,7 +237,5 @@ class RandomDecisionTree
                 m_probe_distanceY, m_minLeafPixelCount, m_nodes);
     }
 };
-
-//using rdt_ptr = std::shared_ptr<RandomDecisionTree>;
 
 #endif // RANDOMDESICIONTREE_H

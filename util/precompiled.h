@@ -13,5 +13,6 @@
 
 #include <vector>
 #include <functional>
+#include <typedefs.h>
 
 #endif // PRECOMPILED_H

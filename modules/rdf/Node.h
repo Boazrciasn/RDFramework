@@ -17,7 +17,7 @@ struct Node
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
-    cv::Mat_<char> feature;// = cv::Mat::ones(3,,3,CV_32SC1);
+    Feature feature;
 
     Node() : Node(0)
     {
@@ -34,30 +34,41 @@ struct Node
         hist.release();
     }
 
-//    bool inline isLeft(Pixel &p, cv::Mat &img)
-//    {
-//        qint16 fr1_x = teta1.x - p.position.x;
-//        qint16 fr1_y = teta1.y - p.position.y;
-//        auto tmp = feature.mul(img(cv::Rect(fr1_x,fr1_y, feature.cols, feature.rows)));
-//        auto fr1 = cv::sum(tmp)[0];
-
-//        qint16 fr2_x = teta2.x - p.position.x;
-//        qint16 fr2_y = teta2.y - p.position.y;
-//        tmp = feature.mul(img(cv::Rect(fr2_x,fr2_y, feature.cols, feature.rows)));
-//        auto fr2 = cv::sum(tmp)[0];;
-//        return (fr1 - fr2) <= tau;
-//    }
-
     bool inline isLeft(Pixel &p, cv::Mat &img)
     {
-        qint16 new_teta1R = teta1.y + p.position.y;
-        qint16 new_teta1C = teta1.x + p.position.x;
-        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
-        qint16 new_teta2R = teta2.y + p.position.y;
-        qint16 new_teta2C = teta2.x + p.position.x;
-        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
-        return (intensity1 - intensity2) <= tau;
+        auto fr1_x = teta1.x + p.position.x;
+        auto fr1_y = teta1.y + p.position.y;
+        int fr1{};
+        int fr2{};
+
+        // TODO: replace 6 with m_feature_padding_x/y
+        auto row = feature.rows;
+        auto col = feature.cols;
+
+        for (int i = 0; i < row; ++i)
+            for (int j = 0; j < col; ++j)
+                fr1 += feature(i,j)*img.at<char>(fr1_y + i, fr1_x + j);
+
+
+        auto fr2_x = teta2.x + p.position.x;
+        auto fr2_y = teta2.y + p.position.y;
+        for (int i = 0; i < row; ++i)
+            for (int j = 0; j < col; ++j)
+                fr2 += feature(i,j)*img.at<char>(fr2_y + i, fr2_x + j);
+
+        return (fr1 - fr2) <= tau;
     }
+
+//    bool inline isLeft(Pixel &p, cv::Mat &img)
+//    {
+//        qint16 new_teta1R = teta1.y + p.position.y;
+//        qint16 new_teta1C = teta1.x + p.position.x;
+//        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
+//        qint16 new_teta2R = teta2.y + p.position.y;
+//        qint16 new_teta2C = teta2.x + p.position.x;
+//        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
+//        return (intensity1 - intensity2) <= tau;
+//    }
 
 private:
     friend class cereal::access;

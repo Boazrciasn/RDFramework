@@ -17,5 +17,7 @@ using IntMat        = cv::Mat_<qint32>;
 using FloatMat      = cv::Mat_<float>;
 using DoubleMat     = cv::Mat_<double>;
 
+using Feature       = cv::Mat_<uchar>;
+
 
 #endif // TYPEDEFS_H
