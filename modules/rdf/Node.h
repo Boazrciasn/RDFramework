@@ -49,32 +49,30 @@ struct Node
         int fr1{};
         int fr2{};
 
-        for (int i = 0; i < row; ++i)
-            for (int j = 0; j < col; ++j)
-            {
-                fr1 += feature(i,j)*img.at<uchar>(fr1_y + i, fr1_x + j);
-                fr2 += feature(i,j)*img.at<uchar>(fr2_y + i, fr2_x + j);
-            }
-
-        return (fr1 - fr2) <= tau;
-
-
-//        uchar* imgRow1;
-//        uchar* imgRow2;
-//        uchar* ftrRow;
 //        for (int i = 0; i < row; ++i)
-//        {
-//            imgRow1 = img.ptr<uchar>(i + fr1_y);
-//            imgRow2 = img.ptr<uchar>(i + fr2_y);
-//            ftrRow = feature.ptr<uchar>(i);
 //            for (int j = 0; j < col; ++j)
 //            {
-//                fr1 += ftrRow[j]*imgRow1[j + fr1_x];
-//                fr2 += ftrRow[j]*imgRow2[j + fr2_x];
+//                fr1 += feature(i,j)*img.at<uchar>(fr1_y + i, fr1_x + j);
+//                fr2 += feature(i,j)*img.at<uchar>(fr2_y + i, fr2_x + j);
 //            }
-//        }
 
-//        return (fr1 - fr2) <= tau;
+
+        uchar* imgRow1;
+        uchar* imgRow2;
+        featureType* ftrRow;
+        for (int i = 0; i < row; ++i)
+        {
+            imgRow1 = img.ptr<uchar>(i + fr1_y);
+            imgRow2 = img.ptr<uchar>(i + fr2_y);
+            ftrRow = feature.ptr<featureType>(i);
+            for (int j = 0; j < col; ++j)
+            {
+                fr1 += ftrRow[j]*imgRow1[j + fr1_x];
+                fr2 += ftrRow[j]*imgRow2[j + fr2_x];
+            }
+        }
+
+        return (fr1 - fr2) <= tau;
     }
 
 //    bool inline isLeft(Pixel &p, cv::Mat &img)

@@ -61,8 +61,8 @@ void RandomDecisionTree::getSubSample()
             while (intensity == 0)
             {
                 // FIXME: take into acount feature pading (replace 6)
-                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY + 6;
-                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX + 6;
+                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY + Feature::max_h;
+                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX + Feature::max_w;
                 intensity = image.at<uchar>(row, col);
             }
             auto &px = m_pixelCloud.pixels1[last + k];
@@ -90,7 +90,12 @@ void RandomDecisionTree::constructRootNode()
     m_nonLeafpxCount = m_pixelCloud.pixels1.size();
     m_statLog.logPxCount(m_nonLeafpxCount, 0);
     m_statLog.logLeafCount(0, 0);
-    computeDivisionAt(rootId);
+
+    if(m_nodes[rootId].end > TableLookUp::size)
+        computeDivisionAt(rootId);
+    else
+        computeDivisionWithLookUpAt(rootId);
+
     rearrange(rootId);
     calculateImpurity(0);
 }
@@ -213,6 +218,80 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     m_nodes[index].ftrID = maxFeatureIndex;
 }
 
+void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
+{
+    // find best teta and tau parameters for the given node
+    float px_count = m_nodes[index].end - m_nodes[index].start;
+    if (px_count == 0)
+        return;
+    auto maxItr = m_params->maxIteration;
+    auto nLabels = m_params->labelCount;
+    int maxTau = 500;
+    quint8 maxFeatureIndex = 0;
+    float maxGain = std::numeric_limits<float>::lowest();
+    cv::Point maxTeta1, maxTeta2;
+    cv::Mat_<float> leftHist(1, nLabels);
+    cv::Mat_<float> rightHist(1, nLabels);
+    float parentEntr = calculateEntropyLookUp(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+    float leftChildEntr, rightChildEntr;
+    float avgEntropyChild;
+    float infoGain;
+    auto totalFeatures = Feature::features.size();
+    int itr;
+    for (quint8 feature = 0; feature < totalFeatures; ++feature)
+    {
+        m_nodes[index].ftrID = feature;
+        itr = 0;
+        while (itr < maxItr)
+        {
+            generateTeta(m_nodes[index].teta1);
+            generateTeta(m_nodes[index].teta2);
+            m_nodes[index].tau = generateTau();
+            leftHist.setTo(0.0f);
+            rightHist.setTo(0.0f);
+            int sizeLeft  = 0;
+            int sizeRight = 0;
+            auto end = m_nodes[index].end;
+            for (auto i = m_nodes[index].start; i < end; ++i)
+            {
+                auto &px = m_pixelCloud.pixels1[i];
+                auto &img = m_DS->images[px.id];
+                if (m_nodes[index].isLeft(px, img))
+                {
+                    ++leftHist(px.label);
+                    sizeLeft++;
+                }
+                else
+                {
+                    ++rightHist(px.label);
+                    sizeRight++;
+                }
+            }
+            leftChildEntr = calculateEntropyLookUp(leftHist);
+            rightChildEntr = calculateEntropyLookUp(rightHist);
+            avgEntropyChild  = leftChildEntr;
+            avgEntropyChild += rightChildEntr;
+            infoGain = parentEntr - avgEntropyChild;
+            // Non-improving epoch :
+            if (infoGain > maxGain)
+            {
+                maxTeta1 = m_nodes[index].teta1;
+                maxTeta2 = m_nodes[index].teta2;
+                maxTau   = m_nodes[index].tau;
+                maxGain  = infoGain;
+                maxFeatureIndex = feature;
+                itr = 0 ;
+            }
+            else
+                ++itr;
+        }
+    }
+    m_nodes[index].tau = maxTau;
+    m_nodes[index].teta1 = maxTeta1;
+    m_nodes[index].teta2 = maxTeta2;
+    m_nodes[index].ftrID = maxFeatureIndex;
+}
+
 void RandomDecisionTree::rearrange(quint32 index)
 {
     quint32 start = m_nodes[index].start;
@@ -245,31 +324,4 @@ bool RandomDecisionTree::isPixelSizeConsistent()
     for (int nodeIndex = decision_node_count; nodeIndex < tot_node_count; ++nodeIndex)
         nPixelsOnLeaves += (m_nodes[nodeIndex].end - m_nodes[nodeIndex].start);
     return m_pixelCloud.pixels1.size() == nPixelsOnLeaves;
-}
-
-void RandomDecisionTree::createFeatures()
-{
-    if(!Feature::features.empty())
-        return;
-    // point
-    MatFeature pnt = MatFeature::ones(1, 1);
-    // edges
-    MatFeature edge = MatFeature::ones(6, 6);
-    edge(cv::Range(edge.rows / 2, edge.rows), cv::Range::all()) = -1;
-    // lines
-    MatFeature line = MatFeature::ones(6, 6);
-    line(cv::Range(line.rows / 3, line.rows / 2), cv::Range::all()) = -1;
-    // four-rectangle
-    MatFeature rect = MatFeature::ones(6, 6);
-    rect(cv::Range(0, rect.rows / 2), cv::Range(rect.cols / 2, rect.cols)) = -1;
-    rect(cv::Range(rect.rows / 2, rect.rows), cv::Range(0, rect.cols / 2)) = -1;
-
-
-    //    Feature::features.push_back(pnt);
-    Feature::features.push_back(edge);
-    Feature::features.push_back(edge.t());
-    Feature::features.push_back(line);
-    Feature::features.push_back(line.t());
-//    Feature::features.push_back(rect);
-//    Feature::features.push_back(rect.t());
 }

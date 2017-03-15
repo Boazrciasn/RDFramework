@@ -60,7 +60,7 @@ class RandomDecisionTree
 
   public:
     SignalSenderInterface *m_signalsender;
-    RandomDecisionTree() { createFeatures(); }
+    RandomDecisionTree() { }
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(pcg32 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
@@ -116,13 +116,13 @@ class RandomDecisionTree
 
 
   private:
-    void createFeatures();
     void getSubSample();
     void constructTree();
     void constructRootNode();
     void constructTreeDecisionNodes();
     void computeLeafHistograms();
     void computeDivisionAt(quint32 index);
+    void computeDivisionWithLookUpAt(quint32 index);
     void rearrange(quint32 index);
 
     void inline initParams()
@@ -178,7 +178,12 @@ class RandomDecisionTree
                 m_nodes[index].tau = 500;
             }
             else
-                computeDivisionAt(index);
+            {
+                if(pxCount > TableLookUp::size)
+                    computeDivisionAt(index);
+                else
+                    computeDivisionWithLookUpAt(index);
+            }
         }
     }
 

@@ -147,6 +147,25 @@ inline double sumall(const T &container, const FUNC &func)
     return sum;
 }
 
+struct TableLookUp
+{
+    static int size;
+    static bool isInit;
+    static tableLookupType* lookUp;
+    TableLookUp() {}
+
+    static void inline inti(){
+        if(isInit)
+            return;
+        size = (1 << 18);
+        lookUp = new tableLookupType[size];
+        lookUp[0] = 0;
+        for (int i = 1; i < size; ++i) {
+            lookUp[i] = i*log(i);
+        }
+    }
+};
+
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
 inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 {
@@ -155,6 +174,22 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
     for (auto px : pixels.pixels1)
         ++hist.at<float>(0, px.label);
     return hist;
+}
+
+inline float calculateEntropyLookUp(const cv::Mat_<float> &hist)
+{
+    float entr{};
+    float temp{};
+    int totalNPixels = cv::sum(hist)[0];
+    auto nCols = hist.cols;
+
+    for (int i = 0; i < nCols; ++i)
+    {
+        int nPixelsAt = hist(i);
+        temp += TableLookUp::lookUp[nPixelsAt];
+    }
+    entr = -temp + TableLookUp::lookUp[totalNPixels];
+    return entr;
 }
 
 inline float calculateEntropy(const cv::Mat_<float> &hist)
@@ -194,7 +229,7 @@ inline float calculateEntropyProb(const cv::Mat_<float> &hist)
 
 inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
 {
-    return calculateEntropy(createHistogram(pixels, labelCount));
+    return calculateEntropyLookUp(createHistogram(pixels, labelCount));
 }
 
 inline int getMaxLikelihoodIndex(const QVector<float> &hist)
@@ -248,7 +283,6 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
     img(cv::Rect(probe_x, probe_y, width, height)).copyTo(unpadded);
     return unpadded;
 }
-
 
 class Util
 {

@@ -63,6 +63,7 @@ void ReaderGUI::load()
 
         QString pos_data = m_dirStandard + "/pos";
         QString neg_data = m_dirStandard + "/neg";
+        auto img_N = 196;
 
         int tot_pos;
         int tot_neg;
@@ -72,14 +73,39 @@ void ReaderGUI::load()
         for(auto i = 0; i < tot_pos; ++i)
             m_DS->labels.push_back(0);
 
-        // TODO: move resize to proper place
-        for(auto& img : m_DS->images)
-            cv::resize(img,img,cv::Size(196,196));
+//        // TODO: move resize to proper place
+//        for(auto& img : m_DS->images)
+//            cv::resize(img,img,cv::Size(196,196));
 
-        m_reader->readImages(neg_data, m_DS->images,m_dFlag);
+        std::vector<cv::Mat> tm_images;
+        m_reader->readImages(neg_data, tm_images,m_dFlag);
+
+        for(auto& img : tm_images)
+        {
+            if(img.rows > img_N && img.cols > img_N)
+            {
+                auto dx = img.cols - img_N;
+                auto dy = img.rows - img_N;
+                cv::Mat northWest(img,cv::Rect(0,0,img_N,img_N));
+                cv::Mat center(img,cv::Rect(dx/2,dy/2,img_N,img_N));
+                cv::Mat southEast(img,cv::Rect(dx,dy,img_N,img_N));
+
+                m_DS->images.push_back(northWest);
+                m_DS->images.push_back(center);
+                m_DS->images.push_back(southEast);
+            }
+            else
+                m_DS->images.push_back(img);
+        }
+
+//        m_reader->readImages(neg_data, m_DS->images,m_dFlag);
         tot_neg = m_DS->images.size() - tot_pos;
         for(auto i = 0; i < tot_neg; ++i)
             m_DS->labels.push_back(1);
+
+        // TODO: move resize to proper place
+        for(auto& img : m_DS->images)
+            cv::resize(img,img, cv::Size(img_N,img_N));
 
         if (!m_DS->images.empty())
         {

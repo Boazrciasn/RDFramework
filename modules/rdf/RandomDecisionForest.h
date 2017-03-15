@@ -9,19 +9,6 @@
 
 #include <3rdparty/cereal/access.hpp>
 
-//void deneme()
-//{
-//    std::array<int> A{1, 5, 8};
-//    auto B = std::get<0>(A) + std::get<1>(A);
-
-//    std::vector<int> X;
-
-//    A naber;
-//    naber.f = 3.0f;
-//    naber.i
-//}
-
-
 class RandomDecisionForest
 {
 
@@ -34,10 +21,6 @@ class RandomDecisionForest
     Colorcode colorcode;
     StatisticsLogger m_statLog;
     PreProcess m_preProcess;
-
-    int m_feature_padding_x = 6;
-    int m_feature_padding_y = 6;
-
 
 public:
     bool trainForest();
@@ -57,7 +40,7 @@ public:
 
     inline void addBorder()
     {
-        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX + m_feature_padding_x, m_params.probDistY + m_feature_padding_x, cv::BORDER_CONSTANT)};
+        std::vector<Process*> preprocess{new MakeBorder(m_params.probDistX + Feature::max_w, m_params.probDistY + Feature::max_h, cv::BORDER_CONSTANT)};
         PreProcess::doBatchPreProcess(m_DS->images, preprocess);
     }
 
@@ -116,6 +99,8 @@ public:
     {
         srand(time(nullptr));
         m_nTreesForDetection = 1;
+        createFeatures();
+        TableLookUp::inti();
     }
     SignalSenderInterface m_signalInterface;
     ~RandomDecisionForest() { m_trees.clear(); }
@@ -141,6 +126,7 @@ public:
     }
 
 private:
+    void createFeatures();
     friend class cereal::access;
 
     template <class Archive>

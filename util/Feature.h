@@ -6,6 +6,8 @@
 class Feature
 {
 public:
+    static int max_w;
+    static int max_h;
     Feature();
     static std::vector<MatFeature> features;
 };

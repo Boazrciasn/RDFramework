@@ -10,6 +10,10 @@
 #include <iostream>
 #include <fstream>
 
+int TableLookUp::size;
+bool TableLookUp::isInit;
+tableLookupType* TableLookUp::lookUp;
+
 void openmp_deneme()
 {
     //    quint32 nThreads = std::thread::hardware_concurrency();

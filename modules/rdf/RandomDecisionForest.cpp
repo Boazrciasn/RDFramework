@@ -12,7 +12,6 @@
 // given the directory of the all samples
 // read subsampled part of the images into pixel cloud
 
-
 bool RandomDecisionForest::trainForest()
 {
     if (m_DS->images.size() == 0)
@@ -158,4 +157,34 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
             confs(row, col) = max;
         }
     }
+}
+
+void RandomDecisionForest::createFeatures()
+{
+    if(!Feature::features.empty())
+        return;
+    // point
+    MatFeature pnt = MatFeature::ones(1, 1);
+    // edges
+    MatFeature edge = MatFeature::ones(6, 6);
+    edge(cv::Range(edge.rows / 2, edge.rows), cv::Range::all()) = -1;
+    // lines
+    MatFeature line = MatFeature::ones(6, 6);
+    line(cv::Range(line.rows / 3, line.rows / 2), cv::Range::all()) = -1;
+    // four-rectangle
+    MatFeature rect = MatFeature::ones(6, 6);
+    rect(cv::Range(0, rect.rows / 2), cv::Range(rect.cols / 2, rect.cols)) = -1;
+    rect(cv::Range(rect.rows / 2, rect.rows), cv::Range(0, rect.cols / 2)) = -1;
+
+
+    Feature::max_w = 6;
+    Feature::max_h = 6;
+
+    Feature::features.push_back(pnt);
+    Feature::features.push_back(edge);
+    Feature::features.push_back(edge.t());
+    Feature::features.push_back(line);
+    Feature::features.push_back(line.t());
+    Feature::features.push_back(rect);
+    Feature::features.push_back(rect.t());
 }
