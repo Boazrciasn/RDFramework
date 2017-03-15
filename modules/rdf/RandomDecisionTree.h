@@ -39,7 +39,7 @@ class RandomDecisionTree
     quint32 m_probe_distanceY{};
 
     std::vector<Node> m_nodes;
-    std::vector<Feature> m_features;
+    std::vector<MatFeature> m_features;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
     RDFParams *m_params;
@@ -149,7 +149,6 @@ class RandomDecisionTree
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
-        m_nodes[index].feature = m_features[0];
 
         auto pxCount = m_nodes[index].end - m_nodes[index].start;
         if (pxCount == 0)

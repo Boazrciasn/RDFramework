@@ -87,7 +87,6 @@ void RandomDecisionTree::constructRootNode()
     quint32 rootId = 0;
     m_nodes[rootId].id = rootId;
     m_nodes[rootId].end = m_pixelCloud.pixels1.size();
-    m_nodes[rootId].feature = m_features[0];
     m_nonLeafpxCount = m_pixelCloud.pixels1.size();
     m_statLog.logPxCount(m_nonLeafpxCount, 0);
     m_statLog.logLeafCount(0, 0);
@@ -149,7 +148,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     auto maxItr = m_params->maxIteration;
     auto nLabels = m_params->labelCount;
     int maxTau = 500;
-    int maxFeatureIndex = 0;
+    quint8 maxFeatureIndex = 0;
     float maxGain = std::numeric_limits<float>::lowest();
     cv::Point maxTeta1, maxTeta2;
     cv::Mat_<float> leftHist(1, nLabels);
@@ -158,11 +157,11 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     float leftChildEntr, rightChildEntr;
     float avgEntropyChild;
     float infoGain;
-    auto totalFeatures = m_features.size();
+    auto totalFeatures = Feature::features.size();
     int itr;
-    for (int feature = 0; feature < totalFeatures; ++feature)
+    for (quint8 feature = 0; feature < totalFeatures; ++feature)
     {
-        m_nodes[index].feature = m_features[feature].clone();
+        m_nodes[index].ftrID = feature;
         itr = 0;
         while (itr < maxItr)
         {
@@ -211,7 +210,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     m_nodes[index].tau = maxTau;
     m_nodes[index].teta1 = maxTeta1;
     m_nodes[index].teta2 = maxTeta2;
-    m_nodes[index].feature = m_features[maxFeatureIndex];
+    m_nodes[index].ftrID = maxFeatureIndex;
 }
 
 void RandomDecisionTree::rearrange(quint32 index)
@@ -250,23 +249,27 @@ bool RandomDecisionTree::isPixelSizeConsistent()
 
 void RandomDecisionTree::createFeatures()
 {
+    if(!Feature::features.empty())
+        return;
     // point
-    Feature pnt = Feature::ones(1, 1);
+    MatFeature pnt = MatFeature::ones(1, 1);
     // edges
-    Feature edge = Feature::ones(6, 6);
+    MatFeature edge = MatFeature::ones(6, 6);
     edge(cv::Range(edge.rows / 2, edge.rows), cv::Range::all()) = -1;
     // lines
-    Feature line = Feature::ones(6, 6);
+    MatFeature line = MatFeature::ones(6, 6);
     line(cv::Range(line.rows / 3, line.rows / 2), cv::Range::all()) = -1;
     // four-rectangle
-    Feature rect = Feature::ones(6, 6);
+    MatFeature rect = MatFeature::ones(6, 6);
     rect(cv::Range(0, rect.rows / 2), cv::Range(rect.cols / 2, rect.cols)) = -1;
     rect(cv::Range(rect.rows / 2, rect.rows), cv::Range(0, rect.cols / 2)) = -1;
-    //    m_features.push_back(pnt);
-    m_features.push_back(edge);
-    m_features.push_back(edge.t());
-    m_features.push_back(line);
-    m_features.push_back(line.t());
-    m_features.push_back(rect);
-    m_features.push_back(rect.t());
+
+
+    //    Feature::features.push_back(pnt);
+    Feature::features.push_back(edge);
+    Feature::features.push_back(edge.t());
+    Feature::features.push_back(line);
+    Feature::features.push_back(line.t());
+//    Feature::features.push_back(rect);
+//    Feature::features.push_back(rect.t());
 }

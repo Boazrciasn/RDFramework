@@ -6,6 +6,7 @@
 #include "PixelCloud.h"
 
 #include <3rdparty/cereal/access.hpp>
+#include "Feature.h"
 
 struct Node
 {
@@ -17,7 +18,8 @@ struct Node
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
-    Feature feature;
+//    MatFeature feature;
+    quint8 ftrID{};
 
     Node() : Node(0)
     {
@@ -36,27 +38,43 @@ struct Node
 
     bool inline isLeft(Pixel &p, cv::Mat &img)
     {
-        auto fr1_x = teta1.x + p.position.x;
-        auto fr1_y = teta1.y + p.position.y;
-        int fr1{};
-        int fr2{};
-
-        // TODO: replace 6 with m_feature_padding_x/y
+        auto feature = Feature::features[ftrID];
         auto row = feature.rows;
         auto col = feature.cols;
 
-        for (int i = 0; i < row; ++i)
-            for (int j = 0; j < col; ++j)
-                fr1 += feature(i,j)*img.at<char>(fr1_y + i, fr1_x + j);
-
-
+        auto fr1_x = teta1.x + p.position.x;
+        auto fr1_y = teta1.y + p.position.y;
         auto fr2_x = teta2.x + p.position.x;
         auto fr2_y = teta2.y + p.position.y;
+        int fr1{};
+        int fr2{};
+
         for (int i = 0; i < row; ++i)
             for (int j = 0; j < col; ++j)
-                fr2 += feature(i,j)*img.at<char>(fr2_y + i, fr2_x + j);
+            {
+                fr1 += feature(i,j)*img.at<uchar>(fr1_y + i, fr1_x + j);
+                fr2 += feature(i,j)*img.at<uchar>(fr2_y + i, fr2_x + j);
+            }
 
         return (fr1 - fr2) <= tau;
+
+
+//        uchar* imgRow1;
+//        uchar* imgRow2;
+//        uchar* ftrRow;
+//        for (int i = 0; i < row; ++i)
+//        {
+//            imgRow1 = img.ptr<uchar>(i + fr1_y);
+//            imgRow2 = img.ptr<uchar>(i + fr2_y);
+//            ftrRow = feature.ptr<uchar>(i);
+//            for (int j = 0; j < col; ++j)
+//            {
+//                fr1 += ftrRow[j]*imgRow1[j + fr1_x];
+//                fr2 += ftrRow[j]*imgRow2[j + fr2_x];
+//            }
+//        }
+
+//        return (fr1 - fr2) <= tau;
     }
 
 //    bool inline isLeft(Pixel &p, cv::Mat &img)
@@ -81,7 +99,7 @@ private:
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        archive( id , start, end, leftCount, tau, feature, hist, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, x1, y1, x2, y2);
 
     }
 
@@ -89,7 +107,7 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        archive( id , start, end, leftCount, tau, feature, hist, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, x1, y1, x2, y2);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
