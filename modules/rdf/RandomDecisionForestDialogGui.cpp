@@ -177,6 +177,7 @@ void RandomDecisionForestDialogGui::onLoad()
                         &selfilter
                     );
     m_forest.loadForest(fname);
+    m_forest.setDataSet(m_dataReaderGUI->DS());
     //    m_forest->printForest();
     qDebug() << "LOAD FOREST PRINTED" ;
 }

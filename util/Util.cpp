@@ -583,7 +583,6 @@ void TableLookUp::init(){
     if(isInit)
         return;
     isInit = true;
-    //lookUp = new tableLookupType[size];
     lookUp[0] = 0;
     for (int i = 1; i < size; ++i)
         lookUp[i] = i*log(i);

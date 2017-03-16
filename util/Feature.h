@@ -10,6 +10,7 @@ public:
     static int max_h;
     Feature();
     static std::vector<MatFeature> features;
+    static void init();
 };
 
 #endif // FEATURE_H

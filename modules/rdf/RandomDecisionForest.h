@@ -99,7 +99,7 @@ public:
     {
         srand(time(nullptr));
         m_nTreesForDetection = 1;
-        createFeatures();
+        Feature::init();
         TableLookUp::init();
     }
     SignalSenderInterface m_signalInterface;
@@ -126,7 +126,6 @@ public:
     }
 
 private:
-    void createFeatures();
     friend class cereal::access;
 
     template <class Archive>
