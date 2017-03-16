@@ -179,7 +179,7 @@ class RandomDecisionTree
             }
             else
             {
-                if(pxCount > TableLookUp::size)
+                if(pxCount >= TableLookUp::size)
                     computeDivisionAt(index);
                 else
                     computeDivisionWithLookUpAt(index);
@@ -219,10 +219,10 @@ class RandomDecisionTree
         hist /= (end - start);
         return hist;
     }
-    cv::Mat_<float> inline computeHistogram(quint32 start, quint32 end, int labelCount)
+    cv::Mat_<quint32> inline computeHistogram(quint32 start, quint32 end, int labelCount)
     {
-        cv::Mat_<float> hist(1, labelCount);
-        hist.setTo(0.0f);
+        cv::Mat_<quint32> hist = cv::Mat_<quint32>::zeros(1, labelCount);
+
         for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist(m_pixelCloud.pixels1[pxIndex].label);
         return hist;
@@ -238,6 +238,46 @@ class RandomDecisionTree
     {
         archive(m_height, m_probe_distanceX,
                 m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+    }
+
+    inline void generateParams(quint32 index)
+    {
+        generateTeta(m_nodes[index].teta1);
+        generateTeta(m_nodes[index].teta2);
+        m_nodes[index].tau = generateTau();
+    }
+
+    inline void computeHistograms(quint32 index, cv::Mat_<quint32>& rightHist, cv::Mat_<quint32>& leftHist)
+    {
+        leftHist = cv::Mat_<quint32>::zeros(1, leftHist.cols);
+        rightHist = cv::Mat_<quint32>::zeros(1, rightHist.cols);
+        int sizeLeft  = 0;
+        int sizeRight = 0;
+        auto end = m_nodes[index].end;
+
+        for (auto i = m_nodes[index].start; i < end; ++i)
+        {
+            auto &px = m_pixelCloud.pixels1[i];
+            auto &img = m_DS->images[px.id];
+            if (m_nodes[index].isLeft(px, img))
+            {
+                ++leftHist(px.label);
+                sizeLeft++;
+            }
+            else
+            {
+                ++rightHist(px.label);
+                sizeRight++;
+            }
+        }
+    }
+
+    inline void setParamsFor(auto maxFeatureIndex, cv::Point maxTeta1, cv::Point maxTeta2, quint32 index, auto maxTau)
+    {
+        m_nodes[index].tau = maxTau;
+        m_nodes[index].teta1 = maxTeta1;
+        m_nodes[index].teta2 = maxTeta2;
+        m_nodes[index].ftrID = maxFeatureIndex;
     }
 };
 

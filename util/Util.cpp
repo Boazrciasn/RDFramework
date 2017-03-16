@@ -10,9 +10,7 @@
 #include <iostream>
 #include <fstream>
 
-int TableLookUp::size;
-bool TableLookUp::isInit;
-tableLookupType* TableLookUp::lookUp;
+tableLookupType TableLookUp::lookUp[TableLookUp::size];
 
 void openmp_deneme()
 {
@@ -579,3 +577,14 @@ std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> 
 //QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
 //ui->label->setPixmap(*newScaledPixmap);
 //ui->label->resize(ui->label->pixmap()->size());
+
+void TableLookUp::init(){
+    static bool isInit{};
+    if(isInit)
+        return;
+    isInit = true;
+    //lookUp = new tableLookupType[size];
+    lookUp[0] = 0;
+    for (int i = 1; i < size; ++i)
+        lookUp[i] = i*log(i);
+}

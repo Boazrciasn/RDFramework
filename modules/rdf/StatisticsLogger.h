@@ -41,7 +41,8 @@ class StatisticsLogger
                                                             m_pxCount[d]) + "  " + QString::number(
                                                             m_pxRatio[d]) + "%  " + QString::number(m_leafCount[d]) + "  " + QString::number(m_impurity[d]) + "  " +
                                                         QString::number(m_impurityRatio[d]) + "%");
-        SignalSenderInterface::instance().printsend("Training Time : " + QString::number(m_trainingTime));
+        SignalSenderInterface::instance().printsend("Training Time : " + QString::number(m_trainingTime) + QString(" sec  /  ")
+                                                    + QString::number(m_trainingTime/60) + QString(" min"));
     }
   private:
     QVector<quint32> m_pxCount;

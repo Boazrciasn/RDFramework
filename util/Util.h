@@ -149,21 +149,11 @@ inline double sumall(const T &container, const FUNC &func)
 
 struct TableLookUp
 {
-    static int size;
-    static bool isInit;
-    static tableLookupType* lookUp;
+    static constexpr int size = 1 << 18;
+    static tableLookupType lookUp[size];
     TableLookUp() {}
 
-    static void inline inti(){
-        if(isInit)
-            return;
-        size = (1 << 18);
-        lookUp = new tableLookupType[size];
-        lookUp[0] = 0;
-        for (int i = 1; i < size; ++i) {
-            lookUp[i] = i*log(i);
-        }
-    }
+    static void init();
 };
 
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
@@ -176,38 +166,36 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
     return hist;
 }
 
-inline float calculateEntropyLookUp(const cv::Mat_<float> &hist)
+inline float calculateEntropyLookUp(const cv::Mat_<quint32>& hist)
 {
-    float entr{};
-    float temp{};
-    int totalNPixels = cv::sum(hist)[0];
+    auto entr = 0.0f;
+    auto totalPx = 0;
     auto nCols = hist.cols;
 
     for (int i = 0; i < nCols; ++i)
     {
-        int nPixelsAt = hist(i);
-        temp += TableLookUp::lookUp[nPixelsAt];
+        entr    += TableLookUp::lookUp[hist(0,i)];
+        totalPx += hist(0,i);
     }
-    entr = -temp + TableLookUp::lookUp[totalNPixels];
-    return entr;
+
+    return TableLookUp::lookUp[totalPx] - entr;
 }
 
-inline float calculateEntropy(const cv::Mat_<float> &hist)
+inline float calculateEntropy(const cv::Mat_<quint32>& hist)
 {
-    float entr{};
-    float temp{};
-    float totalNPixels = cv::sum(hist)[0];
-    int nCols = hist.cols;
+    auto entr = 0.0f;
+    auto totalPx = 0;
+    auto nCols = hist.cols;
+
     for (int i = 0; i < nCols; ++i)
     {
-        float nPixelsAt = hist(0, i);
+        auto nPixelsAt = hist(0,i);
+        totalPx += nPixelsAt;
         if (nPixelsAt > 0)
-        {
-            temp += nPixelsAt*log(nPixelsAt);
-        }
+            entr += nPixelsAt*log(nPixelsAt);
     }
-    entr = -1 * (temp - totalNPixels*log(totalNPixels));
-    return entr;
+
+    return totalPx*log(totalPx) - entr;
 }
 
 inline float calculateEntropyProb(const cv::Mat_<float> &hist)

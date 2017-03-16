@@ -19,6 +19,9 @@ void RandomDecisionTree::train()
 {
     double cpu_time;
     clock_t start = clock();
+
+    auto begin = std::chrono::high_resolution_clock::now();
+
     SignalSenderInterface::instance().printsend("Initializing Parameters...");
     initParams();
     SignalSenderInterface::instance().printsend("Initializing nodes...");
@@ -29,8 +32,14 @@ void RandomDecisionTree::train()
     SignalSenderInterface::instance().printsend("Constructing tree...");
     qApp->processEvents();
     constructTree();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
+
+
     cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
-    m_statLog.logTrainingTime(cpu_time);
+//    m_statLog.logTrainingTime(cpu_time);
+    m_statLog.logTrainingTime(time);
     m_statLog.dump();
     qApp->processEvents();
 }
@@ -91,7 +100,7 @@ void RandomDecisionTree::constructRootNode()
     m_statLog.logPxCount(m_nonLeafpxCount, 0);
     m_statLog.logLeafCount(0, 0);
 
-    if(m_nodes[rootId].end > TableLookUp::size)
+    if(m_nodes[rootId].end >= TableLookUp::size)
         computeDivisionAt(rootId);
     else
         computeDivisionWithLookUpAt(rootId);
@@ -144,60 +153,38 @@ void RandomDecisionTree::computeLeafHistograms()
     }
 }
 
+
 void RandomDecisionTree::computeDivisionAt(quint32 index)
 {
-    // find best teta and tau parameters for the given node
-    float px_count = m_nodes[index].end - m_nodes[index].start;
+    auto px_count = m_nodes[index].end - m_nodes[index].start;
     if (px_count == 0)
         return;
-    auto maxItr = m_params->maxIteration;
-    auto nLabels = m_params->labelCount;
-    int maxTau = 500;
-    quint8 maxFeatureIndex = 0;
-    float maxGain = std::numeric_limits<float>::lowest();
+    auto maxItr             = m_params->maxIteration;
+    auto nLabels            = m_params->labelCount;
+    auto maxTau             = std::numeric_limits<qint16>::max();
+    auto maxFeatureIndex    = std::numeric_limits<quint8>::min();
+    auto maxGain            = std::numeric_limits<float>::min();
+
     cv::Point maxTeta1, maxTeta2;
-    cv::Mat_<float> leftHist(1, nLabels);
-    cv::Mat_<float> rightHist(1, nLabels);
-    float parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
-    float leftChildEntr, rightChildEntr;
-    float avgEntropyChild;
-    float infoGain;
+    cv::Mat_<quint32> leftHist(1, nLabels);
+    cv::Mat_<quint32> rightHist(1, nLabels);
+
     auto totalFeatures = Feature::features.size();
-    int itr;
+    auto parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+    auto infoGain = 0.0f;
+    auto itr = 0;
+
+
     for (quint8 feature = 0; feature < totalFeatures; ++feature)
     {
         m_nodes[index].ftrID = feature;
         itr = 0;
         while (itr < maxItr)
         {
-            generateTeta(m_nodes[index].teta1);
-            generateTeta(m_nodes[index].teta2);
-            m_nodes[index].tau = generateTau();
-            leftHist.setTo(0.0f);
-            rightHist.setTo(0.0f);
-            int sizeLeft  = 0;
-            int sizeRight = 0;
-            auto end = m_nodes[index].end;
-            for (auto i = m_nodes[index].start; i < end; ++i)
-            {
-                auto &px = m_pixelCloud.pixels1[i];
-                auto &img = m_DS->images[px.id];
-                if (m_nodes[index].isLeft(px, img))
-                {
-                    ++leftHist(px.label);
-                    sizeLeft++;
-                }
-                else
-                {
-                    ++rightHist(px.label);
-                    sizeRight++;
-                }
-            }
-            leftChildEntr = calculateEntropy(leftHist);
-            rightChildEntr = calculateEntropy(rightHist);
-            avgEntropyChild  = leftChildEntr;
-            avgEntropyChild += rightChildEntr;
-            infoGain = parentEntr - avgEntropyChild;
+            generateParams(index);
+            computeHistograms(index, rightHist, leftHist);
+            infoGain = parentEntr - calculateEntropy(leftHist) - calculateEntropy(rightHist);
+
             // Non-improving epoch :
             if (infoGain > maxGain)
             {
@@ -212,66 +199,41 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
                 ++itr;
         }
     }
-    m_nodes[index].tau = maxTau;
-    m_nodes[index].teta1 = maxTeta1;
-    m_nodes[index].teta2 = maxTeta2;
-    m_nodes[index].ftrID = maxFeatureIndex;
+
+    setParamsFor(maxFeatureIndex, maxTeta1, maxTeta2, index, maxTau);
 }
 
 void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
 {
-    // find best teta and tau parameters for the given node
-    float px_count = m_nodes[index].end - m_nodes[index].start;
+    auto px_count = m_nodes[index].end - m_nodes[index].start;
     if (px_count == 0)
         return;
-    auto maxItr = m_params->maxIteration;
-    auto nLabels = m_params->labelCount;
-    int maxTau = 500;
-    quint8 maxFeatureIndex = 0;
-    float maxGain = std::numeric_limits<float>::lowest();
+    auto maxItr             = m_params->maxIteration;
+    auto nLabels            = m_params->labelCount;
+    auto maxTau             = std::numeric_limits<qint16>::max();
+    auto maxFeatureIndex    = std::numeric_limits<qint8>::min();
+    auto maxGain            = std::numeric_limits<float>::min();
+
     cv::Point maxTeta1, maxTeta2;
-    cv::Mat_<float> leftHist(1, nLabels);
-    cv::Mat_<float> rightHist(1, nLabels);
-    float parentEntr = calculateEntropyLookUp(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
-    float leftChildEntr, rightChildEntr;
-    float avgEntropyChild;
-    float infoGain;
+    cv::Mat_<quint32> leftHist(1, nLabels);
+    cv::Mat_<quint32> rightHist(1, nLabels);
+
     auto totalFeatures = Feature::features.size();
-    int itr;
-    for (quint8 feature = 0; feature < totalFeatures; ++feature)
+    auto parentEntr = calculateEntropyLookUp(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+    auto infoGain = 0.0f;
+    auto itr = 0;
+
+
+    for (auto feature = 0; feature < totalFeatures; ++feature)
     {
         m_nodes[index].ftrID = feature;
         itr = 0;
         while (itr < maxItr)
         {
-            generateTeta(m_nodes[index].teta1);
-            generateTeta(m_nodes[index].teta2);
-            m_nodes[index].tau = generateTau();
-            leftHist.setTo(0.0f);
-            rightHist.setTo(0.0f);
-            int sizeLeft  = 0;
-            int sizeRight = 0;
-            auto end = m_nodes[index].end;
-            for (auto i = m_nodes[index].start; i < end; ++i)
-            {
-                auto &px = m_pixelCloud.pixels1[i];
-                auto &img = m_DS->images[px.id];
-                if (m_nodes[index].isLeft(px, img))
-                {
-                    ++leftHist(px.label);
-                    sizeLeft++;
-                }
-                else
-                {
-                    ++rightHist(px.label);
-                    sizeRight++;
-                }
-            }
-            leftChildEntr = calculateEntropyLookUp(leftHist);
-            rightChildEntr = calculateEntropyLookUp(rightHist);
-            avgEntropyChild  = leftChildEntr;
-            avgEntropyChild += rightChildEntr;
-            infoGain = parentEntr - avgEntropyChild;
+            generateParams(index);
+            computeHistograms(index, rightHist, leftHist);
+            infoGain = parentEntr - calculateEntropyLookUp(leftHist) - calculateEntropyLookUp(rightHist);
+
             // Non-improving epoch :
             if (infoGain > maxGain)
             {
@@ -286,10 +248,8 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
                 ++itr;
         }
     }
-    m_nodes[index].tau = maxTau;
-    m_nodes[index].teta1 = maxTeta1;
-    m_nodes[index].teta2 = maxTeta2;
-    m_nodes[index].ftrID = maxFeatureIndex;
+
+    setParamsFor(maxFeatureIndex, maxTeta1, maxTeta2, index, maxTau);
 }
 
 void RandomDecisionTree::rearrange(quint32 index)

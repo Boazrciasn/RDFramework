@@ -100,7 +100,7 @@ public:
         srand(time(nullptr));
         m_nTreesForDetection = 1;
         createFeatures();
-        TableLookUp::inti();
+        TableLookUp::init();
     }
     SignalSenderInterface m_signalInterface;
     ~RandomDecisionForest() { m_trees.clear(); }
