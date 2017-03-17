@@ -17,9 +17,6 @@ void RandomDecisionTree::calculateImpurity(quint32 d)
 
 void RandomDecisionTree::train()
 {
-    double cpu_time;
-    clock_t start = clock();
-
     auto begin = std::chrono::high_resolution_clock::now();
 
     SignalSenderInterface::instance().printsend("Initializing Parameters...");
@@ -35,10 +32,6 @@ void RandomDecisionTree::train()
 
     auto end = std::chrono::high_resolution_clock::now();
     auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
-
-
-    cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
-//    m_statLog.logTrainingTime(cpu_time);
     m_statLog.logTrainingTime(time);
     m_statLog.dump();
     qApp->processEvents();
@@ -47,7 +40,6 @@ void RandomDecisionTree::train()
 void RandomDecisionTree::getSubSample()
 {
     quint32 imgCount = m_DS->images.size();
-    quint32 pxPerImgCount = m_params->pixelsPerImage;
     // Set Proper size
     auto size = 0;
     for (auto it = std::begin(m_DS->map_dataPerLabel); it != std::end(m_DS->map_dataPerLabel); ++it)
@@ -137,10 +129,10 @@ void RandomDecisionTree::computeLeafHistograms()
     auto leaf_node_count = 1ul << (m_height - 1) ;
     for (auto node_id = (tot_node_count - leaf_node_count); node_id < tot_node_count; ++node_id)
     {
-        Node parent = m_nodes[(node_id + 1) / 2 - 1];
-        quint32 leftCount = parent.leftCount;
-        quint32 rightCount = parent.end - parent.start - leftCount;
-        int mult = (node_id + 1) % 2; // 0 if left, 1 if right
+        auto& parent = m_nodes[(node_id + 1) / 2 - 1];
+        auto leftCount = parent.leftCount;
+        auto rightCount = parent.end - parent.start - leftCount;
+        auto mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
         auto pxCount = start - end;
@@ -165,9 +157,9 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     auto maxFeatureIndex    = std::numeric_limits<quint8>::min();
     auto maxGain            = std::numeric_limits<float>::min();
 
-    cv::Point maxTeta1, maxTeta2;
-    cv::Mat_<quint32> leftHist(1, nLabels);
-    cv::Mat_<quint32> rightHist(1, nLabels);
+    cv::Point maxTeta1{}, maxTeta2{};
+    QVector<quint32> leftHist(nLabels);
+    QVector<quint32> rightHist(nLabels);
 
     auto totalFeatures = Feature::features.size();
     auto parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
@@ -214,9 +206,9 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
     auto maxFeatureIndex    = std::numeric_limits<qint8>::min();
     auto maxGain            = std::numeric_limits<float>::min();
 
-    cv::Point maxTeta1, maxTeta2;
-    cv::Mat_<quint32> leftHist(1, nLabels);
-    cv::Mat_<quint32> rightHist(1, nLabels);
+    cv::Point maxTeta1{}, maxTeta2{};
+    QVector<quint32> leftHist(nLabels);
+    QVector<quint32> rightHist(nLabels);
 
     auto totalFeatures = Feature::features.size();
     auto parentEntr = calculateEntropyLookUp(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));

@@ -166,30 +166,30 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
     return hist;
 }
 
-inline float calculateEntropyLookUp(const cv::Mat_<quint32>& hist)
+inline float calculateEntropyLookUp(const QVector<quint32>& hist)
 {
     auto entr = 0.0f;
     auto totalPx = 0;
-    auto nCols = hist.cols;
+    auto bins = hist.size();
 
-    for (int i = 0; i < nCols; ++i)
+    for (int i = 0; i < bins; ++i)
     {
-        entr    += TableLookUp::lookUp[hist(0,i)];
-        totalPx += hist(0,i);
+        entr    += TableLookUp::lookUp[hist[i]];
+        totalPx += hist[i];
     }
 
     return TableLookUp::lookUp[totalPx] - entr;
 }
 
-inline float calculateEntropy(const cv::Mat_<quint32>& hist)
+inline float calculateEntropy(const QVector<quint32>& hist)
 {
     auto entr = 0.0f;
     auto totalPx = 0;
-    auto nCols = hist.cols;
+    auto bins = hist.size();
 
-    for (int i = 0; i < nCols; ++i)
+    for (int i = 0; i < bins; ++i)
     {
-        auto nPixelsAt = hist(0,i);
+        auto nPixelsAt = hist[i];
         totalPx += nPixelsAt;
         if (nPixelsAt > 0)
             entr += nPixelsAt*log(nPixelsAt);
@@ -213,11 +213,6 @@ inline float calculateEntropyProb(const cv::Mat_<float> &hist)
         }
     }
     return entr;
-}
-
-inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
-{
-    return calculateEntropyLookUp(createHistogram(pixels, labelCount));
 }
 
 inline int getMaxLikelihoodIndex(const QVector<float> &hist)

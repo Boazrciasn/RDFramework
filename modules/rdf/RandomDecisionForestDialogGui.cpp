@@ -128,15 +128,10 @@ void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
     int lowThreshold = 50;
     int ratio = 3;
     int kernel_size = 3;
-    int count = 0;
     for (auto &img : images)
     {
-        //        cv::imshow( "window_fray", img);
         cv::GaussianBlur(img, img, cv::Size(11, 11), 0);
         cv::Canny(img, img, lowThreshold, lowThreshold * ratio, kernel_size);
-        //        std::cout << m_trainDataReaderGUI->DS()->m_labels[count] << std::endl;
-        //        cv::imshow( "window_name", img);
-        //        cv::waitKey();
     }
 }
 

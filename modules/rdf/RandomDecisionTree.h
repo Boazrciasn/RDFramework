@@ -219,12 +219,13 @@ class RandomDecisionTree
         hist /= (end - start);
         return hist;
     }
-    cv::Mat_<quint32> inline computeHistogram(quint32 start, quint32 end, int labelCount)
-    {
-        cv::Mat_<quint32> hist = cv::Mat_<quint32>::zeros(1, labelCount);
 
-        for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
-            ++hist(m_pixelCloud.pixels1[pxIndex].label);
+    QVector<quint32> inline computeHistogram(quint32 start, quint32 end, int labelCount)
+    {
+        QVector<quint32> hist(labelCount);
+        hist.fill(0);
+        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
+            ++hist[m_pixelCloud.pixels1[pxIndex].label];
         return hist;
     }
 
@@ -247,12 +248,12 @@ class RandomDecisionTree
         m_nodes[index].tau = generateTau();
     }
 
-    inline void computeHistograms(quint32 index, cv::Mat_<quint32>& rightHist, cv::Mat_<quint32>& leftHist)
+    inline void computeHistograms(quint32 index, QVector<quint32>& rightHist, QVector<quint32>& leftHist)
     {
-        leftHist = cv::Mat_<quint32>::zeros(1, leftHist.cols);
-        rightHist = cv::Mat_<quint32>::zeros(1, rightHist.cols);
-        int sizeLeft  = 0;
-        int sizeRight = 0;
+        leftHist.fill(0);
+        rightHist.fill(0);
+        auto sizeLeft  = 0;
+        auto sizeRight = 0;
         auto end = m_nodes[index].end;
 
         for (auto i = m_nodes[index].start; i < end; ++i)
@@ -261,12 +262,12 @@ class RandomDecisionTree
             auto &img = m_DS->images[px.id];
             if (m_nodes[index].isLeft(px, img))
             {
-                ++leftHist(px.label);
+                ++leftHist[px.label];
                 sizeLeft++;
             }
             else
             {
-                ++rightHist(px.label);
+                ++rightHist[px.label];
                 sizeRight++;
             }
         }
