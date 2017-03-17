@@ -80,7 +80,14 @@ void RandomDecisionForestDialogGui::onTrain()
 void RandomDecisionForestDialogGui::onTest()
 {
     m_forest.setNTreesForDetection(m_nTreesForDetection);
+    m_forest.setDataSet(m_dataReaderGUI->DS());
+
+    auto begin = std::chrono::high_resolution_clock::now();
     auto accuracy = m_forest.testForest();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
+
+    printMsgToTestScreen("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
     printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
 }
 
@@ -172,7 +179,6 @@ void RandomDecisionForestDialogGui::onLoad()
                         &selfilter
                     );
     m_forest.loadForest(fname);
-    m_forest.setDataSet(m_dataReaderGUI->DS());
     //    m_forest->printForest();
     qDebug() << "LOAD FOREST PRINTED" ;
 }

@@ -56,7 +56,6 @@ float RandomDecisionForest::testForest()
     qApp->processEvents();
     if (totalImgs == 0) return 0;
 
-    auto begin = std::chrono::high_resolution_clock::now();
     std::atomic<int> posCounter(0);
     tbb::parallel_for(0, totalImgs, 1, [ =, &posCounter ](int nodeIndex)
     {
@@ -66,12 +65,6 @@ float RandomDecisionForest::testForest()
         if (label == m_DS->labels[nodeIndex])
             ++posCounter;
     });
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
-    SignalSenderInterface::instance().printsend("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
-    qApp->processEvents();
-
     return ((float) posCounter) / ((float)totalImgs);
 }
 
