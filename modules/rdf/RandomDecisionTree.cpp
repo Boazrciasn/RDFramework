@@ -166,14 +166,13 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     auto infoGain = 0.0f;
     auto itr = 0;
 
-
-    for (quint8 feature = 0; feature < totalFeatures; ++feature)
+    while (itr < maxItr)
     {
-        m_nodes[index].ftrID = feature;
-        itr = 0;
-        while (itr < maxItr)
+        generateParams(index);
+
+        for (quint8 feature = 0; feature < totalFeatures; ++feature)
         {
-            generateParams(index);
+            m_nodes[index].ftrID = feature;
             computeHistograms(index, rightHist, leftHist);
             infoGain = parentEntr - calculateEntropy(leftHist) - calculateEntropy(rightHist);
 
@@ -185,11 +184,10 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
                 maxTau   = m_nodes[index].tau;
                 maxGain  = infoGain;
                 maxFeatureIndex = feature;
-                itr = 0 ;
+                itr = -1 ;
             }
-            else
-                ++itr;
         }
+        ++itr;
     }
 
     setParamsFor(maxFeatureIndex, maxTeta1, maxTeta2, index, maxTau);
@@ -216,13 +214,14 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
     auto itr = 0;
 
 
-    for (auto feature = 0; feature < totalFeatures; ++feature)
+
+    while (itr < maxItr)
     {
-        m_nodes[index].ftrID = feature;
-        itr = 0;
-        while (itr < maxItr)
+        generateParams(index);
+
+        for (quint8 feature = 0; feature < totalFeatures; ++feature)
         {
-            generateParams(index);
+            m_nodes[index].ftrID = feature;
             computeHistograms(index, rightHist, leftHist);
             infoGain = parentEntr - calculateEntropyLookUp(leftHist) - calculateEntropyLookUp(rightHist);
 
@@ -234,11 +233,10 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
                 maxTau   = m_nodes[index].tau;
                 maxGain  = infoGain;
                 maxFeatureIndex = feature;
-                itr = 0 ;
+                itr = -1 ;
             }
-            else
-                ++itr;
         }
+        ++itr;
     }
 
     setParamsFor(maxFeatureIndex, maxTeta1, maxTeta2, index, maxTau);

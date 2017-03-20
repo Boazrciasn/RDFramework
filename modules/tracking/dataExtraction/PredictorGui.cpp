@@ -61,14 +61,6 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
     if (!m_forest)
         return src.toImage();
 
-    int scale = 1;
-    int delta = 0;
-    int ddepth = CV_16S;
-
-    /// Generate grad_x and grad_y
-    cv::Mat grad_x, grad_y;
-    cv::Mat abs_grad_x, abs_grad_y;
-
     cv::Mat srcImg = Util::toCv(src.toImage(), CV_8UC4);
     cv::Mat map = cv::Mat::zeros(srcImg.rows, srcImg.cols, CV_8UC3);
     cv::Mat srcGray;
@@ -81,15 +73,8 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
         for (int j = step / 2; j < map.cols - 1; j += step)
         {
             cv::Mat roi(srcGray, cv::Rect(j, i, roi_width, roi_height));
-            cv::resize(roi, roi, cv::Size(16, 32));
-
-            cv::Sobel( roi, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT );
-            cv::convertScaleAbs( grad_x, abs_grad_x );
-
-            cv::Sobel( roi, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT );
-            cv::convertScaleAbs( grad_y, abs_grad_y );
-
-            cv::addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, roi );
+            // TODO: pas resize params
+            cv::resize(roi, roi, cv::Size(100, 100));
 
             int decision;
             float confidence;
@@ -109,6 +94,8 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
             roi.release();
         }
     }
+
+    cv::imshow("test",map);
 
     QImage mapMask = Util::Mat2QImage(map);
     return mapMask;

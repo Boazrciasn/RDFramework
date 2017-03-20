@@ -107,11 +107,6 @@ void ReaderGUI::load()
         for(auto& img : m_DS->images)
             cv::resize(img,img, cv::Size(100,100));
 
-        if (!m_DS->images.empty())
-        {
-            ui->LoadedDataset_label->setText(m_dirStandard);
-            emit imagesLoaded(true);
-        }
         break;
     }
     case Type_MNIST:
@@ -120,18 +115,8 @@ void ReaderGUI::load()
         if (!m_dirMNIST.isEmpty())
         {
             m_reader->readImages(m_dirMNIST, m_DS->images, m_dFlag);
-            if (!m_DS->images.empty())
-            {
-                ui->LoadedDataset_label->setText(m_dirMNIST);
-                emit imagesLoaded(true);
-            }
             m_dirMNIST.replace(QRegExp("images.idx3"), "labels.idx1");
             m_reader->readLabels(m_dirMNIST, m_DS->labels, m_dFlag);
-            if (!m_DS->labels.empty())
-            {
-                ui->labelFilepath_label->setText(m_dirMNIST);
-                emit labelsLoaded(true);
-            }
         }
         break;
     }
@@ -143,6 +128,20 @@ void ReaderGUI::load()
     cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
     qDebug() << "Load Time: " << cpu_time;
     countLabels();
+
+
+    // Emit signals
+    if (!m_DS->images.empty())
+    {
+        ui->LoadedDataset_label->setText(m_dirStandard);
+        emit imagesLoaded(true);
+    }
+
+    if (!m_DS->labels.empty())
+    {
+        ui->labelFilepath_label->setText(m_dirMNIST);
+        emit labelsLoaded(true);
+    }
 }
 
 void ReaderGUI::dataTypeChanged(int index)

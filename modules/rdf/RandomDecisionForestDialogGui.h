@@ -41,9 +41,8 @@ class RandomDecisionForestDialogGui : public QDialog
 
     void applySobel(std::vector<cv::Mat> &images);
     void applyCanny(std::vector<cv::Mat> &images);
-
-
-  public:
+    
+public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
 
