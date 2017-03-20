@@ -39,7 +39,7 @@ class RandomDecisionTree
     quint32 m_probe_distanceY{};
 
     std::vector<Node> m_nodes;
-    std::vector<MatFeature> m_features;
+    tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
     RDFParams *m_params;
@@ -153,10 +153,11 @@ class RandomDecisionTree
         auto pxCount = m_nodes[index].end - m_nodes[index].start;
         if (pxCount == 0)
         {
-            if (mult == 0)
-                m_nodes[parentId].tau = -500; // Supress all nodes to right if left node is empty
-            else
-                m_nodes[parentId].tau = 500;
+            return;
+//            if (mult == 0)
+//                m_nodes[parentId].tau = -500; // Supress all nodes to right if left node is empty
+//            else
+//                m_nodes[parentId].tau = 500;
         }
         else if (m_nodes[parentId].tau == 500)
         {
@@ -183,6 +184,7 @@ class RandomDecisionTree
                     computeDivisionAt(index);
                 else
                     computeDivisionWithLookUpAt(index);
+                ++m_featureFreq[m_nodes[index].ftrID];
             }
         }
     }

@@ -9,7 +9,8 @@ public:
     static int max_w;
     static int max_h;
     Feature();
-    static std::vector<MatFeature> features;
+    static QVector<MatFeature> features;
+    static QVector<QString> features_str;
     static void init();
 };
 

@@ -61,6 +61,9 @@
         <property name="checkable">
          <bool>true</bool>
         </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
         <layout class="QFormLayout" name="formLayout_3">
          <property name="labelAlignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -165,6 +168,9 @@
         </property>
         <property name="checkable">
          <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
         <layout class="QFormLayout" name="formLayout">
          <property name="labelAlignment">

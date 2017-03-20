@@ -17,8 +17,11 @@ void RandomDecisionTree::calculateImpurity(quint32 d)
 
 void RandomDecisionTree::train()
 {
-    auto begin = std::chrono::high_resolution_clock::now();
+    // Intit zero freq
+    m_featureFreq.resize(Feature::features.size());
+    std::fill (m_featureFreq.begin(),m_featureFreq.end(),0);
 
+    auto begin = std::chrono::high_resolution_clock::now();
     SignalSenderInterface::instance().printsend("Initializing Parameters...");
     initParams();
     SignalSenderInterface::instance().printsend("Initializing nodes...");
@@ -32,6 +35,7 @@ void RandomDecisionTree::train()
 
     auto end = std::chrono::high_resolution_clock::now();
     auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
+    m_statLog.logFeatureFreq(m_featureFreq);
     m_statLog.logTrainingTime(time);
     m_statLog.dump();
     qApp->processEvents();
@@ -97,6 +101,7 @@ void RandomDecisionTree::constructRootNode()
     else
         computeDivisionWithLookUpAt(rootId);
 
+    ++m_featureFreq[m_nodes[rootId].ftrID];
     rearrange(rootId);
     calculateImpurity(0);
 }
