@@ -68,6 +68,45 @@ float RandomDecisionForest::testForest()
     return ((float) posCounter) / ((float)totalImgs);
 }
 
+float RandomDecisionForest::testForest(tbb::concurrent_vector<cv::Mat>& output)
+{
+    // TODO: it should be removed from here
+    if (!m_DS->isProcessed)
+    {
+        SignalSenderInterface::instance().printsend("Images are not processed! processing images..." );
+        qApp->processEvents();
+        preprocessDS();
+    }
+
+    int totalImgs = m_DS->images.size();
+    SignalSenderInterface::instance().printsend("Number of Images:" + QString::number(totalImgs));
+    qApp->processEvents();
+    if (totalImgs == 0) return 0.0f;
+
+    std::atomic<int> posCounter(0);
+    tbb::parallel_for(0, totalImgs, 1, [ =, &posCounter, &output ](int nodeIndex)
+    {
+        cv::Mat labels{};
+        cv::Mat_<float> confs{};
+        cv::Mat_<float> layered = getLayeredHist(m_DS->images[nodeIndex]);
+
+        cv::Mat_<float> probHist;
+        getCumulativeProbHist(probHist, layered);
+        double max;
+        cv::Point max_loc;
+        cv::minMaxLoc(probHist, NULL, &max, NULL, &max_loc);
+        auto label = max_loc.x;
+
+        if (label == m_DS->labels[nodeIndex])
+            ++posCounter;
+
+        getLabelAndConfMat(layered, labels, confs);
+        output[nodeIndex] = labels;
+    });
+
+    return ((float) posCounter) / ((float)totalImgs);
+}
+
 void RandomDecisionForest::detect(cv::Mat &roi, int &label, float &conf)
 {
     cv::Mat_<float> probHist;

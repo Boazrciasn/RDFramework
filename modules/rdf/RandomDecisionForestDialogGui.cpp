@@ -82,10 +82,33 @@ void RandomDecisionForestDialogGui::onTrain()
 void RandomDecisionForestDialogGui::onTest()
 {
     m_forest.setNTreesForDetection(m_nTreesForDetection);
+    m_dataReaderGUI->DS()->isBordered = true;
     m_forest.setDataSet(m_dataReaderGUI->DS());
 
     auto begin = std::chrono::high_resolution_clock::now();
-    auto accuracy = m_forest.testForest();
+//    auto accuracy = m_forest.testForest();
+
+
+    // ///////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
+    // New Test
+    auto size = m_dataReaderGUI->DS()->images.size();
+    tbb::concurrent_vector<cv::Mat> output(size);
+    std::vector<cv::Mat> results{};
+
+    auto accuracy = m_forest.testForest(output);
+
+    for(auto i = 0; i <  size; ++i)
+    {
+        results.push_back(m_dataReaderGUI->DS()->images[i]);
+        results.push_back(output[i]);
+    }
+
+    m_displayImagesGUI->setImageSet(results);
+    // ///////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
+    /// \brief end
+    ///
     auto end = std::chrono::high_resolution_clock::now();
     auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
 

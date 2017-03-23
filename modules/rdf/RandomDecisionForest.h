@@ -25,6 +25,7 @@ class RandomDecisionForest
 public:
     bool trainForest();
     float testForest();
+    float testForest(tbb::concurrent_vector<cv::Mat>& output);
     void detect(cv::Mat &roi, int &label, float &conf);
     cv::Mat_<float> getLayeredHist(cv::Mat &roi);
     void getCumulativeProbHist(cv::Mat_<float> &probHist, const cv::Mat_<float> &layeredHist);

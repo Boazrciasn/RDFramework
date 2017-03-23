@@ -105,7 +105,7 @@ void ReaderGUI::load()
 
         // TODO: move resize to proper place
         for(auto& img : m_DS->images)
-            cv::resize(img,img, cv::Size(100,100));
+            cv::resize(img,img, cv::Size(50,50));
 
         break;
     }
