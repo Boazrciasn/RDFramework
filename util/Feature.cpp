@@ -16,87 +16,88 @@ void Feature::init(){
         return;
     isInit = true;
 
+    max_w = 4;
+    max_h = 4;
+
+    float ratio = 2.0f/(max_w*max_h);
+
     // point
     MatFeature pnt = MatFeature::ones(1, 1);
-    QString pnt_str = "  ---  \n"
-                      "|  -  |\n"
-                      "  ---  \n";
-
 
     // edges
-    MatFeature edge = MatFeature::ones(6, 6);
-    edge(cv::Range(edge.rows / 2, edge.rows), cv::Range::all()) = -1;
-    QString edge_str = "  ---   ---   --- \n"
-                       "|  -  |  -  |  -  | \n"
-                       "  ---   ---   --- \n"
-                       "| + | + | + | \n"
-                       "  ---   ---   --- \n";
-
-    QString edge_str_t = "  ---   --- \n"
-                         "|  -  | + | \n"
-                         "  ---   --- \n"
-                         "|  -  | + | \n"
-                         "  ---   --- \n"
-                         "|  -  | + | \n"
-                         "  ---   --- \n";
-
+    MatFeature edge = MatFeature::ones(max_h, max_w);
+    edge(cv::Range(max_h / 2, max_h), cv::Range::all()) = -1;
+    edge *= ratio;
 
 
     // lines
-    MatFeature line = MatFeature::ones(6, 6);
-    line(cv::Range(line.rows / 3, line.rows / 2), cv::Range::all()) = -1;
-    QString line_str = "  ---   ---   --- \n"
-                       "| + | + | + | \n"
-                       "  ---   ---   --- \n"
-                       "|  -  |  -  |  -  | \n"
-                       "  ---   ---   --- \n"
-                       "| + | + | + | \n"
-                       "  ---   ---   --- \n";
-
-
-    QString line_str_t = "  ---   ---   --- \n"
-                         "| + |  -  | + | \n"
-                         "  ---   ---   --- \n"
-                         "| + |  -  | + | \n"
-                         "  ---   ---   --- \n"
-                         "| + |  -  | + | \n"
-                         "  ---   ---   --- \n";
-
-
+    MatFeature line = MatFeature::ones(max_h, max_w);
+    line(cv::Range(max_h / 3, (max_h / 3) + max_h/2), cv::Range::all()) = -1;
+    line *= ratio;
 
 
     // four-rectangle
-    MatFeature rect = MatFeature::ones(6, 6);
-    rect(cv::Range(0, rect.rows / 2), cv::Range(rect.cols / 2, rect.cols)) = -1;
-    rect(cv::Range(rect.rows / 2, rect.rows), cv::Range(0, rect.cols / 2)) = -1;
-    QString rect_str = " ---  ---   ---   --- \n"
-                       "| + | + | - | - | \n"
-                       " ---  ---   ---   --- \n"
-                       "| + | + | - | - | \n"
-                       " ---  ---  ---  --- \n"
-                       "| - | - | + | + | \n"
-                       "  ---   ---  ---  --- \n"
-                       "| - | - | + |  + |\n"
-                       "  ---   ---  ---  --- \n";
+    MatFeature rect = MatFeature::ones(max_h,max_w);
+    rect(cv::Range(0, max_h / 2), cv::Range(max_w/ 2, max_w)) = -1;
+    rect(cv::Range(max_h / 2, max_h), cv::Range(0, max_w / 2)) = -1;
+    rect *= ratio;
 
-    max_w = 6;
-    max_h = 6;
+    // Sobel
+    MatFeature sobel_edge = (MatFeature(3, 3) << 1, 2, 1, 0, 0, 0, -1, -2, -1);
+
 
     features.push_back(pnt);
-    features_str.push_back(pnt_str);
+    features_str.push_back(getVisual(pnt));
 
     features.push_back(edge);
-    features_str.push_back(edge_str);
+    features_str.push_back(getVisual(edge));
 
     features.push_back(edge.t());
-    features_str.push_back(edge_str_t);
+    features_str.push_back(getVisual(edge.t()));
 
     features.push_back(line);
-    features_str.push_back(line_str);
+    features_str.push_back(getVisual(line));
 
     features.push_back(line.t());
-    features_str.push_back(line_str_t);
+    features_str.push_back(getVisual(line.t()));
 
     features.push_back(rect);
-    features_str.push_back(rect_str);
+        features_str.push_back(getVisual(rect));
+
+
+    features.push_back(sobel_edge);
+    features_str.push_back(getVisual(sobel_edge));
+
+    features.push_back(sobel_edge.t());
+    features_str.push_back(getVisual(sobel_edge.t()));
+}
+
+QString Feature::getVisual(const MatFeature feature)
+{
+    QString visual = "";
+    auto h = feature.rows;
+    auto w = feature.cols;
+
+    for (int row = 0; row < h; ++row) {
+        visual.append(getSeperator(w));
+        for (int col = 0; col < w; ++col)
+            if(feature(row,col) < 0)
+                visual.append("| *  ");
+            else if(feature(row,col) > 0)
+                visual.append("| + ");
+            else
+                visual.append("| -- ");
+        visual.append("|\n");
+    }
+    visual.append(getSeperator(w));
+    return visual;
+}
+
+QString Feature::getSeperator(const int width)
+{
+    QString seperator = "\n";
+    for (int i = 0; i < width; ++i) {
+        seperator.prepend(" ---- ");
+    }
+    return seperator;
 }

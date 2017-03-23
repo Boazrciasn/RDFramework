@@ -17,7 +17,7 @@ using IntMat            = cv::Mat_<qint32>;
 using FloatMat          = cv::Mat_<float>;
 using DoubleMat         = cv::Mat_<double>;
 
-using featureType       = char;
+using featureType       = float;
 using MatFeature        = cv::Mat_<featureType>;
 
 using tableLookupType   = float;
