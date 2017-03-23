@@ -46,16 +46,8 @@ struct Node
         auto fr1_y = teta1.y + p.position.y;
         auto fr2_x = teta2.x + p.position.x;
         auto fr2_y = teta2.y + p.position.y;
-        int fr1{};
-        int fr2{};
-
-//        for (int i = 0; i < row; ++i)
-//            for (int j = 0; j < col; ++j)
-//            {
-//                fr1 += feature(i,j)*img.at<uchar>(fr1_y + i, fr1_x + j);
-//                fr2 += feature(i,j)*img.at<uchar>(fr2_y + i, fr2_x + j);
-//            }
-
+        featureType fr1{};
+        featureType fr2{};
 
         uchar* imgRow1;
         uchar* imgRow2;
@@ -74,17 +66,6 @@ struct Node
 
         return (fr1 - fr2) <= tau;
     }
-
-//    bool inline isLeft(Pixel &p, cv::Mat &img)
-//    {
-//        qint16 new_teta1R = teta1.y + p.position.y;
-//        qint16 new_teta1C = teta1.x + p.position.x;
-//        qint16 intensity1 = img.at<uchar>(new_teta1R, new_teta1C);
-//        qint16 new_teta2R = teta2.y + p.position.y;
-//        qint16 new_teta2C = teta2.x + p.position.x;
-//        qint16 intensity2 = img.at<uchar>(new_teta2R, new_teta2C);
-//        return (intensity1 - intensity2) <= tau;
-//    }
 
 private:
     friend class cereal::access;
