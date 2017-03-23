@@ -85,6 +85,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>horizontalScrollBar_imageIndex</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>DisplayGUI</receiver>
+   <slot>onSliderMove(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>414</x>
+     <y>359</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>436</x>
+     <y>520</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onSliderMove(int)</slot>
