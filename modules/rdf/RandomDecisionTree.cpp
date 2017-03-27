@@ -57,6 +57,8 @@ void RandomDecisionTree::getSubSample()
         auto label  = m_DS->labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
+
+        auto sum = cv::sum(image)[0];
         quint16 pxCount = m_params->pixelsPerLabelImage[label];
         for (int k = 0; k < pxCount; ++k)
         {
@@ -65,10 +67,13 @@ void RandomDecisionTree::getSubSample()
             quint8 intensity = 0;
             while (intensity == 0)
             {
-                // FIXME: take into acount feature pading (replace 6)
-                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY + Feature::max_h;
-                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX + Feature::max_w;
+                row = (m_generator() % (nRows - 2 * (m_probe_distanceY + Feature::max_h))) + m_probe_distanceY + Feature::max_h;
+                col = (m_generator() % (nCols - 2 * (m_probe_distanceX + Feature::max_w))) + m_probe_distanceX + Feature::max_w;
                 intensity = image.at<uchar>(row, col);
+
+//                qDebug() << id << " " << intensity << " sum: " << sum;
+                if(sum < 25500)
+                    break;
             }
             auto &px = m_pixelCloud.pixels1[last + k];
             px.id = id;
