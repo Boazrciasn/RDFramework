@@ -60,6 +60,11 @@ void ParticleFilter::processImage()
         return 0;
     };
 
+    std::vector<Process*> processes;
+    Sobel* proc = new Sobel(3, 3, CV_SCHARR);
+    processes.push_back(proc);
+    PreProcess::doBatchPreProcessSingle(m_img,processes);
+
     for (int i = 0; i < m_num_iters; ++i)
     {
         // resample particles

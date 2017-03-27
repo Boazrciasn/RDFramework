@@ -116,6 +116,12 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
             cv::Mat srcImg = Util::toCv(m_originalPix.toImage(), CV_8UC4);
             cv::Mat srcGray;
             cv::cvtColor(srcImg, srcGray, CV_RGB2GRAY);
+
+            std::vector<Process*> processes;
+            Sobel* proc = new Sobel(3, 3, CV_SCHARR);
+            processes.push_back(proc);
+            PreProcess::doBatchPreProcessSingle(srcGray,processes);
+
             cv::Mat roiGray(srcGray,cv::Rect(m_TargetROI.x(),m_TargetROI.y(),m_TargetROI.width(),m_TargetROI.height()));
             cv::resize(roiGray,roiGray, cv::Size(50,50));
             cv::imshow("ROI", roiGray);

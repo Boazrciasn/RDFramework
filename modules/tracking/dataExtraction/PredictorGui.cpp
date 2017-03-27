@@ -61,10 +61,17 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
     if (!m_forest)
         return src.toImage();
 
+    m_forest->setNTreesForDetection(3);
     cv::Mat srcImg = Util::toCv(src.toImage(), CV_8UC4);
     cv::Mat map = cv::Mat::zeros(srcImg.rows, srcImg.cols, CV_8UC3);
     cv::Mat srcGray;
     cv::cvtColor(srcImg, srcGray, CV_RGB2GRAY);
+
+    std::vector<Process*> processes;
+    Sobel* proc = new Sobel(3, 3, CV_SCHARR);
+    processes.push_back(proc);
+    PreProcess::doBatchPreProcessSingle(srcGray,processes);
+
     cv::copyMakeBorder(srcGray, srcGray, roi_height / 2, roi_height / 2, roi_width / 2, roi_width / 2, cv::BORDER_REFLECT);
 
     map.setTo(cv::Scalar(0, 255, 0));
@@ -74,7 +81,7 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
         {
             cv::Mat roi(srcGray, cv::Rect(j, i, roi_width, roi_height));
             // TODO: pas resize params
-            cv::resize(roi, roi, cv::Size(100, 100));
+            cv::resize(roi, roi, cv::Size(50, 50));
 
             int decision;
             float confidence;
@@ -95,7 +102,14 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
         }
     }
 
-    cv::imshow("test",map);
+
+
+//    cv::Mat_<float> hist = m_forest->getLayeredHist(srcGray);
+//    cv::Mat_<float> conf;
+//    cv::Mat lbl;
+//    m_forest->getLabelAndConfMat(hist,lbl,conf);
+
+//    cv::imshow("test",lbl);
 
     QImage mapMask = Util::Mat2QImage(map);
     return mapMask;
