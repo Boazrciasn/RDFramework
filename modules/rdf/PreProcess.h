@@ -175,6 +175,12 @@ class PreProcess
             p->processImg(img);
     }
 
+    static void doBatchPreProcessSingle(cv::Mat &img, std::vector<Process *> processes)
+    {
+        for (auto &p : processes)
+            p->processImg(img);
+    }
+
   private:
     std::vector<Process *> m_processes;
 };
