@@ -65,11 +65,11 @@ void Feature::init(){
         features_str.push_back(getVisual(rect));
 
 
-    features.push_back(sobel_edge);
-    features_str.push_back(getVisual(sobel_edge));
+//    features.push_back(sobel_edge);
+//    features_str.push_back(getVisual(sobel_edge));
 
-    features.push_back(sobel_edge.t());
-    features_str.push_back(getVisual(sobel_edge.t()));
+//    features.push_back(sobel_edge.t());
+//    features_str.push_back(getVisual(sobel_edge.t()));
 }
 
 QString Feature::getVisual(const MatFeature feature)

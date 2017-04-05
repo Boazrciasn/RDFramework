@@ -64,6 +64,8 @@ struct Node
             }
         }
 
+        if(ftrID > 0)
+            return fr1 <= tau;
         return (fr1 - fr2) <= tau;
     }
 

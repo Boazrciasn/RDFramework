@@ -73,10 +73,6 @@ void ReaderGUI::load()
         for(auto i = 0; i < tot_pos; ++i)
             m_DS->labels.push_back(0);
 
-//        // TODO: move resize to proper place
-//        for(auto& img : m_DS->images)
-//            cv::resize(img,img,cv::Size(196,196));
-
         std::vector<cv::Mat> tm_images;
         m_reader->readImages(neg_data, tm_images,m_dFlag);
 
@@ -98,10 +94,29 @@ void ReaderGUI::load()
                 m_DS->images.push_back(img);
         }
 
+
 //        m_reader->readImages(neg_data, m_DS->images,m_dFlag);
         tot_neg = m_DS->images.size() - tot_pos;
         for(auto i = 0; i < tot_neg; ++i)
             m_DS->labels.push_back(1);
+
+
+//        QString pos_ = m_dirStandard + "/dataSaved/pos/pos_";
+//        QString neg_ = m_dirStandard + "/dataSaved/neg/neg_";
+
+
+//        for(auto i = 0; i < tot_pos; ++i)
+//        {
+//            std::string file_pos = (pos_ + QString::number(i) + ".jpg").toStdString();
+//            cv::imwrite(file_pos, m_DS->images[i]);
+//        }
+
+//        for(auto i = tot_pos; i < tot_pos + tot_neg; ++i)
+//        {
+//            std::string file_neg = (neg_ + QString::number(i-tot_pos) + ".jpg").toStdString();
+//            cv::imwrite(file_neg, m_DS->images[i]);
+//        }
+
 
         // TODO: move resize to proper place
         for(auto& img : m_DS->images)
