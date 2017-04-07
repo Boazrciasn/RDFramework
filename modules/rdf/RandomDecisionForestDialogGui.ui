@@ -215,7 +215,7 @@
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
                <property name="maximum">
-                <number>256</number>
+                <number>500</number>
                </property>
               </widget>
              </item>

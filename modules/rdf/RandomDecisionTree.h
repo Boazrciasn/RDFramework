@@ -116,6 +116,7 @@ class RandomDecisionTree
 
 
   private:
+    void getSubSampleSingleFrame();
     void getSubSample();
     void constructTree();
     void constructRootNode();
