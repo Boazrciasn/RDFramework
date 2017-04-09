@@ -109,6 +109,11 @@ class RandomDecisionTree
         m_tauProbDistribution = std::uniform_int_distribution<>(-tauRange, tauRange);
     }
 
+    void inline setTauRangePos(int tauRange)
+    {
+        m_tauProbDistribution = std::uniform_int_distribution<>(0, tauRange);
+    }
+
     ~RandomDecisionTree()
     {
         m_nodes.clear();
@@ -132,7 +137,10 @@ class RandomDecisionTree
         setProbeDistanceY(m_params->probDistY);
         setMaxDepth(m_params->maxDepth);
         setMinimumLeafPixelCount(m_params->minLeafPixels);
-        setTauRange(m_params->tauRange);
+        if(m_params->isPositiveRange)
+            setTauRangePos(m_params->tauRange);
+        else
+            setTauRange(m_params->tauRange);
     }
 
     void inline initNodes()

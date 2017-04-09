@@ -47,22 +47,23 @@ void ReaderGUI::countLabels()
 
 void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect>> &frameRects)
 {
-//    QString dir = "/home/neko/Desktop/trackingData/DATA_CAR1/RDFData/";
     QFile inputFile(dir + "/LOG_Video_Stream_2.txt");
+    int max_img = ui->max_img_load_spinBox->value();
+    auto drawRect = ui->draw_rect_checkBox->isChecked();
+    auto load_color = ui->Load_color_comboBox->currentIndex();
     if (inputFile.open(QIODevice::ReadOnly))
     {
        QTextStream in(&inputFile);
        QString line;
-       while (!in.atEnd(), images.size() < 1000)
+       while (!in.atEnd())
        {
           line = in.readLine();
           if(line.contains("frame_"))
           {
             QStringList file_ = line.trimmed().split(" ");
             QString img_file = dir + "/frames/" + file_[0] + file_[1] +".png";
-            cv::Mat img = cv::imread(img_file.toStdString(),CV_LOAD_IMAGE_COLOR); //, CV_LOAD_IMAGE_GRAYSCALE);
+            cv::Mat img = cv::imread(img_file.toStdString(),load_color);
             cv::resize(img,img,cv::Size(),0.5,0.5);
-//            cv::cvtColor(img,img,CV_BGR2Lab);
 
             QVector<QRect> rects;
             line = in.readLine();
@@ -73,7 +74,8 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
                 if(count%2 == 1 && rect[2].toInt()/2 < 100 && rect[3].toInt()/2 < 100)
                 {
                     rects.push_back(QRect(rect[0].toInt()/2,rect[1].toInt()/2,rect[2].toInt()/2,rect[3].toInt()/2));
-//                    cv::rectangle(img,cv::Rect(rect[0].toInt()/2,rect[1].toInt()/2,rect[2].toInt()/2,rect[3].toInt()/2), cv::Scalar(200,0,0),2);
+                    if(drawRect)
+                        cv::rectangle(img,cv::Rect(rect[0].toInt()/2,rect[1].toInt()/2,rect[2].toInt()/2,rect[3].toInt()/2), cv::Scalar(200,0,0),2);
                 }
 
                 line = in.readLine();
@@ -83,12 +85,16 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
 
             images.push_back(img);
             frameRects.push_back(rects);
+            if(max_img != 0 && images.size() >= max_img)
+                break;
           }
        }
        inputFile.close();
     }
 
-    qDebug() << images[0].rows << " " << images[0].cols;
+    if(ui->lab_checkBox->isChecked())
+        for(auto& img : images)
+        cv::cvtColor(img,img,CV_BGR2Lab);
 }
 
 void ReaderGUI::load()
@@ -107,48 +113,49 @@ void ReaderGUI::load()
         m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-        loadFrames(m_fileDir, m_DS->images, m_DS->frameRects);
+        QString pos_data = m_fileDir + "/pos";
+        QString neg_data = m_fileDir + "/neg";
+        auto img_N = 196;
 
-//        QString pos_data = m_fileDir + "/pos";
-//        QString neg_data = m_fileDir + "/neg";
-//        auto img_N = 196;
+        int tot_pos;
+        int tot_neg;
 
-//        int tot_pos;
-//        int tot_neg;
+        // Load Positive
+        m_reader->readImages(pos_data, m_DS->images,m_dFlag);
+        tot_pos = m_DS->images.size();
+        for(auto i = 0; i < tot_pos; ++i)
+            m_DS->labels.push_back(0);
 
-//        m_reader->readImages(pos_data, m_DS->images,m_dFlag);
-//        tot_pos = m_DS->images.size();
-//        for(auto i = 0; i < tot_pos; ++i)
-//            m_DS->labels.push_back(0);
+        // Load Negative
+        std::vector<cv::Mat> tm_images;
+        m_reader->readImages(neg_data, tm_images,m_dFlag);
+        for(auto& img : tm_images)
+        {
+            if(img.rows > img_N && img.cols > img_N)
+            {
+                auto dx = img.cols - img_N;
+                auto dy = img.rows - img_N;
+                cv::Mat northWest(img,cv::Rect(0,0,img_N,img_N));
+                cv::Mat center(img,cv::Rect(dx/2,dy/2,img_N,img_N));
+                cv::Mat southEast(img,cv::Rect(dx,dy,img_N,img_N));
 
-//        std::vector<cv::Mat> tm_images;
-//        m_reader->readImages(neg_data, tm_images,m_dFlag);
-
-//        for(auto& img : tm_images)
-//        {
-//            if(img.rows > img_N && img.cols > img_N)
-//            {
-//                auto dx = img.cols - img_N;
-//                auto dy = img.rows - img_N;
-//                cv::Mat northWest(img,cv::Rect(0,0,img_N,img_N));
-//                cv::Mat center(img,cv::Rect(dx/2,dy/2,img_N,img_N));
-//                cv::Mat southEast(img,cv::Rect(dx,dy,img_N,img_N));
-
-//                m_DS->images.push_back(northWest);
-//                m_DS->images.push_back(center);
-//                m_DS->images.push_back(southEast);
-//            }
-//            else
-//                m_DS->images.push_back(img);
-//        }
-
-
-////        m_reader->readImages(neg_data, m_DS->images,m_dFlag);
-//        tot_neg = m_DS->images.size() - tot_pos;
-//        for(auto i = 0; i < tot_neg; ++i)
-//            m_DS->labels.push_back(1);
+                m_DS->images.push_back(northWest);
+                m_DS->images.push_back(center);
+                m_DS->images.push_back(southEast);
+            }
+            else
+                m_DS->images.push_back(img);
+        }
 
 
+//        m_reader->readImages(neg_data, m_DS->images,m_dFlag);
+        tot_neg = m_DS->images.size() - tot_pos;
+        for(auto i = 0; i < tot_neg; ++i)
+            m_DS->labels.push_back(1);
+
+
+
+////  Save Loaded Data
 //        QString pos_ = m_dirStandard + "/dataSaved/pos/pos_";
 //        QString neg_ = m_dirStandard + "/dataSaved/neg/neg_";
 
@@ -167,8 +174,8 @@ void ReaderGUI::load()
 
 
         // TODO: move resize to proper place
-//        for(auto& img : m_DS->images)
-//            cv::resize(img,img, cv::Size(50,50));
+        for(auto& img : m_DS->images)
+            cv::resize(img,img, cv::Size(50,50));
 
         break;
     }
@@ -181,6 +188,14 @@ void ReaderGUI::load()
             m_fileDir.replace(QRegExp("images.idx3"), "labels.idx1");
             m_reader->readLabels(m_fileDir, m_DS->labels, m_dFlag);
         }
+        break;
+    }
+    case Type_STD_ONE:
+    {
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        loadFrames(m_fileDir, m_DS->images, m_DS->frameRects);
         break;
     }
     default:

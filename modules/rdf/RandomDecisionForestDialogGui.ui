@@ -90,6 +90,19 @@
              <property name="spacing">
               <number>1</number>
              </property>
+             <item row="1" column="3">
+              <widget class="QSpinBox" name="spinBox_PixelsPerImage">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+               <property name="value">
+                <number>200</number>
+               </property>
+              </widget>
+             </item>
              <item row="3" column="3">
               <widget class="QSpinBox" name="spinBox_MaxIteration">
                <property name="alignment">
@@ -103,19 +116,6 @@
                </property>
                <property name="value">
                 <number>100</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QSpinBox" name="spinBox_PixelsPerImage">
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="maximum">
-                <number>1000</number>
-               </property>
-               <property name="value">
-                <number>200</number>
                </property>
               </widget>
              </item>
@@ -342,6 +342,19 @@
                </property>
               </widget>
              </item>
+             <item row="5" column="1">
+              <widget class="QCheckBox" name="checkBox">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Positive Tau</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -518,8 +531,8 @@
    <slot>onTest()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1116</x>
-     <y>179</y>
+     <x>1170</x>
+     <y>177</y>
     </hint>
     <hint type="destinationlabel">
      <x>561</x>
@@ -694,8 +707,8 @@
    <slot>onNTestTreesChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1116</x>
-     <y>287</y>
+     <x>1170</x>
+     <y>285</y>
     </hint>
     <hint type="destinationlabel">
      <x>575</x>
@@ -735,6 +748,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onPositiveTau(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>448</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-30</x>
+     <y>247</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onTrain()</slot>
@@ -754,5 +783,6 @@
   <slot>onNTestTreesChanged(int)</slot>
   <slot>onTauRangeChanged(int)</slot>
   <slot>onPreProcess()</slot>
+  <slot>onPositiveTau(bool)</slot>
  </slots>
 </ui>

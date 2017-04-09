@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
-    <height>120</height>
+    <width>395</width>
+    <height>121</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,45 +20,6 @@
    <string>Form</string>
   </property>
   <layout class="QFormLayout" name="main_formLayout">
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="load_horizontalLayout">
-     <item>
-      <widget class="QLabel" name="DatasetType_label">
-       <property name="text">
-        <string>Dataset Type :</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="DatasetType_comboBox">
-       <item>
-        <property name="text">
-         <string>Standard</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>MNIST</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Load_pushButton">
-       <property name="text">
-        <string>Load</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="loadLabels_checkBox">
-       <property name="text">
-        <string>Load Labels</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="paths_verticalLayout">
      <item>
@@ -114,6 +75,99 @@
      </item>
     </layout>
    </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="load_horizontalLayout">
+     <item>
+      <widget class="QLabel" name="DatasetType_label">
+       <property name="text">
+        <string>Dataset Type :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="DatasetType_comboBox">
+       <item>
+        <property name="text">
+         <string>STD One Frame</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Standard</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>MNIST</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Load_pushButton">
+       <property name="text">
+        <string>Load</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="loadLabels_checkBox">
+       <property name="text">
+        <string>Load Labels</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="load_horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="DatasetType_label_2">
+       <property name="text">
+        <string>Max Imgs:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="max_img_load_spinBox">
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="Load_color_comboBox">
+       <item>
+        <property name="text">
+         <string>GRAYSCALE</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>COLOR</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="draw_rect_checkBox">
+       <property name="text">
+        <string>Rects</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="lab_checkBox">
+       <property name="text">
+        <string>LAB</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources/>
@@ -125,12 +179,12 @@
    <slot>dataTypeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>176</x>
-     <y>46</y>
+     <x>189</x>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
-     <y>391</y>
+     <y>120</y>
     </hint>
    </hints>
   </connection>
@@ -141,12 +195,12 @@
    <slot>load()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>209</x>
-     <y>107</y>
+     <x>275</x>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>188</x>
-     <y>264</y>
+     <y>120</y>
     </hint>
    </hints>
   </connection>

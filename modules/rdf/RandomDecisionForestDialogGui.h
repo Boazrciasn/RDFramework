@@ -73,6 +73,7 @@ public:
     void onMaxIterationChanged(int value);
     void onLabelCountChanged(int value);
     void onTauRangeChanged(int value);
+    void onPositiveTau(bool value);
 };
 
 #endif // RDFDIALOGGUI_H

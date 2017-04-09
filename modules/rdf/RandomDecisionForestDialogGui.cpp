@@ -244,6 +244,7 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("maxIteration", PARAMS.maxIteration);
     settings.setValue("labelCount", PARAMS.labelCount);
     settings.setValue("tauRange", PARAMS.tauRange);
+    settings.setValue("isPositiveRange", PARAMS.isPositiveRange);
     settings.endGroup();
 }
 
@@ -260,6 +261,7 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.maxIteration = settings.value("maxIteration", 100).toInt();
     PARAMS.labelCount = settings.value("labelCount", 26).toInt();
     PARAMS.tauRange = settings.value("tauRange", 127).toInt();
+    PARAMS.isPositiveRange = settings.value("isPositiveRange", false).toBool();
     settings.endGroup();
 }
 
@@ -312,4 +314,9 @@ void RandomDecisionForestDialogGui::onLabelCountChanged(int value)
 void RandomDecisionForestDialogGui::onTauRangeChanged(int value)
 {
     PARAMS.tauRange = value;
+}
+
+void RandomDecisionForestDialogGui::onPositiveTau(bool value)
+{
+    PARAMS.isPositiveRange = value;
 }
