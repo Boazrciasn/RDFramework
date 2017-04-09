@@ -97,8 +97,8 @@ float RandomDecisionForest::testForest(tbb::concurrent_vector<cv::Mat>& output)
         cv::minMaxLoc(probHist, NULL, &max, NULL, &max_loc);
         auto label = max_loc.x;
 
-        if (label == m_DS->labels[nodeIndex])
-            ++posCounter;
+//        if (label == m_DS->labels[nodeIndex])
+//            ++posCounter;
 
         getLabelAndConfMat(layered, labels, confs);
         output[nodeIndex] = labels;
@@ -134,8 +134,8 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     for (int row = 0; row < nRows; ++row)
         for (int col = 0; col < nCols; ++col)
         {
-            if (roi.at<uchar>(row, col) == 0)
-                continue;
+//            if (roi.at<uchar>(row, col) == 0)
+//                continue;
             Pixel px;
             // Since we are sending padded roi we should add probDistX & probDistY to px.position
             px.position = cv::Point(col + m_params.probDistX, row + m_params.probDistY);

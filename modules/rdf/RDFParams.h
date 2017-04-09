@@ -17,6 +17,7 @@ struct RDFParams
     int labelCount;
     int maxIteration;
     int tauRange;
+    bool isPositiveRange{};
 
     template<class Archive>
     void serialize(Archive &archive)
