@@ -55,8 +55,12 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->images);
-    ui->spinBox_LabelCount->setValue(m_dataReaderGUI->DS()->map_dataPerLabel.size());
-    PARAMS.labelCount = m_dataReaderGUI->DS()->map_dataPerLabel.size();
+
+    auto lbl_count = m_dataReaderGUI->DS()->map_dataPerLabel.size();
+    if(lbl_count == 0)
+        lbl_count = 2;
+    ui->spinBox_LabelCount->setValue(lbl_count);
+    PARAMS.labelCount = lbl_count;
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
