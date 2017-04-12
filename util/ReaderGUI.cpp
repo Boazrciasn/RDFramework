@@ -49,8 +49,11 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
 {
     QFile inputFile(dir + "/LOG_Video_Stream_2.txt");
     int max_img = ui->max_img_load_spinBox->value();
+    int skip_img = ui->skip_img_load_spinBox->value();
     auto drawRect = ui->draw_rect_checkBox->isChecked();
     auto load_color = ui->Load_color_comboBox->currentIndex();
+
+    auto skip_counter = 0;
     if (inputFile.open(QIODevice::ReadOnly))
     {
        QTextStream in(&inputFile);
@@ -60,6 +63,8 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
           line = in.readLine();
           if(line.contains("frame_"))
           {
+            if(++skip_counter <= skip_img)
+                continue;
             QStringList file_ = line.trimmed().split(" ");
             QString img_file = dir + "/frames/" + file_[0] + file_[1] +".png";
             cv::Mat img = cv::imread(img_file.toStdString(),load_color);

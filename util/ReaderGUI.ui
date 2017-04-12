@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
+    <width>493</width>
     <height>121</height>
    </rect>
   </property>
@@ -130,6 +130,23 @@
      </item>
      <item>
       <widget class="QSpinBox" name="max_img_load_spinBox">
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="DatasetType_label_3">
+       <property name="text">
+        <string>Skip</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="skip_img_load_spinBox">
        <property name="maximum">
         <number>1000</number>
        </property>
