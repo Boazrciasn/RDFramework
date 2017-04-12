@@ -38,7 +38,8 @@ class RandomDecisionTree
     quint32 m_probe_distanceX{};
     quint32 m_probe_distanceY{};
 
-    std::vector<Node> m_nodes;
+    // TODO: convert to template
+    std::vector<Node2b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
