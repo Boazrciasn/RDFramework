@@ -17,6 +17,8 @@ void RandomDecisionForestDialogGui::initParamValues()
     ui->spinBox_MaxIteration->setValue(PARAMS.maxIteration);
     ui->spinBox_LabelCount->setValue(PARAMS.labelCount);
     ui->spinBox_TauRange->setValue(PARAMS.tauRange);
+    ui->checkBox_isPositive->setChecked(PARAMS.isPositiveRange);
+    ui->spinBox_MaxPixelsEntropy->setValue(PARAMS.maxPxForEntropy);
 }
 
 RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
@@ -249,6 +251,7 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("labelCount", PARAMS.labelCount);
     settings.setValue("tauRange", PARAMS.tauRange);
     settings.setValue("isPositiveRange", PARAMS.isPositiveRange);
+    settings.setValue("maxPxForEntropy", PARAMS.maxPxForEntropy);
     settings.endGroup();
 }
 
@@ -266,6 +269,7 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.labelCount = settings.value("labelCount", 26).toInt();
     PARAMS.tauRange = settings.value("tauRange", 127).toInt();
     PARAMS.isPositiveRange = settings.value("isPositiveRange", false).toBool();
+    PARAMS.maxPxForEntropy = settings.value("maxPxForEntropy", 1000).toInt();
     settings.endGroup();
 }
 

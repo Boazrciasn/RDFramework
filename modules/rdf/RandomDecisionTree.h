@@ -39,7 +39,7 @@ class RandomDecisionTree
     quint32 m_probe_distanceY{};
 
     // TODO: convert to template
-    std::vector<Node2b> m_nodes;
+    std::vector<Node3b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
@@ -266,11 +266,21 @@ class RandomDecisionTree
         rightHist.fill(0);
         auto sizeLeft  = 0;
         auto sizeRight = 0;
-        auto end = m_nodes[index].end;
 
-        for (auto i = m_nodes[index].start; i < end; ++i)
+        auto shift = m_generator();
+        auto max_px_count = m_params->maxPxForEntropy;
+        auto start = m_nodes[index].start;
+        auto end = m_nodes[index].end;
+        auto total = end-start;
+        max_px_count = (total > max_px_count) ? max_px_count : total;
+        auto step = total/max_px_count + 1;
+
+        quint32 px_index;
+
+        for (auto i = 0; i < max_px_count; ++i)
         {
-            auto &px = m_pixelCloud.pixels1[i];
+            px_index = start + (shift + i*step)%total;
+            auto &px = m_pixelCloud.pixels1[px_index];
             auto &img = m_DS->images[px.id];
             if (m_nodes[index].isLeft(px, img))
             {

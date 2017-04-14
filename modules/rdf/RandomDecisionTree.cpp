@@ -29,7 +29,7 @@ void RandomDecisionTree::train()
     m_statLog.setDepth(m_params->maxDepth - 1);
     SignalSenderInterface::instance().printsend("Sub-sampling...");
 //    getSubSample();
-    getSubSampleSingleFrame();
+    getSubSampleSingleFrame(); // TODO: put if statement here
     SignalSenderInterface::instance().printsend("Constructing tree...");
     qApp->processEvents();
     constructTree();

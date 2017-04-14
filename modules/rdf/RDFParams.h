@@ -16,6 +16,7 @@ struct RDFParams
     int minLeafPixels;
     int labelCount;
     int maxIteration;
+    int maxPxForEntropy{};
     int tauRange;
     bool isPositiveRange{};
 

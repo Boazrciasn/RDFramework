@@ -90,19 +90,6 @@
              <property name="spacing">
               <number>1</number>
              </property>
-             <item row="1" column="3">
-              <widget class="QSpinBox" name="spinBox_PixelsPerImage">
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="maximum">
-                <number>1000</number>
-               </property>
-               <property name="value">
-                <number>200</number>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="3">
               <widget class="QSpinBox" name="spinBox_MaxIteration">
                <property name="alignment">
@@ -116,6 +103,19 @@
                </property>
                <property name="value">
                 <number>100</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QSpinBox" name="spinBox_PixelsPerImage">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+               <property name="value">
+                <number>200</number>
                </property>
               </widget>
              </item>
@@ -209,7 +209,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="3">
+             <item row="7" column="3">
               <widget class="QSpinBox" name="spinBox_TauRange">
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -313,7 +313,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="2">
+             <item row="7" column="2">
               <widget class="QLabel" name="label_TauRange">
                <property name="font">
                 <font>
@@ -342,8 +342,8 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QCheckBox" name="checkBox">
+             <item row="8" column="3">
+              <widget class="QCheckBox" name="checkBox_isPositive">
                <property name="font">
                 <font>
                  <weight>75</weight>
@@ -352,6 +352,38 @@
                </property>
                <property name="text">
                 <string>Positive Tau</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QSpinBox" name="spinBox_MaxPixelsEntropy">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+               <property name="singleStep">
+                <number>1000</number>
+               </property>
+               <property name="value">
+                <number>1000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_PixelsPerImage_2">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Max Px for Entropy Calc</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -749,7 +781,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox</sender>
+   <sender>checkBox_isPositive</sender>
    <signal>clicked(bool)</signal>
    <receiver>RandomDecisionForestDialogGui</receiver>
    <slot>onPositiveTau(bool)</slot>

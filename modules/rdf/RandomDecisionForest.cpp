@@ -48,7 +48,7 @@ float RandomDecisionForest::testForest()
     {
         SignalSenderInterface::instance().printsend("Images are not processed! processing images..." );
         qApp->processEvents();
-        preprocessDS();
+//        preprocessDS();
     }
 
     int totalImgs = m_DS->images.size();
