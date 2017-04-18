@@ -290,6 +290,7 @@ class Util
     static cv::Mat toCv(const QImage &image, int cv_type);
     static void CalculateHistogram(cv::Mat &inputMat, cv::Mat &hist, int histSize);
     static QImage toQt(const cv::Mat &src, QImage::Format format);
+    static QImage RGBMattoQt(const cv::Mat &src, QImage::Format format);
     static QImage Mat2QImage(const cv::Mat3b &src);
     static QString cleanNumberAndPunctuation(QString toClean);
     static void plot(const cv::Mat &hist, QWidget *parent, const QString title);

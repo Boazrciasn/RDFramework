@@ -135,6 +135,7 @@ private:
         archive(m_params, m_trees);
         for (auto &rdt : m_trees)
             rdt.setParams(&m_params);
+        setNTreesForDetection(m_params.nTrees);
     }
 
     void printDataInfo();
