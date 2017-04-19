@@ -27,14 +27,14 @@ public:
             return;
         }
 
-        cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
-        cv::cvtColor(roi, roi, CV_RGB2GRAY);
-        cv::resize(roi,roi,cv::Size(100,100));
+//        cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
+//        cv::cvtColor(roi, roi, CV_RGB2GRAY);
+//        cv::resize(roi,roi,cv::Size(100,100));
 
         int label{};
         float conf{};
 
-        m_forest->detect(roi,label,conf);
+//        m_forest->detect(roi,label,conf);
 
         if(label == 0)
             setWeight(conf);

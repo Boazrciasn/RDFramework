@@ -53,6 +53,11 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
     auto drawRect = ui->draw_rect_checkBox->isChecked();
     auto load_color = ui->Load_color_comboBox->currentIndex();
 
+    auto img_size = 416;
+    auto img_row_ratio = 1.0f;
+    auto img_col_ratio = 1.0f;
+    auto max_w_h = 100;
+
     auto skip_counter = 0;
     if (inputFile.open(QIODevice::ReadOnly))
     {
@@ -68,7 +73,9 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
             QStringList file_ = line.trimmed().split(" ");
             QString img_file = dir + "/frames/" + file_[0] + file_[1] +".png";
             cv::Mat img = cv::imread(img_file.toStdString(),load_color);
-            cv::resize(img,img,cv::Size(),0.5,0.5);
+            img_row_ratio = (float)img_size/img.rows;
+            img_col_ratio = (float)img_size/img.cols;
+            cv::resize(img,img,cv::Size(img_size,img_size));
 
             QVector<QRect> rects;
             line = in.readLine();
@@ -76,11 +83,14 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
             while (!in.atEnd() && !line.isEmpty())
             {
                 QStringList rect = line.split(" ");
-                if(count%2 == 1 && rect[2].toInt()/2 < 100 && rect[3].toInt()/2 < 100)
+                if(count%2 == 1 && rect[2].toInt()*img_col_ratio < max_w_h && rect[3].toInt()*img_row_ratio < max_w_h)
                 {
-                    rects.push_back(QRect(rect[0].toInt()/2,rect[1].toInt()/2,rect[2].toInt()/2,rect[3].toInt()/2));
+                    rects.push_back(QRect(rect[0].toInt()*img_col_ratio,rect[1].toInt()*img_row_ratio,rect[2].toInt()*img_col_ratio,rect[3].toInt()*img_row_ratio));
                     if(drawRect)
-                        cv::rectangle(img,cv::Rect(rect[0].toInt()/2,rect[1].toInt()/2,rect[2].toInt()/2,rect[3].toInt()/2), cv::Scalar(200,0,0),2);
+                    {
+                        auto rect = rects.last();
+                        cv::rectangle(img,cv::Rect(rect.x(),rect.y(),rect.width(),rect.height()), cv::Scalar(200,0,0),2);
+                    }
                 }
 
                 line = in.readLine();
@@ -99,7 +109,7 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
 
     if(ui->lab_checkBox->isChecked())
         for(auto& img : images)
-        cv::cvtColor(img,img,CV_BGR2Lab);
+            cv::cvtColor(img,img,CV_BGR2Lab);
 }
 
 void ReaderGUI::load()

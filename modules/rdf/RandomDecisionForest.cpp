@@ -132,12 +132,9 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     // therefore, ROW is the same COL is COL*LABEL_COUNT
     cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols * labelCount);
     for (int row = 0; row < nRows; ++row)
-        for (int col = 0; col < nCols; ++col)
+        tbb::parallel_for(0, nCols, 1, [ =, &layeredHist ](int col)
         {
-//            if (roi.at<uchar>(row, col) == 0)
-//                continue;
             Pixel px;
-            // Since we are sending padded roi we should add probDistX & probDistY to px.position
             px.position = cv::Point(col + m_params.probDistX, row + m_params.probDistY);
             for (size_t i = 0; i < m_nTreesForDetection; ++i)
             {
@@ -145,7 +142,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
                 for (int var = 0; var < labelCount; ++var)
                     layeredHist(row, col * labelCount + var) += tmp(var);
             }
-        }
+        });
     // normalize layeredHist assuming leaf nodes are already normalized
     layeredHist /= m_nTreesForDetection;
     return layeredHist;

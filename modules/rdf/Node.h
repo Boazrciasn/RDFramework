@@ -65,7 +65,7 @@ private:
 
 struct Node2b : public Node
 {
-    bool inline isLeft(Pixel &p, cv::Mat &img)
+    bool inline isLeft(Pixel &p, const cv::Mat &img)
     {
 //        qDebug() << "Node2b";
         auto feature = Feature::features[ftrID];
@@ -79,8 +79,8 @@ struct Node2b : public Node
         featureType fr1{};
         featureType fr2{};
 
-        uchar* imgRow1;
-        uchar* imgRow2;
+        const uchar* imgRow1;
+        const uchar* imgRow2;
         featureType* ftrRow;
         for (int i = 0; i < row; ++i)
         {
@@ -102,7 +102,7 @@ struct Node2b : public Node
 
 struct Node3b : public Node
 { 
-    bool inline isLeft(Pixel &p, cv::Mat &img)
+    bool inline isLeft(Pixel &p, const cv::Mat &img)
     {
 //        qDebug() << "Node3b";
         auto feature = Feature::features[ftrID];

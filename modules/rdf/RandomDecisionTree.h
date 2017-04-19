@@ -71,7 +71,7 @@ class RandomDecisionTree
     void train();
     bool isPixelSizeConsistent();
 
-    cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat &roi)
+    cv::Mat_<float> inline getProbHist(Pixel &px, const cv::Mat &roi)
     {
         auto curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
