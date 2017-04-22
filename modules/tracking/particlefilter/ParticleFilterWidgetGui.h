@@ -102,6 +102,7 @@ protected:
     void setPFSettingsEnabled(bool state);
     void setConfidence();
     void loadVideo(QString filename);
+    void dispROI();
 };
 
 #endif // PARTICLEFILTERWIDGETGUI_H

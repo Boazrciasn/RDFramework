@@ -28,7 +28,8 @@ void RandomDecisionTree::train()
     initNodes();
     m_statLog.setDepth(m_params->maxDepth - 1);
     SignalSenderInterface::instance().printsend("Sub-sampling...");
-    getSubSample();
+//    getSubSample();
+    getSubSampleSingleFrame(); // TODO: put if statement here
     SignalSenderInterface::instance().printsend("Constructing tree...");
     qApp->processEvents();
     constructTree();
@@ -39,6 +40,60 @@ void RandomDecisionTree::train()
     m_statLog.logTrainingTime(time);
     m_statLog.dump();
     qApp->processEvents();
+}
+
+void RandomDecisionTree::getSubSampleSingleFrame()
+{
+    quint32 imgCount = m_DS->images.size();
+    for (quint32 id = 0; id < imgCount; ++id)
+    {
+        auto &image = m_DS->images[id];
+        auto label  = 0; // TODO: m_DS->labels[id];
+        int nRows = image.rows;
+        int nCols = image.cols;
+
+        auto& rects = m_DS->frameRects[id];
+        auto rectCount = rects.size();
+
+        // Positive label
+        for (int i = 0; i < rectCount; ++i)
+        {
+            for (int k = 0; k < m_params->pixelsPerImage; ++k)
+            {
+                int row = (m_generator() % rects[i].height()) + rects[i].y() + m_probe_distanceY + Feature::max_h;
+                int col = (m_generator() % rects[i].width()) + rects[i].x() + m_probe_distanceX + Feature::max_w;
+                Pixel px(cv::Point(col,row),id, label);
+                m_pixelCloud.pixels1.push_back(px);
+            }
+        }
+
+        label = 1;
+        // Nagative label
+        for (int k = 0; k < m_params->pixelsPerImage*rectCount; ++k)
+        {
+            int row = (m_generator() % (nRows - 2 * (m_probe_distanceY + Feature::max_h))) + m_probe_distanceY + Feature::max_h;
+            int col = (m_generator() % (nCols - 2 * (m_probe_distanceX + Feature::max_w))) + m_probe_distanceX + Feature::max_w;
+
+            bool isNeg = true;
+            for (int i = 0; i < rectCount; ++i)
+                if(row > rects[i].y() && row < (rects[i].y() + rects[i].height()) && col > rects[i].x() && col < (rects[i].x() + rects[i].width()))
+                {
+                    isNeg = false;
+                    break;
+                }
+
+            if(!isNeg)// TODO: || row < 180)
+            {
+                --k;
+                continue;
+            }
+
+            Pixel px(cv::Point(col,row),id, label);
+            m_pixelCloud.pixels1.push_back(px);
+        }
+    }
+
+    m_pixelCloud.pixels2.resize(m_pixelCloud.pixels1.size());
 }
 
 void RandomDecisionTree::getSubSample()

@@ -17,6 +17,8 @@ void RandomDecisionForestDialogGui::initParamValues()
     ui->spinBox_MaxIteration->setValue(PARAMS.maxIteration);
     ui->spinBox_LabelCount->setValue(PARAMS.labelCount);
     ui->spinBox_TauRange->setValue(PARAMS.tauRange);
+    ui->checkBox_isPositive->setChecked(PARAMS.isPositiveRange);
+    ui->spinBox_MaxPixelsEntropy->setValue(PARAMS.maxPxForEntropy);
 }
 
 RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
@@ -55,8 +57,12 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->images);
-    ui->spinBox_LabelCount->setValue(m_dataReaderGUI->DS()->map_dataPerLabel.size());
-    PARAMS.labelCount = m_dataReaderGUI->DS()->map_dataPerLabel.size();
+
+    auto lbl_count = m_dataReaderGUI->DS()->map_dataPerLabel.size();
+    if(lbl_count == 0)
+        lbl_count = 2;
+    ui->spinBox_LabelCount->setValue(lbl_count);
+    PARAMS.labelCount = lbl_count;
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
@@ -244,6 +250,8 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("maxIteration", PARAMS.maxIteration);
     settings.setValue("labelCount", PARAMS.labelCount);
     settings.setValue("tauRange", PARAMS.tauRange);
+    settings.setValue("isPositiveRange", PARAMS.isPositiveRange);
+    settings.setValue("maxPxForEntropy", PARAMS.maxPxForEntropy);
     settings.endGroup();
 }
 
@@ -260,6 +268,8 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.maxIteration = settings.value("maxIteration", 100).toInt();
     PARAMS.labelCount = settings.value("labelCount", 26).toInt();
     PARAMS.tauRange = settings.value("tauRange", 127).toInt();
+    PARAMS.isPositiveRange = settings.value("isPositiveRange", false).toBool();
+    PARAMS.maxPxForEntropy = settings.value("maxPxForEntropy", 1000).toInt();
     settings.endGroup();
 }
 
@@ -312,4 +322,9 @@ void RandomDecisionForestDialogGui::onLabelCountChanged(int value)
 void RandomDecisionForestDialogGui::onTauRangeChanged(int value)
 {
     PARAMS.tauRange = value;
+}
+
+void RandomDecisionForestDialogGui::onPositiveTau(bool value)
+{
+    PARAMS.isPositiveRange = value;
 }

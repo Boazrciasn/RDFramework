@@ -209,13 +209,13 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="3">
+             <item row="7" column="3">
               <widget class="QSpinBox" name="spinBox_TauRange">
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
                <property name="maximum">
-                <number>256</number>
+                <number>500</number>
                </property>
               </widget>
              </item>
@@ -313,7 +313,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="2">
+             <item row="7" column="2">
               <widget class="QLabel" name="label_TauRange">
                <property name="font">
                 <font>
@@ -339,6 +339,51 @@
                </property>
                <property name="value">
                 <number>30</number>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="3">
+              <widget class="QCheckBox" name="checkBox_isPositive">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Positive Tau</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QSpinBox" name="spinBox_MaxPixelsEntropy">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+               <property name="singleStep">
+                <number>1000</number>
+               </property>
+               <property name="value">
+                <number>1000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_PixelsPerImage_2">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Max Px for Entropy Calc</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -518,8 +563,8 @@
    <slot>onTest()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1116</x>
-     <y>179</y>
+     <x>1170</x>
+     <y>177</y>
     </hint>
     <hint type="destinationlabel">
      <x>561</x>
@@ -694,8 +739,8 @@
    <slot>onNTestTreesChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1116</x>
-     <y>287</y>
+     <x>1170</x>
+     <y>285</y>
     </hint>
     <hint type="destinationlabel">
      <x>575</x>
@@ -735,6 +780,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBox_isPositive</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onPositiveTau(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>448</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-30</x>
+     <y>247</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onTrain()</slot>
@@ -754,5 +815,6 @@
   <slot>onNTestTreesChanged(int)</slot>
   <slot>onTauRangeChanged(int)</slot>
   <slot>onPreProcess()</slot>
+  <slot>onPositiveTau(bool)</slot>
  </slots>
 </ui>

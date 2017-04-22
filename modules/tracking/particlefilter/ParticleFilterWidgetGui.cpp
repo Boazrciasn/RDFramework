@@ -84,6 +84,36 @@ void ParticleFilterWidgetGui::mousePressEvent(QMouseEvent *event)
     }
 }
 
+void ParticleFilterWidgetGui::dispROI()
+{
+
+    if(m_TargetROI.x() < 0 || (m_TargetROI.x() + m_TargetROI.width()) >= m_originalPix.width() || m_TargetROI.y() < 0 || (m_TargetROI.y() + m_TargetROI.height()) >= m_originalPix.height())
+        return;
+
+    RandomDecisionForest* rdf = m_predictor->getForest();
+    if(rdf)
+    {
+        cv::Mat srcImg = Util::toCv(m_originalPix.toImage(), CV_8UC4);
+        cv::Mat srcGray;
+        cv::cvtColor(srcImg, srcGray, CV_BGR2Lab);
+
+//            std::vector<Process*> processes;
+//            Sobel* proc = new Sobel(3, 3, CV_SCHARR);
+//            processes.push_back(proc);
+//            PreProcess::doBatchPreProcessSingle(srcGray,processes);
+
+        cv::Mat roiGray(srcGray,cv::Rect(m_TargetROI.x(),m_TargetROI.y(),m_TargetROI.width(),m_TargetROI.height()));
+        cv::imshow("ROI", roiGray);
+        cv::Mat_<float> hist = rdf->getLayeredHist(roiGray);
+        cv::Mat_<float> conf;
+        cv::Mat lbl;
+        rdf->getLabelAndConfMat(hist,lbl,conf);
+
+        cv::imshow("ROI_RDF_OUT",lbl);
+        cv::waitKey();
+    }
+}
+
 void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_VideoLodaded)
@@ -109,30 +139,7 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
 
 
         // TODO: For testing purpose
-        RandomDecisionForest* rdf = m_predictor->getForest();
-        if(rdf)
-        {
-            rdf->setNTreesForDetection(3);
-            cv::Mat srcImg = Util::toCv(m_originalPix.toImage(), CV_8UC4);
-            cv::Mat srcGray;
-            cv::cvtColor(srcImg, srcGray, CV_RGB2GRAY);
-
-//            std::vector<Process*> processes;
-//            Sobel* proc = new Sobel(3, 3, CV_SCHARR);
-//            processes.push_back(proc);
-//            PreProcess::doBatchPreProcessSingle(srcGray,processes);
-
-            cv::Mat roiGray(srcGray,cv::Rect(m_TargetROI.x(),m_TargetROI.y(),m_TargetROI.width(),m_TargetROI.height()));
-            cv::resize(roiGray,roiGray, cv::Size(50,50));
-            cv::imshow("ROI", roiGray);
-            cv::Mat_<float> hist = rdf->getLayeredHist(roiGray);
-            cv::Mat_<float> conf;
-            cv::Mat lbl;
-            rdf->getLabelAndConfMat(hist,lbl,conf);
-
-            cv::imshow("ROI_RDF_OUT",lbl);
-            cv::waitKey();
-        }
+        dispROI();
     }
 }
 

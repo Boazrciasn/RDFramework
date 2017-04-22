@@ -16,7 +16,9 @@ struct RDFParams
     int minLeafPixels;
     int labelCount;
     int maxIteration;
+    int maxPxForEntropy{};
     int tauRange;
+    bool isPositiveRange{};
 
     template<class Archive>
     void serialize(Archive &archive)

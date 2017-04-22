@@ -45,6 +45,73 @@ void ReaderGUI::countLabels()
     qDebug() << "Average w/h for label  0: " << avgW << " " << avgH;
 }
 
+void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect>> &frameRects)
+{
+    QFile inputFile(dir + "/LOG_Video_Stream_2.txt");
+    int max_img = ui->max_img_load_spinBox->value();
+    int skip_img = ui->skip_img_load_spinBox->value();
+    auto drawRect = ui->draw_rect_checkBox->isChecked();
+    auto load_color = ui->Load_color_comboBox->currentIndex();
+
+    auto img_size = 416;
+    auto img_row_ratio = 1.0f;
+    auto img_col_ratio = 1.0f;
+    auto max_w_h = 100;
+
+    auto skip_counter = 0;
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&inputFile);
+       QString line;
+       while (!in.atEnd())
+       {
+          line = in.readLine();
+          if(line.contains("frame_"))
+          {
+            if(++skip_counter <= skip_img)
+                continue;
+            QStringList file_ = line.trimmed().split(" ");
+            QString img_file = dir + "/frames/" + file_[0] + file_[1] +".png";
+            cv::Mat img = cv::imread(img_file.toStdString(),load_color);
+            img_row_ratio = (float)img_size/img.rows;
+            img_col_ratio = (float)img_size/img.cols;
+            cv::resize(img,img,cv::Size(img_size,img_size));
+
+            QVector<QRect> rects;
+            line = in.readLine();
+            auto count = 0;
+            while (!in.atEnd() && !line.isEmpty())
+            {
+                QStringList rect = line.split(" ");
+                if(count%2 == 1 && rect[2].toInt()*img_col_ratio < max_w_h && rect[3].toInt()*img_row_ratio < max_w_h)
+                {
+                    rects.push_back(QRect(rect[0].toInt()*img_col_ratio,rect[1].toInt()*img_row_ratio,rect[2].toInt()*img_col_ratio,rect[3].toInt()*img_row_ratio));
+                    if(drawRect)
+                    {
+                        auto rect = rects.last();
+                        cv::rectangle(img,cv::Rect(rect.x(),rect.y(),rect.width(),rect.height()), cv::Scalar(200,0,0),2);
+                    }
+                }
+
+                line = in.readLine();
+                count++;
+            }
+
+
+            images.push_back(img);
+            frameRects.push_back(rects);
+            if(max_img != 0 && images.size() >= max_img)
+                break;
+          }
+       }
+       inputFile.close();
+    }
+
+    if(ui->lab_checkBox->isChecked())
+        for(auto& img : images)
+            cv::cvtColor(img,img,CV_BGR2Lab);
+}
+
 void ReaderGUI::load()
 {
     double cpu_time;
@@ -58,24 +125,25 @@ void ReaderGUI::load()
     {
     case Type_Standard:
     {
-        m_dirStandard = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_dirStandard,
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-        QString pos_data = m_dirStandard + "/pos";
-        QString neg_data = m_dirStandard + "/neg";
+        QString pos_data = m_fileDir + "/pos";
+        QString neg_data = m_fileDir + "/neg";
         auto img_N = 196;
 
         int tot_pos;
         int tot_neg;
 
+        // Load Positive
         m_reader->readImages(pos_data, m_DS->images,m_dFlag);
         tot_pos = m_DS->images.size();
         for(auto i = 0; i < tot_pos; ++i)
             m_DS->labels.push_back(0);
 
+        // Load Negative
         std::vector<cv::Mat> tm_images;
         m_reader->readImages(neg_data, tm_images,m_dFlag);
-
         for(auto& img : tm_images)
         {
             if(img.rows > img_N && img.cols > img_N)
@@ -101,6 +169,8 @@ void ReaderGUI::load()
             m_DS->labels.push_back(1);
 
 
+
+////  Save Loaded Data
 //        QString pos_ = m_dirStandard + "/dataSaved/pos/pos_";
 //        QString neg_ = m_dirStandard + "/dataSaved/neg/neg_";
 
@@ -126,13 +196,21 @@ void ReaderGUI::load()
     }
     case Type_MNIST:
     {
-        m_dirMNIST = QFileDialog::getOpenFileName(this, tr("Open Dataset File"), m_dirMNIST);
-        if (!m_dirMNIST.isEmpty())
+        m_fileDir = QFileDialog::getOpenFileName(this, tr("Open Dataset File"), m_fileDir);
+        if (!m_fileDir.isEmpty())
         {
-            m_reader->readImages(m_dirMNIST, m_DS->images, m_dFlag);
-            m_dirMNIST.replace(QRegExp("images.idx3"), "labels.idx1");
-            m_reader->readLabels(m_dirMNIST, m_DS->labels, m_dFlag);
+            m_reader->readImages(m_fileDir, m_DS->images, m_dFlag);
+            m_fileDir.replace(QRegExp("images.idx3"), "labels.idx1");
+            m_reader->readLabels(m_fileDir, m_DS->labels, m_dFlag);
         }
+        break;
+    }
+    case Type_STD_ONE:
+    {
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        loadFrames(m_fileDir, m_DS->images, m_DS->frameRects);
         break;
     }
     default:
@@ -142,19 +220,19 @@ void ReaderGUI::load()
 
     cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
     qDebug() << "Load Time: " << cpu_time;
-    countLabels();
+//    countLabels();
 
 
     // Emit signals
     if (!m_DS->images.empty())
     {
-        ui->LoadedDataset_label->setText(m_dirStandard);
+        ui->LoadedDataset_label->setText(m_fileDir);
         emit imagesLoaded(true);
     }
 
     if (!m_DS->labels.empty())
     {
-        ui->labelFilepath_label->setText(m_dirMNIST);
+        ui->labelFilepath_label->setText(m_fileDir);
         emit labelsLoaded(true);
     }
 }
@@ -173,8 +251,7 @@ void ReaderGUI::writeSettings()
 {
     QSettings settings("VVGLab", "ReaderGUI");
     settings.beginGroup("path");
-    settings.setValue("m_dirMNIST", m_dirMNIST);
-    settings.setValue("m_dirStandard", m_dirStandard);
+    settings.setValue("m_fileDir", m_fileDir);
     settings.endGroup();
 }
 
@@ -182,7 +259,6 @@ void ReaderGUI::readSettings()
 {
     QSettings settings("VVGLab", "RDFDialogGUI");
     settings.beginGroup("PARAMS");
-    m_dirMNIST = settings.value("m_dirMNIST", "").toString();
-    m_dirStandard = settings.value("m_dirStandard", "").toString();
+    m_fileDir = settings.value("m_fileDir", "").toString();
     settings.endGroup();
 }

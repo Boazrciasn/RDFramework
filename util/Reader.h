@@ -14,8 +14,9 @@
 
 enum
 {
-    Type_Standard = 0,
-    Type_MNIST = 1
+    Type_STD_ONE = 0,
+    Type_Standard = 1,
+    Type_MNIST = 2
 };
 
 class Reader

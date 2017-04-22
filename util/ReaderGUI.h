@@ -26,12 +26,12 @@ class ReaderGUI : public QWidget
     Reader *m_reader;
     int m_dFlag;
 
-    QString m_dirStandard;
-    QString m_dirMNIST;
+    QString m_fileDir;
     void readSettings();
 
 
     void countLabels();
+    void loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects);
 
 private slots:
     void load();

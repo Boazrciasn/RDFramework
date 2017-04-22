@@ -38,7 +38,8 @@ class RandomDecisionTree
     quint32 m_probe_distanceX{};
     quint32 m_probe_distanceY{};
 
-    std::vector<Node> m_nodes;
+    // TODO: convert to template
+    std::vector<Node3b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
@@ -70,7 +71,7 @@ class RandomDecisionTree
     void train();
     bool isPixelSizeConsistent();
 
-    cv::Mat_<float> inline getProbHist(Pixel &px, cv::Mat &roi)
+    cv::Mat_<float> inline getProbHist(Pixel &px, const cv::Mat &roi)
     {
         auto curr = m_nodes[0];
         for (quint32 depth = 1; depth < m_height; ++depth)
@@ -109,6 +110,11 @@ class RandomDecisionTree
         m_tauProbDistribution = std::uniform_int_distribution<>(-tauRange, tauRange);
     }
 
+    void inline setTauRangePos(int tauRange)
+    {
+        m_tauProbDistribution = std::uniform_int_distribution<>(0, tauRange);
+    }
+
     ~RandomDecisionTree()
     {
         m_nodes.clear();
@@ -116,6 +122,7 @@ class RandomDecisionTree
 
 
   private:
+    void getSubSampleSingleFrame();
     void getSubSample();
     void constructTree();
     void constructRootNode();
@@ -131,7 +138,10 @@ class RandomDecisionTree
         setProbeDistanceY(m_params->probDistY);
         setMaxDepth(m_params->maxDepth);
         setMinimumLeafPixelCount(m_params->minLeafPixels);
-        setTauRange(m_params->tauRange);
+        if(m_params->isPositiveRange)
+            setTauRangePos(m_params->tauRange);
+        else
+            setTauRange(m_params->tauRange);
     }
 
     void inline initNodes()
@@ -256,11 +266,21 @@ class RandomDecisionTree
         rightHist.fill(0);
         auto sizeLeft  = 0;
         auto sizeRight = 0;
-        auto end = m_nodes[index].end;
 
-        for (auto i = m_nodes[index].start; i < end; ++i)
+        auto shift = m_generator();
+        auto max_px_count = m_params->maxPxForEntropy;
+        auto start = m_nodes[index].start;
+        auto end = m_nodes[index].end;
+        auto total = end-start;
+        max_px_count = (total > max_px_count) ? max_px_count : total;
+        auto step = total/max_px_count + 1;
+
+        quint32 px_index;
+
+        for (auto i = 0; i < max_px_count; ++i)
         {
-            auto &px = m_pixelCloud.pixels1[i];
+            px_index = start + (shift + i*step)%total;
+            auto &px = m_pixelCloud.pixels1[px_index];
             auto &img = m_DS->images[px.id];
             if (m_nodes[index].isLeft(px, img))
             {
