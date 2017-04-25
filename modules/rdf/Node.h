@@ -19,6 +19,7 @@ struct Node
 
     cv::Mat_<float> hist;
     quint8 ftrID{};
+    bool isLeaf{};
 
     Node() : Node(0)
     {
@@ -28,6 +29,7 @@ struct Node
     {
         hist.create(1, 1);
         hist.setTo(0);
+        isLeaf = false;
     }
 
     ~Node()
@@ -46,7 +48,7 @@ private:
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        archive( id , start, end, leftCount, tau, ftrID, hist, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2);
 
     }
 
@@ -54,12 +56,11 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        archive( id , start, end, leftCount, tau, ftrID, hist, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
         teta2.y = y2;
-//        std::cout << hist << std::endl;
     }
 };
 
@@ -67,7 +68,6 @@ struct Node2b : public Node
 {
     bool inline isLeft(Pixel &p, const cv::Mat &img)
     {
-//        qDebug() << "Node2b";
         auto feature = Feature::features[ftrID];
         auto row = feature.rows;
         auto col = feature.cols;
@@ -104,7 +104,6 @@ struct Node3b : public Node
 { 
     bool inline isLeft(Pixel &p, const cv::Mat &img)
     {
-//        qDebug() << "Node3b";
         auto feature = Feature::features[ftrID];
         auto row = feature.rows;
         auto col = feature.cols;
@@ -114,19 +113,18 @@ struct Node3b : public Node
         auto fr2_x = teta2.x + p.position.x;
         auto fr2_y = teta2.y + p.position.y;
 
-        cv::Vec3b fr1{};
-        cv::Vec3b fr2{};
+        cv::Vec3f fr1{};
+        cv::Vec3f fr2{};
 
         for (int i = 0; i < row; ++i)
             for (int j = 0; j < col; ++j)
             {
-                fr1 += feature(i,j)*img.at<cv::Vec3b>(fr1_y + i,fr1_x + j);
-                fr2 += feature(i,j)*img.at<cv::Vec3b>(fr2_y + i,fr2_x + j);
+                fr1 += feature(i,j)*(cv::Vec3f)img.at<cv::Vec3b>(fr1_y + i,fr1_x + j);
+                fr2 += feature(i,j)*(cv::Vec3f)img.at<cv::Vec3b>(fr2_y + i,fr2_x + j);
             }
 
-
         if(ftrID > 0)
-            fr2 = cv::Vec3b(0,0,0);
+            fr2 = cv::Vec3f(0,0,0);
         auto dist = cv::norm(fr1,fr2,CV_L2);
         return dist <= tau;
     }
