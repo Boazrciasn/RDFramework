@@ -38,6 +38,14 @@ class RandomDecisionTree
     quint32 m_probe_distanceX{};
     quint32 m_probe_distanceY{};
 
+    // RDTBasic var
+    cv::Mat_<qint32> m_nodes_mat{};
+    cv::Mat_<featureType> m_features_mat{};
+    quint16 m_padding_x{};
+    quint16 m_padding_y{};
+    quint8 m_label_count{};
+
+
     // TODO: convert to template
     std::vector<Node3b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
@@ -65,9 +73,16 @@ class RandomDecisionTree
     RandomDecisionTree(DataSet *DS, RDFParams *params);
     void inline setGenerator(pcg32 &generator) {m_generator = generator;}
     void inline setDataSet(DataSet *DS) {m_DS = DS;}
-    void inline setParams(RDFParams *params) {m_params = params;}
     void setSignalInterface(SignalSenderInterface *signalsender) {m_signalsender = signalsender;}
     pcg32 inline getGenerator() {return m_generator;}
+
+    void inline setParams(RDFParams *params) {
+        m_params = params;
+        m_label_count = m_params->labelCount;
+        m_padding_x = m_params->probDistX + Feature::max_w;
+        m_padding_y = m_params->probDistY + Feature::max_h;
+    }
+
     void train();
     bool isPixelSizeConsistent();
 
@@ -161,41 +176,26 @@ class RandomDecisionTree
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
 
         auto pxCount = m_nodes[index].end - m_nodes[index].start;
+
+        // Supress all nodes to other node if this node is empty
         if (pxCount == 0)
-        {
-            return;
-//            if (mult == 0)
-//                m_nodes[parentId].tau = -500; // Supress all nodes to right if left node is empty
-//            else
-//                m_nodes[parentId].tau = 500;
-        }
-        else if (m_nodes[parentId].tau == 500)
+            m_nodes[parentId].tau = 1000*mult - 500;
+        else if(m_nodes[parentId].isLeaf || isLeaf(m_nodes[index].start, m_nodes[index].end))
         {
             ++m_leafCount;
             m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
             generateTeta(m_nodes[index].teta1);
             generateTeta(m_nodes[index].teta2);
             m_nodes[index].tau = 500;
+            m_nodes[index].isLeaf = true;
         }
-
         else
         {
-            if (isLeaf(m_nodes[index].start, m_nodes[index].end))
-            {
-                ++m_leafCount;
-                m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
-                generateTeta(m_nodes[index].teta1);
-                generateTeta(m_nodes[index].teta2);
-                m_nodes[index].tau = 500;
-            }
+            if(pxCount >= TableLookUp::size)
+                computeDivisionAt(index);
             else
-            {
-                if(pxCount >= TableLookUp::size)
-                    computeDivisionAt(index);
-                else
-                    computeDivisionWithLookUpAt(index);
-                ++m_featureFreq[m_nodes[index].ftrID];
-            }
+                computeDivisionWithLookUpAt(index);
+            ++m_featureFreq[m_nodes[index].ftrID];
         }
     }
 
@@ -242,15 +242,99 @@ class RandomDecisionTree
     }
 
 
+    inline void compressFtr()
+    {
+        auto ftr_count = Feature::features.size();
+        auto ftr_px_count = Feature::max_h*Feature::max_w;
+        m_features_mat = cv::Mat_<featureType>::zeros(ftr_count,ftr_px_count);
 
-  private:
+        // feature one is single pixel
+        m_features_mat(0,0) = 1;
+
+        for(auto i = 1; i < ftr_count; ++i)
+            for(auto j = 0; j < ftr_px_count; ++j)
+                m_features_mat(i,j) = Feature::features[i](j/Feature::max_w,j%Feature::max_h);
+        std::cout << m_features_mat << std::endl;
+    }
+
+    inline cv::Mat_<qint32> leaf2Mat(quint32 index)
+    {
+        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
+        auto& hist = m_nodes[index].hist;
+        leaf_mat(0,0) = -1;
+
+        for (int i = 0; i < hist.cols; ++i)
+            leaf_mat(0,i + 1) = hist(0,i)*255;
+        return leaf_mat;
+    }
+
+    inline cv::Mat_<qint32> node2Mat(quint32 index)
+    {
+        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
+        auto& node = m_nodes[index];
+        node_mat(0,1) = node.ftrID;
+        node_mat(0,2) = node.tau;
+        node_mat(0,3) = node.teta1.x;
+        node_mat(0,4) = node.teta1.y;
+        node_mat(0,5) = node.teta2.x;
+        node_mat(0,6) = node.teta2.y;
+
+        return node_mat;
+    }
+
+    inline qint32 compressNodes(quint32 nodeIdx)
+    {
+//        qDebug() << "id: " << m_nodes[nodeIdx].id
+//                 << " start: " << m_nodes[nodeIdx].start
+//                 << " end: " << m_nodes[nodeIdx].end
+//                 << " tau: " << m_nodes[nodeIdx].tau
+//                 << " isLeaf: " << m_nodes[nodeIdx].isLeaf;
+
+        if(m_nodes[nodeIdx].isLeaf)
+        {
+            auto node_h = m_height - (quint32)log2(nodeIdx+1) - 1;
+            auto leafIndex = (1 << node_h) * (nodeIdx + 1) - 1;
+            m_nodes_mat.push_back(leaf2Mat(leafIndex));
+            return m_nodes_mat.rows - 1;
+        }
+
+        // Add root
+        m_nodes_mat.push_back(node2Mat(nodeIdx));
+        int idx = m_nodes_mat.rows - 1;
+
+        // Add let
+        if(m_nodes[nodeIdx].tau != -500)
+            compressNodes(2*nodeIdx + 1);
+
+        // Add right
+        if(m_nodes[nodeIdx].tau != 500)
+        {
+            auto right = compressNodes(2*nodeIdx + 2);
+            m_nodes_mat(idx,0) = right;
+        }
+
+        return idx;
+    }
+
+public:
+    inline void compreseTree() {
+        m_nodes_mat.reserve(300000);
+        compressFtr();
+        compressNodes(0);
+//        cv::FileStorage storage("/home/neko/Desktop/RDT.yml", cv::FileStorage::WRITE);
+//        storage << "m_nodes_mat" << m_nodes_mat;
+//        storage << "m_features_mat" << m_features_mat;
+//        storage.release();
+    }
+
+
+private:
     friend class cereal::access;
 
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive(m_height, m_probe_distanceX,
-                m_probe_distanceY, m_minLeafPixelCount, m_nodes);
+        archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
     }
 
     inline void generateParams(quint32 index)
