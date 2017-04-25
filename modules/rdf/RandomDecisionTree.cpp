@@ -173,8 +173,8 @@ void RandomDecisionTree::constructTreeDecisionNodes()
         SignalSenderInterface::instance().printsend("Tree at depth " + QString::number(depth) + " being processed...");
         m_leafCount = 0;
         m_nonLeafpxCount = m_pixelCloud.pixels1.size();
-        int level_nodes = 1 << depth;          // Number of nodes at this level
-        int tot_nodes   = (1 << (depth + 1)) - 1; // Number of nodes at this and previous levels
+        int level_nodes = 1ul << depth;          // Number of nodes at this level
+        int tot_nodes   = (1ul << (depth + 1)) - 1; // Number of nodes at this and previous levels
         tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
         {
             processNode(nodeIndex);
@@ -201,8 +201,15 @@ void RandomDecisionTree::computeLeafHistograms()
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
         auto pxCount = start - end;
-        if (pxCount <= m_params->minLeafPixels)
+
+
+        if (pxCount == 0)
+        {
+            parent.tau = 1000*mult - 500; // Supress all nodes to right if left node is empty
             continue;
+        }
+
+        m_nodes[node_id].isLeaf = true;
         m_nodes[node_id].id = node_id;
         m_nodes[node_id].start = start;
         m_nodes[node_id].end = end;
