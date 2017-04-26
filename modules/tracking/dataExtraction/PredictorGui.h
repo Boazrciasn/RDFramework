@@ -4,7 +4,7 @@
 #include "Util.h"
 #include <QWidget>
 #include <opencv2/ml.hpp>
-#include "rdf/RandomDecisionForest.h"
+#include "rdf/RDFBasic.h"
 
 namespace Ui
 {
@@ -24,7 +24,7 @@ class PredictorGui : public QWidget
     void writeSettings();
     ~PredictorGui();
 
-    inline RandomDecisionForest* getForest() const
+    inline RDFBasic* getForest() const
     {
         return m_forest;
     }
@@ -42,7 +42,7 @@ private slots:
   private:
     Ui::PredictorGui *ui;
     cv::Ptr<cv::ml::SVM> m_svm{};
-    RandomDecisionForest *m_forest{};
+    RDFBasic *m_forest{};
 
     QString m_posDes;
     QString m_negDes;

@@ -10,7 +10,7 @@
 #include <opencv2/ml.hpp>
 
 #include "modules/tracking/videoplayer/VideoProcess.h"
-#include "rdf/RandomDecisionForest.h"
+#include "rdf/RDFBasic.h"
 
 class Particle;
 class Target;
@@ -49,7 +49,7 @@ class ParticleFilter : public VideoProcess
     inline void setModelType(int value) { type = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
     inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
-    inline void setRDF(RandomDecisionForest* rdf){m_forest = rdf;}
+    inline void setRDF(RDFBasic* rdf){m_forest = rdf;}
     void setVideoReader(VideoReader *videoReader);
     void processImage();
     void showParticles();
@@ -80,7 +80,7 @@ class ParticleFilter : public VideoProcess
     VideoReader *m_VideoReader;
 
     cv::Ptr<cv::ml::SVM> m_svm{};
-    RandomDecisionForest *m_forest{};
+    RDFBasic *m_forest{};
 
 };
 #endif

@@ -32,16 +32,19 @@ ParticleFilter::ParticleFilter(
 
 void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 {
-    m_img = inputImg;
+    //        m_forest->setNTreesForDetection(1);
+    m_img = inputImg.clone();
 
-    // TODO: Replace
-//    std::vector<Process*> processes;
-//    Sobel* proc = new Sobel(3, 3, CV_SCHARR);
-//    processes.push_back(proc);
-//    PreProcess::doBatchPreProcessSingle(m_img,processes);
+    cv::resize(m_img,m_img,cv::Size(416,416));
+    cv::cvtColor(m_img,m_img, CV_RGB2Lab);
 
-    processImage();
-    imgOut = m_img;
+    cv::Mat_<float> confs{};
+    cv::Mat_<float> layered = m_forest->getLayeredHist(m_img);
+    m_forest->getLabelAndConfMat(layered, imgOut, confs);
+    cv::cvtColor(imgOut,imgOut, CV_RGB2BGR);
+
+    //    processImage();
+    //    imgOut = m_img;
 }
 
 int ParticleFilter::getRatioOfTop(int count)

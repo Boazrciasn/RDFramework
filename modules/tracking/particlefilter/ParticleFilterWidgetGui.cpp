@@ -90,7 +90,7 @@ void ParticleFilterWidgetGui::dispROI()
     if(m_TargetROI.x() < 0 || (m_TargetROI.x() + m_TargetROI.width()) >= m_originalPix.width() || m_TargetROI.y() < 0 || (m_TargetROI.y() + m_TargetROI.height()) >= m_originalPix.height())
         return;
 
-    RandomDecisionForest* rdf = m_predictor->getForest();
+    RDFBasic* rdf = m_predictor->getForest();
     if(rdf)
     {
         cv::Mat srcImg = Util::toCv(m_originalPix.toImage(), CV_8UC4);
@@ -430,7 +430,7 @@ void ParticleFilterWidgetGui::setConfidence()
 void ParticleFilterWidgetGui::onActionDispConfMap()
 {
     m_svm = m_predictor->getSvm();
-    RandomDecisionForest* rdf = m_predictor->getForest();
+    RDFBasic* rdf = m_predictor->getForest();
     if(!m_VideoLodaded || m_isPlaying)
         return;
 

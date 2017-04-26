@@ -181,7 +181,7 @@ void PredictorGui::extractHOGFeatures()
 
 void PredictorGui::loadRDF()
 {
-    m_forest = new RandomDecisionForest();
+    m_forest = new RDFBasic();
     QString selfilter = tr("BINARY (*.bin *.txt)");
     QString fname = QFileDialog::getOpenFileName(
                         this,
