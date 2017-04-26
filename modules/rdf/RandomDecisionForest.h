@@ -12,7 +12,7 @@
 class RandomDecisionForest
 {
 
-  private:
+private:
     std::vector<RandomDecisionTree> m_trees{};
     RDFParams m_params{};
     DataSet *m_DS;
@@ -48,16 +48,16 @@ public:
     inline void computePixelPerImgMap()
     {
         auto maxLabel = std::max_element(m_DS->map_dataPerLabel.begin(), m_DS->map_dataPerLabel.end(),
-            [](const std::pair<quint16,quint16>& p1, const std::pair<quint16,quint16>& p2) {
-                return p1.second < p2.second; });
+                                         [](const std::pair<quint16,quint16>& p1, const std::pair<quint16,quint16>& p2) {
+            return p1.second < p2.second; });
         float maxTotPerLabel = maxLabel->second * m_params.pixelsPerImage;
 
         for (auto it = m_DS->map_dataPerLabel.begin(); it != m_DS->map_dataPerLabel.end(); ++it)
             m_params.pixelsPerLabelImage[it->first] = std::round(maxTotPerLabel/it->second);
 
-//        for (auto it = m_DS->map_dataPerLabel.begin(); it != m_DS->map_dataPerLabel.end(); ++it)
-//            qDebug() << it->second << " * " << m_params.pixelsPerLabelImage[it->first] << " = " <<
-//                        it->second*m_params.pixelsPerLabelImage[it->first];
+        //        for (auto it = m_DS->map_dataPerLabel.begin(); it != m_DS->map_dataPerLabel.end(); ++it)
+        //            qDebug() << it->second << " * " << m_params.pixelsPerLabelImage[it->first] << " = " <<
+        //                        it->second*m_params.pixelsPerLabelImage[it->first];
     }
 
     inline void setDataSet(DataSet* DS)
@@ -107,14 +107,13 @@ public:
     ~RandomDecisionForest() { m_trees.clear(); }
 
     // Cereal serialize code:
-  public:
+public:
     inline void saveForest(QString fname)
     {
         std::ofstream file(fname.toStdString(), std::ios::binary);
         cereal::BinaryOutputArchive ar(file);
         ar(*this);
         file.flush();
-        file.close();
         file.close();
     }
 

@@ -131,6 +131,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     // for each pix we alocate LABEL_COUNT slots to keep hist
     // therefore, ROW is the same COL is COL*LABEL_COUNT
     cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols * labelCount);
+
     for (int row = 0; row < nRows; ++row)
         tbb::parallel_for(0, nCols, 1, [ =, &layeredHist ](int col)
         {

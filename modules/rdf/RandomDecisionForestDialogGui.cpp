@@ -3,6 +3,7 @@
 #include "rdf/RDFParams.h"
 #include "rdf/RandomDecisionForestDialogGui.h"
 #include "ui_RandomDecisionForestDialogGui.h"
+#include "RDFBasic.h"
 
 
 
