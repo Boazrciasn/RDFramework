@@ -3,8 +3,6 @@
 #include "rdf/RDFParams.h"
 #include "rdf/RandomDecisionForestDialogGui.h"
 #include "ui_RandomDecisionForestDialogGui.h"
-#include "RDFBasic.h"
-
 
 
 void RandomDecisionForestDialogGui::initParamValues()
@@ -31,7 +29,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     initParamValues();
     m_nTreesForDetection = ui->spinBox_NTestTrees->value();
     QObject::connect(&SignalSenderInterface::instance(), SIGNAL(printsend(QString)), this,
-                     SLOT(printMsgToTrainScreen(QString)));
+                     SLOT(printMsg(QString)));
     m_dataReaderGUI = new ReaderGUI();
     m_displayImagesGUI = new DisplayGUI();
     m_preprocessGUI = new PreProcessGUI();
@@ -52,6 +50,14 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 {
+    delete m_dataReaderGUI;
+    delete m_displayImagesGUI;
+    delete &m_forest;
+    delete &m_forest_basic;
+    delete &m_preprocesses;
+    delete m_preprocessGUI;
+    delete m_splitterHori;
+    delete m_splitterVert;
     delete ui;
 }
 
@@ -80,121 +86,53 @@ void RandomDecisionForestDialogGui::onTrain()
     m_forest.setPreProcess(m_preprocessGUI->preprocesses());
     m_forest.setDataSet(m_dataReaderGUI->DS());
     if (m_forest.trainForest())
-        ui->console->append("Forest Trained ! ");
+        printMsg("Forest Trained ! ");
     else
-        ui->console->append("Failed to Train Forest! (Forest DS is not set) ");
-    ui->console->repaint();
+        printMsg("Failed to Train Forest! (Forest DS is not set) ");
 }
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    m_forest.setNTreesForDetection(m_nTreesForDetection);
-    m_dataReaderGUI->DS()->isBordered = true;
-    m_forest.setDataSet(m_dataReaderGUI->DS());
-
+//    m_forest_basic.setNTreesForDetection(m_nTreesForDetection);
     auto begin = std::chrono::high_resolution_clock::now();
 //    auto accuracy = m_forest.testForest();
-
 
     // ///////////////////////////////////////////////////
     // ///////////////////////////////////////////////////
     // New Test
     auto size = m_dataReaderGUI->DS()->images.size();
-    tbb::concurrent_vector<cv::Mat> output(size);
     std::vector<cv::Mat> results{};
 
-    auto accuracy = m_forest.testForest(output);
 
-    for(auto i = 0; i <  size; ++i)
+    for(auto i = 0u; i <  size; ++i)
     {
+        cv::Mat labels{};
+        cv::Mat_<float> confs{};
+        cv::Mat_<float> layered = m_forest_basic.getLayeredHist(m_dataReaderGUI->DS()->images[i]);
+        m_forest_basic.getLabelAndConfMat(layered, labels, confs);
+
         results.push_back(m_dataReaderGUI->DS()->images[i]);
-        results.push_back(output[i]);
+        results.push_back(labels);
     }
 
     m_displayImagesGUI->setImageSet(results);
     // ///////////////////////////////////////////////////
     // ///////////////////////////////////////////////////
-    /// \brief end
-    ///
+
     auto end = std::chrono::high_resolution_clock::now();
     auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
 
-    printMsgToTestScreen("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
-    printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
+    printMsg("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()
 {
-    // TODO: find proper place for this operation
-//    for(auto &img :  m_dataReaderGUI->DS()->images)
-//        cv::resize(img,img,cv::Size(128,256));
-
-
     PreProcess::doBatchPreProcess(m_dataReaderGUI->DS()->images, m_preprocessGUI->preprocesses());
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->images);
     m_dataReaderGUI->DS()->isProcessed = true;
 }
 
-void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
-{
-    int scale = 1;
-    int delta = 0;
-    int ddepth = CV_16S;
-    /// Generate grad_x and grad_y
-    cv::Mat grad_x, grad_y;
-    cv::Mat abs_grad_x, abs_grad_y;
-    for (auto &img : images)
-    {
-        cv::GaussianBlur(img, img, cv::Size(3, 3), 0);
-        //        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
-        /// Gradient X
-        //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
-        cv::Sobel(img, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT);
-        cv::convertScaleAbs(grad_x, abs_grad_x);
-        /// Gradient Y
-        //Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
-        cv::Sobel(img, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT);
-        cv::convertScaleAbs(grad_y, abs_grad_y);
-        /// Total Gradient (approximate)
-        cv::addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, img);
-        //        cv::imshow( "window_name", img);
-        //        cv::waitKey();
-    }
-}
-
-void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
-{
-    int lowThreshold = 50;
-    int ratio = 3;
-    int kernel_size = 3;
-    for (auto &img : images)
-    {
-        cv::GaussianBlur(img, img, cv::Size(11, 11), 0);
-        cv::Canny(img, img, lowThreshold, lowThreshold * ratio, kernel_size);
-    }
-}
-
-void RandomDecisionForestDialogGui::image_at_classified_as(int index, char label)
-{
-    ui->console->append("Image " + QString::number(
-                            index) + " is classified as " + label);
-    ui->console->repaint();
-}
-
-void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
-{
-    ui->console->append(" Classification Accuracy : " + QString::number(
-                            accuracy) + "%");
-    ui->console->repaint();
-}
-
-void RandomDecisionForestDialogGui::printMsgToTrainScreen(QString msg)
-{
-    ui->console->append(msg);
-    ui->console->repaint();
-}
-
-void RandomDecisionForestDialogGui::printMsgToTestScreen(QString msg)
+void RandomDecisionForestDialogGui::printMsg(QString msg)
 {
     ui->console->append(msg);
     ui->console->repaint();
@@ -210,9 +148,8 @@ void RandomDecisionForestDialogGui::onLoad()
                         tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)"),
                         &selfilter
                     );
-    m_forest.loadForest(fname);
-    //    m_forest->printForest();
-    qDebug() << "LOAD FOREST PRINTED" ;
+    m_forest_basic.loadForest(fname);
+    ui->console->append("FOREST LOADED");
 }
 
 void RandomDecisionForestDialogGui::onSave()
@@ -226,10 +163,8 @@ void RandomDecisionForestDialogGui::onSave()
                     + "_nPxPI_" + QString::number(m_forest.params().pixelsPerImage)
                     + ".bin";
     m_forest.saveForest(dirname + "/" + fname);
-    qDebug() << "SAVED FOREST PRINTED" ;
+    ui->console->append("FOREST SAVED");
 }
-
-
 
 void RandomDecisionForestDialogGui::closeEvent(QCloseEvent *event)
 {
