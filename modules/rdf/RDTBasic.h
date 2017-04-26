@@ -9,8 +9,13 @@
 
 #include "Node.h"
 
-extern void computeLayeredHist_gpu(cv::Mat& img, cv::Mat_<float>& layered_hist, cv::Mat_<int>& tree_nodes, cv::Mat_<float>& features, int lbl_count, int padding);
-
+extern void computeLayeredHist_gpu(const cv::Mat& img,
+                                   cv::Mat_<float>& layered_hist,
+                                   const cv::Mat_<int>& tree_nodes,
+                                   const cv::Mat_<float>& features,
+                                   int lbl_count,
+                                   int padding_x,
+                                   int padding_y);
 class RDTBasic
 {
 public:
@@ -24,7 +29,8 @@ public:
     cv::Mat_<float> inline getLayeredHist(const cv::Mat& roi)
     {
         cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols * m_label_count);
-        computeLayeredHist(roi, layeredHist);
+//        computeLayeredHist(roi, layeredHist);
+        computeLayeredHist_gpu(roi, layeredHist, m_nodes, m_features, m_label_count, m_padding_x, m_padding_y);
         return layeredHist;
     }
 

@@ -37,8 +37,8 @@ class StatisticsLogger
 
     void inline logFeatureFreq(tbb::concurrent_vector<int> frequency) {
         m_featureSelectionRatio.resize(frequency.size());
-        float total = std::accumulate(frequency.begin(), frequency.end(), 0);
-        for (int i = 0; i < frequency.size(); ++i) {
+        auto total = std::accumulate(frequency.begin(), frequency.end(), 0);
+        for (auto i = 0u; i < frequency.size(); ++i) {
             m_featureSelectionRatio[i] = 100*frequency[i]/total;
         }
     }
@@ -62,8 +62,8 @@ class StatisticsLogger
     void dumpFeatureFrequency()
     {
         QString features;
-        for (int d = 0; d < m_featureSelectionRatio.size(); ++d)
-            features += QString::number(d).sprintf(": %2.2f %\n", m_featureSelectionRatio[d]) + Feature::features_str[d];
+        for (auto d = 0; d < m_featureSelectionRatio.size(); ++d)
+            features += QString::number(d).sprintf(": %2.2f %\n", (float)m_featureSelectionRatio[d]) + Feature::features_str[d];
 
 
         SignalSenderInterface::instance().printsend(features);
