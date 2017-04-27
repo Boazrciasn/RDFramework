@@ -10,8 +10,6 @@ public:
     RDFBasic() { }
     ~RDFBasic() {
         m_trees.clear();
-        delete &m_params;
-        delete &colorcode;
     }
 
     void inline detect(const cv::Mat& roi, int& label, float &conf)
