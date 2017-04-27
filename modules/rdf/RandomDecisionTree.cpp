@@ -146,6 +146,10 @@ void RandomDecisionTree::constructTree()
 {
     constructRootNode();
     constructTreeDecisionNodes();
+    SignalSenderInterface::instance().printsend("Updating nodes...");
+    computeLeafHistograms();
+    updateNodesWithNewDada();
+    SignalSenderInterface::instance().printsend("Computing leaf Histogram...");
     computeLeafHistograms();
 }
 
@@ -165,6 +169,7 @@ void RandomDecisionTree::constructRootNode()
 
     ++m_featureFreq[m_nodes[rootId].ftrID];
     rearrange(rootId);
+    m_pixelCloud.swap();
     calculateImpurity(0);
 }
 
@@ -187,6 +192,35 @@ void RandomDecisionTree::constructTreeDecisionNodes()
         m_statLog.logPxCount(m_nonLeafpxCount, depth);
         m_statLog.logLeafCount(m_leafCount, depth);
         qApp->processEvents();
+    }
+}
+
+void RandomDecisionTree::updateNodesWithNewDada()
+{
+    // For hist calc use different pxls
+    m_pixelCloud.pixels1.clear();
+    m_pixelCloud.pixels2.clear();
+    m_params->pixelsPerImage = m_params->pixelsPerImage + 100;
+    getSubSampleSingleFrame();
+
+    rearrange(0);   // process root
+    m_pixelCloud.swap();
+
+    for (quint32 depth = 1; depth < m_height - 1; ++depth)
+    {
+        int level_nodes = 1ul << depth;          // Number of nodes at this level
+        int tot_nodes   = (1ul << (depth + 1)) - 1; // Number of nodes at this and previous levels
+        tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
+        {
+            auto mult                = (nodeIndex + 1) % 2; // 0 if left, 1 if right
+            auto parentId            = (nodeIndex + 1) / 2 - 1;
+            auto leftCount           = m_nodes[parentId].leftCount;
+            auto rightCount          = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
+            m_nodes[nodeIndex].start = m_nodes[parentId].start + mult * leftCount;
+            m_nodes[nodeIndex].end   = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
+            rearrange(nodeIndex);
+        });
+        m_pixelCloud.swap();
     }
 }
 
@@ -217,6 +251,9 @@ void RandomDecisionTree::computeLeafHistograms()
         m_nodes[node_id].end = end;
         m_nodes[node_id].hist = computeHistogramNorm(start, end, m_params->labelCount);
     }
+
+    m_pixelCloud.pixels1.clear();
+    m_pixelCloud.pixels2.clear();
 }
 
 

@@ -8,9 +8,6 @@ SET(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fopenmp")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -fopenmp -O3")
 
-LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
-LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
-LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 
 # Find packages
@@ -71,6 +68,10 @@ QT5_WRAP_UI(UISrcs  Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/Re
 
 
 if (CUDA_FOUND)
+    LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
+    LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
+    LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
+
     CUDA_ADD_EXECUTABLE("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
         ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES})
 

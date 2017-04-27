@@ -142,6 +142,7 @@ class RandomDecisionTree
     void constructTree();
     void constructRootNode();
     void constructTreeDecisionNodes();
+    void updateNodesWithNewDada();
     void computeLeafHistograms();
     void computeDivisionAt(quint32 index);
     void computeDivisionWithLookUpAt(quint32 index);
@@ -167,10 +168,10 @@ class RandomDecisionTree
 
     void inline processNode(quint32 index)
     {
-        int mult = (index + 1) % 2; // 0 if left, 1 if right
-        int parentId = (index + 1) / 2 - 1;
-        quint32 leftCount = m_nodes[parentId].leftCount;
-        quint32 rightCount = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
+        auto mult = (index + 1) % 2; // 0 if left, 1 if right
+        auto parentId = (index + 1) / 2 - 1;
+        auto leftCount = m_nodes[parentId].leftCount;
+        auto rightCount = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
