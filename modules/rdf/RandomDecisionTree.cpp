@@ -236,7 +236,7 @@ void RandomDecisionTree::computeLeafHistograms()
         auto mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
-        auto pxCount = start - end;
+        auto pxCount = end - start;
 
 
         if (pxCount == 0)
