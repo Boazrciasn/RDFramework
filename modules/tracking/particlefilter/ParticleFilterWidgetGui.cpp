@@ -188,8 +188,12 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     int width;
     int height;
     std::tie(width, height) = frameSize;
+
+    // TODO: fix it
+    width = 416;
+    height = 416;
     m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters,
-                              m_particleWidth, m_particleHeight, m_histSize,m_TargetsVector[0]);
+                              m_particleWidth, m_particleHeight);
     m_PF->setRDF(m_predictor->getForest());
     m_PF->initializeParticles();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);

@@ -15,13 +15,11 @@ enum {CIRCLE, RECTANGLE};
 class Particle
 {
   public:
-    Particle(int x, int y, float weight, cv::Mat &target, int histSize)
+    Particle(int x, int y, float weight)
     {
         m_x = x;
         m_y = y;
         m_weight = weight;
-        m_targetHist = target;
-        m_histSize = histSize;
     }
 
     virtual void exec(cv::Mat *img) = 0;
@@ -43,30 +41,10 @@ class Particle
     inline float weight() const {return m_weight;}
     inline void setWeight(float value) { m_weight = value; }
 
-    inline cv::Mat target() const {return m_targetHist;}
-    inline void setTarget(cv::Mat &target) {m_targetHist = target;}
-
-    inline int histSize() const {return m_histSize;}
-    inline void setHistSize(int value) {m_histSize = value;}
-
-    inline void setHOGDescriptor(cv::HOGDescriptor *hog){m_hog = hog;}
-    inline cv::HOGDescriptor* getHOGDescriptor(){return m_hog;}
-
-    inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
-    inline cv::Ptr<cv::ml::SVM> getSVM(){return m_svm;}
-
-    inline void setRDF(RDFBasic* rdf){m_forest = rdf;}
-
   protected:
     int m_x;
     int m_y;
-    int m_histSize;
     float m_weight;
-    cv::Mat m_targetHist;
-
-    cv::HOGDescriptor *m_hog;
-    cv::Ptr<cv::ml::SVM> m_svm;
-    RDFBasic *m_forest{};
 };
 
 #endif
