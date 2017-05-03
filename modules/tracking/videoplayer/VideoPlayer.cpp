@@ -17,16 +17,16 @@ void VideoPlayer::run()
     int delay = (1000 / m_frameRate);
     while (!m_stop && !m_FrameBuffer->empty())
     {
-        m_RGBframe = m_FrameBuffer->dequeue();
-        if (m_RGBframe.empty())
+        m_frame = m_FrameBuffer->dequeue();
+        if (m_frame.empty())
         {
             msleep(delay);
             continue;
         }
         m_CurrentFrame++;
-        m_processor->exec(m_RGBframe, m_RGBframe);
-//        m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
-        m_img = Util::RGBMattoQt(m_RGBframe, QImage::Format_RGB888);
+        cv::resize(m_frame,m_frame,cv::Size(416,416));
+        m_processor->exec(m_frame, m_frame);
+        m_img = Util::toQt(m_frame, QImage::Format_RGB888);
         emit playerFrame(m_img);
         msleep(delay);
     }
@@ -36,8 +36,8 @@ void VideoPlayer::run()
 void VideoPlayer::processImage()
 {
     // Background Subtruction MOG
-    cv::blur(m_RGBframe, m_RGBframe, cv::Size(5, 5));
-    m_pMOG->apply(m_RGBframe, m_fgMaskMOG2);
+    cv::blur(m_frame, m_frame, cv::Size(5, 5));
+    m_pMOG->apply(m_frame, m_fgMaskMOG2);
     cv::Mat labels;
     cv::Mat stats;
     cv::Mat centroids;
@@ -85,10 +85,9 @@ void VideoPlayer::msleep(int ms)
 void VideoPlayer::initializeVideo()
 {
     while (m_FrameBuffer->size() < 1) {};
-    m_RGBframe = m_FrameBuffer->dequeue();
+    m_frame = m_FrameBuffer->dequeue();
     m_CurrentFrame++;
-//    m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
-    m_img = Util::RGBMattoQt(m_RGBframe, QImage::Format_RGB888);
+    m_img = Util::toQt(m_frame, QImage::Format_RGB888);
 }
 
 bool VideoPlayer::loadVideo(std::string filename)

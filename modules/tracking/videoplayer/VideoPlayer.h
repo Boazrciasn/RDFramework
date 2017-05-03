@@ -31,7 +31,7 @@ class VideoPlayer : public QThread
     QWaitCondition m_waitcond;
     cv::Mat m_frame_out;
     double m_frameRate;
-    cv::Mat m_RGBframe;
+    cv::Mat m_frame;
     QImage m_img;
     double m_CurrentFrame;
 

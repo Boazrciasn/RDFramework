@@ -65,6 +65,8 @@ public:
                 cv::Point max_loc;
                 auto tmpProbHist = layeredHist(cv::Range(row, row + 1), cv::Range(col * labelCount, (col + 1) * labelCount));
                 cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
+
+                if( max < 0.70 ) max_loc.x = 1;
                 labels.at<cv::Vec3b>(row, col) = colorcode.colors[max_loc.x];
                 confs(row, col) = max;
             });

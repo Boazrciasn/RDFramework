@@ -22,7 +22,6 @@ class VideoReader : public QThread
     int m_numOfFrames;
     int m_bufferEndPos = 0;
     cv::VideoCapture *m_capture;
-    cv::Mat m_RGBframe;
     QImage m_img;
     BufferQueue<cv::Mat> *m_FrameBuffer;
     bool m_stop = false;

@@ -53,7 +53,8 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
     auto drawRect = ui->draw_rect_checkBox->isChecked();
     auto load_color = ui->Load_color_comboBox->currentIndex();
 
-    auto img_size = 416;
+    auto img_size_row = 720/2;
+    auto img_size_col = 1280/2;
     auto img_row_ratio = 1.0f;
     auto img_col_ratio = 1.0f;
     auto max_w_h = 100;
@@ -73,9 +74,9 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
             QStringList file_ = line.trimmed().split(" ");
             QString img_file = dir + "/frames/" + file_[0] + file_[1] +".png";
             cv::Mat img = cv::imread(img_file.toStdString(),load_color);
-            img_row_ratio = (float)img_size/img.rows;
-            img_col_ratio = (float)img_size/img.cols;
-            cv::resize(img,img,cv::Size(img_size,img_size));
+            img_row_ratio = (float)img_size_row/img.rows;
+            img_col_ratio = (float)img_size_col/img.cols;
+            cv::resize(img,img,cv::Size(img_size_col,img_size_row));
 
             QVector<QRect> rects;
             line = in.readLine();
