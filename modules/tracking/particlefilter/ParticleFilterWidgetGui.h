@@ -61,6 +61,9 @@ protected:
     void onHistSizeChanged(int value);
     void onStepSizeChanged(int value);
 
+    void onDBSCANEpsChanged(double value);
+    void onDBSCANMinPtsChanged(int value);
+
   private:
     Ui::ParticleFilterWidgetGui *ui;
     VideoPlayer *m_VideoPlayer;
@@ -73,12 +76,14 @@ protected:
     cv::Mat m_Frame;
     cv::Mat m_FrameGray;
     cv::Mat m_FrameOut;
-    int m_particleCount;
-    int m_numIters;
-    int m_particleWidth;
-    int m_particleHeight;
-    int m_histSize ;
-    int m_stepSize;
+    int m_particleCount{};
+    int m_numIters{};
+    int m_particleWidth{};
+    int m_particleHeight{};
+    int m_histSize{};
+    int m_stepSize{};
+    int m_dbscan_min_pts{};
+    float m_dbscan_eps{};
     bool m_VideoLodaded{};
     bool m_isPlaying{};
     bool m_dragging{};

@@ -19,6 +19,8 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     m_particleHeight = ui->particleHeightLSpinBox->value();
     m_histSize = ui->histogramSizespinBox->value();
     m_stepSize = ui->stepSizeSizeSpinBox->value();
+    m_dbscan_eps = ui->dbscanEpsDoubleSpinBox->value();
+    m_dbscan_min_pts= ui->dbscanMinPtsSizespinBox->value();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     ui->histogramSizespinBox->setValue(m_histSize);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
@@ -187,6 +189,8 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     m_PF = new ParticleFilter(width, height, m_particleCount, m_numIters,
                               m_particleWidth, m_particleHeight);
     m_PF->setRDF(m_predictor->getForest());
+    m_PF->setDBSCANEps(m_dbscan_eps);
+    m_PF->setDBSCANMinPts(m_dbscan_min_pts);
     m_PF->initializeParticles();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setProcess(m_PF);
@@ -325,6 +329,16 @@ void ParticleFilterWidgetGui::onStepSizeChanged(int value)
     m_stepSize = value;
 }
 
+void ParticleFilterWidgetGui::onDBSCANEpsChanged(double value)
+{
+    m_dbscan_eps = value;
+}
+
+void ParticleFilterWidgetGui::onDBSCANMinPtsChanged(int value)
+{
+    m_dbscan_min_pts = value;
+}
+
 void ParticleFilterWidgetGui::writeSettings()
 {
     QSettings settings("VVGLab", "PFilterGUI");
@@ -335,6 +349,8 @@ void ParticleFilterWidgetGui::writeSettings()
     settings.setValue("particleWidthLSpinBox", ui->particleWidthLSpinBox->value());
     settings.setValue("particleHeightLSpinBox", ui->particleHeightLSpinBox->value());
     settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
+    settings.setValue("dbscanEpsDoubleSpinBox", ui->dbscanEpsDoubleSpinBox->value());
+    settings.setValue("dbscanMinPtsSizespinBox", ui->dbscanMinPtsSizespinBox->value());
 
     settings.setValue("stepSizeSizeSpinBox", ui->stepSizeSizeSpinBox->value());
     settings.endGroup();
@@ -355,6 +371,8 @@ void ParticleFilterWidgetGui::readSettings()
     ui->particleHeightLSpinBox->setValue(settings.value("particleHeightLSpinBox",128).toInt());
     ui->histogramSizespinBox->setValue(settings.value("histogramSizespinBox",12).toInt());
     ui->stepSizeSizeSpinBox->setValue(settings.value("stepSizeSizeSpinBox",15).toInt());
+    ui->dbscanEpsDoubleSpinBox->setValue(settings.value("dbscanEpsDoubleSpinBox", 8.0f).toDouble());
+    ui->dbscanMinPtsSizespinBox->setValue(settings.value("dbscanMinPtsSizespinBox",20).toInt());
     settings.endGroup();
 
     settings.beginGroup("video");

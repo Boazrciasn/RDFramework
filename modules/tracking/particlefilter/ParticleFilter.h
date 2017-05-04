@@ -26,30 +26,36 @@ class ParticleFilter : public VideoProcess
     inline void setParticleWidth(int value) { m_particle_width = value; }
     inline void setParticleHeight(int value) { m_particle_height = value; }
     inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
+    inline void setDBSCANEps(float value) { m_dbscan_eps = value; }
+    inline void setDBSCANMinPts(int value) { m_dbscan_min_pts = value; }
     inline void setRDF(RDFBasic* rdf){m_forest = rdf;}
     void processImage();
     void showParticles();
     void showTopNParticles(int count);
+    void showDetections();
 
   private:
     void distortParticle(RectangleParticle& p);
 
-    int m_num_particles;
-    int m_num_iters;
-    int m_particle_width;
-    int m_particle_height;
-    int m_distortRange;
-    int m_num_particles_to_display;
-    int img_height, img_width;
-    int m_xRange;
-    int m_yRange;
+    int m_num_particles{};
+    int m_num_iters{};
+    int m_particle_width{};
+    int m_particle_height{};
+    int m_distortRange{};
+    int m_num_particles_to_display{};
+    int img_height{}, img_width{};
+    int m_xRange{};
+    int m_yRange{};
+
+    float m_dbscan_eps{};
+    int m_dbscan_min_pts{};
+
     QVector<RectangleParticle> m_particles;
     QVector<RectangleParticle> m_particlesNew;
     RDFBasic *m_forest{};
     pcg32 m_generator;
-    std::uniform_real_distribution<> m_rand_dice;
-    std::uniform_real_distribution<> m_rand_distortion;
-    cv::Ptr<cv::cuda::BackgroundSubtractorGMG> m_bsMoG;
+    std::uniform_real_distribution<> m_rand_dice{};
+    std::uniform_real_distribution<> m_rand_distortion{};
 };
 #endif
 

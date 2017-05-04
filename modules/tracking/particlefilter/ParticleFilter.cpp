@@ -21,10 +21,13 @@ ParticleFilter::ParticleFilter(
     m_distortRange = 10; // TODO: set from gui
     m_rand_dice    = std::uniform_real_distribution<>(0, 1);
     m_rand_distortion = std::uniform_real_distribution<>(-1, 1);
-    m_bsMoG = cv::cuda::createBackgroundSubtractorGMG(5);
 
     m_xRange = (img_width - m_particle_width);
     m_yRange = (img_height - m_particle_height);
+
+    // Default
+    setDBSCANEps(8.0f);
+    setDBSCANMinPts(20);
 }
 
 void ParticleFilter::initializeParticles()
@@ -50,13 +53,6 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 {
     m_img = inputImg.clone();
 
-    // Background Subtraction
-//    cv::cuda::GpuMat src(inputImg);
-//    cv::cuda::GpuMat des;
-//    m_bsMoG->apply(src, des);
-//    des.download(imgOut);
-
-
     cv::cvtColor(m_img,m_img, CV_BGR2Lab);
     cv::Mat_<float> confs{};
     cv::Mat_<float> layered = m_forest->getLayeredHist(m_img);
@@ -64,13 +60,7 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 
     cv::medianBlur(m_img, m_img, 3);
     m_img(cv::Range(0,240), cv::Range::all()) = 0;
-
-//    m_img.copyTo(imgOut, imgOut);
-//    m_img = imgOut;
     processImage();
-
-//    m_bsMoG->apply(inputImg, imgOut);
-//    m_img.copyTo(imgOut, imgOut);
     imgOut = m_img;
 }
 
@@ -119,11 +109,7 @@ void ParticleFilter::processImage()
     });
 
     showTopNParticles(m_num_particles_to_display);
-    auto eps = 5.0f;
-    auto min_pts = 30;
-
-    auto clusters = DBSCAN::getClusters(m_particles, eps, min_pts);
-    qDebug() << clusters.size();
+    showDetections();
 }
 
 // TODO: double'dan inte cast edilliyor tekrar?
@@ -145,6 +131,27 @@ void ParticleFilter::distortParticle(RectangleParticle& p)
     }
 }
 
+void ParticleFilter::showDetections()
+{
+    auto clusters = DBSCAN::getClusters(m_particles, m_dbscan_eps, m_dbscan_min_pts);
+
+    for(auto cluster : clusters)
+    {
+        int x = 0;
+        int y = 0;
+        for (auto p : cluster)
+        {
+            x += p.x();
+            y += p.y();
+        }
+        x = x / cluster.size();
+        y = y / cluster.size();
+        int x_end = x + m_particle_width;
+        int y_end = y + m_particle_height;
+        rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(0, 130, 0), 2);
+    }
+}
+
 void ParticleFilter::showParticles()
 {
     int x = 0;
@@ -158,7 +165,7 @@ void ParticleFilter::showParticles()
     y = y / m_num_particles;
     int x_end = x + m_particle_width;
     int y_end = y + m_particle_height;
-    rectangle(m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+    rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(130, 0, 0), 1);
 }
 
 void ParticleFilter::showTopNParticles(int count)
@@ -175,7 +182,7 @@ void ParticleFilter::showTopNParticles(int count)
         y = m_particles[i].y();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_height;
-        rectangle(m_img, cvPoint(x, y), cvPoint(x_end, y_end), cvScalar(130, 0, 0), 1);
+        rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(130, 0, 0), 1);
     }
 }
 
