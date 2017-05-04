@@ -19,19 +19,20 @@ ParticleFilter::ParticleFilter(
     setParticlesToDisplay(m_num_particles_to_display);
     m_distortRange = 10; // TODO: set from gui
     m_rand_dice    = std::uniform_real_distribution<>(0, 1);
-    m_rand_distortion = std::uniform_real_distribution<>(-m_distortRange, m_distortRange);
+    m_rand_distortion = std::uniform_real_distribution<>(-1, 1);
     m_bsMoG = cv::cuda::createBackgroundSubtractorGMG(5);
+
+    m_xRange = (img_width - m_particle_width);
+    m_yRange = (img_height - m_particle_height);
 }
 
 void ParticleFilter::initializeParticles()
 {
-    int xRange = (img_width - m_particle_width);
-    int yRange = (img_height - m_particle_height);
     m_particles.resize(m_num_particles);
     for (auto& p : m_particles)
     {
-        p.setX((int)(m_rand_dice(m_generator)*xRange));
-        p.setY((int)(m_rand_dice(m_generator)*yRange));
+        p.setX((int)(m_rand_dice(m_generator)*m_xRange));
+        p.setY((int)(m_rand_dice(m_generator)*m_yRange));
         p.setWeight(1.0f / m_num_particles);
         p.setWidth(m_particle_width);
         p.setHeight(m_particle_height);
@@ -89,14 +90,28 @@ void ParticleFilter::processImage()
         return index;
     };
 
+    reInitialiaze();
     for (int i = 0; i < m_num_iters; ++i)
     {
         // resample particles
-        for (int j = 0; j < m_num_particles; ++j)
+        auto ratio = 0.9f;
+        auto resample_count = (int)(ratio*m_num_particles);
+        for (int j = 0; j < resample_count; ++j)
         {
             auto p_new = m_particles[resamplingWheel()].clone();
             distortParticle(p_new);             // Motion Update
             p_new.exec(m_img);                  // update weight
+            m_particlesNew.push_back(p_new);
+        }
+
+        for (int j = 0; j < m_num_particles-resample_count; ++j)
+        {
+            RectangleParticle p_new;
+            p_new.setX((int)(m_rand_dice(m_generator)*m_xRange));
+            p_new.setY((int)(m_rand_dice(m_generator)*m_yRange));
+            p_new.setWeight(1.0f / m_num_particles);
+            p_new.setWidth(m_particle_width);
+            p_new.setHeight(m_particle_height);
             m_particlesNew.push_back(p_new);
         }
 
@@ -123,9 +138,9 @@ void ParticleFilter::distortParticle(RectangleParticle& p)
 {
     int newx = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
     int newy = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    if (newx < img_width - m_particle_width && newx > 0)
+    if (newx < m_xRange && newx > 0)
         p.setX(newx);
-    if (newy < img_height - m_particle_width && newy > 0)
+    if (newy < m_yRange && newy > 0)
         p.setY(newy);
 }
 

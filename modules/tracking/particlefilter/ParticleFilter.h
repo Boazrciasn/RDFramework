@@ -41,6 +41,8 @@ class ParticleFilter : public VideoProcess
     int m_distortRange;
     int m_num_particles_to_display;
     int img_height, img_width;
+    int m_xRange;
+    int m_yRange;
     QVector<RectangleParticle> m_particles;
     QVector<RectangleParticle> m_particlesNew;
     RDFBasic *m_forest{};
