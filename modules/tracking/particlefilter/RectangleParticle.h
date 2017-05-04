@@ -27,7 +27,7 @@ public:
                 conf +=  (img.at<cv::Vec3b>(row,col) == cv::Vec3b(0,0,255) ? 1:0);
 
         auto tot = m_width*m_height;
-        if(conf > tot/2)
+        if(conf > tot/4)
             setWeight(conf/tot);
         else
             setWeight(0.0f);

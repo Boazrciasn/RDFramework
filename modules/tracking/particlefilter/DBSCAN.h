@@ -8,7 +8,7 @@ class DBSCAN {
 public:
 
     template <typename T>
-    static inline QVector<QVector<RectangleParticle>> getClusters(QVector<T>& particles, float epsilon, quint8 min_points)
+    static inline QVector<QVector<T>> getClusters(QVector<T>& particles, float epsilon, quint8 min_points)
     {
         QVector<QVector<T>> result;
         auto clusters = 0;

@@ -208,7 +208,7 @@
          <item row="0" column="1">
           <widget class="QSpinBox" name="particleCountSpinBox">
            <property name="maximum">
-            <number>1000</number>
+            <number>100000</number>
            </property>
            <property name="value">
             <number>100</number>

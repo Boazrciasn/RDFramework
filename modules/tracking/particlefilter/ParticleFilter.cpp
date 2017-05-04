@@ -81,27 +81,37 @@ void ParticleFilter::processImage()
         return index;
     };
 
-    reInitialiaze();
+//    reInitialiaze();
+
     for (int i = 0; i < m_num_iters; ++i)
     {
+        for (auto& p : m_particles)
+            p.exec(m_img);
+
+        // normalize weights
+        auto total_weight = sumall(m_particles, [](RectangleParticle P) { return P.weight(); });
+        for (auto& p : m_particles)
+            p.setWeight(p.weight() / total_weight);
+
+
         // resample particles
         for (int j = 0; j < m_num_particles; ++j)
         {
             auto p_new = m_particles[resamplingWheel()].clone();
             distortParticle(p_new);             // Motion Update
-            p_new.exec(m_img);                  // update weight
             m_particlesNew.push_back(p_new);
         }
 
         // update particles
         m_particles = m_particlesNew;
         m_particlesNew.clear();
-
-        // normalize weights
-        auto total_weight = sumall(m_particles, [](RectangleParticle P) { return P.weight(); });
-        for (auto& p : m_particles)
-            p.setWeight(p.weight() / total_weight);
     }
+
+
+    // normalize weights
+    auto total_weight = sumall(m_particles, [](RectangleParticle P) { return P.weight(); });
+    for (auto& p : m_particles)
+        p.setWeight(p.weight() / total_weight);
 
     // sort descending
     std::sort(std::begin(m_particles), std::end(m_particles), [](RectangleParticle P1, RectangleParticle P2) {
@@ -115,10 +125,21 @@ void ParticleFilter::processImage()
 // TODO: double'dan inte cast edilliyor tekrar?
 void ParticleFilter::distortParticle(RectangleParticle& p)
 {
+    if(p.weight() == 0.0)
+    {
+        p.setX((int)(m_rand_dice(m_generator)*m_xRange));
+        p.setY((int)(m_rand_dice(m_generator)*m_yRange));
+        p.setWeight(1.0f / m_num_particles);
+        p.setWidth(m_particle_width);
+        p.setHeight(m_particle_height);
+        return;
+    }
+
+
     int new_x = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
     int new_y = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    int new_w = p.getWidth() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    int new_h = p.getHeight() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+    quint16 new_w = p.getWidth() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+    quint16 new_h = p.getHeight() + (int)(m_rand_distortion(m_generator)*m_distortRange);
     if (new_x < (img_width - new_w) && new_x > 0)
     {
         p.setX(new_x);
