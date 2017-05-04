@@ -13,7 +13,9 @@ public:
 
     RectangleParticle clone()
     {
-        return RectangleParticle(m_x, m_y, m_width, m_height, m_weight);
+        RectangleParticle clone(m_x, m_y, m_width, m_height, m_weight);
+        clone.setIsVisited(isVisited());
+        return clone;
     }
 
 
@@ -49,12 +51,17 @@ public:
     inline void setWeight(float value) { m_weight = value; }
 
 
+    inline bool isVisited() const {return m_isVisited;}
+    inline void setIsVisited(bool value) { m_isVisited = value; }
+
+
 private:
-    quint16 m_x;
-    quint16 m_y;
-    quint16 m_width;
-    quint16 m_height;
-    float m_weight;
+    quint16 m_x{};
+    quint16 m_y{};
+    quint16 m_width{};
+    quint16 m_height{};
+    float m_weight{};
+    bool m_isVisited{};
 };
 
 #endif // RECTANGLEPARTICLE_H

@@ -6,6 +6,7 @@
 #include "Util.h"
 #include "Target.h"
 #include "tracking/particlefilter/RectangleParticle.h"
+#include "DBSCAN.h"
 
 ParticleFilter::ParticleFilter(
         int frameWidth, int frameHeight, int nParticles, int nIters,
@@ -94,24 +95,11 @@ void ParticleFilter::processImage()
     for (int i = 0; i < m_num_iters; ++i)
     {
         // resample particles
-        auto ratio = 0.9f;
-        auto resample_count = (int)(ratio*m_num_particles);
-        for (int j = 0; j < resample_count; ++j)
+        for (int j = 0; j < m_num_particles; ++j)
         {
             auto p_new = m_particles[resamplingWheel()].clone();
             distortParticle(p_new);             // Motion Update
             p_new.exec(m_img);                  // update weight
-            m_particlesNew.push_back(p_new);
-        }
-
-        for (int j = 0; j < m_num_particles-resample_count; ++j)
-        {
-            RectangleParticle p_new;
-            p_new.setX((int)(m_rand_dice(m_generator)*m_xRange));
-            p_new.setY((int)(m_rand_dice(m_generator)*m_yRange));
-            p_new.setWeight(1.0f / m_num_particles);
-            p_new.setWidth(m_particle_width);
-            p_new.setHeight(m_particle_height);
             m_particlesNew.push_back(p_new);
         }
 
@@ -131,17 +119,30 @@ void ParticleFilter::processImage()
     });
 
     showTopNParticles(m_num_particles_to_display);
+    auto eps = 5.0f;
+    auto min_pts = 30;
+
+    auto clusters = DBSCAN::getClusters(m_particles, eps, min_pts);
+    qDebug() << clusters.size();
 }
 
 // TODO: double'dan inte cast edilliyor tekrar?
 void ParticleFilter::distortParticle(RectangleParticle& p)
 {
-    int newx = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    int newy = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    if (newx < m_xRange && newx > 0)
-        p.setX(newx);
-    if (newy < m_yRange && newy > 0)
-        p.setY(newy);
+    int new_x = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+    int new_y = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+    int new_w = p.getWidth() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+    int new_h = p.getHeight() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+    if (new_x < (img_width - new_w) && new_x > 0)
+    {
+        p.setX(new_x);
+        p.setWidth(new_w);
+    }
+    if (new_y < (img_height - new_h) && new_y > 0)
+    {
+        p.setY(new_y);
+        p.setHeight(new_h);
+    }
 }
 
 void ParticleFilter::showParticles()
