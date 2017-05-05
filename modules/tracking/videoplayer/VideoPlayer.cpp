@@ -136,7 +136,7 @@ double VideoPlayer::getCurrentFrame()
 std::tuple<int, int> VideoPlayer::getFrameSize()
 {
     // TODO: fix it
-    return std::make_tuple(m_frame_w, m_frame_h);
+    return std::make_tuple(m_frame_w, m_frame_h - 240);
 //    return std::make_tuple(m_VideoReader->getFrameWidth(), m_VideoReader->getFrameHeight());
 }
 

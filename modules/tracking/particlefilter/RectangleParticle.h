@@ -21,16 +21,12 @@ public:
 
     void exec(const cv::Mat& img)
     {
-        float conf{};
+        auto conf = 0.0f;
         for (int row = m_y; row < m_y+m_height; ++row)
             for (int col = m_x; col < m_x + m_width ; ++col)
-                conf +=  (img.at<cv::Vec3b>(row,col) == cv::Vec3b(0,0,255) ? 1:0);
+                conf +=  img.at<uchar>(row,col);
 
-        auto tot = m_width*m_height;
-        if(conf > tot/4)
-            setWeight(conf/tot);
-        else
-            setWeight(0.0f);
+        setWeight(conf);
     }
 
     inline cv::Rect getParticle() const { return cv::Rect(m_x, m_y, m_width, m_height); }

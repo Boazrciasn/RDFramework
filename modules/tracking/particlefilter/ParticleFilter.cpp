@@ -62,7 +62,6 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 
     m_img = inputImg;
     showDetections();
-
     imgOut = m_img;
 }
 
@@ -120,7 +119,7 @@ void ParticleFilter::processImage()
         return P1.weight() > P2.weight();
     });
 
-//    showTopNParticles(m_num_particles_to_display);
+    showTopNParticles(m_num_particles_to_display);
 }
 
 // TODO: double'dan inte cast edilliyor tekrar?
