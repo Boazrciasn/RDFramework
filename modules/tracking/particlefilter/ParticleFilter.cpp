@@ -114,7 +114,6 @@ void ParticleFilter::showDetections()
         rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(0, 130, 0), 2);
     }
 }
-}
 
 void ParticleFilter::showTopNParticles(int count)
 {
