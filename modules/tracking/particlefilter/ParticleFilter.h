@@ -8,7 +8,9 @@
 #include <opencv2/opencv.hpp>
 #include "3rdparty/pcg-cpp-0.98/include/pcg_random.hpp"
 
-class RectangleParticle;
+#include "RectangleParticle.h"
+#include "Util.h"
+
 class VideoReader;
 
 class ParticleFilter : public VideoProcess
@@ -19,7 +21,7 @@ class ParticleFilter : public VideoProcess
     ~ParticleFilter();
 
     void initializeParticles();
-    void reInitialiaze();
+    void reset();
 
     inline void setNumParticles(int value) { m_num_particles = value; }
     inline void setNumIters(int value) { m_num_iters = value; }
@@ -30,13 +32,10 @@ class ParticleFilter : public VideoProcess
     inline void setDBSCANMinPts(int value) { m_dbscan_min_pts = value; }
     inline void setRDF(RDFBasic* rdf){m_forest = rdf;}
     void processImage();
-    void showParticles();
     void showTopNParticles(int count);
     void showDetections();
 
   private:
-    void distortParticle(RectangleParticle& p);
-
     int m_num_particles{};
     int m_num_iters{};
     int m_particle_width{};
@@ -50,12 +49,61 @@ class ParticleFilter : public VideoProcess
     float m_dbscan_eps{};
     int m_dbscan_min_pts{};
 
-    QVector<RectangleParticle> m_particles;
+    QVector<RectangleParticle> m_search_particles;
+    QVector<RectangleParticle> m_tracking_particles;
     QVector<RectangleParticle> m_particlesNew;
+
     RDFBasic *m_forest{};
     pcg32 m_generator;
     std::uniform_real_distribution<> m_rand_dice{};
-    std::uniform_real_distribution<> m_rand_distortion{};
+    std::normal_distribution<> m_rand_distortion{};
+
+    void resample(QVector<RectangleParticle>& particles);
+
+    void inline computeWeights(QVector<RectangleParticle>& particles)
+    {
+        for (auto& p : particles)
+            p.exec(m_img);
+    }
+
+    void inline normalizeWeights(QVector<RectangleParticle>& particles)
+    {
+        auto total_weight = sumall(particles, [](RectangleParticle P) { return P.weight(); });
+        for (auto& p : particles)
+            p.setWeight(p.weight() / total_weight);
+    }
+
+    int inline resamplingWheel(QVector<RectangleParticle>& particles, float max_weight)
+    {
+        auto num_particles = particles.size();
+        auto index = (int)(m_rand_dice(m_generator)*num_particles);
+        auto beta = m_rand_dice(m_generator)*2.0f*max_weight;
+        while(beta > particles[index].weight())
+        {
+            beta -= particles[index].weight();
+            index = (index + 1) % num_particles;
+        }
+        return index;
+    }
+
+    void inline distortParticle(RectangleParticle& p)
+    {
+        int new_x = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+        int new_y = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+
+        quint16 new_w = p.getWidth(); // + (int)(m_rand_distortion(m_generator)*m_distortRange);
+        quint16 new_h = p.getHeight(); // + (int)(m_rand_distortion(m_generator)*m_distortRange);
+        if (new_x < (img_width - new_w) && new_x > 0)
+        {
+            p.setX(new_x);
+            p.setWidth(new_w);
+        }
+        if (new_y < (img_height - new_h) && new_y > 0)
+        {
+            p.setY(new_y);
+            p.setHeight(new_h);
+        }
+    }
 };
 #endif
 

@@ -15,6 +15,8 @@ public:
     {
         RectangleParticle clone(m_x, m_y, m_width, m_height, m_weight);
         clone.setIsVisited(isVisited());
+        clone.set_dx(m_dx);
+        clone.set_dy(m_dy);
         return clone;
     }
 
@@ -50,12 +52,24 @@ public:
     inline bool isVisited() const {return m_isVisited;}
     inline void setIsVisited(bool value) { m_isVisited = value; }
 
+    inline qint16 dx() const { return m_dx; }
+    inline void set_dx(qint16 value) {m_dx = value;}
+
+    inline qint16 dy() const { return m_dy; }
+    inline void set_dy(qint16 value) {m_dy = value;}
+
+    inline cv::Rect getRect(){
+        return cv::Rect(m_x, m_y, m_weight, m_height);
+    }
+
 
 private:
     quint16 m_x{};
     quint16 m_y{};
     quint16 m_width{};
     quint16 m_height{};
+    qint16 m_dx{};         // velocity increment x direction
+    qint16 m_dy{};         // velocity increment y direction
     float m_weight{};
     bool m_isVisited{};
 };

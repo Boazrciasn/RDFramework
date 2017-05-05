@@ -188,7 +188,6 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     m_PF->setRDF(m_predictor->getForest());
     m_PF->setDBSCANEps(m_dbscan_eps);
     m_PF->setDBSCANMinPts(m_dbscan_min_pts);
-    m_PF->initializeParticles();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setProcess(m_PF);
 }
@@ -244,7 +243,7 @@ void ParticleFilterWidgetGui::onHorizontalSliderReleased()
 {
     m_VideoPlayer->setCurrentFrame(m_currFrame);
     if(m_PF)
-        m_PF->reInitialiaze();
+        m_PF->reset();
     if (m_isPlaying)
         m_VideoPlayer->playVideo();
 }

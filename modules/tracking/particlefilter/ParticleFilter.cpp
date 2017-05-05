@@ -3,7 +3,6 @@
 #include <time.h>
 
 #include "tracking/particlefilter/ParticleFilter.h"
-#include "Util.h"
 #include "Target.h"
 #include "tracking/particlefilter/RectangleParticle.h"
 #include "DBSCAN.h"
@@ -18,9 +17,9 @@ ParticleFilter::ParticleFilter(
     setParticleWidth(particleWidth);
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
-    m_distortRange = 10; // TODO: set from gui
+    m_distortRange = 1; // TODO: set from gui
     m_rand_dice    = std::uniform_real_distribution<>(0, 1);
-    m_rand_distortion = std::uniform_real_distribution<>(-1, 1);
+    m_rand_distortion = std::normal_distribution<>(-1, 1);
 
     m_xRange = (img_width - m_particle_width);
     m_yRange = (img_height - m_particle_height);
@@ -28,25 +27,6 @@ ParticleFilter::ParticleFilter(
     // Default
     setDBSCANEps(8.0f);
     setDBSCANMinPts(20);
-}
-
-void ParticleFilter::initializeParticles()
-{
-    m_particles.resize(m_num_particles);
-    for (auto& p : m_particles)
-    {
-        p.setX((int)(m_rand_dice(m_generator)*m_xRange));
-        p.setY((int)(m_rand_dice(m_generator)*m_yRange));
-        p.setWeight(1.0f / m_num_particles);
-        p.setWidth(m_particle_width);
-        p.setHeight(m_particle_height);
-    }
-}
-
-void ParticleFilter::reInitialiaze()
-{
-    m_particles.clear();
-    initializeParticles();
 }
 
 void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
@@ -60,6 +40,7 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
     cv::medianBlur(m_img, m_img, 3);
     processImage();
 
+    cv::imshow("debug PF", m_img);
     m_img = inputImg;
     showDetections();
     imgOut = m_img;
@@ -67,95 +48,56 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 
 void ParticleFilter::processImage()
 {
-    auto resamplingWheel = [this]() {
-        auto result = std::max_element(std::begin(m_particles), std::end(m_particles), [](RectangleParticle P1, RectangleParticle P2) {
-            return P1.weight() < P2.weight();
-        });
-        auto index = (int)(m_rand_dice(m_generator)*m_num_particles);
-        auto mw =  m_particles[std::distance(std::begin(m_particles), result)].weight();
-        auto beta = m_rand_dice(m_generator)*2.0f*mw;
-        while(beta > m_particles[index].weight())
-        {
-            beta -= m_particles[index].weight();
-            index = (index + 1) % m_num_particles;
-        }
-        return index;
-    };
-
-    reInitialiaze();
-
+    // new ObjSearch
+    initializeParticles();
     for (int i = 0; i < m_num_iters; ++i)
     {
-        for (auto& p : m_particles)
-            p.exec(m_img);
-
-        // normalize weights
-        auto total_weight = sumall(m_particles, [](RectangleParticle P) { return P.weight(); });
-        for (auto& p : m_particles)
-            p.setWeight(p.weight() / total_weight);
-
-
-        // resample particles
-        for (int j = 0; j < m_num_particles; ++j)
-        {
-            auto p_new = m_particles[resamplingWheel()].clone();
-            distortParticle(p_new);             // Motion Update
-            m_particlesNew.push_back(p_new);
-        }
-
-        // update particles
-        m_particles = m_particlesNew;
-        m_particlesNew.clear();
+        computeWeights(m_search_particles);
+        normalizeWeights(m_search_particles);
+        resample(m_search_particles);
     }
 
+//    auto clusters = DBSCAN::getClusters(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
 
     // normalize weights
-    auto total_weight = sumall(m_particles, [](RectangleParticle P) { return P.weight(); });
-    for (auto& p : m_particles)
+    auto total_weight = sumall(m_search_particles, [](RectangleParticle P) { return P.weight(); });
+    for (auto& p : m_search_particles)
         p.setWeight(p.weight() / total_weight);
 
     // sort descending
-    std::sort(std::begin(m_particles), std::end(m_particles), [](RectangleParticle P1, RectangleParticle P2) {
+    std::sort(std::begin(m_search_particles), std::end(m_search_particles), [](RectangleParticle P1, RectangleParticle P2) {
         return P1.weight() > P2.weight();
     });
 
     showTopNParticles(m_num_particles_to_display);
 }
 
-// TODO: double'dan inte cast edilliyor tekrar?
-void ParticleFilter::distortParticle(RectangleParticle& p)
+void ParticleFilter::resample(QVector<RectangleParticle> &particles)
 {
-    if(p.weight() == 0.0)
+    // compute max weight
+    auto p_indx = std::max_element(std::begin(particles), std::end(particles), [](RectangleParticle P1, RectangleParticle P2) {
+        return P1.weight() < P2.weight();
+    });
+    auto max_w = particles[std::distance(std::begin(m_search_particles), p_indx)].weight();
+
+    // resample particles
+    for (int j = 0; j < m_num_particles; ++j)
     {
-        p.setX((int)(m_rand_dice(m_generator)*m_xRange));
-        p.setY((int)(m_rand_dice(m_generator)*m_yRange));
-        p.setWeight(1.0f / m_num_particles);
-        p.setWidth(m_particle_width);
-        p.setHeight(m_particle_height);
-        return;
+        auto p_new = particles[resamplingWheel(m_search_particles, max_w)].clone();
+        distortParticle(p_new);             // Motion Update
+        m_particlesNew.push_back(p_new);
     }
 
-
-    int new_x = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    int new_y = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    quint16 new_w = p.getWidth() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    quint16 new_h = p.getHeight() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-    if (new_x < (img_width - new_w) && new_x > 0)
-    {
-        p.setX(new_x);
-        p.setWidth(new_w);
-    }
-    if (new_y < (img_height - new_h) && new_y > 0)
-    {
-        p.setY(new_y);
-        p.setHeight(new_h);
-    }
+    // update particles
+//    particles.clear();
+    particles = m_particlesNew;
+    m_particlesNew.clear();
 }
+
 
 void ParticleFilter::showDetections()
 {
-    auto clusters = DBSCAN::getClusters(m_particles, m_dbscan_eps, m_dbscan_min_pts);
-
+    auto clusters = DBSCAN::getClusters(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
     for(auto cluster : clusters)
     {
         int x = 0;
@@ -172,44 +114,47 @@ void ParticleFilter::showDetections()
         rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(0, 130, 0), 2);
     }
 }
-
-void ParticleFilter::showParticles()
-{
-    int x = 0;
-    int y = 0;
-    for (int i = 0; i < m_num_particles; ++i)
-    {
-        x += m_particles[i].x();
-        y += m_particles[i].y();
-    }
-    x = x / m_num_particles;
-    y = y / m_num_particles;
-    int x_end = x + m_particle_width;
-    int y_end = y + m_particle_height;
-    rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(130, 0, 0), 1);
 }
 
 void ParticleFilter::showTopNParticles(int count)
 {
     if (count > m_num_particles)
         count = m_num_particles;
-    else if (count == 0)
-        showParticles();
     int x = 0;
     int y = 0;
     for (int i = 0; i < count; ++i)
     {
-        x = m_particles[i].x();
-        y = m_particles[i].y();
+        x = m_search_particles[i].x();
+        y = m_search_particles[i].y();
         int x_end = x + m_particle_width;
         int y_end = y + m_particle_height;
-        rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(130, 0, 0), 1);
+        rectangle(m_img, cv::Point(x, y), cv::Point(x_end, y_end), cv::Scalar(130, 0, 0), 1);
     }
+}
+
+void ParticleFilter::initializeParticles()
+{
+    m_search_particles.clear();
+    m_search_particles.resize(m_num_particles);
+    for (auto& p : m_search_particles)
+    {
+        p.setX((int)(m_rand_dice(m_generator)*m_xRange));
+        p.setY((int)(m_rand_dice(m_generator)*m_yRange));
+        p.setWeight(1.0f / m_num_particles);
+        p.setWidth(m_particle_width);
+        p.setHeight(m_particle_height);
+    }
+}
+
+void ParticleFilter::reset()
+{
+    // TODO: add other reset things
+    m_tracking_particles.clear();
 }
 
 ParticleFilter::~ParticleFilter()
 {
-    m_particles.clear();
+    m_search_particles.clear();
     m_particlesNew.clear();
     delete m_forest;
 }
