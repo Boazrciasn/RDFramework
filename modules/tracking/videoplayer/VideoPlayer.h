@@ -35,6 +35,9 @@ class VideoPlayer : public QThread
     QImage m_img;
     double m_CurrentFrame;
 
+    int m_frame_w = 416;
+    int m_frame_h = 416;
+
     VideoProcess *m_processor{};
 
 

@@ -12,17 +12,18 @@ public:
     {
         QVector<QVector<T>> result;
         auto clusters = 0;
-        auto total = particles.size();
-        for(auto i = 0;  i < total; ++i)
+        for(auto& p : particles)
         {
-            if(particles[i].isVisited())
+            if(p.isVisited())
                 continue;
-            particles[i].setIsVisited(true);
-            auto sphere_particles = regionQuery(i, particles, epsilon);
+            p.setIsVisited(true);
+            auto sphere_particles = regionQuery(p, particles, epsilon);
             if(sphere_particles.size() >= min_points)
             {
                 result.push_back(QVector<T>());
-                expandCluster(particles[i].clone(), sphere_particles, result, particles, clusters++, epsilon, min_points);
+                result[clusters].push_back(p.clone());
+                expandCluster(sphere_particles, result, particles, clusters, epsilon, min_points);
+                clusters++;
             }
             sphere_particles.clear();
         }
@@ -32,50 +33,43 @@ public:
 
 private:
     template <typename T>
-    static inline void expandCluster(T p, QVector<quint16>& sphere_particles,
+    static inline void expandCluster(std::set<quint16>& sphere_particles,
                                                            QVector<QVector<T>>& result,
                                                            QVector<T>& particles,
                                                            int cluster, float epsilon, quint8 min_points)
     {
-        result[cluster].push_back(p);
-        for(auto i = 0;  i < sphere_particles.size(); ++i)
+
+        for(auto itt = std::begin(sphere_particles);  itt != std::end(sphere_particles); ++itt)
         {
-            auto index = sphere_particles[i];
-            if(particles[index].isVisited())
+            auto& p = particles[*itt];
+            if(p.isVisited())
                 continue;
+            p.setIsVisited(true);
 
-            particles[index].setIsVisited(true);
-            auto sphere_particles_ = regionQuery(i, particles, epsilon);
+            auto sphere_particles_ = regionQuery(p, particles, epsilon);
             if (sphere_particles_.size() >= min_points)
-                merge(sphere_particles, sphere_particles_);
+                sphere_particles.insert(sphere_particles_.begin(), sphere_particles_.end());
 
+            result[cluster].push_back(p.clone());
             sphere_particles_.clear();
-            result[cluster].push_back(particles[index].clone());
         }
     }
 
     template <typename T>
-    static inline QVector<quint16> regionQuery(int index, QVector<T>& particles, float epsilon)
+    static inline std::set<quint16> regionQuery(T p, QVector<T>& particles, float epsilon)
     {
-        QVector<quint16> result{};
-        auto total = particles.size();
-        for(auto i = 0; i < total; ++i)
-            if(distSquared(particles[i],particles[index]) <= epsilon*epsilon )
-                result.push_back(i);
-        return result;
+        std::set<quint16> set;
+        auto nTot = particles.size();
+        for(auto i = 0; i < nTot; ++i)
+            if(distSquared(p, particles[i]) <= epsilon*epsilon )
+                set.insert(i);
+        return set;
     }
 
     template <typename T>
     static inline float distSquared(T& p1, T& p2)
     {
         return ((p1.x() - p2.x())*(p1.x() - p2.x()) + (p1.y() - p2.y())*(p1.y() - p2.y()));
-    }
-
-    static inline void merge(QVector<quint16>& set1, QVector<quint16>& set2)
-    {
-        for(auto val : set2)
-            if(!set1.contains(val))
-                set1.push_back(val);
     }
 };
 

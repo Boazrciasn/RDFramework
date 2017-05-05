@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>761</height>
+    <width>1369</width>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
       <item>
        <widget class="QLabel" name="display_label">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="styleSheet">
          <string notr="true">Background-color: #000;</string>
         </property>
@@ -510,8 +513,8 @@
    <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>277</x>
-     <y>741</y>
+     <x>321</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>163</x>
@@ -526,8 +529,8 @@
    <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>363</x>
-     <y>741</y>
+     <x>414</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
@@ -542,8 +545,8 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>449</x>
-     <y>741</y>
+     <x>500</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
@@ -559,7 +562,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>230</x>
-     <y>703</y>
+     <y>676</y>
     </hint>
     <hint type="destinationlabel">
      <x>193</x>
@@ -575,7 +578,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>113</x>
-     <y>703</y>
+     <y>676</y>
     </hint>
     <hint type="destinationlabel">
      <x>48</x>
@@ -590,7 +593,7 @@
    <slot>onParticleCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>71</y>
     </hint>
     <hint type="destinationlabel">
@@ -606,7 +609,7 @@
    <slot>onIterationCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
@@ -622,7 +625,7 @@
    <slot>onParticleWidthChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>131</y>
     </hint>
     <hint type="destinationlabel">
@@ -638,7 +641,7 @@
    <slot>onSetParticleCountSliderMoved(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1032</x>
+     <x>1064</x>
      <y>302</y>
     </hint>
     <hint type="destinationlabel">
@@ -654,8 +657,8 @@
    <slot>onActionSaveTarget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>593</x>
-     <y>741</y>
+     <x>587</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
@@ -670,7 +673,7 @@
    <slot>onHistSizeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>191</y>
     </hint>
     <hint type="destinationlabel">
@@ -686,8 +689,8 @@
    <slot>onActionSetupPF()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>997</x>
-     <y>730</y>
+     <x>1062</x>
+     <y>704</y>
     </hint>
     <hint type="destinationlabel">
      <x>758</x>
@@ -703,7 +706,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>160</x>
-     <y>703</y>
+     <y>676</y>
     </hint>
     <hint type="destinationlabel">
      <x>146</x>
@@ -718,11 +721,11 @@
    <slot>onParticleHeightChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>161</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1134</x>
+     <x>1101</x>
      <y>264</y>
     </hint>
    </hints>
@@ -734,11 +737,11 @@
    <slot>onStepSizeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>411</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1204</x>
+     <x>1101</x>
      <y>351</y>
     </hint>
    </hints>
@@ -754,7 +757,7 @@
      <y>440</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1156</x>
+     <x>1101</x>
      <y>424</y>
     </hint>
    </hints>
@@ -766,7 +769,7 @@
    <slot>onDBSCANEpsChanged(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1015</x>
+     <x>1264</x>
      <y>206</y>
     </hint>
     <hint type="destinationlabel">
@@ -782,7 +785,7 @@
    <slot>onDBSCANMinPtsChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1047</x>
+     <x>1264</x>
      <y>239</y>
     </hint>
     <hint type="destinationlabel">

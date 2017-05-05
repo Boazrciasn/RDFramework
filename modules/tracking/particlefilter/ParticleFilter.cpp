@@ -52,15 +52,17 @@ void ParticleFilter::reInitialiaze()
 void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 {
     m_img = inputImg.clone();
-
     cv::cvtColor(m_img,m_img, CV_BGR2Lab);
     cv::Mat_<float> confs{};
     cv::Mat_<float> layered = m_forest->getLayeredHist(m_img);
     m_forest->getLabelAndConfMat(layered, m_img, confs);
 
     cv::medianBlur(m_img, m_img, 3);
-    m_img(cv::Range(0,240), cv::Range::all()) = 0;
     processImage();
+
+    m_img = inputImg;
+    showDetections();
+
     imgOut = m_img;
 }
 
@@ -81,7 +83,7 @@ void ParticleFilter::processImage()
         return index;
     };
 
-//    reInitialiaze();
+    reInitialiaze();
 
     for (int i = 0; i < m_num_iters; ++i)
     {
@@ -118,8 +120,7 @@ void ParticleFilter::processImage()
         return P1.weight() > P2.weight();
     });
 
-    showTopNParticles(m_num_particles_to_display);
-    showDetections();
+//    showTopNParticles(m_num_particles_to_display);
 }
 
 // TODO: double'dan inte cast edilliyor tekrar?

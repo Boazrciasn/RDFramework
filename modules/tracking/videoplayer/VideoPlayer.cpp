@@ -24,7 +24,8 @@ void VideoPlayer::run()
             continue;
         }
         m_CurrentFrame++;
-        cv::resize(m_frame,m_frame,cv::Size(416,416));
+        cv::resize(m_frame,m_frame,cv::Size(m_frame_w,m_frame_h));
+        m_frame = m_frame(cv::Range(240, m_frame_h), cv::Range::all());     // TODO:: Remove for general purpose
         m_processor->exec(m_frame, m_frame);
         m_img = Util::toQt(m_frame, QImage::Format_RGB888);
         emit playerFrame(m_img);
@@ -86,6 +87,10 @@ void VideoPlayer::initializeVideo()
 {
     while (m_FrameBuffer->size() < 1) {};
     m_frame = m_FrameBuffer->dequeue();
+
+    cv::resize(m_frame,m_frame,cv::Size(m_frame_w,m_frame_h));
+    m_frame = m_frame(cv::Range(240, m_frame_h), cv::Range::all());     // TODO:: Remove for general purpose
+
     m_CurrentFrame++;
     m_img = Util::toQt(m_frame, QImage::Format_RGB888);
 }
@@ -130,7 +135,9 @@ double VideoPlayer::getCurrentFrame()
 
 std::tuple<int, int> VideoPlayer::getFrameSize()
 {
-    return std::make_tuple(m_VideoReader->getFrameWidth(), m_VideoReader->getFrameHeight());
+    // TODO: fix it
+    return std::make_tuple(m_frame_w, m_frame_h);
+//    return std::make_tuple(m_VideoReader->getFrameWidth(), m_VideoReader->getFrameHeight());
 }
 
 
