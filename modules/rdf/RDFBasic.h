@@ -1,5 +1,6 @@
 #ifndef RDFBASIC_H
 #define RDFBASIC_H
+#include <fstream>
 #include "RDTBasic.h"
 #include "RDFParams.h"
 #include "PixelCloud.h"
