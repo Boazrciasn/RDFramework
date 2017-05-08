@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>241</width>
-    <height>258</height>
+    <height>323</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,6 +85,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Camera Calibration</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -93,7 +100,7 @@
      <x>0</x>
      <y>0</y>
      <width>241</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -208,8 +215,8 @@
    <slot>open_PFTracker()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>172</y>
+     <x>135</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>
@@ -224,8 +231,8 @@
    <slot>open_DataExtractor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>130</x>
-     <y>195</y>
+     <x>139</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel">
      <x>179</x>
@@ -240,12 +247,28 @@
    <slot>open_HOGExtractor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>80</x>
-     <y>219</y>
+     <x>89</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>90</x>
-     <y>364</y>
+     <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowGui</receiver>
+   <slot>open_CamCalib()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>122</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>198</x>
+     <y>532</y>
     </hint>
    </hints>
   </connection>
@@ -258,5 +281,6 @@
   <slot>open_PFTracker()</slot>
   <slot>open_DataExtractor()</slot>
   <slot>open_HOGExtractor()</slot>
+  <slot>open_CamCalib()</slot>
  </slots>
 </ui>

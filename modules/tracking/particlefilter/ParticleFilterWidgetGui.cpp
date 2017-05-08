@@ -31,11 +31,6 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
 
     // used for conf map with default values
     m_TargetROI = QRect(0,0,m_particleWidth,m_particleHeight);
-
-    cv::namedWindow("ROI");
-    cv::namedWindow("ROI_RDF_OUT");
-    cv::moveWindow("ROI", 0, 50);
-    cv::moveWindow("ROI_RDF_OUT", 0, 200);
 }
 
 void ParticleFilterWidgetGui::closeEvent(QCloseEvent *event)
@@ -103,14 +98,10 @@ void ParticleFilterWidgetGui::dispROI()
 //            PreProcess::doBatchPreProcessSingle(srcGray,processes);
 
         cv::Mat roiGray(srcGray,cv::Rect(m_TargetROI.x(),m_TargetROI.y(),m_TargetROI.width(),m_TargetROI.height()));
-        cv::imshow("ROI", roiGray);
         cv::Mat_<float> hist = rdf->getLayeredHist(roiGray);
         cv::Mat_<float> conf;
         cv::Mat lbl;
         rdf->getLabelAndConfMat(hist,lbl,conf);
-
-        cv::imshow("ROI_RDF_OUT",lbl);
-        cv::waitKey();
     }
 }
 
@@ -221,7 +212,7 @@ void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
         //        , Qt::KeepAspectRatio, Qt::FastTransformation)
         //        );
 
-        ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
+        ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrameInd());
         m_originalPix = ui->display_label->pixmap()->copy();
         m_ratio_w = m_originalPix.width()/m_ratio_w;
         m_ratio_h = m_originalPix.width()/m_ratio_h;

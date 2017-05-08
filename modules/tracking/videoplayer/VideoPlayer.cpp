@@ -124,7 +124,7 @@ void VideoPlayer::setCurrentFrame(int frameNumber)
     emit playerFrame(m_img);
 }
 
-double VideoPlayer::getCurrentFrame()
+double VideoPlayer::getCurrentFrameInd()
 {
     return m_CurrentFrame;
 }

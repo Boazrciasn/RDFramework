@@ -25,7 +25,8 @@ void VideoPlayerGui::updatePlayerUI(QImage img)
         ui->Display_label->setPixmap(
             QPixmap::fromImage(img).scaled(ui->Display_label->size(), Qt::KeepAspectRatio, Qt::FastTransformation)
         );
-        ui->Frame_horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
+        ui->Frame_horizontalSlider->setValue(m_VideoPlayer->getCurrentFrameInd());
+        emit currentFrame(img);
     }
 }
 

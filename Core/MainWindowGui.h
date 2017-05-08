@@ -9,6 +9,7 @@
 #include <QThread>
 
 #include "util/Reader.h"
+#include "util/CamCalibGUI.h"
 #include "ocr/MyDialogGui.h"
 #include "ocr/HistogramDialogGui.h"
 #include "Util.h"
@@ -43,6 +44,7 @@ class MainWindowGui : public QMainWindow
     void open_Resizerwidget();
     void open_PFTracker();
     void open_DataExtractor();
+    void open_CamCalib();
     void open_HOGExtractor();
 
   private:

@@ -66,7 +66,8 @@ class VideoPlayer : public QThread
     void playVideo();
     void stopVideo() { m_stop = true; }
     bool isStopped() const { return m_stop; }
-    double getCurrentFrame();
+    double getCurrentFrameInd();
+    cv::Mat currentFrame() { return m_RGBframe; }
     inline VideoProcess *getVideoProcess() const { return m_processor; }
 
     int getNumberOfFrames() const { return m_VideoReader->getNumberOfFrames(); }

@@ -65,7 +65,7 @@ QT5_WRAP_UI(UISrcs  Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/Re
                     modules/tracking/dataExtraction/DataExtractorGui.ui
                     modules/tracking/dataExtraction/PredictorGui.ui
                     modules/tracking/videoplayer/VideoPlayerGui.ui
-                    util/ReaderGUI.ui)
+                    util/ReaderGUI.ui util/CamCalibGUI.ui)
 
 add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
                 ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs})

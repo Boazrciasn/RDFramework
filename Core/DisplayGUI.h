@@ -16,6 +16,7 @@ class DisplayGUI : public QWidget
   public:
     explicit DisplayGUI(QWidget *parent = 0);
     void setImageSet(std::vector<cv::Mat> &images);
+    void setImage(cv::Mat img);
     ~DisplayGUI();
 
   private:
@@ -25,6 +26,7 @@ class DisplayGUI : public QWidget
     bool m_imagesExists;
     std::vector<cv::Mat> m_images;
     void display();
+    void display(cv::Mat img);
 
   private slots:
     void onSliderMove(int value);

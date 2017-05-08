@@ -79,6 +79,12 @@ void MainWindowGui::open_DataExtractor()
     dataExtractwidget->show();
 }
 
+void MainWindowGui::open_CamCalib()
+{
+    CamCalibGUI *camcalibwidget = new CamCalibGUI();
+    camcalibwidget->show();
+}
+
 void MainWindowGui::open_HOGExtractor()
 {
     HOGExtactor *hogExtr = new HOGExtactor();

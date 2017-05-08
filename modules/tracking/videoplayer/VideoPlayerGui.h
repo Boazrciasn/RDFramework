@@ -17,6 +17,10 @@ class VideoPlayerGui : public QWidget
 
   public:
     explicit VideoPlayerGui(QWidget *parent = 0);
+    inline cv::Mat currentFrame()
+    {
+        return m_VideoPlayer->currentFrame();
+    }
     inline void setProcess(VideoProcess *process)
     {
         m_VideoPlayer->setProcess(process);
@@ -38,6 +42,9 @@ class VideoPlayerGui : public QWidget
     void onActionBrowse();
     void onActionPlay();
     void onActionPause();
+
+   signals:
+    void currentFrame(const QImage &image);
 };
 
 #endif // VIDEOPLAYERGUI_H
