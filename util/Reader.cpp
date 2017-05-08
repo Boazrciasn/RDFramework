@@ -47,14 +47,18 @@ void Reader::readImages(QString dir, std::vector<cv::Mat> &images, int flags = T
     {
     case Type_Standard:
     {
-        QDirIterator itFile(dir, QStringList() << "*.jpg" << "*.jpeg" << "*.png" << "*.pgm", QDir::Files,
-                            QDirIterator::Subdirectories);
-        while (itFile.hasNext())
+        std::vector<cv::String> filenames;
+        cv::glob(dir.toStdString(), filenames);
+
+        for(size_t i = 0; i < filenames.size(); ++i)
         {
-            itFile.next();
-            cv::Mat image = cv::imread(itFile.filePath().toStdString(), CV_LOAD_IMAGE_GRAYSCALE);
-            images.push_back(image);
+            auto src = cv::imread(filenames[i], CV_LOAD_IMAGE_GRAYSCALE);
+            if(!src.data)
+                std::cerr << "Problem loading image!!!" << std::endl;
+            else
+                images.push_back(src);
         }
+
         break;
     }
     case Type_MNIST:

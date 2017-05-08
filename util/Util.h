@@ -95,7 +95,7 @@ class HAARNode : public NodeTest<HAARNode>
   public :
     void runFeature()
     {
-        std::cout<<"Selecting best HAAR"<< std::endl;
+        std::cout << "Selecting best HAAR" << std::endl;
     }
 };
 
@@ -147,6 +147,15 @@ inline double sumall(const T &container, const FUNC &func)
     return sum;
 }
 
+struct TableLookUp
+{
+    static constexpr int size = 1 << 18;
+    static tableLookupType lookUp[size];
+    TableLookUp() {}
+
+    static void init();
+};
+
 // creates histogram out of a pixel vector : need(?) fix after image info re-arrange.
 inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
 {
@@ -157,23 +166,36 @@ inline cv::Mat_<float> createHistogram(PixelCloud &pixels, int labelCount)
     return hist;
 }
 
-inline float calculateEntropy(const cv::Mat_<float> &hist)
+inline float calculateEntropyLookUp(const QVector<quint32>& hist)
 {
-    float entr{};
-    float totalNPixels = cv::sum(hist)[0];
-    int nCols = hist.cols;
-    for (int i = 0; i < nCols; ++i)
+    auto entr = 0.0f;
+    auto totalPx = 0;
+    auto bins = hist.size();
+
+    for (int i = 0; i < bins; ++i)
     {
-        float nPixelsAt = hist(0, i);
-        if (nPixelsAt > 0)
-        {
-            float probability = nPixelsAt / totalNPixels;
-            entr -= probability * (log(probability));
-            //TODO: Commenting out for bugfix.
-            //            entr -= nPixelsAt * log(nPixelsAt);
-        }
+        entr    += TableLookUp::lookUp[hist[i]];
+        totalPx += hist[i];
     }
-    return entr /* + totalNPixels * log(totalNPixels)*/;
+
+    return TableLookUp::lookUp[totalPx] - entr;
+}
+
+inline float calculateEntropy(const QVector<quint32>& hist)
+{
+    auto entr = 0.0f;
+    auto totalPx = 0;
+    auto bins = hist.size();
+
+    for (int i = 0; i < bins; ++i)
+    {
+        auto nPixelsAt = hist[i];
+        totalPx += nPixelsAt;
+        if (nPixelsAt > 0)
+            entr += nPixelsAt*log(nPixelsAt);
+    }
+
+    return totalPx*log(totalPx) - entr;
 }
 
 inline float calculateEntropyProb(const cv::Mat_<float> &hist)
@@ -191,11 +213,6 @@ inline float calculateEntropyProb(const cv::Mat_<float> &hist)
         }
     }
     return entr;
-}
-
-inline float calculateEntropyOfVector(PixelCloud &pixels, int labelCount)
-{
-    return calculateEntropy(createHistogram(pixels, labelCount));
 }
 
 inline int getMaxLikelihoodIndex(const QVector<float> &hist)
@@ -250,7 +267,6 @@ inline cv::Mat unpad(const cv::Mat &img, int probe_x, int probe_y)
     return unpadded;
 }
 
-
 class Util
 {
   private:
@@ -274,6 +290,7 @@ class Util
     static cv::Mat toCv(const QImage &image, int cv_type);
     static void CalculateHistogram(cv::Mat &inputMat, cv::Mat &hist, int histSize);
     static QImage toQt(const cv::Mat &src, QImage::Format format);
+    static QImage RGBMattoQt(const cv::Mat &src, QImage::Format format);
     static QImage Mat2QImage(const cv::Mat3b &src);
     static QString cleanNumberAndPunctuation(QString toClean);
     static void plot(const cv::Mat &hist, QWidget *parent, const QString title);

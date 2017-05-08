@@ -10,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 
+tableLookupType TableLookUp::lookUp[TableLookUp::size];
+
 void openmp_deneme()
 {
     //    quint32 nThreads = std::thread::hardware_concurrency();
@@ -73,19 +75,21 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
     QImage dest;
     if (src.type() == CV_8UC3)
     {
-        dest = QImage((const unsigned char *)(src.data),
-                      src.cols, src.rows, format);
-        //        for(int i = 0; i < height; i++)
-        //        {
-        //            const quint8 *pSrc = src.ptr<quint8>(i);
-        //            quint8 *pDest = dest.scanLine(i);
-        //            for(int j = 0; j < width; j++)
-        //            {
-        //                *pDest++ = *pSrc++;
-        //                *pDest++ = *pSrc++;
-        //                *pDest++ = *pSrc++;
-        //            }
-        //        }
+        cv::Mat srcRGB;
+        cv::cvtColor(src, srcRGB, CV_BGR2RGB);
+        dest = QImage((const unsigned char *)(srcRGB.data),
+                      srcRGB.cols, srcRGB.rows, format);
+                for(int i = 0; i < height; i++)
+                {
+                    const quint8 *pSrc = srcRGB.ptr<quint8>(i);
+                    quint8 *pDest = dest.scanLine(i);
+                    for(int j = 0; j < width; j++)
+                    {
+                        *pDest++ = *pSrc++;
+                        *pDest++ = *pSrc++;
+                        *pDest++ = *pSrc++;
+                    }
+                }
     }
     else if (src.type() == CV_8UC1)
     {
@@ -103,6 +107,47 @@ QImage Util::toQt(const cv::Mat &src, QImage::Format format)
             }
         }
     }
+    return dest;
+}
+
+QImage Util::RGBMattoQt(const cv::Mat &src, QImage::Format format)
+{
+    quint16 width = src.cols;
+    quint16 height = src.rows;
+    QImage dest = QImage((const unsigned char *)(src.data),
+                  src.cols, src.rows, format);
+
+    if (src.type() == CV_8UC3)
+    {
+        for(int i = 0; i < height; i++)
+        {
+            const quint8 *pSrc = src.ptr<quint8>(i);
+            quint8 *pDest = dest.scanLine(i);
+            for(int j = 0; j < width; j++)
+            {
+                *pDest++ = *pSrc++;
+                *pDest++ = *pSrc++;
+                *pDest++ = *pSrc++;
+            }
+        }
+    }
+    else if (src.type() == CV_8UC1)
+    {
+        dest = QImage(width, height, format);
+        for (int i = 0; i < height; i++)
+        {
+            const quint8 *pSrc = src.ptr<quint8>(i);
+            quint8 *pDest = dest.scanLine(i);
+            for (int j = 0; j < width; j++)
+            {
+                quint8 val = *pSrc++;
+                *pDest++ = val;
+                *pDest++ = val;
+                *pDest++ = val;
+            }
+        }
+    }
+
     return dest;
 }
 
@@ -575,3 +620,13 @@ std::vector<std::vector<cv::Point> > Util::DBSCAN_points(std::vector<cv::Point> 
 //QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
 //ui->label->setPixmap(*newScaledPixmap);
 //ui->label->resize(ui->label->pixmap()->size());
+
+void TableLookUp::init(){
+    static bool isInit{};
+    if(isInit)
+        return;
+    isInit = true;
+    lookUp[0] = 0;
+    for (int i = 1; i < size; ++i)
+        lookUp[i] = i*log(i);
+}

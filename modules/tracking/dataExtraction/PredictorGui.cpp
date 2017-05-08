@@ -61,18 +61,17 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
     if (!m_forest)
         return src.toImage();
 
-    int scale = 1;
-    int delta = 0;
-    int ddepth = CV_16S;
-
-    /// Generate grad_x and grad_y
-    cv::Mat grad_x, grad_y;
-    cv::Mat abs_grad_x, abs_grad_y;
-
+    m_forest->setNTreesForDetection(3);
     cv::Mat srcImg = Util::toCv(src.toImage(), CV_8UC4);
     cv::Mat map = cv::Mat::zeros(srcImg.rows, srcImg.cols, CV_8UC3);
     cv::Mat srcGray;
     cv::cvtColor(srcImg, srcGray, CV_RGB2GRAY);
+
+//    std::vector<Process*> processes;
+//    Sobel* proc = new Sobel(3, 3, CV_SCHARR);
+//    processes.push_back(proc);
+//    PreProcess::doBatchPreProcessSingle(srcGray,processes);
+
     cv::copyMakeBorder(srcGray, srcGray, roi_height / 2, roi_height / 2, roi_width / 2, roi_width / 2, cv::BORDER_REFLECT);
 
     map.setTo(cv::Scalar(0, 255, 0));
@@ -81,15 +80,8 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
         for (int j = step / 2; j < map.cols - 1; j += step)
         {
             cv::Mat roi(srcGray, cv::Rect(j, i, roi_width, roi_height));
-            cv::resize(roi, roi, cv::Size(16, 32));
-
-            cv::Sobel( roi, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT );
-            cv::convertScaleAbs( grad_x, abs_grad_x );
-
-            cv::Sobel( roi, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT );
-            cv::convertScaleAbs( grad_y, abs_grad_y );
-
-            cv::addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, roi );
+            // TODO: pas resize params
+            cv::resize(roi, roi, cv::Size(50, 50));
 
             int decision;
             float confidence;
@@ -110,6 +102,15 @@ QImage PredictorGui::getConfMapRDF(const QPixmap src, int roi_width, int roi_hei
         }
     }
 
+
+
+//    cv::Mat_<float> hist = m_forest->getLayeredHist(srcGray);
+//    cv::Mat_<float> conf;
+//    cv::Mat lbl;
+//    m_forest->getLabelAndConfMat(hist,lbl,conf);
+
+//    cv::imshow("test",lbl);
+
     QImage mapMask = Util::Mat2QImage(map);
     return mapMask;
 }
@@ -124,7 +125,7 @@ void PredictorGui::load()
     m_svmFile = QFileDialog::getOpenFileName(this, QObject::tr("Open Trained SVM"),
                                              m_svmFile, QObject::tr("Trained SVM (*.xml)"));
     if (m_svmFile.contains(".xml"))
-        m_svm = cv::ml::SVM::load<cv::ml::SVM>(m_svmFile.toStdString());
+//        m_svm = cv::ml::SVM::load<cv::ml::SVM>(m_svmFile.toStdString());
     emit svmChanged();
 }
 
@@ -180,7 +181,7 @@ void PredictorGui::extractHOGFeatures()
 
 void PredictorGui::loadRDF()
 {
-    m_forest = new RandomDecisionForest();
+    m_forest = new RDFBasic();
     QString selfilter = tr("BINARY (*.bin *.txt)");
     QString fname = QFileDialog::getOpenFileName(
                         this,

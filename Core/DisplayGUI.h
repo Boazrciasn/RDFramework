@@ -2,6 +2,7 @@
 #define DISPLAYGUI_H
 #include "precompiled.h"
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -18,7 +19,7 @@ class DisplayGUI : public QWidget
     ~DisplayGUI();
 
   private:
-    Ui::DisplayGUI *ui;
+    std::unique_ptr<Ui::DisplayGUI> ui;
     int m_fileIndex = 0;
     bool m_labelsExists;
     bool m_imagesExists;

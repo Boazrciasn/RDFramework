@@ -31,6 +31,11 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
 
     // used for conf map with default values
     m_TargetROI = QRect(0,0,m_particleWidth,m_particleHeight);
+
+    cv::namedWindow("ROI");
+    cv::namedWindow("ROI_RDF_OUT");
+    cv::moveWindow("ROI", 0, 50);
+    cv::moveWindow("ROI_RDF_OUT", 0, 200);
 }
 
 void ParticleFilterWidgetGui::closeEvent(QCloseEvent *event)
@@ -79,6 +84,36 @@ void ParticleFilterWidgetGui::mousePressEvent(QMouseEvent *event)
     }
 }
 
+void ParticleFilterWidgetGui::dispROI()
+{
+
+    if(m_TargetROI.x() < 0 || (m_TargetROI.x() + m_TargetROI.width()) >= m_originalPix.width() || m_TargetROI.y() < 0 || (m_TargetROI.y() + m_TargetROI.height()) >= m_originalPix.height())
+        return;
+
+    RDFBasic* rdf = m_predictor->getForest();
+    if(rdf)
+    {
+        cv::Mat srcImg = Util::toCv(m_originalPix.toImage(), CV_8UC4);
+        cv::Mat srcGray;
+        cv::cvtColor(srcImg, srcGray, CV_BGR2Lab);
+
+//            std::vector<Process*> processes;
+//            Sobel* proc = new Sobel(3, 3, CV_SCHARR);
+//            processes.push_back(proc);
+//            PreProcess::doBatchPreProcessSingle(srcGray,processes);
+
+        cv::Mat roiGray(srcGray,cv::Rect(m_TargetROI.x(),m_TargetROI.y(),m_TargetROI.width(),m_TargetROI.height()));
+        cv::imshow("ROI", roiGray);
+        cv::Mat_<float> hist = rdf->getLayeredHist(roiGray);
+        cv::Mat_<float> conf;
+        cv::Mat lbl;
+        rdf->getLabelAndConfMat(hist,lbl,conf);
+
+        cv::imshow("ROI_RDF_OUT",lbl);
+        cv::waitKey();
+    }
+}
+
 void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_VideoLodaded)
@@ -101,6 +136,10 @@ void ParticleFilterWidgetGui::mouseReleaseEvent(QMouseEvent *event)
         b = QPoint(int(b.x() * sx), int(b.y() * sy));
         m_TargetROI = QRect(a, b);
         setConfidence();
+
+
+        // TODO: For testing purpose
+        dispROI();
     }
 }
 
@@ -111,7 +150,9 @@ void ParticleFilterWidgetGui::onActionSaveTarget()
     m_RubberBand->hide();
     Target *currTarget;
 //    m_originalPix = ui->display_label->pixmap();
-    QPixmap targetPixMap = m_originalPix.copy(m_TargetROI);
+    // rescale to original size
+    QPixmap targetPixMap = m_originalPix.copy(m_TargetROI).scaled(QSize(m_TargetROI.width()/m_ratio_w, m_TargetROI.height()/m_ratio_h));
+
     QString labelno = QString::number(m_TargetCount).rightJustified(4, '0');
     bool isOkPressed{};
     QString labelName = "Human_" + labelno;
@@ -169,6 +210,9 @@ ParticleFilterWidgetGui::~ParticleFilterWidgetGui()
 
 void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
 {
+    m_ratio_w = img.width();
+    m_ratio_h = img.height();
+
     if (!img.isNull())
     {
         ui->display_label->setAlignment(Qt::AlignCenter);
@@ -179,6 +223,8 @@ void ParticleFilterWidgetGui::updatePlayerUI(QImage img)
 
         ui->horizontalSlider->setValue(m_VideoPlayer->getCurrentFrame());
         m_originalPix = ui->display_label->pixmap()->copy();
+        m_ratio_w = m_originalPix.width()/m_ratio_w;
+        m_ratio_h = m_originalPix.width()/m_ratio_h;
     }
 //    int ratio = m_PF->getRatioOfTop(ui->particlesToDisplaySlider->value());
 //    ui->top_n_ratio_label->setText(QString::number(ratio));
@@ -384,15 +430,15 @@ void ParticleFilterWidgetGui::setConfidence()
 void ParticleFilterWidgetGui::onActionDispConfMap()
 {
     m_svm = m_predictor->getSvm();
-    RandomDecisionForest* rdf = m_predictor->getForest();
+    RDFBasic* rdf = m_predictor->getForest();
     if(!m_VideoLodaded || m_isPlaying)
         return;
 
     QImage confMap;
     if(m_svm)
-        confMap = m_predictor->getConfMapSVM(m_originalPix, m_particleWidth, m_particleHeight, m_stepSize);
+        confMap = m_predictor->getConfMapSVM(m_originalPix, m_particleWidth*m_ratio_w, m_particleHeight*m_ratio_h, m_stepSize);
     else if(rdf)
-        confMap = m_predictor->getConfMapRDF(m_originalPix, m_particleWidth, m_particleHeight, m_stepSize);
+        confMap = m_predictor->getConfMapRDF(m_originalPix, m_particleWidth*m_ratio_w, m_particleHeight*m_ratio_h, m_stepSize);
     else
         return;
     QImage img = m_originalPix.toImage();

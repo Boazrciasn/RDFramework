@@ -6,48 +6,116 @@ void RandomDecisionTree::calculateImpurity(quint32 d)
     quint32 impurity = 0;
     int level_node_count = 1 << d;          // Number of nodes at this level
     int tot_node_count   = (1 << (d + 1)) - 1; // Number of nodes at this and previous levels
-
     for (auto node_id = (tot_node_count - level_node_count); node_id < tot_node_count; ++node_id)
     {
-        float entropy = calculateEntropyProb(computeHistogramNorm(m_nodes[node_id].start, m_nodes[node_id].end, m_params->labelCount));
-        impurity += (m_nodes[node_id].end-m_nodes[node_id].start)*entropy;
+        float entropy = calculateEntropyProb(computeHistogramNorm(m_nodes[node_id].start, m_nodes[node_id].end,
+                                                                  m_params->labelCount));
+        impurity += (m_nodes[node_id].end - m_nodes[node_id].start) * entropy;
     }
-    m_statLog.logImpurity(impurity,d);
+    m_statLog.logImpurity(impurity, d);
 }
 
 void RandomDecisionTree::train()
 {
-    double cpu_time;
-    clock_t start = clock();
+    // Intit zero freq
+    m_featureFreq.resize(Feature::features.size());
+    std::fill (m_featureFreq.begin(),m_featureFreq.end(),0);
+
+    auto begin = std::chrono::high_resolution_clock::now();
     SignalSenderInterface::instance().printsend("Initializing Parameters...");
     initParams();
     SignalSenderInterface::instance().printsend("Initializing nodes...");
     initNodes();
     m_statLog.setDepth(m_params->maxDepth - 1);
     SignalSenderInterface::instance().printsend("Sub-sampling...");
-    getSubSample();
-
+//    getSubSample();
+    getSubSampleSingleFrame(); // TODO: put if statement here
     SignalSenderInterface::instance().printsend("Constructing tree...");
     qApp->processEvents();
     constructTree();
-    cpu_time = static_cast<double>(clock() - start) / CLOCKS_PER_SEC;
-    m_statLog.logTrainingTime(cpu_time);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
+    m_statLog.logFeatureFreq(m_featureFreq);
+    m_statLog.logTrainingTime(time);
     m_statLog.dump();
     qApp->processEvents();
+
+    compreseTree();
+}
+
+void RandomDecisionTree::getSubSampleSingleFrame()
+{
+    quint32 imgCount = m_DS->images.size();
+    for (quint32 id = 0; id < imgCount; ++id)
+    {
+        auto &image = m_DS->images[id];
+        auto label  = 0; // TODO: m_DS->labels[id];
+        int nRows = image.rows;
+        int nCols = image.cols;
+
+        auto& rects = m_DS->frameRects[id];
+        auto rectCount = rects.size();
+
+        // Positive label
+        for (int i = 0; i < rectCount; ++i)
+        {
+            for (int k = 0; k < m_params->pixelsPerImage; ++k)
+            {
+                int row = (m_generator() % rects[i].height()) + rects[i].y() + m_probe_distanceY + Feature::max_h;
+                int col = (m_generator() % rects[i].width()) + rects[i].x() + m_probe_distanceX + Feature::max_w;
+                Pixel px(cv::Point(col,row),id, label);
+                m_pixelCloud.pixels1.push_back(px);
+            }
+        }
+
+        label = 1;
+        // Nagative label
+        for (int k = 0; k < m_params->pixelsPerImage*rectCount; ++k)
+        {
+            int row = (m_generator() % (nRows - 2 * (m_probe_distanceY + Feature::max_h))) + m_probe_distanceY + Feature::max_h;
+            int col = (m_generator() % (nCols - 2 * (m_probe_distanceX + Feature::max_w))) + m_probe_distanceX + Feature::max_w;
+
+            bool isNeg = true;
+            for (int i = 0; i < rectCount; ++i)
+                if(row > rects[i].y() && row < (rects[i].y() + rects[i].height()) && col > rects[i].x() && col < (rects[i].x() + rects[i].width()))
+                {
+                    isNeg = false;
+                    break;
+                }
+
+            if(!isNeg)// TODO: || row < 180)
+            {
+                --k;
+                continue;
+            }
+
+            Pixel px(cv::Point(col,row),id, label);
+            m_pixelCloud.pixels1.push_back(px);
+        }
+    }
+
+    m_pixelCloud.pixels2.resize(m_pixelCloud.pixels1.size());
 }
 
 void RandomDecisionTree::getSubSample()
 {
     quint32 imgCount = m_DS->images.size();
-    quint32 pxPerImgCount = m_params->pixelsPerImage;
-    m_pixelCloud.pixels1.resize(imgCount * pxPerImgCount);
-    m_pixelCloud.pixels2.resize(imgCount * pxPerImgCount);
+    // Set Proper size
+    auto size = 0;
+    for (auto it = std::begin(m_DS->map_dataPerLabel); it != std::end(m_DS->map_dataPerLabel); ++it)
+        size += (it->second * m_params->pixelsPerLabelImage[it->first]);
+    m_pixelCloud.pixels1.resize(size);
+    m_pixelCloud.pixels2.resize(size);
+    quint32 last{};
     for (quint32 id = 0; id < imgCount; ++id)
     {
         auto &image = m_DS->images[id];
         auto label  = m_DS->labels[id];
         int nRows = image.rows;
         int nCols = image.cols;
+
+        auto sum = cv::sum(image)[0];
         quint16 pxCount = m_params->pixelsPerLabelImage[label];
         for (int k = 0; k < pxCount; ++k)
         {
@@ -56,16 +124,21 @@ void RandomDecisionTree::getSubSample()
             quint8 intensity = 0;
             while (intensity == 0)
             {
-                row = (m_generator() % (nRows - 2 * m_probe_distanceY)) + m_probe_distanceY;
-                col = (m_generator() % (nCols - 2 * m_probe_distanceX)) + m_probe_distanceX;
+                row = (m_generator() % (nRows - 2 * (m_probe_distanceY + Feature::max_h))) + m_probe_distanceY + Feature::max_h;
+                col = (m_generator() % (nCols - 2 * (m_probe_distanceX + Feature::max_w))) + m_probe_distanceX + Feature::max_w;
                 intensity = image.at<uchar>(row, col);
+
+//                qDebug() << id << " " << intensity << " sum: " << sum;
+                if(sum < 25500)
+                    break;
             }
-            auto &px = m_pixelCloud.pixels1[id * pxPerImgCount + k];
+            auto &px = m_pixelCloud.pixels1[last + k];
             px.id = id;
             px.label = label;
             px.position.x = col;
             px.position.y = row;
         }
+        last += pxCount;
     }
 }
 
@@ -84,7 +157,13 @@ void RandomDecisionTree::constructRootNode()
     m_nonLeafpxCount = m_pixelCloud.pixels1.size();
     m_statLog.logPxCount(m_nonLeafpxCount, 0);
     m_statLog.logLeafCount(0, 0);
-    computeDivisionAt(rootId);
+
+    if(m_nodes[rootId].end >= TableLookUp::size)
+        computeDivisionAt(rootId);
+    else
+        computeDivisionWithLookUpAt(rootId);
+
+    ++m_featureFreq[m_nodes[rootId].ftrID];
     rearrange(rootId);
     calculateImpurity(0);
 }
@@ -96,8 +175,8 @@ void RandomDecisionTree::constructTreeDecisionNodes()
         SignalSenderInterface::instance().printsend("Tree at depth " + QString::number(depth) + " being processed...");
         m_leafCount = 0;
         m_nonLeafpxCount = m_pixelCloud.pixels1.size();
-        int level_nodes = 1 << depth;          // Number of nodes at this level
-        int tot_nodes   = (1 << (depth + 1)) - 1; // Number of nodes at this and previous levels
+        int level_nodes = 1ul << depth;          // Number of nodes at this level
+        int tot_nodes   = (1ul << (depth + 1)) - 1; // Number of nodes at this and previous levels
         tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
         {
             processNode(nodeIndex);
@@ -117,15 +196,22 @@ void RandomDecisionTree::computeLeafHistograms()
     auto leaf_node_count = 1ul << (m_height - 1) ;
     for (auto node_id = (tot_node_count - leaf_node_count); node_id < tot_node_count; ++node_id)
     {
-        Node parent = m_nodes[(node_id + 1) / 2 - 1];
-        quint32 leftCount = parent.leftCount;
-        quint32 rightCount = parent.end - parent.start - leftCount;
-        int mult = (node_id + 1) % 2; // 0 if left, 1 if right
+        auto& parent = m_nodes[(node_id + 1) / 2 - 1];
+        auto leftCount = parent.leftCount;
+        auto rightCount = parent.end - parent.start - leftCount;
+        auto mult = (node_id + 1) % 2; // 0 if left, 1 if right
         auto start = parent.start + mult * leftCount;
         auto end = parent.end - ((mult + 1) % 2) * rightCount;
-        auto pxCount = start-end;
-        if (pxCount <= m_params->minLeafPixels)
+        auto pxCount = start - end;
+
+
+        if (pxCount == 0)
+        {
+            parent.tau = 1000*mult - 500; // Supress all nodes to right if left node is empty
             continue;
+        }
+
+        m_nodes[node_id].isLeaf = true;
         m_nodes[node_id].id = node_id;
         m_nodes[node_id].start = start;
         m_nodes[node_id].end = end;
@@ -133,69 +219,101 @@ void RandomDecisionTree::computeLeafHistograms()
     }
 }
 
+
 void RandomDecisionTree::computeDivisionAt(quint32 index)
 {
-    // find best teta and tau parameters for the given node
-    float px_count = m_nodes[index].end - m_nodes[index].start;
+    auto px_count = m_nodes[index].end - m_nodes[index].start;
     if (px_count == 0)
         return;
-    auto maxItr = m_params->maxIteration;
-    auto nLabels = m_params->labelCount;
-    int maxTau = 500;
-    float maxGain = std::numeric_limits<float>::lowest();
-    cv::Point maxTeta1, maxTeta2;
-    int itr = 0;
-    cv::Mat_<float> leftHist(1, nLabels);
-    cv::Mat_<float> rightHist(1, nLabels);
-    float parentEntr = calculateEntropy(computeHistogramNorm(m_nodes[index].start, m_nodes[index].end, nLabels));
-    float leftChildEntr, rightChildEntr;
-    float avgEntropyChild;
-    float infoGain;
+    auto maxItr             = m_params->maxIteration;
+    auto nLabels            = m_params->labelCount;
+    auto maxTau             = std::numeric_limits<qint16>::max();
+    auto maxFeatureIndex    = std::numeric_limits<quint8>::min();
+    auto maxGain            = std::numeric_limits<float>::min();
+
+    cv::Point maxTeta1{}, maxTeta2{};
+    QVector<quint32> leftHist(nLabels);
+    QVector<quint32> rightHist(nLabels);
+
+    auto totalFeatures = Feature::features.size();
+    auto parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+    auto infoGain = 0.0f;
+    auto itr = 0;
+
     while (itr < maxItr)
     {
-        generateTeta(m_nodes[index].teta1);
-        generateTeta(m_nodes[index].teta2);
-        m_nodes[index].tau = generateTau();
-        leftHist.setTo(0.0f);
-        rightHist.setTo(0.0f);
-        int sizeLeft  = 0;
-        int sizeRight = 0;
-        auto end = m_nodes[index].end;
-        for (auto i = m_nodes[index].start; i < end; ++i)
+        generateParams(index);
+
+        for (quint8 feature = 0; feature < totalFeatures; ++feature)
         {
-            auto &px = m_pixelCloud.pixels1[i];
-            auto &img = m_DS->images[px.id];
-            if (m_nodes[index].isLeft(px, img))
+            m_nodes[index].ftrID = feature;
+            computeHistograms(index, rightHist, leftHist);
+            infoGain = parentEntr - calculateEntropy(leftHist) - calculateEntropy(rightHist);
+
+            // Non-improving epoch :
+            if (infoGain > maxGain)
             {
-                ++leftHist(px.label);
-                sizeLeft++;
-            }
-            else
-            {
-                ++rightHist(px.label);
-                sizeRight++;
+                maxTeta1 = m_nodes[index].teta1;
+                maxTeta2 = m_nodes[index].teta2;
+                maxTau   = m_nodes[index].tau;
+                maxGain  = infoGain;
+                maxFeatureIndex = feature;
+                itr = -1 ;
             }
         }
-        leftChildEntr = calculateEntropy(leftHist);
-        rightChildEntr = calculateEntropy(rightHist);
-        avgEntropyChild  = (sizeLeft / px_count) * leftChildEntr;
-        avgEntropyChild += (sizeRight / px_count) * rightChildEntr;
-        infoGain = parentEntr - avgEntropyChild;
-        // Non-improving epoch :
-        if (infoGain > maxGain)
-        {
-            maxTeta1 = m_nodes[index].teta1;
-            maxTeta2 = m_nodes[index].teta2;
-            maxTau   = m_nodes[index].tau;
-            maxGain  = infoGain;
-            itr = 0 ;
-        }
-        else
-            ++itr;
+        ++itr;
     }
-    m_nodes[index].tau = maxTau;
-    m_nodes[index].teta1 = maxTeta1;
-    m_nodes[index].teta2 = maxTeta2;
+
+    setParamsFor(maxFeatureIndex, maxTeta1, maxTeta2, index, maxTau);
+}
+
+void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
+{
+    auto px_count = m_nodes[index].end - m_nodes[index].start;
+    if (px_count == 0)
+        return;
+    auto maxItr             = m_params->maxIteration;
+    auto nLabels            = m_params->labelCount;
+    auto maxTau             = std::numeric_limits<qint16>::max();
+    auto maxFeatureIndex    = std::numeric_limits<qint8>::min();
+    auto maxGain            = std::numeric_limits<float>::min();
+
+    cv::Point maxTeta1{}, maxTeta2{};
+    QVector<quint32> leftHist(nLabels);
+    QVector<quint32> rightHist(nLabels);
+
+    auto totalFeatures = Feature::features.size();
+    auto parentEntr = calculateEntropyLookUp(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
+    auto infoGain = 0.0f;
+    auto itr = 0;
+
+
+
+    while (itr < maxItr)
+    {
+        generateParams(index);
+
+        for (quint8 feature = 0; feature < totalFeatures; ++feature)
+        {
+            m_nodes[index].ftrID = feature;
+            computeHistograms(index, rightHist, leftHist);
+            infoGain = parentEntr - calculateEntropyLookUp(leftHist) - calculateEntropyLookUp(rightHist);
+
+            // Non-improving epoch :
+            if (infoGain > maxGain)
+            {
+                maxTeta1 = m_nodes[index].teta1;
+                maxTeta2 = m_nodes[index].teta2;
+                maxTau   = m_nodes[index].tau;
+                maxGain  = infoGain;
+                maxFeatureIndex = feature;
+                itr = -1 ;
+            }
+        }
+        ++itr;
+    }
+
+    setParamsFor(maxFeatureIndex, maxTeta1, maxTeta2, index, maxTau);
 }
 
 void RandomDecisionTree::rearrange(quint32 index)

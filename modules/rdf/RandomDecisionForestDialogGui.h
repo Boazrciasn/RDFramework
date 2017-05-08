@@ -9,6 +9,7 @@
 #include "Core/DisplayGUI.h"
 #include "Core/PreProcessGUI.h"
 #include "SignalSenderInterface.h"
+#include "RDFBasic.h"
 
 namespace Ui
 {
@@ -21,6 +22,7 @@ class RandomDecisionForestDialogGui : public QDialog
   private:
     Ui::RandomDecisionForestDialogGui *ui;
     RandomDecisionForest m_forest;
+    RDFBasic m_forest_basic;
     RDFParams PARAMS;
     ReaderGUI *m_dataReaderGUI;
     DisplayGUI *m_displayImagesGUI;
@@ -38,12 +40,8 @@ class RandomDecisionForestDialogGui : public QDialog
 
   private:
     void initParamValues();
-
-    void applySobel(std::vector<cv::Mat> &images);
-    void applyCanny(std::vector<cv::Mat> &images);
-
-
-  public:
+    
+public:
     explicit RandomDecisionForestDialogGui(QWidget *parent = 0);
     ~RandomDecisionForestDialogGui();
 
@@ -54,10 +52,7 @@ class RandomDecisionForestDialogGui : public QDialog
     void onTrain();
     void onTest();
     void onPreProcess();
-    void image_at_classified_as(int index, char label);
-    void resultPercetange(double accuracy);
-    void printMsgToTrainScreen(QString msg);
-    void printMsgToTestScreen(QString msg);
+    void printMsg(QString msg);
 
     void onLoad();
     void onSave();
@@ -74,6 +69,7 @@ class RandomDecisionForestDialogGui : public QDialog
     void onMaxIterationChanged(int value);
     void onLabelCountChanged(int value);
     void onTauRangeChanged(int value);
+    void onPositiveTau(bool value);
 };
 
 #endif // RDFDIALOGGUI_H

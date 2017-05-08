@@ -87,6 +87,10 @@ protected:
     QPoint m_Point;
     QPoint m_PointMove;
 
+    // resize ratio
+    float m_ratio_w{1};
+    float m_ratio_h{1};
+
     RectangleParticle *m_RectParticle;
 
     QVector<Target *> m_TargetsVector;
@@ -98,6 +102,7 @@ protected:
     void setPFSettingsEnabled(bool state);
     void setConfidence();
     void loadVideo(QString filename);
+    void dispROI();
 };
 
 #endif // PARTICLEFILTERWIDGETGUI_H

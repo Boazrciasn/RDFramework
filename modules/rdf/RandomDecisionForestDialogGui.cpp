@@ -5,7 +5,6 @@
 #include "ui_RandomDecisionForestDialogGui.h"
 
 
-
 void RandomDecisionForestDialogGui::initParamValues()
 {
     ui->spinBox_NTrees->setValue(PARAMS.nTrees);
@@ -17,6 +16,8 @@ void RandomDecisionForestDialogGui::initParamValues()
     ui->spinBox_MaxIteration->setValue(PARAMS.maxIteration);
     ui->spinBox_LabelCount->setValue(PARAMS.labelCount);
     ui->spinBox_TauRange->setValue(PARAMS.tauRange);
+    ui->checkBox_isPositive->setChecked(PARAMS.isPositiveRange);
+    ui->spinBox_MaxPixelsEntropy->setValue(PARAMS.maxPxForEntropy);
 }
 
 RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
@@ -28,7 +29,7 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
     initParamValues();
     m_nTreesForDetection = ui->spinBox_NTestTrees->value();
     QObject::connect(&SignalSenderInterface::instance(), SIGNAL(printsend(QString)), this,
-                     SLOT(printMsgToTrainScreen(QString)));
+                     SLOT(printMsg(QString)));
     m_dataReaderGUI = new ReaderGUI();
     m_displayImagesGUI = new DisplayGUI();
     m_preprocessGUI = new PreProcessGUI();
@@ -49,12 +50,26 @@ RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
 
 RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
 {
+    delete m_dataReaderGUI;
+    delete m_displayImagesGUI;
+    delete &m_forest;
+    delete &m_forest_basic;
+    delete &m_preprocesses;
+    delete m_preprocessGUI;
+    delete m_splitterHori;
+    delete m_splitterVert;
     delete ui;
 }
 
 void RandomDecisionForestDialogGui::onImagesLoaded(bool)
 {
     m_displayImagesGUI->setImageSet(m_dataReaderGUI->DS()->images);
+
+    auto lbl_count = m_dataReaderGUI->DS()->map_dataPerLabel.size();
+    if(lbl_count == 0)
+        lbl_count = 2;
+    ui->spinBox_LabelCount->setValue(lbl_count);
+    PARAMS.labelCount = lbl_count;
 }
 
 void RandomDecisionForestDialogGui::onLabelsLoaded()
@@ -71,17 +86,43 @@ void RandomDecisionForestDialogGui::onTrain()
     m_forest.setPreProcess(m_preprocessGUI->preprocesses());
     m_forest.setDataSet(m_dataReaderGUI->DS());
     if (m_forest.trainForest())
-        ui->console->append("Forest Trained ! ");
+        printMsg("Forest Trained ! ");
     else
-        ui->console->append("Failed to Train Forest! (Forest DS is not set) ");
-    ui->console->repaint();
+        printMsg("Failed to Train Forest! (Forest DS is not set) ");
 }
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    m_forest.setNTreesForDetection(m_nTreesForDetection);
-    auto accuracy = m_forest.testForest();
-    printMsgToTestScreen(QString::number(m_nTreesForDetection) + " tree accuracy: " + QString::number(100 * accuracy));
+//    m_forest_basic.setNTreesForDetection(m_nTreesForDetection);
+    auto begin = std::chrono::high_resolution_clock::now();
+//    auto accuracy = m_forest.testForest();
+
+    // ///////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
+    // New Test
+    auto size = m_dataReaderGUI->DS()->images.size();
+    std::vector<cv::Mat> results{};
+
+
+    for(auto i = 0u; i <  size; ++i)
+    {
+        cv::Mat labels{};
+        cv::Mat_<float> confs{};
+        cv::Mat_<float> layered = m_forest_basic.getLayeredHist(m_dataReaderGUI->DS()->images[i]);
+        m_forest_basic.getLabelAndConfMat(layered, labels, confs);
+
+        results.push_back(m_dataReaderGUI->DS()->images[i]);
+        results.push_back(labels);
+    }
+
+    m_displayImagesGUI->setImageSet(results);
+    // ///////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
+
+    printMsg("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()
@@ -91,71 +132,7 @@ void RandomDecisionForestDialogGui::onPreProcess()
     m_dataReaderGUI->DS()->isProcessed = true;
 }
 
-void RandomDecisionForestDialogGui::applySobel(std::vector<cv::Mat> &images)
-{
-    int scale = 1;
-    int delta = 0;
-    int ddepth = CV_16S;
-    /// Generate grad_x and grad_y
-    cv::Mat grad_x, grad_y;
-    cv::Mat abs_grad_x, abs_grad_y;
-    for (auto &img : images)
-    {
-        cv::GaussianBlur(img, img, cv::Size(3, 3), 0);
-        //        cv::Canny( img, img, lowThreshold, lowThreshold*ratio, kernel_size );
-        /// Gradient X
-        //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
-        cv::Sobel(img, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT);
-        cv::convertScaleAbs(grad_x, abs_grad_x);
-        /// Gradient Y
-        //Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
-        cv::Sobel(img, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT);
-        cv::convertScaleAbs(grad_y, abs_grad_y);
-        /// Total Gradient (approximate)
-        cv::addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, img);
-        //        cv::imshow( "window_name", img);
-        //        cv::waitKey();
-    }
-}
-
-void RandomDecisionForestDialogGui::applyCanny(std::vector<cv::Mat> &images)
-{
-    int lowThreshold = 50;
-    int ratio = 3;
-    int kernel_size = 3;
-    int count = 0;
-    for (auto &img : images)
-    {
-        //        cv::imshow( "window_fray", img);
-        cv::GaussianBlur(img, img, cv::Size(11, 11), 0);
-        cv::Canny(img, img, lowThreshold, lowThreshold * ratio, kernel_size);
-        //        std::cout << m_trainDataReaderGUI->DS()->m_labels[count] << std::endl;
-        //        cv::imshow( "window_name", img);
-        //        cv::waitKey();
-    }
-}
-
-void RandomDecisionForestDialogGui::image_at_classified_as(int index, char label)
-{
-    ui->console->append("Image " + QString::number(
-                            index) + " is classified as " + label);
-    ui->console->repaint();
-}
-
-void RandomDecisionForestDialogGui::resultPercetange(double accuracy)
-{
-    ui->console->append(" Classification Accuracy : " + QString::number(
-                            accuracy) + "%");
-    ui->console->repaint();
-}
-
-void RandomDecisionForestDialogGui::printMsgToTrainScreen(QString msg)
-{
-    ui->console->append(msg);
-    ui->console->repaint();
-}
-
-void RandomDecisionForestDialogGui::printMsgToTestScreen(QString msg)
+void RandomDecisionForestDialogGui::printMsg(QString msg)
 {
     ui->console->append(msg);
     ui->console->repaint();
@@ -171,9 +148,8 @@ void RandomDecisionForestDialogGui::onLoad()
                         tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)"),
                         &selfilter
                     );
-    m_forest.loadForest(fname);
-    //    m_forest->printForest();
-    qDebug() << "LOAD FOREST PRINTED" ;
+    m_forest_basic.loadForest(fname);
+    ui->console->append("FOREST LOADED");
 }
 
 void RandomDecisionForestDialogGui::onSave()
@@ -187,10 +163,8 @@ void RandomDecisionForestDialogGui::onSave()
                     + "_nPxPI_" + QString::number(m_forest.params().pixelsPerImage)
                     + ".bin";
     m_forest.saveForest(dirname + "/" + fname);
-    qDebug() << "SAVED FOREST PRINTED" ;
+    ui->console->append("FOREST SAVED");
 }
-
-
 
 void RandomDecisionForestDialogGui::closeEvent(QCloseEvent *event)
 {
@@ -212,6 +186,8 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("maxIteration", PARAMS.maxIteration);
     settings.setValue("labelCount", PARAMS.labelCount);
     settings.setValue("tauRange", PARAMS.tauRange);
+    settings.setValue("isPositiveRange", PARAMS.isPositiveRange);
+    settings.setValue("maxPxForEntropy", PARAMS.maxPxForEntropy);
     settings.endGroup();
 }
 
@@ -228,6 +204,8 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.maxIteration = settings.value("maxIteration", 100).toInt();
     PARAMS.labelCount = settings.value("labelCount", 26).toInt();
     PARAMS.tauRange = settings.value("tauRange", 127).toInt();
+    PARAMS.isPositiveRange = settings.value("isPositiveRange", false).toBool();
+    PARAMS.maxPxForEntropy = settings.value("maxPxForEntropy", 1000).toInt();
     settings.endGroup();
 }
 
@@ -280,4 +258,9 @@ void RandomDecisionForestDialogGui::onLabelCountChanged(int value)
 void RandomDecisionForestDialogGui::onTauRangeChanged(int value)
 {
     PARAMS.tauRange = value;
+}
+
+void RandomDecisionForestDialogGui::onPositiveTau(bool value)
+{
+    PARAMS.isPositiveRange = value;
 }

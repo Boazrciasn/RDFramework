@@ -8,7 +8,7 @@
 
 #include <opencv2/ml.hpp>
 #include <opencv2/objdetect.hpp>
-#include "rdf/RandomDecisionForest.h"
+#include "rdf/RDFBasic.h"
 
 enum {CIRCLE, RECTANGLE};
 
@@ -55,7 +55,7 @@ class Particle
     inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
     inline cv::Ptr<cv::ml::SVM> getSVM(){return m_svm;}
 
-    inline void setRDF(RandomDecisionForest* rdf){m_forest = rdf;}
+    inline void setRDF(RDFBasic* rdf){m_forest = rdf;}
 
   protected:
     int m_x;
@@ -66,7 +66,7 @@ class Particle
 
     cv::HOGDescriptor *m_hog;
     cv::Ptr<cv::ml::SVM> m_svm;
-    RandomDecisionForest *m_forest{};
+    RDFBasic *m_forest{};
 };
 
 #endif

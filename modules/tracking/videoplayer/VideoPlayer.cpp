@@ -25,7 +25,8 @@ void VideoPlayer::run()
         }
         m_CurrentFrame++;
         m_processor->exec(m_RGBframe, m_RGBframe);
-        m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
+//        m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
+        m_img = Util::RGBMattoQt(m_RGBframe, QImage::Format_RGB888);
         emit playerFrame(m_img);
         msleep(delay);
     }
@@ -86,7 +87,8 @@ void VideoPlayer::initializeVideo()
     while (m_FrameBuffer->size() < 1) {};
     m_RGBframe = m_FrameBuffer->dequeue();
     m_CurrentFrame++;
-    m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
+//    m_img = Util::toQt(m_RGBframe, QImage::Format_RGB888);
+    m_img = Util::RGBMattoQt(m_RGBframe, QImage::Format_RGB888);
 }
 
 bool VideoPlayer::loadVideo(std::string filename)
