@@ -10,6 +10,7 @@
 
 #include "RectangleParticle.h"
 #include "Util.h"
+#include "DBSCAN.h"
 
 class VideoReader;
 
@@ -37,6 +38,7 @@ class ParticleFilter : public VideoProcess
 
   private:
     int m_num_particles{};
+    int m_nTrackers{};
     int m_num_iters{};
     int m_particle_width{};
     int m_particle_height{};
@@ -53,6 +55,8 @@ class ParticleFilter : public VideoProcess
     QVector<RectangleParticle> m_tracking_particles;
     QVector<RectangleParticle> m_particlesNew;
 
+    QVector<cv::Rect> m_tracked_clusters;
+
     RDFBasic *m_forest{};
     pcg32 m_generator;
     std::uniform_real_distribution<> m_rand_dice{};
@@ -68,9 +72,9 @@ class ParticleFilter : public VideoProcess
 
     void inline normalizeWeights(QVector<RectangleParticle>& particles)
     {
-        auto total_weight = sumall(particles, [](RectangleParticle P) { return P.weight(); });
+        auto total_weight = sumall(particles, [](RectangleParticle P) { return P.weight; });
         for (auto& p : particles)
-            p.setWeight(p.weight() / total_weight);
+            p.weight = p.weight / total_weight;
     }
 
     int inline resamplingWheel(QVector<RectangleParticle>& particles, float max_weight)
@@ -78,9 +82,9 @@ class ParticleFilter : public VideoProcess
         auto num_particles = particles.size();
         auto index = (int)(m_rand_dice(m_generator)*num_particles);
         auto beta = m_rand_dice(m_generator)*2.0f*max_weight;
-        while(beta > particles[index].weight())
+        while(beta > particles[index].weight)
         {
-            beta -= particles[index].weight();
+            beta -= particles[index].weight;
             index = (index + 1) % num_particles;
         }
         return index;
@@ -88,21 +92,65 @@ class ParticleFilter : public VideoProcess
 
     void inline distortParticle(RectangleParticle& p)
     {
-        int new_x = p.x() + (int)(m_rand_distortion(m_generator)*m_distortRange);
-        int new_y = p.y() + (int)(m_rand_distortion(m_generator)*m_distortRange);
+        quint16 new_x = (quint16)(p.x + m_rand_distortion(m_generator)*m_distortRange);
+        quint16 new_y = (quint16)(p.y + m_rand_distortion(m_generator)*m_distortRange);
 
-        quint16 new_w = p.getWidth(); // + (int)(m_rand_distortion(m_generator)*m_distortRange);
-        quint16 new_h = p.getHeight(); // + (int)(m_rand_distortion(m_generator)*m_distortRange);
+        quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*m_distortRange);
+        quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*m_distortRange);
         if (new_x < (img_width - new_w) && new_x > 0)
         {
-            p.setX(new_x);
-            p.setWidth(new_w);
+            p.x = new_x;
+//            p.setWidth(new_w);
         }
         if (new_y < (img_height - new_h) && new_y > 0)
         {
-            p.setY(new_y);
-            p.setHeight(new_h);
+            p.y = new_y;
+//            p.setHeight(new_h);
         }
+    }
+
+    cv::Mat m_tmp_debug;
+
+    void inline addNewTrackers()
+    {
+        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(130, 0, 0), 3);
+        auto all_clusters = DBSCAN::getClusters_(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
+        showRects(m_tmp_debug, all_clusters, cv::Scalar(0, 130, 0),2);
+
+        for(auto observed_c : all_clusters)
+        {
+            auto isExist = false;
+            for(auto tracked_c : m_tracked_clusters)
+                if(DBSCAN::normL2Sqr(observed_c,tracked_c) <= (m_dbscan_eps)*(m_dbscan_eps))
+                {
+                    isExist = true;
+                    break;
+                }
+            if(!isExist)
+            {
+                m_tracked_clusters.push_back(observed_c);
+                QVector<RectangleParticle> newTrackers(m_nTrackers);
+                for(auto& p : newTrackers)
+                {
+                    p.x = observed_c.x;
+                    p.y = observed_c.y;
+                    p.width = observed_c.width;
+                    p.height = observed_c.height;
+                    distortParticle(p);
+                    p.exec(m_img);
+                }
+                m_tracking_particles.append(newTrackers);
+            }
+        }
+
+        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(0, 0, 130),1);
+        cv::imshow("debug1", m_tmp_debug);
+    }
+
+    void inline showRects(cv::Mat& img, QVector<cv::Rect> detect, cv::Scalar color, int th)
+    {
+        for(auto cluster : detect)
+            cv::rectangle(img, cluster, color, th);
     }
 };
 #endif

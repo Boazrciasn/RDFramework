@@ -1,11 +1,11 @@
 #include "precompiled.h"
 
 #include <time.h>
+#include <chrono>
 
 #include "tracking/particlefilter/ParticleFilter.h"
 #include "Target.h"
 #include "tracking/particlefilter/RectangleParticle.h"
-#include "DBSCAN.h"
 
 ParticleFilter::ParticleFilter(
         int frameWidth, int frameHeight, int nParticles, int nIters,
@@ -18,6 +18,7 @@ ParticleFilter::ParticleFilter(
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
     m_distortRange = 1; // TODO: set from gui
+    m_nTrackers = 20;   // TODO: set from gui
     m_rand_dice    = std::uniform_real_distribution<>(0, 1);
     m_rand_distortion = std::normal_distribution<>(-1, 1);
 
@@ -32,6 +33,7 @@ ParticleFilter::ParticleFilter(
 void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 {
     m_img = inputImg.clone();
+    m_tmp_debug = inputImg.clone();
     cv::cvtColor(m_img,m_img, CV_BGR2Lab);
     cv::Mat_<float> confs{};
     cv::Mat_<float> layered = m_forest->getLayeredHist(m_img);
@@ -46,8 +48,17 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
     imgOut = m_img;
 }
 
+
+
 void ParticleFilter::processImage()
 {
+//    for (int i = 0; i < 1; ++i)
+//    {
+//        computeWeights(m_tracking_particles);
+//        normalizeWeights(m_tracking_particles);
+//        resample(m_tracking_particles);
+//    }
+
     // new ObjSearch
     initializeParticles();
     for (int i = 0; i < m_num_iters; ++i)
@@ -57,39 +68,31 @@ void ParticleFilter::processImage()
         resample(m_search_particles);
     }
 
-//    auto clusters = DBSCAN::getClusters(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
-
-    // normalize weights
-    auto total_weight = sumall(m_search_particles, [](RectangleParticle P) { return P.weight(); });
-    for (auto& p : m_search_particles)
-        p.setWeight(p.weight() / total_weight);
-
-    // sort descending
-    std::sort(std::begin(m_search_particles), std::end(m_search_particles), [](RectangleParticle P1, RectangleParticle P2) {
-        return P1.weight() > P2.weight();
-    });
-
-    showTopNParticles(m_num_particles_to_display);
+    m_tracking_particles = m_search_particles;
+    m_tracked_clusters = DBSCAN::getClusters_(m_tracking_particles, m_dbscan_eps, m_dbscan_min_pts);
+//    addNewTrackers();
 }
 
 void ParticleFilter::resample(QVector<RectangleParticle> &particles)
 {
+    auto nParticles = particles.size();
+    if(nParticles == 0) return;
     // compute max weight
     auto p_indx = std::max_element(std::begin(particles), std::end(particles), [](RectangleParticle P1, RectangleParticle P2) {
-        return P1.weight() < P2.weight();
+        return P1.weight < P2.weight;
     });
-    auto max_w = particles[std::distance(std::begin(m_search_particles), p_indx)].weight();
+    auto max_w = particles[std::distance(std::begin(particles), p_indx)].weight;
 
     // resample particles
-    for (int j = 0; j < m_num_particles; ++j)
+    for (int j = 0; j < nParticles; ++j)
     {
-        auto p_new = particles[resamplingWheel(m_search_particles, max_w)].clone();
+        auto p_new = particles[resamplingWheel(particles, max_w)].clone();
         distortParticle(p_new);             // Motion Update
         m_particlesNew.push_back(p_new);
     }
 
     // update particles
-//    particles.clear();
+    particles.clear();
     particles = m_particlesNew;
     m_particlesNew.clear();
 }
@@ -97,36 +100,30 @@ void ParticleFilter::resample(QVector<RectangleParticle> &particles)
 
 void ParticleFilter::showDetections()
 {
-    auto clusters = DBSCAN::getClusters(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
-    for(auto cluster : clusters)
-    {
-        int x = 0;
-        int y = 0;
-        for (auto p : cluster)
-        {
-            x += p.x();
-            y += p.y();
-        }
-        x = x / cluster.size();
-        y = y / cluster.size();
-        int x_end = x + m_particle_width;
-        int y_end = y + m_particle_height;
-        rectangle(m_img, cvPoint(x, y), cv::Point(x_end, y_end), cv::Scalar(0, 130, 0), 2);
-    }
+    for(auto cluster : m_tracked_clusters)
+        cv::rectangle(m_img, cluster, cv::Scalar(0, 130, 0), 2);
 }
 
 void ParticleFilter::showTopNParticles(int count)
 {
-    if (count > m_num_particles)
-        count = m_num_particles;
+    normalizeWeights(m_tracking_particles);
+    auto size = m_tracking_particles.size();
+    // sort descending
+    std::sort(std::begin(m_tracking_particles), std::end(m_tracking_particles), [](RectangleParticle P1, RectangleParticle P2) {
+        return P1.weight > P2.weight;
+    });
+
+    if (count > size)
+        count = size;
     int x = 0;
     int y = 0;
-    for (int i = 0; i < count; ++i)
+    for (auto i = 0; i < count; ++i)
     {
-        x = m_search_particles[i].x();
-        y = m_search_particles[i].y();
-        int x_end = x + m_particle_width;
-        int y_end = y + m_particle_height;
+        auto& p = m_tracking_particles[i];
+        x = p.x;
+        y = p.y;
+        int x_end = x + p.width;
+        int y_end = y + p.height;
         rectangle(m_img, cv::Point(x, y), cv::Point(x_end, y_end), cv::Scalar(130, 0, 0), 1);
     }
 }
@@ -137,11 +134,10 @@ void ParticleFilter::initializeParticles()
     m_search_particles.resize(m_num_particles);
     for (auto& p : m_search_particles)
     {
-        p.setX((int)(m_rand_dice(m_generator)*m_xRange));
-        p.setY((int)(m_rand_dice(m_generator)*m_yRange));
-        p.setWeight(1.0f / m_num_particles);
-        p.setWidth(m_particle_width);
-        p.setHeight(m_particle_height);
+        p.x = (int)(m_rand_dice(m_generator)*m_xRange);
+        p.y = (int)(m_rand_dice(m_generator)*m_yRange);
+        p.width = m_particle_width;
+        p.height = m_particle_height;
     }
 }
 
