@@ -32,6 +32,24 @@
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
         <layout class="QGridLayout" name="boxGridLayout">
+         <property name="leftMargin">
+          <number>3</number>
+         </property>
+         <property name="topMargin">
+          <number>3</number>
+         </property>
+         <property name="rightMargin">
+          <number>3</number>
+         </property>
+         <property name="bottomMargin">
+          <number>3</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>9</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>3</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="focal_label">
            <property name="font">
@@ -59,12 +77,15 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
           <widget class="QSlider" name="focal_slider">
+           <property name="maximum">
+            <number>2000</number>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -90,19 +111,37 @@
          </item>
          <item row="1" column="1">
           <widget class="QLabel" name="alpha_val">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>10</height>
+            </size>
+           </property>
+           <property name="baseSize">
             <size>
              <width>10</width>
              <height>10</height>
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item row="1" column="2">
           <widget class="QSlider" name="alpha_slider">
+           <property name="maximum">
+            <number>180</number>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -135,12 +174,15 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item row="2" column="2">
           <widget class="QSlider" name="beta_slider">
+           <property name="maximum">
+            <number>180</number>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -173,12 +215,15 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item row="3" column="2">
           <widget class="QSlider" name="gamma_slider">
+           <property name="maximum">
+            <number>180</number>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -211,12 +256,15 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item row="4" column="2">
           <widget class="QSlider" name="distance_slider">
+           <property name="maximum">
+            <number>2000</number>
+           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -231,5 +279,93 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>focal_slider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>CamCalibGUI</receiver>
+   <slot>fslider()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>102</x>
+     <y>-22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>alpha_slider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>CamCalibGUI</receiver>
+   <slot>alphaslider()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>174</x>
+     <y>276</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-66</x>
+     <y>168</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>beta_slider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>CamCalibGUI</receiver>
+   <slot>betaslider()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>154</x>
+     <y>410</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-128</x>
+     <y>446</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>gamma_slider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>CamCalibGUI</receiver>
+   <slot>gammaslider()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>531</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-58</x>
+     <y>519</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>distance_slider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>CamCalibGUI</receiver>
+   <slot>dslider()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>164</x>
+     <y>654</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-214</x>
+     <y>657</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>fslider()</slot>
+  <slot>alphaslider()</slot>
+  <slot>betaslider()</slot>
+  <slot>gammaslider()</slot>
+  <slot>dslider()</slot>
+ </slots>
 </ui>

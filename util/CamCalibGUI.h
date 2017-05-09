@@ -6,7 +6,8 @@
 
 #include "modules/tracking/videoplayer/VideoPlayerGui.h"
 #include "Core/DisplayGUI.h"
-
+#include "util/IPMMapper.h"
+#define PI 3.1415926
 namespace Ui
 {
 class CamCalibGUI;
@@ -27,10 +28,16 @@ class CamCalibGUI : public QWidget
     QSplitter *m_splitterVert{};
     QSplitter *m_splitterHori{};
     cv::Mat m_img;
-    double alpha, beta, gamma, f, d;
+    cv::Mat m_transformedImg;
+    HomographyParams m_params;
 
   private slots:
-    void applyIPM(QImage img);
+    void collectImage(QImage img);
+    void alphaslider();
+    void betaslider();
+    void gammaslider();
+    void dslider();
+    void fslider();
 };
 
 #endif // CAMCALIBGUI_H
