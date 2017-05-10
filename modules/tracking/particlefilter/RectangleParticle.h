@@ -30,10 +30,19 @@ struct RectangleParticle
 
     void exec(const cv::Mat& integralImg)
     {
-        weight = integralImg.at<int>(y, x) + integralImg.at<int>(y + height, x + width) -
+        float weight_outer = integralImg.at<int>(y, x) + integralImg.at<int>(y + height, x + width) -
                 integralImg.at<int>(y + height, x) - integralImg.at<int>(y,x + width);
 
-        weight /= (width*height);
+        auto pad = 3;
+        float weight_inner = integralImg.at<int>(y + pad, x + pad) + integralImg.at<int>(y + height - pad, x + width - pad) -
+                integralImg.at<int>(y + height - pad, x + pad) - integralImg.at<int>(y + pad, x + width - pad);
+
+        weight_outer /= (width*height);
+        weight_outer = (weight_outer==0) ? 1:weight_outer;
+        weight_inner /= (width*height);
+
+        weight = (weight_inner*weight_inner)/weight_outer;
+//        qDebug() << weight_inner << " " << weight_inner/weight_outer << " " << weight;
     }
 
     inline cv::Rect boundingBox(){
