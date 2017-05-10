@@ -11,6 +11,8 @@ struct RectangleParticle
     quint16 height{};
     qint16 dx{};         // velocity increment x direction
     qint16 dy{};         // velocity increment y direction
+    qint16 r{};
+    qint16 theta{};
     float weight{};
     bool isVisited{};
 
@@ -23,7 +25,7 @@ struct RectangleParticle
     {
         RectangleParticle clone(x, y, width, height, weight);
         clone.isVisited = isVisited;
-        clone.isVisited = dx;
+        clone.dx = dx;
         clone.dy = dy;
         return clone;
     }
