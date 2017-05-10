@@ -34,6 +34,7 @@ struct RectangleParticle
         for (int row = y; row < y+height; ++row)
             for (int col = x; col < x + width ; ++col)
                 weight +=  img.at<uchar>(row,col);
+        weight /= (width*height);
     }
 
     inline cv::Rect boundingBox(){

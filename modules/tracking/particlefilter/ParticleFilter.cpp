@@ -17,10 +17,10 @@ ParticleFilter::ParticleFilter(
     setParticleWidth(particleWidth);
     setParticleHeight(particleHeight);
     setParticlesToDisplay(m_num_particles_to_display);
-    m_distortRange = 1; // TODO: set from gui
-    m_nTrackers = 20;   // TODO: set from gui
+    m_distortRange = 10; // TODO: set from gui
+    m_nTrackers = 30;   // TODO: set from gui
     m_rand_dice    = std::uniform_real_distribution<>(0, 1);
-    m_rand_distortion = std::normal_distribution<>(-1, 1);
+    m_rand_distortion = std::normal_distribution<>();
 
     m_xRange = (img_width - m_particle_width);
     m_yRange = (img_height - m_particle_height);
@@ -44,7 +44,8 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 
     cv::imshow("debug PF", m_img);
     m_img = inputImg;
-    showDetections();
+//    showTopNParticles(m_tracking_particles.size());
+    showRects(m_img, m_tracked_clusters, cv::Scalar(0, 130, 0), 2);
     imgOut = m_img;
 }
 
@@ -52,12 +53,12 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 
 void ParticleFilter::processImage()
 {
-//    for (int i = 0; i < 1; ++i)
-//    {
-//        computeWeights(m_tracking_particles);
-//        normalizeWeights(m_tracking_particles);
-//        resample(m_tracking_particles);
-//    }
+    for (int i = 0; i < 2; ++i)
+    {
+        computeWeights(m_tracking_particles);
+        normalizeWeights(m_tracking_particles);
+        resample(m_tracking_particles, 1);
+    }
 
     // new ObjSearch
     initializeParticles();
@@ -65,15 +66,14 @@ void ParticleFilter::processImage()
     {
         computeWeights(m_search_particles);
         normalizeWeights(m_search_particles);
-        resample(m_search_particles);
+        resample(m_search_particles, 0);
     }
 
-    m_tracking_particles = m_search_particles;
     m_tracked_clusters = DBSCAN::getClusters_(m_tracking_particles, m_dbscan_eps, m_dbscan_min_pts);
-//    addNewTrackers();
+    addNewTrackers();
 }
 
-void ParticleFilter::resample(QVector<RectangleParticle> &particles)
+void ParticleFilter::resample(QVector<RectangleParticle> &particles, quint8 updateOrNot)
 {
     auto nParticles = particles.size();
     if(nParticles == 0) return;
@@ -87,7 +87,9 @@ void ParticleFilter::resample(QVector<RectangleParticle> &particles)
     for (int j = 0; j < nParticles; ++j)
     {
         auto p_new = particles[resamplingWheel(particles, max_w)].clone();
-        distortParticle(p_new);             // Motion Update
+        if(p_new.weight < 1.0f/(1*nParticles))
+            continue;
+        distortParticle(p_new, updateOrNot);             // Motion Update
         m_particlesNew.push_back(p_new);
     }
 

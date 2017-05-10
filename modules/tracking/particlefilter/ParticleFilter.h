@@ -11,6 +11,7 @@
 #include "RectangleParticle.h"
 #include "Util.h"
 #include "DBSCAN.h"
+#include <random>
 
 class VideoReader;
 
@@ -62,7 +63,7 @@ class ParticleFilter : public VideoProcess
     std::uniform_real_distribution<> m_rand_dice{};
     std::normal_distribution<> m_rand_distortion{};
 
-    void resample(QVector<RectangleParticle>& particles);
+    void resample(QVector<RectangleParticle>& particles, quint8 updateOrNot);
 
     void inline computeWeights(QVector<RectangleParticle>& particles)
     {
@@ -90,22 +91,25 @@ class ParticleFilter : public VideoProcess
         return index;
     }
 
-    void inline distortParticle(RectangleParticle& p)
+    void inline distortParticle(RectangleParticle& p, quint8 updateOrNot)
     {
-        quint16 new_x = (quint16)(p.x + m_rand_distortion(m_generator)*m_distortRange);
-        quint16 new_y = (quint16)(p.y + m_rand_distortion(m_generator)*m_distortRange);
+        quint16 new_x = (quint16)(p.x + p.dx);
+        quint16 new_y = (quint16)(p.y + p.dy);
 
-        quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*m_distortRange);
-        quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*m_distortRange);
-        if (new_x < (img_width - new_w) && new_x > 0)
+        auto sig = 0.5;
+        quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
+        quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
+        if (new_x < (img_width - new_w) && new_x > 0 && new_w > m_particle_width*0.5 && new_w < m_particle_width*1.5)
         {
             p.x = new_x;
-//            p.setWidth(new_w);
+            p.width = new_w;
+            p.dx += m_rand_distortion(m_generator)*1*updateOrNot;
         }
-        if (new_y < (img_height - new_h) && new_y > 0)
+        if (new_y < (img_height - new_h) && new_y > 0 && new_h > m_particle_height*0.5 && new_h < m_particle_height*1.5)
         {
             p.y = new_y;
-//            p.setHeight(new_h);
+            p.height = new_h;
+            p.dy += m_rand_distortion(m_generator)*5*updateOrNot;
         }
     }
 
@@ -113,9 +117,9 @@ class ParticleFilter : public VideoProcess
 
     void inline addNewTrackers()
     {
-        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(130, 0, 0), 3);
+//        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(130, 0, 0), 3);
         auto all_clusters = DBSCAN::getClusters_(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
-        showRects(m_tmp_debug, all_clusters, cv::Scalar(0, 130, 0),2);
+//        showRects(m_tmp_debug, all_clusters, cv::Scalar(0, 130, 0),2);
 
         for(auto observed_c : all_clusters)
         {
@@ -136,15 +140,15 @@ class ParticleFilter : public VideoProcess
                     p.y = observed_c.y;
                     p.width = observed_c.width;
                     p.height = observed_c.height;
-                    distortParticle(p);
+                    distortParticle(p, 0);
                     p.exec(m_img);
                 }
                 m_tracking_particles.append(newTrackers);
             }
         }
 
-        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(0, 0, 130),1);
-        cv::imshow("debug1", m_tmp_debug);
+//        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(0, 0, 130),1);
+//        cv::imshow("debug1", m_tmp_debug);
     }
 
     void inline showRects(cv::Mat& img, QVector<cv::Rect> detect, cv::Scalar color, int th)
