@@ -53,8 +53,8 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
     auto drawRect = ui->draw_rect_checkBox->isChecked();
     auto load_color = ui->Load_color_comboBox->currentIndex();
 
-    auto img_size_row = 720/2;
-    auto img_size_col = 1280/2;
+    auto img_size_row = 416;
+    auto img_size_col = 416;
     auto img_row_ratio = 1.0f;
     auto img_col_ratio = 1.0f;
     auto max_w_h = 100;
@@ -111,6 +111,87 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
     if(ui->lab_checkBox->isChecked())
         for(auto& img : images)
             cv::cvtColor(img,img,CV_BGR2Lab);
+}
+
+void ReaderGUI::loadTME(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects)
+{
+    QFile inputFile(dir + "/data.txt");
+    int max_img = ui->max_img_load_spinBox->value();
+    int skip_img = ui->skip_img_load_spinBox->value();
+    auto drawRect = ui->draw_rect_checkBox->isChecked();
+    auto load_color = ui->Load_color_comboBox->currentIndex();
+
+    auto img_size_row = 416;
+    auto img_size_col = 416;
+    auto img_row_ratio = 1.0f;
+    auto img_col_ratio = 1.0f;
+
+    auto skip_counter = 0;
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&inputFile);
+        QString line;
+        while (!in.atEnd())
+        {
+            line = in.readLine();
+            if(!line.contains("frame_"))
+                continue;
+
+            if(++skip_counter <= skip_img)
+                continue;
+
+
+            QStringList file_ = line.trimmed().split(" ");
+            QString img_file = dir + "/data/" + file_[1] +".png";
+            cv::Mat _img_ = cv::imread(img_file.toStdString(),load_color);
+            img_row_ratio = (float)img_size_row/_img_.rows;
+            img_col_ratio = (float)img_size_col/_img_.cols;
+
+            cv::Mat img;
+            for (int i = 1; i < _img_.cols; i += 2) {
+                img.push_back((_img_(cv::Range::all(), cv::Range(i,i+1))).t());
+            }
+
+            img = img.t();
+            _img_.release();
+            for (int i = 1; i < img.rows; i += 2) {
+                _img_.push_back(img(cv::Range(i,i+1), cv::Range::all()));
+            }
+
+            img = _img_;
+
+            cv::resize(img,img,cv::Size(img_size_col,img_size_row));
+
+            QVector<QRect> rects;
+            line = in.readLine();
+            auto count = 0;
+            while (!in.atEnd() && !line.isEmpty())
+            {
+                QStringList rect = line.split(" ");
+                rects.push_back(QRect((int)rect[0].toFloat()*img_col_ratio, (int)rect[1].toFloat()*img_row_ratio,
+                        (int)rect[2].toFloat()*img_col_ratio, (int)rect[3].toFloat()*img_row_ratio));
+                if(drawRect)
+                {
+                    auto rect = rects.last();
+                    cv::rectangle(img,cv::Rect(rect.x(),rect.y(),rect.width(),rect.height()), cv::Scalar(200,0,0),2);
+                }
+
+                line = in.readLine();
+                count++;
+            }
+
+            images.push_back(img);
+            frameRects.push_back(rects);
+            if(max_img != 0 && images.size() >= max_img)
+                break;
+        }
+    }
+    inputFile.close();
+
+    if(ui->lab_checkBox->isChecked())
+        for(auto& img : images)
+            cv::cvtColor(img,img,CV_BGR2Lab);
+
 }
 
 void ReaderGUI::load()
@@ -212,6 +293,14 @@ void ReaderGUI::load()
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
         loadFrames(m_fileDir, m_DS->images, m_DS->frameRects);
+        break;
+    }
+    case Type_TME:
+    {
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        loadTME(m_fileDir, m_DS->images, m_DS->frameRects);
         break;
     }
     default:

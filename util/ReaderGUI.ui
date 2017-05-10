@@ -101,6 +101,11 @@
          <string>MNIST</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>TME</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>

@@ -32,6 +32,7 @@ class ReaderGUI : public QWidget
 
     void countLabels();
     void loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects);
+    void loadTME(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects);
 
 private slots:
     void load();
