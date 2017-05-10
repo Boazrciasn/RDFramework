@@ -12,6 +12,7 @@
 #include "Util.h"
 #include "DBSCAN.h"
 #include <random>
+#include <math.h>
 
 class VideoReader;
 
@@ -94,19 +95,23 @@ class ParticleFilter : public VideoProcess
 
     void inline distortParticle(RectangleParticle& p, quint8 updateOrNot)
     {
-        quint16 new_x = (quint16)(p.x + p.dx);
-        quint16 new_y = (quint16)(p.y + p.dy);
+        quint16 new_x = (quint16)(p.x + p.r*cos(p.theta*M_PI/180));
+        quint16 new_y = (quint16)(p.y + p.r*sin(p.theta*M_PI/180));
 
-        auto sig = 0.5;
+
+        p.r += m_rand_distortion(m_generator)*3;
+        p.theta += m_rand_distortion(m_generator)*10;     // random [-20, 20]
+
+        auto sig = 1.5;
         quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
         quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
-        if (new_x < (img_width - new_w) && new_x > 0 && new_w > m_particle_width*0.5 && new_w < m_particle_width*1.5)
+        if (new_x < (img_width - new_w) && new_x > 0)
         {
             p.x = new_x;
             p.width = new_w;
             p.dx += m_rand_distortion(m_generator)*1*updateOrNot;
         }
-        if (new_y < (img_height - new_h) && new_y > 0 && new_h > m_particle_height*0.5 && new_h < m_particle_height*1.5)
+        if (new_y < (img_height - new_h) && new_y > 0)
         {
             p.y = new_y;
             p.height = new_h;
@@ -114,14 +119,34 @@ class ParticleFilter : public VideoProcess
         }
     }
 
+    void inline distortNewParticle(RectangleParticle& p)
+    {
+        p.r = m_rand_distortion(m_generator)*5;
+        p.theta = m_rand_dice(m_generator)*360;     // random [0, 360]
+
+        quint16 new_x = (quint16)(p.x + m_rand_distortion(m_generator));
+        quint16 new_y = (quint16)(p.y + m_rand_distortion(m_generator));
+
+        auto sig = 0.5;
+        quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
+        quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
+        if (new_x < (img_width - new_w) && new_x > 0)
+        {
+            p.x = new_x;
+            p.width = new_w;
+        }
+        if (new_y < (img_height - new_h) && new_y > 0)
+        {
+            p.y = new_y;
+            p.height = new_h;
+        }
+    }
+
     cv::Mat m_tmp_debug;
 
     void inline addNewTrackers()
     {
-//        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(130, 0, 0), 3);
         auto all_clusters = DBSCAN::getClusters_(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
-//        showRects(m_tmp_debug, all_clusters, cv::Scalar(0, 130, 0),2);
-
         for(auto observed_c : all_clusters)
         {
             auto isExist = false;
@@ -141,15 +166,12 @@ class ParticleFilter : public VideoProcess
                     p.y = observed_c.y;
                     p.width = observed_c.width;
                     p.height = observed_c.height;
-                    distortParticle(p, 0);
+                    distortNewParticle(p);
                     p.exec(m_integralMat);
                 }
                 m_tracking_particles.append(newTrackers);
             }
         }
-
-//        showRects(m_tmp_debug, m_tracked_clusters, cv::Scalar(0, 0, 130),1);
-//        cv::imshow("debug1", m_tmp_debug);
     }
 
     void inline showRects(cv::Mat& img, QVector<cv::Rect> detect, cv::Scalar color, int th)
