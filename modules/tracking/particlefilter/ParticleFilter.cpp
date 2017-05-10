@@ -55,12 +55,14 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 
 void ParticleFilter::processImage()
 {
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         computeWeights(m_tracking_particles);
         normalizeWeights(m_tracking_particles);
         resample(m_tracking_particles, 1);
     }
+    computeWeights(m_tracking_particles);
+    normalizeWeights(m_tracking_particles);
 
     // new ObjSearch
     initializeParticles();
@@ -70,6 +72,9 @@ void ParticleFilter::processImage()
         normalizeWeights(m_search_particles);
         resample(m_search_particles, 0);
     }
+    computeWeights(m_search_particles);
+    normalizeWeights(m_search_particles);
+
 
     m_tracked_clusters = DBSCAN::getClusters_(m_tracking_particles, m_dbscan_eps, m_dbscan_min_pts);
     addNewTrackers();

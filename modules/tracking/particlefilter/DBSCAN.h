@@ -44,8 +44,8 @@ public:
             auto sphere_particles = regionQuery(p, particles, epsilon);
             if(sphere_particles.size() >= min_points)
             {
-                result.push_back(p.boundingBox());
-                expandCluster_(sphere_particles, result, particles, clusters, epsilon, min_points);
+                result.push_back(cv::Rect(0,0,0,0));
+                expandCluster_(p, sphere_particles, result, particles, clusters, epsilon, min_points);
                 clusters++;
             }
             sphere_particles.clear();
@@ -85,13 +85,16 @@ private:
     }
 
     template <typename T>
-    static inline void expandCluster_(std::set<quint16>& sphere_particles,
+    static inline void expandCluster_(T& p_, std::set<quint16>& sphere_particles,
                                                            QVector<cv::Rect>& result,
                                                            QVector<T>& particles,
                                                            int cluster, float epsilon, quint8 min_points)
     {
-
-        auto clusterSize = 1;
+        auto x = p_.x * p_.weight;
+        auto y = p_.y * p_.weight;
+        auto w = p_.width * p_.weight;
+        auto h = p_.height * p_.weight;
+        auto tot_weight = p_.weight;
         for(auto itt = std::begin(sphere_particles);  itt != std::end(sphere_particles); ++itt)
         {
             auto& p = particles[*itt];
@@ -103,18 +106,18 @@ private:
             if (sphere_particles_.size() >= min_points)
                 sphere_particles.insert(sphere_particles_.begin(), sphere_particles_.end());
 
-            result[cluster].x += p.x;
-            result[cluster].y += p.y;
-            result[cluster].width += p.width;
-            result[cluster].height += p.height;
-            ++clusterSize;
+            x += p.x * p.weight;
+            y += p.y * p.weight;
+            w += p.width * p.weight;
+            h += p.height * p.weight;
+            tot_weight += p.weight;
             sphere_particles_.clear();
         }
 
-        result[cluster].x       /= clusterSize;
-        result[cluster].y       /= clusterSize;
-        result[cluster].width   /= clusterSize;
-        result[cluster].height  /= clusterSize;
+        result[cluster].x       = x/tot_weight;
+        result[cluster].y       = y/tot_weight;
+        result[cluster].width   = w/tot_weight;
+        result[cluster].height  = h/tot_weight;
     }
 
     template <typename T>
