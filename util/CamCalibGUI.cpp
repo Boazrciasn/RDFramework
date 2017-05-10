@@ -18,6 +18,11 @@ CamCalibGUI::CamCalibGUI(QWidget *parent) :
     ui->left_verticalLayout->addWidget(m_splitterVert);
     ui->mainGridLayout->addWidget(m_splitterHori, 1, 0);
     QObject::connect(m_videoplayer, SIGNAL(currentFrame(QImage)), SLOT(collectImage(QImage)));
+    m_params.alpha = 90.;
+    m_params.beta = 90.;
+    m_params.gamma = 90.;
+    m_params.d = 500.;
+    m_params.f = 500.;
 }
 
 CamCalibGUI::~CamCalibGUI()
@@ -33,41 +38,41 @@ void CamCalibGUI::collectImage(QImage img)
     m_displayImagesGUI->setImage(m_transformedImg);
 }
 
-void CamCalibGUI::alphaslider()
+void CamCalibGUI::alphaslider(int inpt)
 {
-    m_params.alpha = ((double)ui->alpha_slider->value()- 90)* PI/180;
+    m_params.alpha = ((double)inpt- 90)* PI/180;
     ui->alpha_val->setText(QString::number(m_params.alpha));
     m_transformedImg = applyIPM(m_img, m_params);
     m_displayImagesGUI->setImage(m_transformedImg);
 }
 
-void CamCalibGUI::betaslider()
+void CamCalibGUI::betaslider(int inpt)
 {
-    m_params.beta = ((double)ui->beta_slider->value()- 90)* PI/180;
+    m_params.beta = ((double)inpt- 90)* PI/180;
     ui->beta_val->setText(QString::number(m_params.beta));
     m_transformedImg = applyIPM(m_img, m_params);
     m_displayImagesGUI->setImage(m_transformedImg);
 }
 
-void CamCalibGUI::gammaslider()
+void CamCalibGUI::gammaslider(int inpt)
 {
-    m_params.gamma = ((double)ui->gamma_slider->value()- 90)* PI/180;
+    m_params.gamma = ((double)inpt- 90)* PI/180;
     ui->gamma_val->setText(QString::number(m_params.gamma));
     m_transformedImg = applyIPM(m_img, m_params);
     m_displayImagesGUI->setImage(m_transformedImg);
 }
 
-void CamCalibGUI::dslider()
+void CamCalibGUI::dslider(int inpt)
 {
-    m_params.d = ui->distance_slider->value();
+    m_params.d = inpt;
     ui->distance_val->setText(QString::number(m_params.d));
     m_transformedImg = applyIPM(m_img, m_params);
     m_displayImagesGUI->setImage(m_transformedImg);
 }
 
-void CamCalibGUI::fslider()
+void CamCalibGUI::fslider(int inpt)
 {
-    m_params.f = ui->focal_slider->value();
+    m_params.f = inpt;
     ui->focal_val->setText(QString::number(m_params.f));
     m_transformedImg = applyIPM(m_img, m_params);
     m_displayImagesGUI->setImage(m_transformedImg);

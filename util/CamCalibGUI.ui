@@ -282,9 +282,9 @@
  <connections>
   <connection>
    <sender>focal_slider</sender>
-   <signal>sliderReleased()</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>CamCalibGUI</receiver>
-   <slot>fslider()</slot>
+   <slot>fslider(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>147</x>
@@ -298,9 +298,9 @@
   </connection>
   <connection>
    <sender>alpha_slider</sender>
-   <signal>sliderReleased()</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>CamCalibGUI</receiver>
-   <slot>alphaslider()</slot>
+   <slot>alphaslider(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>174</x>
@@ -314,9 +314,9 @@
   </connection>
   <connection>
    <sender>beta_slider</sender>
-   <signal>sliderReleased()</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>CamCalibGUI</receiver>
-   <slot>betaslider()</slot>
+   <slot>betaslider(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>154</x>
@@ -330,13 +330,13 @@
   </connection>
   <connection>
    <sender>gamma_slider</sender>
-   <signal>sliderReleased()</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>CamCalibGUI</receiver>
-   <slot>gammaslider()</slot>
+   <slot>gammaslider(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>145</x>
-     <y>531</y>
+     <x>292</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>-58</x>
@@ -346,9 +346,9 @@
   </connection>
   <connection>
    <sender>distance_slider</sender>
-   <signal>sliderReleased()</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>CamCalibGUI</receiver>
-   <slot>dslider()</slot>
+   <slot>dslider(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>164</x>
@@ -362,10 +362,10 @@
   </connection>
  </connections>
  <slots>
-  <slot>fslider()</slot>
-  <slot>alphaslider()</slot>
-  <slot>betaslider()</slot>
-  <slot>gammaslider()</slot>
-  <slot>dslider()</slot>
+  <slot>fslider(int)</slot>
+  <slot>alphaslider(int)</slot>
+  <slot>betaslider(int)</slot>
+  <slot>gammaslider(int)</slot>
+  <slot>dslider(int)</slot>
  </slots>
 </ui>

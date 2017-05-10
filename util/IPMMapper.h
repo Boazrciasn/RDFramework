@@ -55,7 +55,7 @@ inline cv::Mat applyIPM(cv::Mat input, HomographyParams params)
     // Final and overall transformation matrix
     cv::Mat transform = A2 * (T * (R * A1));
     cv::Mat warped_img;
-    cv::warpPerspective(input, warped_img, transform, inp_size, cv::INTER_CUBIC | cv::WARP_INVERSE_MAP);
+    cv::warpPerspective(input, warped_img, transform, inp_size/2, cv::INTER_CUBIC | cv::WARP_INVERSE_MAP);
     return warped_img;
 }
 

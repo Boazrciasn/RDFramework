@@ -33,11 +33,11 @@ class CamCalibGUI : public QWidget
 
   private slots:
     void collectImage(QImage img);
-    void alphaslider();
-    void betaslider();
-    void gammaslider();
-    void dslider();
-    void fslider();
+    void alphaslider(int inpt);
+    void betaslider(int inpt);
+    void gammaslider(int inpt);
+    void dslider(int inpt);
+    void fslider(int inpt);
 };
 
 #endif // CAMCALIBGUI_H
