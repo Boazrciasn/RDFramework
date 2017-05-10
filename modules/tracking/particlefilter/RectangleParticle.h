@@ -28,12 +28,11 @@ struct RectangleParticle
         return clone;
     }
 
-    void exec(const cv::Mat& img)
+    void exec(const cv::Mat& integralImg)
     {
-        weight = 0.0f;
-        for (int row = y; row < y+height; ++row)
-            for (int col = x; col < x + width ; ++col)
-                weight +=  img.at<uchar>(row,col);
+        weight = integralImg.at<int>(y, x) + integralImg.at<int>(y + height, x + width) -
+                integralImg.at<int>(y + height, x) - integralImg.at<int>(y,x + width);
+
         weight /= (width*height);
     }
 

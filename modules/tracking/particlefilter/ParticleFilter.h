@@ -57,6 +57,7 @@ class ParticleFilter : public VideoProcess
     QVector<RectangleParticle> m_particlesNew;
 
     QVector<cv::Rect> m_tracked_clusters;
+    cv::Mat m_integralMat;
 
     RDFBasic *m_forest{};
     pcg32 m_generator;
@@ -68,7 +69,7 @@ class ParticleFilter : public VideoProcess
     void inline computeWeights(QVector<RectangleParticle>& particles)
     {
         for (auto& p : particles)
-            p.exec(m_img);
+            p.exec(m_integralMat);
     }
 
     void inline normalizeWeights(QVector<RectangleParticle>& particles)
@@ -141,7 +142,7 @@ class ParticleFilter : public VideoProcess
                     p.width = observed_c.width;
                     p.height = observed_c.height;
                     distortParticle(p, 0);
-                    p.exec(m_img);
+                    p.exec(m_integralMat);
                 }
                 m_tracking_particles.append(newTrackers);
             }

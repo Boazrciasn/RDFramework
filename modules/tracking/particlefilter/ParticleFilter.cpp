@@ -40,6 +40,8 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
     m_forest->getLabelAndConfMat(layered, m_img, confs);
 
     cv::medianBlur(m_img, m_img, 3);
+    cv::integral(m_img, m_integralMat);
+
     processImage();
 
     cv::imshow("debug PF", m_img);
