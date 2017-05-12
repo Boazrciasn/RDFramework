@@ -10,15 +10,15 @@
 
 struct Node
 {
-    quint32 id{};
-    quint32 start{};
-    quint32 end{};
-    quint32 leftCount{};
-    qint16 tau{};
+    uint32_t id{};
+    uint32_t start{};
+    uint32_t end{};
+    uint32_t leftCount{};
+    uint16_t tau{};
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
-    quint8 ftrID{};
+    uint8_t ftrID{};
     bool isLeaf{};
 
     Node() : Node(0)
