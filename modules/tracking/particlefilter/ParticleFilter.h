@@ -19,39 +19,45 @@ class VideoReader;
 class ParticleFilter : public VideoProcess
 {
   public:
-    ParticleFilter(int frameWidth, int frameHeight, int nParticles, int nIters, int particleWidth, int particleHeight);
+    ParticleFilter(uint16_t frameWidth, uint16_t frameHeight, uint16_t nParticles, uint8_t nIters,
+            uint16_t particleWidth, uint16_t particleHeight);
     void exec(const cv::Mat &inputImg, cv::Mat &imgOut);
     ~ParticleFilter();
 
     void initializeParticles();
     void reset();
 
-    inline void setNumParticles(int value) { m_num_particles = value; }
-    inline void setNumIters(int value) { m_num_iters = value; }
-    inline void setParticleWidth(int value) { m_particle_width = value; }
-    inline void setParticleHeight(int value) { m_particle_height = value; }
-    inline void setParticlesToDisplay(int value) { m_num_particles_to_display = value; }
+    inline void setNumParticles(uint16_t value) { m_num_particles = value; }
+    inline void setNumTrackers(uint16_t value) { m_nTrackers = value; }
+    inline void setNumIters(uint8_t value) { m_num_iters = value; }
+    inline void setParticleWidth(uint16_t value) { m_particle_width = value; }
+    inline void setParticleHeight(uint16_t value) { m_particle_height = value; }
+    inline void setParticlesToDisplay(uint16_t value) { m_num_particles_to_display = value; }
     inline void setDBSCANEps(float value) { m_dbscan_eps = value; }
-    inline void setDBSCANMinPts(int value) { m_dbscan_min_pts = value; }
+    inline void setDBSCANMinPts(uint8_t value) { m_dbscan_min_pts = value; }
     inline void setRDF(RDFBasic* rdf){m_forest = rdf;}
     void processImage();
     void showTopNParticles(int count);
-    void showDetections();
+
+    inline void showDetections()
+    {
+        for(auto cluster : m_tracked_clusters)
+            cv::rectangle(m_img, cluster, cv::Scalar(0, 130, 0), 2);
+    }
 
   private:
-    int m_num_particles{};
-    int m_nTrackers{};
-    int m_num_iters{};
-    int m_particle_width{};
-    int m_particle_height{};
-    int m_distortRange{};
-    int m_num_particles_to_display{};
-    int img_height{}, img_width{};
-    int m_xRange{};
-    int m_yRange{};
+    uint16_t m_num_particles{};
+    uint16_t m_nTrackers{};
+    uint8_t m_num_iters{};
+    uint16_t m_particle_width{};
+    uint16_t m_particle_height{};
+    uint16_t m_num_particles_to_display{};
+    uint16_t m_img_height{}, m_img_width{};
+    uint16_t m_xRange{};
+    uint16_t m_yRange{};
 
     float m_dbscan_eps{};
-    int m_dbscan_min_pts{};
+    uint8_t m_dbscan_min_pts{};
 
     QVector<RectangleParticle> m_search_particles;
     QVector<RectangleParticle> m_tracking_particles;
@@ -64,8 +70,9 @@ class ParticleFilter : public VideoProcess
     pcg32 m_generator;
     std::uniform_real_distribution<> m_rand_dice{};
     std::normal_distribution<> m_rand_distortion{};
+    Colorcode colors;
 
-    void resample(QVector<RectangleParticle>& particles, quint8 updateOrNot);
+    void resample(QVector<RectangleParticle>& particles, bool isSearch);
 
     void inline computeWeights(QVector<RectangleParticle>& particles)
     {
@@ -77,7 +84,7 @@ class ParticleFilter : public VideoProcess
     {
         auto total_weight = sumall(particles, [](RectangleParticle P) { return P.weight; });
         for (auto& p : particles)
-            p.weight = p.weight / total_weight;
+            p.weight = p.weight / (float)total_weight;
     }
 
     int inline resamplingWheel(QVector<RectangleParticle>& particles, float max_weight)
@@ -93,56 +100,99 @@ class ParticleFilter : public VideoProcess
         return index;
     }
 
-    void inline distortParticle(RectangleParticle& p, quint8 updateOrNot)
+    void inline distortParticle(RectangleParticle& p)
     {
-        quint16 new_x = (quint16)(p.x + p.r*cos(p.theta*M_PI/180));
-        quint16 new_y = (quint16)(p.y + p.r*sin(p.theta*M_PI/180));
+        quint16 new_x = (quint16)(p.x + p.r*cos((p.theta)*M_PI/180));
+        quint16 new_y = (quint16)(p.y + p.r*sin((p.theta)*M_PI/180));
 
 
-        p.r += m_rand_distortion(m_generator)*3;
-        p.theta += m_rand_distortion(m_generator)*10;     // random [-20, 20]
+        p.r += m_rand_distortion(m_generator)*2;
+        p.theta += m_rand_distortion(m_generator)*45/p.age;
 
         auto sig = 1.5;
         quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
         quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
-        if (new_x < (img_width - new_w) && new_x > 0)
+        if (new_x < (m_img_width - new_w) && new_x > 0)
         {
             p.x = new_x;
             p.width = new_w;
-            p.dx += m_rand_distortion(m_generator)*1*updateOrNot;
         }
-        if (new_y < (img_height - new_h) && new_y > 0)
+        if (new_y < (m_img_height - new_h) && new_y > 0)
         {
             p.y = new_y;
             p.height = new_h;
-            p.dy += m_rand_distortion(m_generator)*5*updateOrNot;
+        }
+
+
+
+
+
+
+//        p.x = (quint16)(p.x + p.r*cos((p.theta)*M_PI/180));
+//        p.y = (quint16)(p.y + p.r*sin((p.theta)*M_PI/180));
+//        p.r += m_rand_distortion(m_generator)*2;
+//        p.theta += m_rand_distortion(m_generator)*45/p.age;
+
+//        auto sig = 1.5;
+//        p.width = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
+//        p.height = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
+
+
+//        quint16 new_x = std::min(std::max((int)p.x, 0), m_img_width-1);
+//        quint16 new_y = std::min(std::max((int)p.y, 0), m_img_height-1);
+//        quint16 new_w = std::min(p.x + p.width, m_img_width-1) - new_x;
+//        quint16 new_h = std::min(p.y + p.height, m_img_height-1) - new_y;
+
+//        p.x = new_x;
+//        p.y = new_y;
+//        p.width = new_w;
+//        p.height = new_h;
+    }
+
+    void inline distortSearchParticle(RectangleParticle& p)
+    {
+        auto sig = 2.0f;
+        quint16 new_x = (quint16)(p.x + m_rand_distortion(m_generator)*sig);
+        quint16 new_y = (quint16)(p.y + m_rand_distortion(m_generator)*sig);
+
+        sig = 1.5;
+        quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
+        quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
+        if (new_x < (m_img_width - new_w) && new_x > 0)
+        {
+            p.x = new_x;
+            p.width = new_w;
+        }
+        if (new_y < (m_img_height - new_h) && new_y > 0)
+        {
+            p.y = new_y;
+            p.height = new_h;
         }
     }
 
     void inline distortNewParticle(RectangleParticle& p)
     {
-        p.r = m_rand_distortion(m_generator)*5;
-        p.theta = m_rand_dice(m_generator)*360;     // random [0, 360]
+        p.r = uint8_t(m_rand_distortion(m_generator)*5);
+        p.theta = 90;// m_rand_dice(m_generator)*180;
+        p.age = 1;
 
-        quint16 new_x = (quint16)(p.x + m_rand_distortion(m_generator));
-        quint16 new_y = (quint16)(p.y + m_rand_distortion(m_generator));
+        auto new_x = uint16_t(p.x + m_rand_distortion(m_generator)*2);
+        auto new_y = uint16_t(p.y + m_rand_distortion(m_generator)*2);
 
         auto sig = 0.5;
         quint16 new_w = (quint16)(p.width + m_rand_distortion(m_generator)*sig);
         quint16 new_h = (quint16)(p.height + m_rand_distortion(m_generator)*sig);
-        if (new_x < (img_width - new_w) && new_x > 0)
+        if (new_x < (m_img_width - new_w) && new_x > 0)
         {
             p.x = new_x;
             p.width = new_w;
         }
-        if (new_y < (img_height - new_h) && new_y > 0)
+        if (new_y < (m_img_height - new_h) && new_y > 0)
         {
             p.y = new_y;
             p.height = new_h;
         }
     }
-
-    cv::Mat m_tmp_debug;
 
     void inline addNewTrackers()
     {
@@ -162,10 +212,10 @@ class ParticleFilter : public VideoProcess
                 QVector<RectangleParticle> newTrackers(m_nTrackers);
                 for(auto& p : newTrackers)
                 {
-                    p.x = observed_c.x;
-                    p.y = observed_c.y;
-                    p.width = observed_c.width;
-                    p.height = observed_c.height;
+                    p.x = uint16_t(observed_c.x);
+                    p.y = uint16_t(observed_c.y);
+                    p.width = uint16_t(observed_c.width);
+                    p.height = uint16_t(observed_c.height);
                     distortNewParticle(p);
                     p.exec(m_integralMat);
                 }
@@ -178,6 +228,15 @@ class ParticleFilter : public VideoProcess
     {
         for(auto cluster : detect)
             cv::rectangle(img, cluster, color, th);
+    }
+
+    void inline showDetections(QVector<RectangleParticle>& particles, cv::Mat& img)
+    {
+        for(auto& p : particles)
+        {
+            auto rgb = colors.colors[p.cluster%colors.colors.size()];
+            cv::rectangle(img, p.boundingBox(), cv::Scalar(rgb[0], rgb[1], rgb[2]), 1);
+        }
     }
 };
 #endif

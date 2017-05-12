@@ -22,8 +22,6 @@
 #include "util/SignalSenderInterface.h"
 #include "StatisticsLogger.h"
 
-#define MIN_ENTROPY 0.05
-
 #include "Node.h"
 #include "DataSet.h"
 #include "RDFParams.h"
@@ -41,9 +39,9 @@ class RandomDecisionTree
     // RDTBasic var
     cv::Mat_<qint32> m_nodes_mat{};
     cv::Mat_<featureType> m_features_mat{};
-    quint16 m_padding_x{};
-    quint16 m_padding_y{};
-    quint8 m_label_count{};
+    uint16_t m_padding_x{};
+    uint16_t m_padding_y{};
+    uint8_t m_label_count{};
 
 
     // TODO: convert to template

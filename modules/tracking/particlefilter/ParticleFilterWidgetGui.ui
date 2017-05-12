@@ -180,7 +180,7 @@
           </layout>
          </item>
          <item row="8" column="1">
-          <widget class="QSpinBox" name="histogramSizespinBox">
+          <widget class="QSpinBox" name="numTrackersSpinBox">
            <property name="minimum">
             <number>8</number>
            </property>
@@ -407,7 +407,7 @@
           </widget>
          </item>
          <item row="8" column="0">
-          <widget class="QLabel" name="HistogramSizelabel">
+          <widget class="QLabel" name="numTrackersLabel">
            <property name="font">
             <font>
              <family>Futura</family>
@@ -415,7 +415,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Histogram Size</string>
+            <string># Trackers/obj</string>
            </property>
           </widget>
          </item>
@@ -667,7 +667,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>histogramSizespinBox</sender>
+   <sender>numTrackersSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ParticleFilterWidgetGui</receiver>
    <slot>onHistSizeChanged(int)</slot>

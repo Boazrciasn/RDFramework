@@ -80,7 +80,7 @@ protected:
     int m_numIters{};
     int m_particleWidth{};
     int m_particleHeight{};
-    int m_histSize{};
+    int m_numTrackers{};
     int m_stepSize{};
     int m_dbscan_min_pts{};
     float m_dbscan_eps{};

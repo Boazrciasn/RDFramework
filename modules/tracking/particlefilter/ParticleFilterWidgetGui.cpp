@@ -17,12 +17,12 @@ ParticleFilterWidgetGui::ParticleFilterWidgetGui(QWidget *parent) :
     m_numIters = ui->iterCountSpinBox->value();
     m_particleWidth = ui->particleWidthLSpinBox->value();
     m_particleHeight = ui->particleHeightLSpinBox->value();
-    m_histSize = ui->histogramSizespinBox->value();
+    m_numTrackers = ui->numTrackersSpinBox->value();
     m_stepSize = ui->stepSizeSizeSpinBox->value();
     m_dbscan_eps = ui->dbscanEpsDoubleSpinBox->value();
     m_dbscan_min_pts= ui->dbscanMinPtsSizespinBox->value();
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
-    ui->histogramSizespinBox->setValue(m_histSize);
+    ui->numTrackersSpinBox->setValue(m_numTrackers);
     m_RubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 
 
@@ -162,7 +162,7 @@ void ParticleFilterWidgetGui::onActionSaveTarget()
         labelName = QInputDialog::getText(&msgBox, "Set Label Name", " Label :", QLineEdit::Normal, labelName, &isOkPressed);
         if (isOkPressed)
         {
-            currTarget = new Target(labelName, targetPixMap.toImage(), m_histSize);
+            currTarget = new Target(labelName, targetPixMap.toImage(), m_numTrackers);
             m_TargetsVector.push_back(currTarget);
             ui->targets_ListWidget->addItem(currTarget->getLabel());
             m_TargetCount = m_TargetsVector.size();
@@ -188,6 +188,7 @@ void ParticleFilterWidgetGui::onActionSetupPF()
     m_PF->setRDF(m_predictor->getForest());
     m_PF->setDBSCANEps(m_dbscan_eps);
     m_PF->setDBSCANMinPts(m_dbscan_min_pts);
+    m_PF->setNumTrackers(m_numTrackers);
     ui->particlesToDisplaySlider->setMaximum(m_particleCount);
     m_VideoPlayer->setProcess(m_PF);
 }
@@ -317,7 +318,7 @@ void ParticleFilterWidgetGui::onParticleHeightChange(int value)
 
 void ParticleFilterWidgetGui::onHistSizeChanged(int value)
 {
-    m_histSize = value;
+    m_numTrackers = value;
 }
 
 void ParticleFilterWidgetGui::onStepSizeChanged(int value)
@@ -347,6 +348,7 @@ void ParticleFilterWidgetGui::writeSettings()
     settings.setValue("particleCountSpinBox", ui->particleCountSpinBox->value());
     settings.setValue("dbscanEpsDoubleSpinBox", ui->dbscanEpsDoubleSpinBox->value());
     settings.setValue("dbscanMinPtsSizespinBox", ui->dbscanMinPtsSizespinBox->value());
+    settings.setValue("numTrackersSpinBox", ui->numTrackersSpinBox->value());
 
     settings.setValue("stepSizeSizeSpinBox", ui->stepSizeSizeSpinBox->value());
     settings.endGroup();
@@ -365,7 +367,7 @@ void ParticleFilterWidgetGui::readSettings()
     ui->iterCountSpinBox->setValue(settings.value("iterCountSpinBox",3).toInt());
     ui->particleWidthLSpinBox->setValue(settings.value("particleWidthLSpinBox",64).toInt());
     ui->particleHeightLSpinBox->setValue(settings.value("particleHeightLSpinBox",128).toInt());
-    ui->histogramSizespinBox->setValue(settings.value("histogramSizespinBox",12).toInt());
+    ui->numTrackersSpinBox->setValue(settings.value("numTrackersSpinBox",30).toInt());
     ui->stepSizeSizeSpinBox->setValue(settings.value("stepSizeSizeSpinBox",15).toInt());
     ui->dbscanEpsDoubleSpinBox->setValue(settings.value("dbscanEpsDoubleSpinBox", 8.0f).toDouble());
     ui->dbscanMinPtsSizespinBox->setValue(settings.value("dbscanMinPtsSizespinBox",20).toInt());

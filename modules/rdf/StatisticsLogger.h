@@ -36,7 +36,7 @@ class StatisticsLogger
     }
 
     void inline logFeatureFreq(tbb::concurrent_vector<int> frequency) {
-        m_featureSelectionRatio.resize(frequency.size());
+        m_featureSelectionRatio.resize((int)frequency.size());
         auto total = std::accumulate(frequency.begin(), frequency.end(), 0);
         for (auto i = 0u; i < frequency.size(); ++i) {
             m_featureSelectionRatio[i] = 100*frequency[i]/total;

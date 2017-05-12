@@ -5,14 +5,14 @@
 
 struct RectangleParticle
 {
-    quint16 x{};
-    quint16 y{};
-    quint16 width{};
-    quint16 height{};
-    qint16 dx{};         // velocity increment x direction
-    qint16 dy{};         // velocity increment y direction
-    qint16 r{};
-    qint16 theta{};
+    uint16_t x{};
+    uint16_t y{};
+    uint16_t width{};
+    uint16_t height{};
+    uint16_t r{};
+    int16_t theta{};
+    uint16_t age{};
+    uint8_t cluster{};
     float weight{};
     bool isVisited{};
 
@@ -24,9 +24,9 @@ struct RectangleParticle
     RectangleParticle clone()
     {
         RectangleParticle clone(x, y, width, height, weight);
-        clone.isVisited = isVisited;
-        clone.dx = dx;
-        clone.dy = dy;
+        clone.r = r;
+        clone.theta = theta;
+        clone.age = age;
         return clone;
     }
 
@@ -44,7 +44,6 @@ struct RectangleParticle
         weight_inner /= (width*height);
 
         weight = (weight_inner*weight_inner)/weight_outer;
-//        qDebug() << weight_inner << " " << weight_inner/weight_outer << " " << weight;
     }
 
     inline cv::Rect boundingBox(){

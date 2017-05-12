@@ -46,6 +46,16 @@ public:
         return layeredHist/m_nTreesForDetection;
     }
 
+    cv::Mat inline computeLabels(const cv::Mat &roi)
+    {
+        cv::Mat_<float> confs;
+        cv::Mat_<float> layered = getLayeredHist(roi);
+        cv::Mat res;
+        getLabelAndConfMat(layered, res, confs);
+        return res;
+    }
+
+
     cv::Mat_<float> getCumulativeProbHist(const cv::Mat_<float> &layeredHist);
 
     void inline getLabelAndConfMat(cv::Mat_<float> &layeredHist, cv::Mat &labels, cv::Mat_<float> &confs)

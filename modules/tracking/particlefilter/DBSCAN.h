@@ -8,10 +8,10 @@ class DBSCAN {
 public:
 
     template <typename T>
-    static inline QVector<QVector<T>> getClusters(QVector<T>& particles, float epsilon, quint8 min_points)
+    static inline QVector<QVector<T>> getClusters(QVector<T>& particles, float epsilon, uint8_t min_points)
     {
         QVector<QVector<T>> result;
-        auto clusters = 0;
+        auto clusters = 1;
         for(auto& p : particles)
         {
             if(p.isVisited)
@@ -32,7 +32,7 @@ public:
     }
 
     template <typename T>
-    static inline QVector<cv::Rect> getClusters_(QVector<T>& particles, float epsilon, quint8 min_points)
+    static inline QVector<cv::Rect> getClusters_(QVector<T>& particles, float epsilon, uint8_t min_points)
     {
         QVector<cv::Rect> result;
         auto clusters = 0;
@@ -65,7 +65,7 @@ private:
     static inline void expandCluster(std::set<quint16>& sphere_particles,
                                                            QVector<QVector<T>>& result,
                                                            QVector<T>& particles,
-                                                           int cluster, float epsilon, quint8 min_points)
+                                                           int cluster, float epsilon, uint8_t min_points)
     {
 
         for(auto itt = std::begin(sphere_particles);  itt != std::end(sphere_particles); ++itt)
@@ -88,8 +88,9 @@ private:
     static inline void expandCluster_(T& p_, std::set<quint16>& sphere_particles,
                                                            QVector<cv::Rect>& result,
                                                            QVector<T>& particles,
-                                                           int cluster, float epsilon, quint8 min_points)
+                                                           int cluster, float epsilon, uint8_t min_points)
     {
+        p_.cluster = cluster;
         auto x = p_.x * p_.weight;
         auto y = p_.y * p_.weight;
         auto w = p_.width * p_.weight;
@@ -112,6 +113,7 @@ private:
             h += p.height * p.weight;
             tot_weight += p.weight;
             sphere_particles_.clear();
+            p.cluster = cluster;
         }
 
         result[cluster].x       = x/tot_weight;
