@@ -23,13 +23,13 @@ FIND_PACKAGE(Qt5Multimedia REQUIRED)
 FIND_PACKAGE(Qt5MultimediaWidgets REQUIRED)
 FIND_PACKAGE(Qt5PrintSupport REQUIRED)
 
-
-
 INCLUDE(FindCUDA)
 SET(CUDA_INCLUDE_DIRS "/usr/local/cuda/include")
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS}
-                    ${CUDA_INCLUDE_DIRS} Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
+                    ${CUDA_INCLUDE_DIRS}
+                    ${TBB_INCLUDE_DIRS}
+                    Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
                                             modules/    util/)
 
 SET(QT_USE_QTXML TRUE)
