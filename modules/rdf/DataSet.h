@@ -22,7 +22,7 @@ struct DataSet
 
     QString toString() const
     {
-        auto res = QString("<<<< DataSet >>>>\n   images: ") + QString::number(images.size())
+        auto res = "<<<< DataSet >>>>\n   images: "_qs + QString::number(images.size())
                 + QString("\n   Images per Label: \n");
         for (auto it = std::begin(map_dataPerLabel); it != std::end(map_dataPerLabel); ++it)
             res += QString("      ") + QString::number(it->first)

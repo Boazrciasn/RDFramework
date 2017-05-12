@@ -379,7 +379,7 @@ private:
         }
     }
 
-    inline void setParamsFor(auto maxFeatureIndex, cv::Point maxTeta1, cv::Point maxTeta2, quint32 index, auto maxTau)
+    inline void setParamsFor(qint8 maxFeatureIndex, cv::Point maxTeta1, cv::Point maxTeta2, quint32 index, qint16 maxTau)
     {
         m_nodes[index].tau = maxTau;
         m_nodes[index].teta1 = maxTeta1;

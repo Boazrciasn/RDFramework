@@ -47,7 +47,7 @@ void RandomDecisionTree::train()
 void RandomDecisionTree::getSubSampleSingleFrame()
 {
     quint32 imgCount = m_DS->images.size();
-    for (quint32 id = 0; id < imgCount; ++id)
+    for (auto id = 0_ui32; id < imgCount; ++id)
     {
         auto &image = m_DS->images[id];
         auto label  = 0; // TODO: m_DS->labels[id];
@@ -100,20 +100,20 @@ void RandomDecisionTree::getSubSampleSingleFrame()
 
 void RandomDecisionTree::getSubSample()
 {
-    quint32 imgCount = m_DS->images.size();
+    auto imgCount = (quint32)m_DS->images.size();
     // Set Proper size
-    auto size = 0;
+    auto size{0};
     for (auto it = std::begin(m_DS->map_dataPerLabel); it != std::end(m_DS->map_dataPerLabel); ++it)
         size += (it->second * m_params->pixelsPerLabelImage[it->first]);
     m_pixelCloud.pixels1.resize(size);
     m_pixelCloud.pixels2.resize(size);
-    quint32 last{};
-    for (quint32 id = 0; id < imgCount; ++id)
+    auto last = quint32{};
+    for (auto id = 0_ui32; id < imgCount; ++id)
     {
         auto &image = m_DS->images[id];
         auto label  = m_DS->labels[id];
-        int nRows = image.rows;
-        int nCols = image.cols;
+        auto nRows = (int)image.rows;
+        auto nCols = (int)image.cols;
 
         auto sum = cv::sum(image)[0];
         quint16 pxCount = m_params->pixelsPerLabelImage[label];

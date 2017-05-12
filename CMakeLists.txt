@@ -30,6 +30,7 @@ find_package(Qt5MultimediaWidgets REQUIRED)
 # TBB package
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+include_directories(${TBB_INCLUDE_DIRS})
 
 # NM Not tested yet
 find_package(Qt5PrintSupport REQUIRED)

@@ -32,9 +32,9 @@ protected:
 
   public:
     explicit ParticleFilterWidgetGui(QWidget *parent = 0);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
     ~ParticleFilterWidgetGui();
