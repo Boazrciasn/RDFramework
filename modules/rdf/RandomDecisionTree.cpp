@@ -62,8 +62,8 @@ void RandomDecisionTree::getSubSampleSingleFrame()
         {
             for (int k = 0; k < m_params->pixelsPerImage; ++k)
             {
-                int row = (m_generator() % rects[i].height()) + rects[i].y() + m_probe_distanceY + Feature::max_h;
-                int col = (m_generator() % rects[i].width()) + rects[i].x() + m_probe_distanceX + Feature::max_w;
+                int row = (m_generator() % rects[i].height()-6) + rects[i].y() + m_probe_distanceY + Feature::max_h;
+                int col = (m_generator() % rects[i].width()-6) + rects[i].x() + m_probe_distanceX + Feature::max_w;
                 Pixel px(cv::Point(col,row),id, label);
                 m_pixelCloud.pixels1.push_back(px);
             }
@@ -264,8 +264,8 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
         return;
     auto maxItr             = m_params->maxIteration;
     auto nLabels            = m_params->labelCount;
-    auto maxTau             = std::numeric_limits<qint16>::max();
-    auto maxFeatureIndex    = std::numeric_limits<quint8>::min();
+    auto maxTau             = std::numeric_limits<tauType>::max();
+    auto maxFeatureIndex    = std::numeric_limits<ftrIdType>::min();
     auto maxGain            = std::numeric_limits<float>::min();
 
     cv::Point maxTeta1{}, maxTeta2{};
@@ -281,7 +281,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     {
         generateParams(index);
 
-        for (quint8 feature = 0; feature < totalFeatures; ++feature)
+        for (ftrIdType feature = 0; feature < totalFeatures; ++feature)
         {
             m_nodes[index].ftrID = feature;
             computeHistograms(index, rightHist, leftHist);
@@ -311,8 +311,8 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
         return;
     auto maxItr             = m_params->maxIteration;
     auto nLabels            = m_params->labelCount;
-    auto maxTau             = std::numeric_limits<qint16>::max();
-    auto maxFeatureIndex    = std::numeric_limits<qint8>::min();
+    auto maxTau             = std::numeric_limits<tauType>::max();
+    auto maxFeatureIndex    = std::numeric_limits<ftrIdType>::min();
     auto maxGain            = std::numeric_limits<float>::min();
 
     cv::Point maxTeta1{}, maxTeta2{};
@@ -330,7 +330,7 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
     {
         generateParams(index);
 
-        for (quint8 feature = 0; feature < totalFeatures; ++feature)
+        for (ftrIdType feature = 0; feature < totalFeatures; ++feature)
         {
             m_nodes[index].ftrID = feature;
             computeHistograms(index, rightHist, leftHist);

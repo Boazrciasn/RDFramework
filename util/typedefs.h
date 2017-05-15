@@ -18,6 +18,8 @@ using FloatMat          = cv::Mat_<float>;
 using DoubleMat         = cv::Mat_<double>;
 
 using featureType       = float;
+using ftrIdType         = uint8_t;
+using tauType           = int32_t;
 using MatFeature        = cv::Mat_<featureType>;
 
 using tableLookupType   = float;

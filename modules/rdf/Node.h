@@ -14,11 +14,11 @@ struct Node
     uint32_t start{};
     uint32_t end{};
     uint32_t leftCount{};
-    uint16_t tau{};
+    tauType tau{};
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
-    uint8_t ftrID{};
+    ftrIdType ftrID{};
     bool isLeaf{};
 
     Node() : Node(0)
