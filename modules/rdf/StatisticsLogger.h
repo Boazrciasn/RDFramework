@@ -63,7 +63,8 @@ class StatisticsLogger
     {
         QString features;
         for (auto d = 0; d < m_featureSelectionRatio.size(); ++d)
-            features += QString::number(d).sprintf(": %2.2f %\n", (float)m_featureSelectionRatio[d]) + Feature::features_str[d];
+            features += QString::number(d).sprintf(": %2.2f %%\n", m_featureSelectionRatio[d]) + Feature::features_str[d];
+
 
 
         SignalSenderInterface::instance().printsend(features);
