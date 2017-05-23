@@ -1,22 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 set(project_name "RDF")
 
-# set the project name
 project("${project_name}")
-SET(CMAKE_CXX_STANDARD 14)
-
-# Find packages
-FIND_PACKAGE(OpenCV 3 REQUIRED)
-FIND_PACKAGE(CUDA REQUIRED)
-FIND_PACKAGE(Boost)
-FIND_PACKAGE(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
-
-# Qt5 package
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-FIND_PACKAGE(Qt5Xml REQUIRED)
-FIND_PACKAGE(Qt5Multimedia REQUIRED)
-FIND_PACKAGE(Qt5MultimediaWidgets REQUIRED)
-FIND_PACKAGE(Qt5PrintSupport REQUIRED)
 
 SET(GPU_ARCH "50" CACHE STRING "GPU architecture to be used")
 SET(USE_OPENMP FALSE CACHE BOOL "Use OpenMP")
@@ -31,23 +16,24 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 ${OPENMP_FLAGS
 
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 
-INCLUDE(FindCUDA) # SET(CUDA_INCLUDE_DIRS "/usr/local/cuda/include")
-INCLUDE_DIRECTORIES(
-    ${OpenCV_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS}
-    ${CUDA_INCLUDE_DIRS}
-    ${TBB_INCLUDE_DIRS}
-    Core/
-    3rdparty/qcustomplot/
-    3rdparty/cereal/
-    modules/
-    util/
-    )
+SET(CMAKE_CXX_STANDARD 14)
+
+FIND_PACKAGE(OpenCV 3 REQUIRED)
+FIND_PACKAGE(CUDA REQUIRED)
+FIND_PACKAGE(Boost)
+FIND_PACKAGE(TBB)
+
+FIND_PACKAGE(Qt5Widgets REQUIRED)
+FIND_PACKAGE(Qt5Xml REQUIRED)
+FIND_PACKAGE(Qt5Multimedia REQUIRED)
+FIND_PACKAGE(Qt5MultimediaWidgets REQUIRED)
+FIND_PACKAGE(Qt5PrintSupport REQUIRED)
+
+INCLUDE(FindCUDA)
 
 SET(QT_USE_QTXML TRUE)
 SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 
 FILE(GLOB CORE Core/*.ui Core/*.cpp Core/*.h Core/*.hpp)
 FILE(GLOB OCR modules/ocr/*.ui modules/ocr/*.cpp modules/ocr/*.h modules/ocr/*.hpp)
@@ -88,17 +74,10 @@ if (CUDA_FOUND)
             "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
             ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
             )
-#        set_source_files_properties(${CUDA_FILES} PROPERTIES LANGUAGE CXX)
         set_property(SOURCE ${CUDA_FILES} PROPERTY LANGUAGE CXX)
-        set_property(SOURCE ${CUDA_FILES} PROPERTY COMPILE_FLAGS "-Wall --cuda-path=${CUDA_TOOLKIT_ROOT_DIR} --cuda-gpu-arch=sm_${GPU_ARCH} -x cuda")
+        set_property(SOURCE ${CUDA_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wall --cuda-path=${CUDA_TOOLKIT_ROOT_DIR} --cuda-gpu-arch=sm_${GPU_ARCH} -x cuda ")
 
-#        if(CUDA_64_BIT_DEVICE_CODE)
-#          link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib64")
-#        else()
-#          link_directories("${CUDA_TOOLKIT_ROOT_DIR}/lib")
-#        endif()
-
-        target_link_libraries(${project_name} "cudart" "cuda" "dl" "rt" "pthread")
+        target_link_libraries(${project_name} "cudart_static" "cuda" "dl" "pthread")
 
     else()
         LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
@@ -119,9 +98,21 @@ else()
 
 endif()
 
+INCLUDE_DIRECTORIES(
+    ${OpenCV_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${CUDA_INCLUDE_DIRS}
+    ${TBB_INCLUDE_DIRS}
+    Core/
+    3rdparty/qcustomplot/
+    3rdparty/cereal/
+    modules/
+    util/
+    )
+
+qt5_use_modules("${project_name}" Core Gui Widgets)
+
 target_link_libraries(
     "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
     tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets ${CUDART}
     )
-
-qt5_use_modules("${project_name}" Core Gui Widgets)
