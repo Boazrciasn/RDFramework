@@ -19,7 +19,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 SET(CMAKE_CXX_STANDARD 14)
 
 FIND_PACKAGE(OpenCV 3 REQUIRED)
-FIND_PACKAGE(CUDA REQUIRED)
+FIND_PACKAGE(CUDA)
 FIND_PACKAGE(Boost)
 FIND_PACKAGE(TBB)
 
@@ -28,8 +28,6 @@ FIND_PACKAGE(Qt5Xml REQUIRED)
 FIND_PACKAGE(Qt5Multimedia REQUIRED)
 FIND_PACKAGE(Qt5MultimediaWidgets REQUIRED)
 FIND_PACKAGE(Qt5PrintSupport REQUIRED)
-
-INCLUDE(FindCUDA)
 
 SET(QT_USE_QTXML TRUE)
 SET(CMAKE_AUTOMOC ON)
@@ -51,9 +49,6 @@ FILE(GLOB PCG 3rdparty/pcg-cpp-0.98/include/*.hpp)
 FILE(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataExtraction/*.hpp
     modules/tracking/dataExtraction/*.h modules/tracking/dataExtraction/*.ui)
 
-# CUDA
-FILE(GLOB CUDA_FILES modules/rdf/*.cu)
-
 # Create Qt MOC files
 QT5_WRAP_UI(
     UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui Core/DisplayGUI.ui Core/PreProcessGUI.ui
@@ -69,15 +64,25 @@ QT5_WRAP_UI(
 
 if (CUDA_FOUND)
     SET(CUDART ${CUDA_CUDART_LIBRARY})
+
+    FILE(GLOB CUDA_FILES modules/rdf/*.cu)
+
     if(USE_CLANG_FOR_GPU)
         add_executable(
             "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
             ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
             )
-        set_property(SOURCE ${CUDA_FILES} PROPERTY LANGUAGE CXX)
-        set_property(SOURCE ${CUDA_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wall --cuda-path=${CUDA_TOOLKIT_ROOT_DIR} --cuda-gpu-arch=sm_${GPU_ARCH} -x cuda ")
 
-        target_link_libraries(${project_name} "cudart_static" "cuda" "dl" "pthread")
+        set_property(SOURCE ${CUDA_FILES}
+            PROPERTY LANGUAGE CXX
+            )
+
+        set_property(SOURCE ${CUDA_FILES}
+            APPEND_STRING PROPERTY
+            COMPILE_FLAGS " -Wall --cuda-path=${CUDA_TOOLKIT_ROOT_DIR} --cuda-gpu-arch=sm_${GPU_ARCH} -x cuda"
+            )
+
+#        target_link_libraries(${project_name} "cudart_static" "cuda" "dl" "pthread")
 
     else()
         LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
