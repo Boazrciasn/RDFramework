@@ -1,11 +1,13 @@
 #include "precompiled.h"
+
 #include <ctime>
+
 #include <QApplication>
 
-#include "RandomDecisionForest.h"
 #include "3rdparty/pcg-cpp-0.98/include/pcg_random.hpp"
 #include "3rdparty/pcg-cpp-0.98/include/randutils.hpp"
-//#include <omp.h>
+
+#include "RandomDecisionForest.h"
 
 // histogram normalize ?
 // getLeafNode and Test  needs rework
@@ -54,7 +56,8 @@ float RandomDecisionForest::testForest()
     int totalImgs = m_DS->images.size();
     SignalSenderInterface::instance().printsend("Number of Images:" + QString::number(totalImgs));
     qApp->processEvents();
-    if (totalImgs == 0) return 0;
+    if (totalImgs == 0)
+        return 0;
 
     std::atomic<int> posCounter(0);
     tbb::parallel_for(0, totalImgs, 1, [ =, &posCounter ](int nodeIndex)
@@ -95,7 +98,7 @@ float RandomDecisionForest::testForest(tbb::concurrent_vector<cv::Mat>& output)
         double max;
         cv::Point max_loc;
         cv::minMaxLoc(probHist, NULL, &max, NULL, &max_loc);
-        auto label = max_loc.x;
+//        auto label = max_loc.x;
 
 //        if (label == m_DS->labels[nodeIndex])
 //            ++posCounter;

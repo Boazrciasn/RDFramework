@@ -3,8 +3,9 @@
 
 #include "precompiled.h"
 
-struct RectangleParticle
+class RectangleParticle
 {
+public:
     uint16_t x{};
     uint16_t y{};
     uint16_t width{};
@@ -40,13 +41,14 @@ struct RectangleParticle
                 integralImg.at<int>(y + height - pad, x + pad) - integralImg.at<int>(y + pad, x + width - pad);
 
         weight_outer /= (width*height);
-        weight_outer = (weight_outer==0) ? 1:weight_outer;
+        weight_outer = (weight_outer==0) ? 1 : weight_outer;
         weight_inner /= (width*height);
 
         weight = (weight_inner*weight_inner)/weight_outer;
     }
 
-    inline cv::Rect boundingBox(){
+    inline cv::Rect boundingBox()
+    {
         return cv::Rect(x, y, width, height);
     }
 };

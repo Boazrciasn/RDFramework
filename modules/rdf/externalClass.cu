@@ -6,10 +6,13 @@
 
 #define N 512
 
-__global__ void add(int *a, int *b, int *c, cv::cuda::PtrStepSz<uchar> asdf) {
+__global__
+void add(int *a, int *b, int *c, cv::cuda::PtrStepSz<uchar> unused)
+{
 	c[blockIdx.x] = a[blockIdx.x] + b[blockIdx.x];
 }
 
+__host__
 void kernel_wrapper(int *a, int *b, int *c)
 {
 	int *d_a, *d_b, *d_c;
@@ -35,12 +38,15 @@ void kernel_wrapper(int *a, int *b, int *c)
 }
 
 
-__global__ void img_proc_kernel(cv::cuda::PtrStepSz<uchar3> img,
-								cv::cuda::PtrStepSz<float> layered_hist,
-								cv::cuda::PtrStepSz<int> tree_nodes,
-								cv::cuda::PtrStepSz<float>features,
-								int lbl_count,
-								int padding)
+__global__
+void img_proc_kernel(
+        cv::cuda::PtrStepSz<uchar3> img,
+        cv::cuda::PtrStepSz<float> layered_hist,
+        cv::cuda::PtrStepSz<int> tree_nodes,
+        cv::cuda::PtrStepSz<float>features,
+        int lbl_count,
+        int padding
+        )
 {
 	int xIndex = blockIdx.x * blockDim.x + threadIdx.x + padding;
 	int yIndex = blockIdx.y * blockDim.y + threadIdx.y + padding;
@@ -98,6 +104,7 @@ __global__ void img_proc_kernel(cv::cuda::PtrStepSz<uchar3> img,
 	img(xIndex,yIndex).z = 0;
 }
 
+__host__
 void img_proc(cv::Mat& img, cv::Mat_<float>& layered_hist, cv::Mat_<int>& tree_nodes, cv::Mat_<float>& features, int lbl_count, int padding)
 {
 	dim3 block_size(32,16); // 512 threads
@@ -112,7 +119,7 @@ void img_proc(cv::Mat& img, cv::Mat_<float>& layered_hist, cv::Mat_<int>& tree_n
 	cv::cuda::GpuMat nodes_d(tree_nodes);
 	cv::cuda::GpuMat features_d(features);
 
-	img_proc_kernel<<<grid_size,block_size>>>(img_d, layered_hist_d, nodes_d, features_d, lbl_count, padding);
+    img_proc_kernel<<<grid_size,block_size>>>(img_d, layered_hist_d, nodes_d, features_d, lbl_count, padding);
 	img_d.download(img);
 }
 
