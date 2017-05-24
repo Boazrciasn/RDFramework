@@ -136,7 +136,7 @@
      <item>
       <widget class="QSpinBox" name="max_img_load_spinBox">
        <property name="maximum">
-        <number>1000</number>
+        <number>10000</number>
        </property>
        <property name="singleStep">
         <number>100</number>
@@ -153,7 +153,7 @@
      <item>
       <widget class="QSpinBox" name="skip_img_load_spinBox">
        <property name="maximum">
-        <number>1000</number>
+        <number>10000</number>
        </property>
        <property name="singleStep">
         <number>100</number>

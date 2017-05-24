@@ -253,7 +253,7 @@ class RandomDecisionTree
         for(auto i = 1; i < ftr_count; ++i)
             for(auto j = 0; j < ftr_px_count; ++j)
                 m_features_mat(i,j) = Feature::features[i](j/Feature::max_w,j%Feature::max_h);
-        std::cout << m_features_mat << std::endl;
+//        std::cout << m_features_mat << std::endl;
     }
 
     inline cv::Mat_<qint32> leaf2Mat(quint32 index)

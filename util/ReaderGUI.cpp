@@ -285,6 +285,7 @@ void ReaderGUI::load()
             m_fileDir.replace(QRegExp("images.idx3"), "labels.idx1");
             m_reader->readLabels(m_fileDir, m_DS->labels, m_dFlag);
         }
+        countLabels();
         break;
     }
     case Type_STD_ONE:
