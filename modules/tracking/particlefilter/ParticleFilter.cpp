@@ -1,6 +1,7 @@
 #include "precompiled.h"
 #include <chrono>
 #include "tracking/particlefilter/ParticleFilter.h"
+#include <thread>
 
 ParticleFilter::ParticleFilter(
         uint16_t frameWidth, uint16_t frameHeight, uint16_t nParticles, uint8_t nIters,
@@ -20,50 +21,72 @@ ParticleFilter::ParticleFilter(
 
 void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 {
-    cv::cvtColor(inputImg, m_img, CV_BGR2Lab);
-    m_img = m_forest->computeLabels(m_img);
-    cv::medianBlur(m_img, m_img, 3);
-//    SimpleBlobDetector detector;
+    {   /// RDF
+        cv::cvtColor(inputImg, m_img, CV_BGR2Lab);
+        m_img = m_forest->computeLabels(m_img);
+        cv::medianBlur(m_img, m_img, 3);
+    }
 
-    cv::integral(m_img, m_integralMat);
-    processImage();
-    cv::imshow("debug PF", m_img);
-    m_img = inputImg;
+    {   /// BINARIZE
+        cv::threshold(m_img , m_img , 0, 255, cv::THRESH_BINARY);
+        cv::dilate(m_img, m_img, cv::Mat(), cv::Point(-1,-1));
+        cv::erode(m_img, m_img, cv::Mat(), cv::Point(-1,-1), 2);
+    }
+
+    cv::imshow("Test", m_img);
+
+    //    { /// Blob Detection
+    //    std::vector<cv::Rect>  bBox_vec;
+    //    auto m_aspectMax = 1.30;
+    //    auto m_aspectMin = 0.30;
+    //    auto m_BBoxMinSize = 500;
+    //    auto m_BBoxMaxSize = 5000;
+    //    bBox_vec = Util::calculateBoundingBoxRect(m_img, m_BBoxMinSize, m_BBoxMaxSize, m_aspectMax, m_aspectMin);
+    //    m_img = inputImg.clone();
+    //    Util::drawBoundingBox(m_img, bBox_vec);
+    //    }
 
 
-    m_tracked_clusters = DBSCAN::getClusters_(m_tracking_particles, m_dbscan_eps, m_dbscan_min_pts);
-//    qDebug() << "Cluster count: " << m_tracked_clusters.size();
-    addNewTrackers();
-//    showTopNParticles(m_tracking_particles.size());
-//    showRects(m_img, m_tracked_clusters, cv::Scalar(0, 130, 0), 2);
-    showDetections(m_search_particles, m_img);
+    {
+        cv::integral(m_img, m_integralMat);
+        m_img = inputImg;
+        processImage();
+    }
+
+
+
+//    std::chrono::seconds dura(1);
+//    std::this_thread::sleep_for( dura );
+
+
+
+    //    m_tracked_clusters = DBSCAN::getClusters(m_tracking_particles, m_dbscan_eps, m_dbscan_min_pts);
+    //    qDebug() << "Cluster count: " << m_tracked_clusters.size();
+    //    addNewTrackers();
+    //    showTopNParticles(m_tracking_particles.size());
+
+//    {
+//        std::sort(std::begin(m_search_particles), std::end(m_search_particles),
+//                  [](RectangleParticle P1, RectangleParticle P2) {
+//            return P1.weight > P2.weight;
+//        });
+//        m_search_particles.resize(200);
+//        auto all_clusters = DBSCAN::getClusters(m_search_particles, m_dbscan_eps, m_dbscan_min_pts);
+//        showRects(m_img, all_clusters, cv::Scalar(0, 130, 0), 2);
+//        //    showDetections(m_search_particles, m_img);
+//    }
     imgOut = m_img;
-//    addNewTrackers();
 }
-
-
 
 void ParticleFilter::processImage()
 {
-//    for (int i = 0; i < 1; ++i)
-    {
-        computeWeights(m_tracking_particles);
-        normalizeWeights(m_tracking_particles);
-        resample(m_tracking_particles, false);
-    }
-    computeWeights(m_tracking_particles);
-    normalizeWeights(m_tracking_particles);
-
-    // new ObjSearch
+    updateTrackers();
+    setSTDforTrackers();
     initializeParticles();
-    for (int i = 0; i < m_num_iters; ++i)
-    {
-        computeWeights(m_search_particles);
-        normalizeWeights(m_search_particles);
-        resample(m_search_particles, true);
-    }
-    computeWeights(m_search_particles);
-    normalizeWeights(m_search_particles);
+//    showRects(m_img, m_tracked_clusters, cv::Scalar(0, 130, 0), 2);
+    detectObjects();
+    addNewTrackers();
+    updateWeights(m_tracking_particles);
 }
 
 void ParticleFilter::resample(QVector<RectangleParticle> &particles, bool isSearch) {
@@ -73,7 +96,7 @@ void ParticleFilter::resample(QVector<RectangleParticle> &particles, bool isSear
     if (nParticles == 0) return;
     // compute max weight
     auto p_indx = std::max_element(std::begin(particles), std::end(particles),
-                                   [](RectangleParticle P1, RectangleParticle P2) {
+                                   [](RectangleParticle& P1, RectangleParticle& P2) {
                                        return P1.weight < P2.weight;
                                    });
     auto max_w = particles[std::distance(std::begin(particles), p_indx)].weight;
@@ -81,8 +104,6 @@ void ParticleFilter::resample(QVector<RectangleParticle> &particles, bool isSear
     // resample particles
     for (int j = 0; j < nParticles; ++j) {
         auto p_new = particles[resamplingWheel(particles, max_w)].clone();
-        if (p_new.weight < 1.0f / (1 * nParticles))
-            continue;
         isSearch ? distortSearchParticle(p_new) : distortParticle(p_new);
         m_particlesNew.push_back(p_new);
     }
@@ -90,15 +111,43 @@ void ParticleFilter::resample(QVector<RectangleParticle> &particles, bool isSear
     for (auto &p : m_particlesNew)
         ++p.age;
 
-    if (!isSearch)
-        qDebug() << nParticles;
-
     // update particles
     particles.clear();
     particles = m_particlesNew;
     m_particlesNew.clear();
 }
 
+void ParticleFilter::setSTDforTrackers()
+{
+    std::vector<cv::Point2f> diff(m_tracked_clusters.size());
+    std::vector<cv::Point2f> diff_dim(m_tracked_clusters.size());
+    std::vector<uint32_t> counter(m_tracked_clusters.size(),0);
+    auto nP = m_tracking_particles.size();
+    for(auto i = 0; i < nP; ++i)
+    {
+        auto& p = m_tracking_particles[i];
+        auto c  = p.cluster - 1;
+        if (c < 0) continue;
+        auto pt = p.center() - m_tracked_clusters[c].center();
+        diff[c].x += std::pow(pt.x,2);
+        diff[c].y += std::pow(pt.y,2);
+        diff_dim[c].x += std::pow(p.width - m_tracked_clusters[c].width,2);
+        diff_dim[c].y += std::pow(p.height - m_tracked_clusters[c].height,2);
+        ++counter[c];
+    }
+
+    for(auto& p : m_tracking_particles)
+    {
+        auto c = p.cluster-1;
+        if (c < 0) continue;
+        p.sig_x = std::sqrt(diff[c].x/counter[c]);
+        p.sig_y = std::sqrt(diff[c].y/counter[c]);
+        p.sig_w = 1;//std::sqrt(diff_dim[c].x/counter[c]);
+        p.sig_h = 1;//std::sqrt(diff_dim[c].y/counter[c]);
+    }
+    diff.clear();
+    counter.clear();
+}
 
 void ParticleFilter::showTopNParticles(int count) {
     auto size = m_tracking_particles.size();
@@ -114,22 +163,6 @@ void ParticleFilter::showTopNParticles(int count) {
         auto rgb = colors.colors[p.cluster % colors.colors.size()];
         rectangle(m_img, p.boundingBox(), cv::Scalar(rgb[0], rgb[1], rgb[2]), 1);
     }
-}
-
-void ParticleFilter::initializeParticles() {
-    m_search_particles.clear();
-    m_search_particles.resize(m_num_particles);
-    for (auto &p : m_search_particles) {
-        p.x = uint16_t(m_rand_dice(m_generator) * m_xRange);
-        p.y = uint16_t(m_rand_dice(m_generator) * m_yRange);
-        p.width = m_particle_width;
-        p.height = m_particle_height;
-    }
-}
-
-void ParticleFilter::reset() {
-    // TODO: add other reset things
-    m_tracking_particles.clear();
 }
 
 ParticleFilter::~ParticleFilter() {

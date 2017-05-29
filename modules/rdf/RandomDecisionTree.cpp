@@ -62,8 +62,8 @@ void RandomDecisionTree::getSubSampleSingleFrame()
         {
             for (int k = 0; k < m_params->pixelsPerImage; ++k)
             {
-                int row = (m_generator() % rects[i].height()-6) + rects[i].y() + m_probe_distanceY + Feature::max_h;
-                int col = (m_generator() % rects[i].width()-6) + rects[i].x() + m_probe_distanceX + Feature::max_w;
+                int row = (m_generator() % rects[i].height()) + rects[i].y() + m_probe_distanceY + Feature::max_h;
+                int col = (m_generator() % rects[i].width()) + rects[i].x() + m_probe_distanceX + Feature::max_w;
                 Pixel px(cv::Point(col,row),id, label);
                 m_pixelCloud.pixels1.push_back(px);
             }
@@ -129,8 +129,8 @@ void RandomDecisionTree::getSubSample()
                 intensity = image.at<uchar>(row, col);
 
 //                qDebug() << id << " " << intensity << " sum: " << sum;
-                if(sum < 25500)
-                    break;
+//                if(sum < 25500)
+//                    break;
             }
             auto &px = m_pixelCloud.pixels1[last + k];
             px.id = id;
@@ -147,8 +147,8 @@ void RandomDecisionTree::constructTree()
     constructRootNode();
     constructTreeDecisionNodes();
     SignalSenderInterface::instance().printsend("Updating nodes...");
-    computeLeafHistograms();
-    updateNodesWithNewDada();
+//    computeLeafHistograms();
+//    updateNodesWithNewDada();
     SignalSenderInterface::instance().printsend("Computing leaf Histogram...");
     computeLeafHistograms();
 }

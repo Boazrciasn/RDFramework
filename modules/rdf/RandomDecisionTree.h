@@ -45,7 +45,7 @@ class RandomDecisionTree
 
 
     // TODO: convert to template
-    std::vector<Node3b> m_nodes;
+    std::vector<Node2b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
@@ -320,10 +320,12 @@ public:
         m_nodes_mat.reserve(300000);
         compressFtr();
         compressNodes(0);
-//        cv::FileStorage storage("/home/neko/Desktop/RDT.yml", cv::FileStorage::WRITE);
-//        storage << "m_nodes_mat" << m_nodes_mat;
-//        storage << "m_features_mat" << m_features_mat;
-//        storage.release();
+        static int treeId = 0;
+        std::string fname = "RDT_" + std::to_string(treeId++) + ".yml";
+        cv::FileStorage storage(fname, cv::FileStorage::WRITE);
+        storage << "m_nodes_mat" << m_nodes_mat;
+        storage << "m_features_mat" << m_features_mat;
+        storage.release();
     }
 
 
@@ -333,7 +335,8 @@ private:
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
+        archive(quint32(), std::vector<Node3b>(), m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
+//        archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
     }
 
     inline void generateParams(quint32 index)
