@@ -37,7 +37,6 @@ void ReaderGUI::countLabels()
             avgH += m_DS->images[i].rows;
             ++counter;
         }
-
     }
 
     avgW /= counter;
@@ -272,8 +271,8 @@ void ReaderGUI::load()
 
         // TODO: move resize to proper place
         for(auto& img : m_DS->images)
-            cv::resize(img,img, cv::Size(50,50));
-
+            cv::resize(img,img, cv::Size(64,128));
+        countLabels();
         break;
     }
     case Type_MNIST:

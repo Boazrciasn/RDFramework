@@ -102,8 +102,11 @@ void RandomDecisionForestDialogGui::onTest()
     // New Test
     auto size = m_dataReaderGUI->DS()->images.size();
     std::vector<cv::Mat> results{};
+    Colorcode colorsBag;
 
 
+    std::atomic<int> posCounter(0);
+    auto pxAcc = 0.0f;
     for(auto i = 0u; i <  size; ++i)
     {
         cv::Mat labels{};
@@ -113,6 +116,26 @@ void RandomDecisionForestDialogGui::onTest()
 
         results.push_back(m_dataReaderGUI->DS()->images[i]);
         results.push_back(labels);
+
+        auto color = colorsBag.colors[m_dataReaderGUI->DS()->labels[i]];
+        auto counter = 0.0f;
+        auto c = 0.0f;
+        for (int row = 0; row < labels.rows; ++row) {
+            for (int col = 0; col < labels.cols; ++col) {
+                if(labels.at<cv::Vec3b>(row,col) == cv::Vec3b(255,255,255))
+                    continue;
+                ++c;
+                if (labels.at<cv::Vec3b>(row,col) == color)
+                    ++counter;
+            }
+        }
+
+        pxAcc += counter/c;
+        int label{};
+        float conf{};
+        m_forest_basic.detect(m_dataReaderGUI->DS()->images[i], label, conf);
+        if (label == m_dataReaderGUI->DS()->labels[i])
+            ++posCounter;
     }
 
     m_displayImagesGUI->setImageSet(results);
@@ -123,6 +146,8 @@ void RandomDecisionForestDialogGui::onTest()
     auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
 
     printMsg("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
+    printMsg("Accuracy: " + QString::number(100 * (float) posCounter / (float)size) + "%");
+    printMsg("Pixel Accuracy: " + QString::number(100 * (float) pxAcc / (float)size) + "%");
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()

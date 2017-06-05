@@ -213,8 +213,8 @@ class ParticleFilter : public VideoProcess
 
     void inline addNewTrackers()
     {
-        auto eps = 10.0f;
-        auto min_pts = 30;
+        auto eps = 17.0f;
+        auto min_pts = 25;
 
         std::sort(std::begin(m_search_particles), std::end(m_search_particles),
                   [](RectangleParticle P1, RectangleParticle P2) {
@@ -224,8 +224,8 @@ class ParticleFilter : public VideoProcess
         auto all_clusters = DBSCAN::getClusters(m_search_particles, eps, min_pts);
 
 //        showDetections(m_search_particles, m_img);
-        showDetections(m_tracking_particles, m_img);
-        showRects(m_img, m_tracked_clusters, cv::Scalar(0, 130, 0), 2);
+//        showDetections(m_tracking_particles, m_img);
+        showRects(m_img, all_clusters, cv::Scalar(0, 130, 0), 2);
 
         for(auto& observed_c : all_clusters)
         {
