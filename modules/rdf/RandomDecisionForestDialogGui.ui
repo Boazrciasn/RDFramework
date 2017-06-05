@@ -387,6 +387,19 @@
                </property>
               </widget>
              </item>
+             <item row="8" column="1">
+              <widget class="QCheckBox" name="checkBox_isMNIST">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>MNIST &amp; Standard</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -787,12 +800,28 @@
    <slot>onPositiveTau(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>448</x>
-     <y>204</y>
+     <x>1170</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
      <x>-30</x>
      <y>247</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_isMNIST</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>RandomDecisionForestDialogGui</receiver>
+   <slot>onMNIST(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>206</y>
     </hint>
    </hints>
   </connection>
@@ -816,5 +845,6 @@
   <slot>onTauRangeChanged(int)</slot>
   <slot>onPreProcess()</slot>
   <slot>onPositiveTau(bool)</slot>
+  <slot>onMNIST(bool)</slot>
  </slots>
 </ui>

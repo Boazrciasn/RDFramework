@@ -70,6 +70,7 @@ public:
     void onLabelCountChanged(int value);
     void onTauRangeChanged(int value);
     void onPositiveTau(bool value);
+    void onMNIST(bool value);
 };
 
 #endif // RDFDIALOGGUI_H

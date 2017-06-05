@@ -28,8 +28,12 @@ void RandomDecisionTree::train()
     initNodes();
     m_statLog.setDepth(m_params->maxDepth - 1);
     SignalSenderInterface::instance().printsend("Sub-sampling...");
-//    getSubSample();
-    getSubSampleSingleFrame(); // TODO: put if statement here
+
+    if(m_params->isMNIST)
+        getSubSample();
+    else
+        getSubSampleSingleFrame();
+
     SignalSenderInterface::instance().printsend("Constructing tree...");
     qApp->processEvents();
     constructTree();
@@ -41,7 +45,7 @@ void RandomDecisionTree::train()
     m_statLog.dump();
     qApp->processEvents();
 
-    compreseTree();
+//    compreseTree();
 }
 
 void RandomDecisionTree::getSubSampleSingleFrame()

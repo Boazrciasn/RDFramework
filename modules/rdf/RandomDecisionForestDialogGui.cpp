@@ -18,6 +18,7 @@ void RandomDecisionForestDialogGui::initParamValues()
     ui->spinBox_TauRange->setValue(PARAMS.tauRange);
     ui->checkBox_isPositive->setChecked(PARAMS.isPositiveRange);
     ui->spinBox_MaxPixelsEntropy->setValue(PARAMS.maxPxForEntropy);
+    ui->checkBox_isMNIST->setChecked(PARAMS.isMNIST);
 }
 
 RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
@@ -213,6 +214,7 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("tauRange", PARAMS.tauRange);
     settings.setValue("isPositiveRange", PARAMS.isPositiveRange);
     settings.setValue("maxPxForEntropy", PARAMS.maxPxForEntropy);
+    settings.setValue("isMNIST", PARAMS.isMNIST);
     settings.endGroup();
 }
 
@@ -231,6 +233,7 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.tauRange = settings.value("tauRange", 127).toInt();
     PARAMS.isPositiveRange = settings.value("isPositiveRange", false).toBool();
     PARAMS.maxPxForEntropy = settings.value("maxPxForEntropy", 1000).toInt();
+    PARAMS.isMNIST = settings.value("isMNIST", false).toBool();
     settings.endGroup();
 }
 
@@ -289,3 +292,9 @@ void RandomDecisionForestDialogGui::onPositiveTau(bool value)
 {
     PARAMS.isPositiveRange = value;
 }
+
+void RandomDecisionForestDialogGui::onMNIST(bool value)
+{
+    PARAMS.isMNIST = value;
+}
+
