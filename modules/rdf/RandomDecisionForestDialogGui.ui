@@ -452,6 +452,19 @@
                </property>
               </widget>
              </item>
+             <item row="1" column="2">
+              <widget class="QCheckBox" name="checkBox_isRDFC">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>RDF-C</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

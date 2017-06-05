@@ -54,7 +54,7 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
     delete m_dataReaderGUI;
     delete m_displayImagesGUI;
     delete &m_forest;
-    delete &m_forest_basic;
+    delete &m_rdf;
     delete &m_preprocesses;
     delete m_preprocessGUI;
     delete m_splitterHori;
@@ -94,61 +94,10 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-//    m_forest_basic.setNTreesForDetection(m_nTreesForDetection);
-    auto begin = std::chrono::high_resolution_clock::now();
-//    auto accuracy = m_forest.testForest();
-
-    // ///////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////
-    // New Test
-    auto size = m_dataReaderGUI->DS()->images.size();
-    std::vector<cv::Mat> results{};
-    Colorcode colorsBag;
-
-
-    std::atomic<int> posCounter(0);
-    auto pxAcc = 0.0f;
-    for(auto i = 0u; i <  size; ++i)
-    {
-        cv::Mat labels{};
-        cv::Mat_<float> confs{};
-        cv::Mat_<float> layered = m_forest_basic.getLayeredHist(m_dataReaderGUI->DS()->images[i]);
-        m_forest_basic.getLabelAndConfMat(layered, labels, confs);
-
-        results.push_back(m_dataReaderGUI->DS()->images[i]);
-        results.push_back(labels);
-
-        auto color = colorsBag.colors[m_dataReaderGUI->DS()->labels[i]];
-        auto counter = 0.0f;
-        auto c = 0.0f;
-        for (int row = 0; row < labels.rows; ++row) {
-            for (int col = 0; col < labels.cols; ++col) {
-                if(labels.at<cv::Vec3b>(row,col) == cv::Vec3b(255,255,255))
-                    continue;
-                ++c;
-                if (labels.at<cv::Vec3b>(row,col) == color)
-                    ++counter;
-            }
-        }
-
-        pxAcc += counter/c;
-        int label{};
-        float conf{};
-        m_forest_basic.detect(m_dataReaderGUI->DS()->images[i], label, conf);
-        if (label == m_dataReaderGUI->DS()->labels[i])
-            ++posCounter;
-    }
-
-    m_displayImagesGUI->setImageSet(results);
-    // ///////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
-
-    printMsg("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
-    printMsg("Accuracy: " + QString::number(100 * (float) posCounter / (float)size) + "%");
-    printMsg("Pixel Accuracy: " + QString::number(100 * (float) pxAcc / (float)size) + "%");
+    if(ui->checkBox_isRDFC->isChecked())
+        test(m_rdf_c);
+    else
+        test(m_rdf);
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()
@@ -174,7 +123,11 @@ void RandomDecisionForestDialogGui::onLoad()
                         tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)"),
                         &selfilter
                     );
-    m_forest_basic.loadForest(fname);
+
+    if(ui->checkBox_isRDFC->isChecked())
+         m_rdf_c.loadForest(fname);
+    else
+        m_rdf.loadForest(fname);
     ui->console->append("FOREST LOADED");
 }
 

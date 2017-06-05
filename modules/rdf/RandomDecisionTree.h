@@ -335,8 +335,8 @@ private:
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive(quint32(), std::vector<Node3b>(), m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
-//        archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
+//        archive(quint32(), std::vector<Node3b>(), m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
+        archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
     }
 
     inline void generateParams(quint32 index)
