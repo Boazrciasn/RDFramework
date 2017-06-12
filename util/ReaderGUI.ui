@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
+    <width>498</width>
     <height>121</height>
    </rect>
   </property>
@@ -104,6 +104,11 @@
        <item>
         <property name="text">
          <string>TME</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>MOT</string>
         </property>
        </item>
       </widget>

@@ -75,6 +75,7 @@ void ParticleFilter::exec(const cv::Mat &inputImg, cv::Mat &imgOut)
 //        showRects(m_img, all_clusters, cv::Scalar(0, 130, 0), 2);
 //        //    showDetections(m_search_particles, m_img);
 //    }
+//    showRects(m_img, m_tracked_clusters, cv::Scalar(0, 130, 0), 2);
     imgOut = m_img;
 }
 
@@ -83,7 +84,6 @@ void ParticleFilter::processImage()
     updateTrackers();
     setSTDforTrackers();
     initializeParticles();
-//    showRects(m_img, m_tracked_clusters, cv::Scalar(0, 130, 0), 2);
     detectObjects();
     addNewTrackers();
     updateWeights(m_tracking_particles);

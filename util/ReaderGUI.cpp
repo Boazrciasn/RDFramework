@@ -193,6 +193,50 @@ void ReaderGUI::loadTME(QString dir, std::vector<cv::Mat> &images, QVector<QVect
 
 }
 
+
+void ReaderGUI::loadMOT(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects)
+{
+    QFile inputFile(dir + "/gt/gt.txt");
+    auto drawRect = ui->draw_rect_checkBox->isChecked();
+    auto load_color = ui->Load_color_comboBox->currentIndex();
+
+
+
+    QString path = dir + "/img1";
+    QDir img_dir( path );
+    img_dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );
+    int total_files = img_dir.count();
+
+    for (int img_id = 1; img_id <= total_files; ++img_id) {
+        auto img_file = path + QString("/%1.jpg").arg(img_id, 6, 10, QChar('0'));
+        cv::Mat img = cv::imread(img_file.toStdString(),load_color);
+        images.push_back(img);
+    }
+
+
+    if (!inputFile.open(QIODevice::ReadOnly))
+        return;
+
+    frameRects.resize(total_files);
+    QTextStream in(&inputFile);
+    while (!in.atEnd())
+    {
+        auto line = in.readLine();
+        auto line_tokens = line.trimmed().split(",");
+        auto frame_id   = line_tokens[0].toInt() - 1;
+        frameRects[frame_id].push_back(QRect((int)line_tokens[2].toFloat(), (int)line_tokens[3].toFloat(),
+                (int)line_tokens[4].toFloat(), (int)line_tokens[5].toFloat()));
+
+        if(drawRect)
+        {
+            auto rect = frameRects[frame_id].last();
+            cv::rectangle(images[frame_id],cv::Rect(rect.x(),rect.y(),rect.width(),rect.height()), cv::Scalar(200,0,0),2);
+        }
+    }
+}
+
+
+
 void ReaderGUI::load()
 {
     double cpu_time;
@@ -301,6 +345,14 @@ void ReaderGUI::load()
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
         loadTME(m_fileDir, m_DS->images, m_DS->frameRects);
+        break;
+    }
+    case Type_MOT:
+    {
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        loadMOT(m_fileDir, m_DS->images, m_DS->frameRects);
         break;
     }
     default:
