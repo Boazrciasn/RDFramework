@@ -1,41 +1,37 @@
 cmake_minimum_required(VERSION 3.2)
 set(project_name "RDF")
 
-# set the project name
 project("${project_name}")
-SET(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fopenmp")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -fopenmp -O3")
+SET(GPU_ARCH "50" CACHE STRING "GPU architecture to be used")
+SET(USE_OPENMP FALSE CACHE BOOL "Use OpenMP")
+SET(USE_CLANG_FOR_GPU FALSE CACHE BOOL "Set this for using Clang during GPU kernel compiles")
+
+if(USE_OPENMP)
+    SET(OPENMP_FLAGS "-fopenmp")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall ${OPENMP_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 ${OPENMP_FLAGS}")
 
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 
-# Find packages
-FIND_PACKAGE(OpenCV 3 REQUIRED)
-FIND_PACKAGE(CUDA REQUIRED)
-FIND_PACKAGE(Boost)
-FIND_PACKAGE(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+SET(CMAKE_CXX_STANDARD 14)
 
-# Qt5 package
+FIND_PACKAGE(OpenCV 3 REQUIRED)
+FIND_PACKAGE(CUDA)
+FIND_PACKAGE(Boost)
+FIND_PACKAGE(TBB)
+
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 FIND_PACKAGE(Qt5Xml REQUIRED)
 FIND_PACKAGE(Qt5Multimedia REQUIRED)
 FIND_PACKAGE(Qt5MultimediaWidgets REQUIRED)
 FIND_PACKAGE(Qt5PrintSupport REQUIRED)
 
-INCLUDE(FindCUDA)
-SET(CUDA_INCLUDE_DIRS "/usr/local/cuda/include")
-INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS}
-                    ${Boost_INCLUDE_DIRS}
-                    ${CUDA_INCLUDE_DIRS}
-                    ${TBB_INCLUDE_DIRS}
-                    Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
-                                            modules/    util/)
-
 SET(QT_USE_QTXML TRUE)
 SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 
 FILE(GLOB CORE Core/*.ui Core/*.cpp Core/*.h Core/*.hpp)
 FILE(GLOB OCR modules/ocr/*.ui modules/ocr/*.cpp modules/ocr/*.h modules/ocr/*.hpp)
@@ -53,38 +49,75 @@ FILE(GLOB PCG 3rdparty/pcg-cpp-0.98/include/*.hpp)
 FILE(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataExtraction/*.hpp
     modules/tracking/dataExtraction/*.h modules/tracking/dataExtraction/*.ui)
 
-# CUDA
-FILE(GLOB CUDA_FILES modules/rdf/*.cu)
-
 # Create Qt MOC files
-QT5_WRAP_UI(UISrcs  Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui Core/DisplayGUI.ui Core/PreProcessGUI.ui
+QT5_WRAP_UI(
+    UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui Core/DisplayGUI.ui Core/PreProcessGUI.ui
     modules/ocr/AnnExtractorDialogGui.ui modules/ocr/ExtractedDialogGui.ui modules/ocr/HistogramDialogGui.ui modules/ocr/MyDialogGui.ui
     modules/rdf/RandomDecisionForestDialogGui.ui
     modules/tracking/particlefilter/ParticleFilterWidgetGui.ui
     modules/tracking/dataExtraction/DataExtractorGui.ui
     modules/tracking/dataExtraction/PredictorGui.ui
     modules/tracking/videoplayer/VideoPlayerGui.ui
-    util/ReaderGUI.ui)
+    util/ReaderGUI.ui
+    )
 
 
 if (CUDA_FOUND)
-    LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
-    LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
-    LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_50,code=sm_50)
+    SET(CUDART ${CUDA_CUDART_LIBRARY})
 
-    CUDA_ADD_EXECUTABLE("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
-        ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES})
+    FILE(GLOB CUDA_FILES modules/rdf/*.cu)
 
-    target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
-        tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets /usr/local/cuda/lib64/libcudart.so)
+    if(USE_CLANG_FOR_GPU)
+        add_executable(
+            "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
+            ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
+            )
+
+        set_property(SOURCE ${CUDA_FILES}
+            PROPERTY LANGUAGE CXX
+            )
+
+        set_property(SOURCE ${CUDA_FILES}
+            APPEND_STRING PROPERTY
+            COMPILE_FLAGS " -Wall --cuda-path=${CUDA_TOOLKIT_ROOT_DIR} --cuda-gpu-arch=sm_${GPU_ARCH} -x cuda"
+            )
+
+#        target_link_libraries(${project_name} "cudart_static" "cuda" "dl" "pthread")
+
+    else()
+        LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
+        LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
+        LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_${GPU_ARCH},code=sm_${GPU_ARCH})
+
+        CUDA_ADD_EXECUTABLE(
+            "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
+            ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
+            )
+    endif()
 else()
 
-    add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
-        ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
-
-    target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
-        tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
+    add_executable(
+        "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
+        ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs}
+        )
 
 endif()
 
+INCLUDE_DIRECTORIES(
+    ${OpenCV_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${CUDA_INCLUDE_DIRS}
+    ${TBB_INCLUDE_DIRS}
+    Core/
+    3rdparty/qcustomplot/
+    3rdparty/cereal/
+    modules/
+    util/
+    )
+
 qt5_use_modules("${project_name}" Core Gui Widgets)
+
+target_link_libraries(
+    "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
+    tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets ${CUDART}
+    )

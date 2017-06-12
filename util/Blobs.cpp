@@ -41,7 +41,7 @@ void renderBlobs(
         {
             if (bAllowed[i])
             {
-                QColor color = QColor((++nColors * 77) % 360, 0.5, 1.0);
+                QColor color = QColor((++nColors * 77) % 360, 128, 255);
                 palette[i] = cv::Vec3b(color.blue(), color.green(), color.red());
             }
         }

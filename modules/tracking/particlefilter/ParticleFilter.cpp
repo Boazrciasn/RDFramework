@@ -5,10 +5,12 @@
 
 ParticleFilter::ParticleFilter(
         uint16_t frameWidth, uint16_t frameHeight, uint16_t nParticles, uint8_t nIters,
-        uint16_t particleWidth, uint16_t particleHeight) : m_img_width(frameWidth), m_img_height(frameHeight),
-                                                           m_num_particles(nParticles), m_num_iters(nIters),
-                                                           m_particle_width(particleWidth),
-                                                           m_particle_height(particleHeight) {
+        uint16_t particleWidth, uint16_t particleHeight) :
+    m_num_particles(nParticles), m_num_iters(nIters),
+    m_particle_width(particleWidth),
+    m_particle_height(particleHeight),
+    m_img_width(frameWidth), m_img_height(frameHeight)
+{
     m_rand_dice = std::uniform_real_distribution<>(0, 1);
     m_rand_distortion = std::normal_distribution<>();
     m_xRange = (m_img_width - m_particle_width);

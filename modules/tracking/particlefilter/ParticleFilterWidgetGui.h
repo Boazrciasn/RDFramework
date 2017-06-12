@@ -1,20 +1,23 @@
 #ifndef PARTICLEFILTERWIDGETGUI_H
 #define PARTICLEFILTERWIDGETGUI_H
+
 #include "precompiled.h"
 
-#include <QWidget>
+#include <tuple>
 
+#include <QWidget>
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <tuple>
-#include "Util.h"
+
+#include <opencv2/objdetect.hpp>
+
 #include "tracking/videoplayer/VideoReader.h"
 #include "tracking/videoplayer/VideoPlayer.h"
 #include "tracking/particlefilter/ParticleFilter.h"
-#include "Target.h"
 #include "tracking/dataExtraction/PredictorGui.h"
-#include <opencv2/objdetect.hpp>
+#include "Target.h"
+#include "Util.h"
 
 class RectangleParticle;
 
@@ -93,13 +96,13 @@ protected:
     QPoint m_PointMove;
 
     // resize ratio
-    float m_ratio_w{1};
-    float m_ratio_h{1};
+    float m_ratio_w{1.0f};
+    float m_ratio_h{1.0f};
 
     RectangleParticle *m_RectParticle;
 
     QVector<Target *> m_TargetsVector;
-    quint32 m_TargetCount = 0 ;
+    quint32 m_TargetCount = 0;
     int m_currFrame;
 
     void writeSettings();

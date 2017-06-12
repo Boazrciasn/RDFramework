@@ -64,7 +64,7 @@ class ParticleFilter : public VideoProcess
     uint16_t m_particle_width{};
     uint16_t m_particle_height{};
     uint16_t m_num_particles_to_display{};
-    uint16_t m_img_height{}, m_img_width{};
+    uint16_t m_img_width{}, m_img_height{};
     uint16_t m_xRange{};
     uint16_t m_yRange{};
 
