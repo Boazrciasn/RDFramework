@@ -258,7 +258,8 @@ class RandomDecisionTree
 
     inline cv::Mat_<qint32> leaf2Mat(quint32 index)
     {
-        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
+//        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
+        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,11);
         auto& hist = m_nodes[index].hist;
         leaf_mat(0,0) = -1;
 
@@ -269,7 +270,8 @@ class RandomDecisionTree
 
     inline cv::Mat_<qint32> node2Mat(quint32 index)
     {
-        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
+//        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
+        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,11);
         auto& node = m_nodes[index];
         node_mat(0,1) = node.ftrID;
         node_mat(0,2) = node.tau;
@@ -320,12 +322,12 @@ public:
         m_nodes_mat.reserve(300000);
         compressFtr();
         compressNodes(0);
-        static int treeId = 0;
-        std::string fname = "RDT_" + std::to_string(treeId++) + ".yml";
-        cv::FileStorage storage(fname, cv::FileStorage::WRITE);
-        storage << "m_nodes_mat" << m_nodes_mat;
-        storage << "m_features_mat" << m_features_mat;
-        storage.release();
+//        static int treeId = 0;
+//        std::string fname = "RDT_" + std::to_string(treeId++) + ".yml";
+//        cv::FileStorage storage(fname, cv::FileStorage::WRITE);
+//        storage << "m_nodes_mat" << m_nodes_mat;
+//        storage << "m_features_mat" << m_features_mat;
+//        storage.release();
     }
 
 
