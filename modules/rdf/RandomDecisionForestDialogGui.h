@@ -95,25 +95,25 @@ private:
             results.push_back(m_dataReaderGUI->DS()->images[i]);
             results.push_back(labels);
 
-//            auto color = colorsBag.colors[m_dataReaderGUI->DS()->labels[i]];
-//            auto counter = 0.0f;
-//            auto c = 0.0f;
-//            for (int row = 0; row < labels.rows; ++row) {
-//                for (int col = 0; col < labels.cols; ++col) {
-//                    if(labels.at<cv::Vec3b>(row,col) == cv::Vec3b(255,255,255))
-//                        continue;
-//                    ++c;
-//                    if (labels.at<cv::Vec3b>(row,col) == color)
-//                        ++counter;
-//                }
-//            }
+            auto color = colorsBag.colors[m_dataReaderGUI->DS()->labels[i]];
+            auto counter = 0.0f;
+            auto c = 0.0f;
+            for (int row = 0; row < labels.rows; ++row) {
+                for (int col = 0; col < labels.cols; ++col) {
+                    if(labels.at<cv::Vec3b>(row,col) == cv::Vec3b(255,255,255))
+                        continue;
+                    ++c;
+                    if (labels.at<cv::Vec3b>(row,col) == color)
+                        ++counter;
+                }
+            }
 
-//            pxAcc += counter/c;
-//            int label{};
-//            float conf{};
-//            rdf.detect(m_dataReaderGUI->DS()->images[i], label, conf);
-//            if (label == m_dataReaderGUI->DS()->labels[i])
-//                ++posCounter;
+            pxAcc += counter/c;
+            int label{};
+            float conf{};
+            rdf.detect(m_dataReaderGUI->DS()->images[i], label, conf);
+            if (label == m_dataReaderGUI->DS()->labels[i])
+                ++posCounter;
         }
 
         m_displayImagesGUI->setImageSet(results);

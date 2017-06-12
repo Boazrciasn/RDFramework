@@ -45,7 +45,7 @@ void RandomDecisionTree::train()
     m_statLog.dump();
     qApp->processEvents();
 
-//    compreseTree();
+    compreseTree();
 }
 
 void RandomDecisionTree::getSubSampleSingleFrame()

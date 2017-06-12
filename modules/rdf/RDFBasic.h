@@ -64,7 +64,7 @@ public:
         auto nRows = layeredHist.rows;
         auto nCols = layeredHist.cols / labelCount;
 
-        labels = cv::Mat::zeros(nRows, nCols, CV_8UC1);
+        labels = cv::Mat::zeros(nRows, nCols, CV_8UC3);
         confs = cv::Mat_<float>::zeros(nRows, nCols);
 
         for (int row = 0; row < nRows; ++row)
@@ -75,9 +75,14 @@ public:
                 auto tmpProbHist = layeredHist(cv::Range(row, row + 1), cv::Range(col * labelCount, (col + 1) * labelCount));
                 cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
 
-                if( max_loc.x == 0)
-                    labels.at<uchar>(row, col) = max*255;
-                confs(row, col) = max;
+
+                if (cv::sum(tmpProbHist)[0] != 0)
+                {
+                    labels.at<cv::Vec3b>(row, col) = colorcode.colors[max_loc.x];
+                    //                if( max_loc.x == 0)
+                    //                    labels.at<uchar>(row, col) = max*255;
+                    confs(row, col) = max;
+                }
             });
 
 //            for (int col = 0; col < nCols; ++col)

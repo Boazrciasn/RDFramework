@@ -175,8 +175,7 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
     int labelCount = m_params.labelCount;
     int nRows = layeredHist.rows;
     int nCols = layeredHist.cols / labelCount;
-    labels = cv::Mat(nRows, nCols, CV_8UC3);
-    labels.setTo(cv::Scalar(255, 255, 255));
+    labels = cv::Mat::zeros(nRows, nCols, CV_8UC3);
     confs = cv::Mat_<float>(nRows, nCols);
     for (int row = 0; row < nRows; ++row)
     {
