@@ -29,8 +29,8 @@ public:
     cv::Mat_<float> inline getLayeredHist(const cv::Mat& roi)
     {
         cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols * m_label_count);
-//        computeLayeredHist(roi, layeredHist);
-        computeLayeredHist_gpu(roi, layeredHist, m_nodes, m_features, m_label_count, m_padding_x, m_padding_y);
+        computeLayeredHist(roi, layeredHist);
+//        computeLayeredHist_gpu(roi, layeredHist, m_nodes, m_features, m_label_count, m_padding_x, m_padding_y);
         return layeredHist;
     }
 
@@ -44,7 +44,9 @@ private:
 
     void computeLayeredHist(const cv::Mat& roi, cv::Mat_<float>& layeredHist);
     bool inline isLeaf(qint32 id) { return id == -1;}
-    void processPixel(qint16 x, qint16 y, const cv::Mat &roi, cv::Mat_<float> &layeredHist);
+    void processPixel3b(qint16 x, qint16 y, const cv::Mat &roi, cv::Mat_<float> &layeredHist);
+
+    void processPixel2b(qint16 x, qint16 y, const cv::Mat &roi, cv::Mat_<float> &layeredHist);
 
 
 
@@ -57,7 +59,7 @@ private:
     template<class Archive>
     void serialize(Archive &archive)
     {
-        archive(quint32(), std::vector<Node3b>() , m_nodes, m_features, m_label_count, m_padding_x, m_padding_y);
+        archive(quint32(), std::vector<Node2b>() , m_nodes, m_features, m_label_count, m_padding_x, m_padding_y);
     }
 };
 
