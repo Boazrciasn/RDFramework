@@ -11,7 +11,9 @@ public:
     Feature();
     static QVector<MatFeature> features;
     static QVector<QString> features_str;
+    static MatFeature features_mat;
     static void init();
+    static void load(QString features_file);
     static QString getVisual(const MatFeature feature);
     static QString getSeperator(const int width);
 };
