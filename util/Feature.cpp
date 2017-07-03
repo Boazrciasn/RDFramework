@@ -1,12 +1,7 @@
 #include "Feature.h"
 
-#define FEATURE_COL_SIZE 7
-#define LEFT 3
-#define TOP 4
-#define RIGHT 5
-#define BOTTOM 6
-
 QVector<MatFeature> Feature::features;
+QVector<MatFeature> Feature::features_integral;
 MatFeature Feature::features_mat;
 QVector<QString> Feature::features_str;
 int Feature::max_w;
@@ -25,10 +20,10 @@ void Feature::init(){
         return;
     isInit = true;
 
-//    max_w = 4;
-//    max_h = 4;
-    max_w = 64;
-    max_h = 64;
+    max_w = 6;
+    max_h = 6;
+//    max_w = 64;
+//    max_h = 64;
 
     float ratio = 2.0f/(max_w*max_h);
 
@@ -85,10 +80,10 @@ void Feature::init(){
 
 
 //    // point
-//    MatFeature pt_mat = (MatFeature(1, 7) << 2, 0, 2.0f/(max_w*max_h), 0, 0, max_w, max_h/2);
+//    MatFeature pt_mat = (MatFeature(1, 7) << 2, 1, 2.0f/(max_w*max_h), 0, 0, max_w, max_h/2);
 //    features_mat.push_back(pt_mat);
 //    features_mat.push_back(pt_mat);
-//    MatFeature pt_mat_t = (MatFeature(1, 7) << 2, 0, 2.0f/(max_w*max_h), 0, 0, max_w/2, max_h);
+//    MatFeature pt_mat_t = (MatFeature(1, 7) << 2, -1, 2.0f/(max_w*max_h), 0, 0, max_w/2, max_h);
 //    features_mat.push_back(pt_mat_t);
 //    features_mat.push_back(pt_mat_t);
 
@@ -116,6 +111,28 @@ void Feature::load(QString features_file)
     auto total   = line.toInt();
     auto counter = 0;
 
+
+    // point
+    MatFeature pt_mat = MatFeature::zeros(2, FEATURE_COL_SIZE);
+    pt_mat(0, REGION_COUNT) = 2;
+    pt_mat(1, REGION_COUNT) = 1;
+    pt_mat(1, POS_NEG_REG) = 1;
+    pt_mat(1, POS_NEG_REG) = -1;
+
+    pt_mat(0, RIGHT) = max_w;
+    pt_mat(0, BOTTOM) = max_h;
+    pt_mat(1, RIGHT) = max_w;
+    pt_mat(1, BOTTOM) = max_h;
+
+    pt_mat(0, REGION_RATIO) = 1.0f/(max_w*max_h);
+    pt_mat(1, REGION_RATIO) = 1.0f/(max_w*max_h);
+
+    features_mat.push_back(pt_mat.clone());
+    features_integral.push_back(pt_mat.clone());
+
+
+
+
     while (!input.atEnd() && counter < total)
     {
         line = input.readLine().trimmed();
@@ -126,25 +143,27 @@ void Feature::load(QString features_file)
 
 
         MatFeature new_feature = MatFeature::zeros(rect_count, FEATURE_COL_SIZE);
-        new_feature(0,0) = rect_count;
+        new_feature(0, REGION_COUNT) = rect_count;
 
 
         for (auto i = 0; i < rect_count; ++i) {
             line = input.readLine().trimmed();
             tokens = line.split(" ");
 
-            new_feature(i,1) = (tokens[tokens.size()-1].toInt() + 1) / 2;
+            new_feature(i, POS_NEG_REG) = tokens[tokens.size()-1].toInt();
 
             new_feature(i, LEFT) = tokens[0].toFloat()*max_w;
             new_feature(i, TOP) = tokens[1].toFloat()*max_h;
             new_feature(i, RIGHT) = (int)(tokens[2].toFloat()*max_w);
             new_feature(i, BOTTOM) = (int)(tokens[3].toFloat()*max_h);
 
-            new_feature(i,2) = (new_feature(i, RIGHT) - new_feature(i, LEFT))
-                    * (new_feature(i, BOTTOM) - new_feature(i, TOP));                     // how many points in region
+            new_feature(i, REGION_RATIO) = (new_feature(i, RIGHT) - new_feature(i, LEFT))
+                    * (new_feature(i, BOTTOM) - new_feature(i, TOP)) / (max_w*max_h);                     // how many points in region
 
         }
+
         features_mat.push_back(new_feature.clone());
+        features_integral.push_back(new_feature.clone());
         new_feature.release();
         ++counter;
     }
