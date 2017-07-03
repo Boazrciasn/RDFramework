@@ -30,13 +30,13 @@ bool RandomDecisionForest::trainForest()
         rdt.setParams(&m_params);
         rdt.setGenerator(rng);
         rdt.setSignalInterface(&m_signalInterface);
-        SignalSenderInterface::instance().printsend("Train...") ;
+        SignalSenderInterface::instance().printsend("Train...");
         rdt.train();
         if (rdt.isPixelSizeConsistent())
             SignalSenderInterface::instance().printsend("Pixel size is consistent at the leaves!");
         else
-            SignalSenderInterface::instance().printsend("Pixel size is not consistent at the leaves!") ;
-        SignalSenderInterface::instance().printsend("Tree " + QString::number(i + 1) + " Constructed.") ;
+            SignalSenderInterface::instance().printsend("Pixel size is not consistent at the leaves!");
+        SignalSenderInterface::instance().printsend("Tree " + QString::number(i + 1) + " Constructed.");
         qApp->processEvents();
     }
     SignalSenderInterface::instance().printsend("Forest Size : " + QString::number(m_trees.size()));
@@ -128,6 +128,11 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     //FIX ME: refactor code.
     cv::copyMakeBorder(roi, padded_roi, m_params.probDistY, m_params.probDistY,
                        m_params.probDistX, m_params.probDistX, cv::BORDER_CONSTANT);
+
+    cv::Mat integral_roi;
+    cv::integral(padded_roi, integral_roi);
+
+
     int nRows = roi.rows;
     int nCols = roi.cols;
     int labelCount = m_params.labelCount;
@@ -140,12 +145,14 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
         {
             Pixel px;
             px.position = cv::Point(col + m_params.probDistX, row + m_params.probDistY);
-            for (size_t i = 0; i < m_nTreesForDetection; ++i)
-            {
-                auto tmp = m_trees[i].getProbHist(px, padded_roi);
-                for (int var = 0; var < labelCount; ++var)
-                    layeredHist(row, col * labelCount + var) += tmp(var);
-            }
+
+            if(padded_roi.at<uchar>(px.position.y,px.position.x) != 0)
+                for (size_t i = 0; i < m_nTreesForDetection; ++i)
+                {
+                    auto tmp = m_trees[i].getProbHist(px, integral_roi);
+                    for (int var = 0; var < labelCount; ++var)
+                        layeredHist(row, col * labelCount + var) += tmp(var);
+                }
         });
     // normalize layeredHist assuming leaf nodes are already normalized
     layeredHist /= m_nTreesForDetection;

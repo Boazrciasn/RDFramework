@@ -18,7 +18,7 @@ void RandomDecisionTree::calculateImpurity(quint32 d)
 void RandomDecisionTree::train()
 {
     // Intit zero freq
-    m_featureFreq.resize(Feature::features.size());
+    m_featureFreq.resize(Feature::features_integral.size());
     std::fill (m_featureFreq.begin(),m_featureFreq.end(),0);
 
     auto begin = std::chrono::high_resolution_clock::now();
@@ -276,7 +276,7 @@ void RandomDecisionTree::computeDivisionAt(quint32 index)
     QVector<quint32> leftHist(nLabels);
     QVector<quint32> rightHist(nLabels);
 
-    auto totalFeatures = Feature::features.size();
+    auto totalFeatures = Feature::features_integral.size();
     auto parentEntr = calculateEntropy(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
     auto infoGain = 0.0f;
     auto itr = 0;
@@ -323,7 +323,7 @@ void RandomDecisionTree::computeDivisionWithLookUpAt(quint32 index)
     QVector<quint32> leftHist(nLabels);
     QVector<quint32> rightHist(nLabels);
 
-    auto totalFeatures = Feature::features.size();
+    auto totalFeatures = Feature::features_integral.size();
     auto parentEntr = calculateEntropyLookUp(computeHistogram(m_nodes[index].start, m_nodes[index].end, nLabels));
     auto infoGain = 0.0f;
     auto itr = 0;
@@ -367,7 +367,7 @@ void RandomDecisionTree::rearrange(quint32 index)
     for (auto i = start; i < end; ++i)
     {
         auto &px = m_pixelCloud.pixels1[i];
-        auto &img = m_DS->images[px.id];
+        auto &img = m_DS->integral_images[px.id];
         if (m_nodes[index].isLeft(px, img))
         {
             m_pixelCloud.pixels2[dx++] = m_pixelCloud.pixels1[i];

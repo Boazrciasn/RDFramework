@@ -8,6 +8,7 @@ struct DataSet
 {
     QVector<QVector<QRect>> frameRects{};
     std::vector<cv::Mat> images{};
+    std::vector<cv::Mat> integral_images{};
     std::vector<int> labels{};
     std::map<quint16,quint16> map_dataPerLabel;
     QString info;

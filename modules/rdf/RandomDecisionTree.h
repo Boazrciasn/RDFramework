@@ -45,7 +45,7 @@ class RandomDecisionTree
 
 
     // TODO: convert to template
-    std::vector<Node2b> m_nodes;
+    std::vector<NodeIntegral2b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
@@ -369,7 +369,7 @@ private:
         {
             px_index = start + (shift + i*step)%total;
             auto &px = m_pixelCloud.pixels1[px_index];
-            auto &img = m_DS->images[px.id];
+            auto &img = m_DS->integral_images[px.id];
             if (m_nodes[index].isLeft(px, img))
             {
                 ++leftHist[px.label];

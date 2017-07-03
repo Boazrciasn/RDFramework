@@ -130,5 +130,59 @@ struct Node3b : public Node
     }
 };
 
+struct NodeIntegral2b : public Node
+{
+    bool inline isLeft(Pixel &p, const cv::Mat &integral_img)
+    {
+        auto feature = Feature::features_integral[ftrID];
+
+//        std::cout << feature << "\n" <<std::endl;
+//        std::cout << integral_img << "\n" <<std::endl;
+
+        auto fr1_x = teta1.x + p.position.x;
+        auto fr1_y = teta1.y + p.position.y;
+
+        auto fr2_x = feature(1,0)*(teta2.x + p.position.x) + (((int)feature(1,0) + 1)%2)*fr1_x;
+        auto fr2_y = feature(1,0)*(teta2.y + p.position.y) + (((int)feature(1,0) + 1)%2)*fr1_y;
+
+        featureType ftr{};
+
+        auto reg_count = (int)feature(0, REGION_COUNT);
+        for (auto reg = 0; reg < reg_count; ++reg)
+        {
+            auto switch_1 = (int)(feature(reg, POS_NEG_REG) + 1)/2;
+            auto switch_2 = (switch_1 + 1) % 2;
+            auto tmp_x = (int)(switch_1*fr1_x + switch_2*fr2_x);
+            auto tmp_y = (int)(switch_1*fr1_y + switch_2*fr2_y);
+
+            auto area = (float)(
+                    integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, LEFT)) -
+                    integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, RIGHT) + 1) -
+                    integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, LEFT)) +
+                    integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, RIGHT) + 1));
+
+
+
+
+//            std::cout << "( " << tmp_y + feature(reg, TOP) << ", " << tmp_x + feature(reg, LEFT) << " ) " << std::endl;
+//            std::cout << "( " << tmp_y + feature(reg, TOP) << ", " << tmp_x + feature(reg, RIGHT) + 1 << " )" << std::endl;
+//            std::cout << "( " << tmp_y + feature(reg, BOTTOM) + 1 << ", " << tmp_x + feature(reg, LEFT) << " )" << std::endl;
+//            std::cout << "( " << tmp_y + feature(reg, BOTTOM) + 1 << ", " << tmp_x + feature(reg, RIGHT) + 1 << " )" << std::endl;
+
+//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, LEFT)) << std::endl;
+//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, RIGHT) + 1) << std::endl;
+//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, LEFT)) << std::endl;
+//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, RIGHT) + 1) << std::endl;
+//            std::cout << (int)area << std::endl;
+
+            ftr += area * feature(reg, POS_NEG_REG) * feature(reg, REGION_RATIO);
+//            std::cout << "are: " << area << " " << ftr << std::endl;
+        }
+
+//        qDebug() << ftr;
+        return ftr <= tau;
+    }
+};
+
 
 #endif // NODE_H

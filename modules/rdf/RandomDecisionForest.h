@@ -69,6 +69,14 @@ public:
             m_DS->isBordered = true;
         }
         computePixelPerImgMap();
+
+
+        // TODO:: move to proper position
+        for (auto& img : m_DS->images) {
+            cv::Mat integral_img;
+            cv::integral(img, integral_img);
+            m_DS->integral_images.push_back(integral_img.clone());
+        }
     }
 
     inline void preprocessDS()
