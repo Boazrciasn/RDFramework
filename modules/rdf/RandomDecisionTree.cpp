@@ -1,6 +1,5 @@
 #include "RandomDecisionTree.h"
 
-
 void RandomDecisionTree::calculateImpurity(quint32 d)
 {
     quint32 impurity = 0;
@@ -64,11 +63,18 @@ void RandomDecisionTree::getSubSampleSingleFrame()
         // Positive label
         for (int i = 0; i < rectCount; ++i)
         {
+            auto cx = rects[i].x() + rects[i].width()/2 + m_probe_distanceX + Feature::max_w;
+            auto cy = rects[i].y() + rects[i].height()/2 + m_probe_distanceY + Feature::max_h;
             for (int k = 0; k < m_params->pixelsPerImage; ++k)
             {
                 int row = (m_generator() % rects[i].height()) + rects[i].y() + m_probe_distanceY + Feature::max_h;
                 int col = (m_generator() % rects[i].width()) + rects[i].x() + m_probe_distanceX + Feature::max_w;
                 Pixel px(cv::Point(col,row),id, label);
+                px.box_c_dx = cx - col;
+                px.box_c_dy = cy - row;
+                px.box_hw = rects[i].width()/2;
+                px.box_hh = rects[i].height()/2;
+
                 m_pixelCloud.pixels1.push_back(px);
             }
         }
@@ -245,7 +251,7 @@ void RandomDecisionTree::computeLeafHistograms()
 
         if (pxCount == 0)
         {
-            parent.tau = 1000*mult - 500; // Supress all nodes to right if left node is empty
+            parent.tau = MAX_TAU*(2*mult-1);  // Supress all nodes to right if left node is empty
             continue;
         }
 
@@ -254,6 +260,7 @@ void RandomDecisionTree::computeLeafHistograms()
         m_nodes[node_id].start = start;
         m_nodes[node_id].end = end;
         m_nodes[node_id].hist = computeHistogramNorm(start, end, m_params->labelCount);
+        computeRegressionStats(node_id);
     }
 
     m_pixelCloud.pixels1.clear();

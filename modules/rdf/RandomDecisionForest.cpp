@@ -203,3 +203,46 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
         }
     }
 }
+
+void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &regressionMat, cv::Mat_<uchar> &regressionWidth)
+{
+
+    cv::Mat padded_roi;
+    //FIX ME: refactor code.
+    cv::copyMakeBorder(roi, padded_roi, m_params.probDistY + Feature::max_h, m_params.probDistY + Feature::max_h,
+                       m_params.probDistX + Feature::max_w, m_params.probDistX + Feature::max_w, cv::BORDER_CONSTANT);
+
+    cv::Mat integral_roi;
+    cv::integral(padded_roi, integral_roi);
+
+
+    int nRows = roi.rows;
+    int nCols = roi.cols;
+
+    for (int row = 0; row < nRows; ++row)
+        tbb::parallel_for(0, nCols, 1, [ =, &regressionMat, &regressionWidth ](int col)
+        {
+            Pixel px;
+            px.position = cv::Point(col + m_params.probDistX + Feature::max_w, row + m_params.probDistY + Feature::max_h);
+
+            for (size_t i = 0; i < m_nTreesForDetection; ++i)
+            {
+                Node node = m_trees[i].getLeaf(px, integral_roi);
+                if(node.hist(0,0) > node.hist(0,1))     // if it is psitive
+                {
+                    ++regressionMat(node.dy + row, node.dx + col);
+                    regressionWidth(node.dy + row, node.dx + col) += node.hw;
+                }
+
+            }
+        });
+
+    for (int row = 0; row < nRows; ++row)
+        tbb::parallel_for(0, nCols, 1, [ =, &regressionMat, &regressionWidth ](int col)
+        {
+            if(regressionMat(row, col) != 0)
+                regressionWidth(row, col) /= regressionMat(row, col);
+
+        });
+
+}

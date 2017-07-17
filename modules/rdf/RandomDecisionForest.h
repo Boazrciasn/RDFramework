@@ -32,6 +32,8 @@ public:
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                             cv::Mat &labels, cv::Mat_<float> &confs);
 
+    void getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &regressionMat, cv::Mat_<uchar> &regressionWidth);         // TODO:: It is for testing purpose only
+
     void setParams(const RDFParams &params)
     {
         m_params = params;

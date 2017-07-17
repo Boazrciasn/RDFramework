@@ -14,6 +14,11 @@ struct Node
     uint32_t start{};
     uint32_t end{};
     uint32_t leftCount{};
+
+    int32_t dx{};
+    int32_t dy{};
+    uint16_t hw{};          // half width
+
     tauType tau{};
     cv::Point teta1{}, teta2{};
 
@@ -48,7 +53,7 @@ private:
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw);
 
     }
 
@@ -56,7 +61,7 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
@@ -136,9 +141,6 @@ struct NodeIntegral2b : public Node
     {
         auto feature = Feature::features_integral[ftrID];
 
-//        std::cout << feature << "\n" <<std::endl;
-//        std::cout << integral_img << "\n" <<std::endl;
-
         auto fr1_x = teta1.x + p.position.x;
         auto fr1_y = teta1.y + p.position.y;
 
@@ -161,25 +163,8 @@ struct NodeIntegral2b : public Node
                     integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, LEFT)) +
                     integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, RIGHT) + 1));
 
-
-
-
-//            std::cout << "( " << tmp_y + feature(reg, TOP) << ", " << tmp_x + feature(reg, LEFT) << " ) " << std::endl;
-//            std::cout << "( " << tmp_y + feature(reg, TOP) << ", " << tmp_x + feature(reg, RIGHT) + 1 << " )" << std::endl;
-//            std::cout << "( " << tmp_y + feature(reg, BOTTOM) + 1 << ", " << tmp_x + feature(reg, LEFT) << " )" << std::endl;
-//            std::cout << "( " << tmp_y + feature(reg, BOTTOM) + 1 << ", " << tmp_x + feature(reg, RIGHT) + 1 << " )" << std::endl;
-
-//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, LEFT)) << std::endl;
-//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, RIGHT) + 1) << std::endl;
-//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, LEFT)) << std::endl;
-//            std::cout << (int)integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, RIGHT) + 1) << std::endl;
-//            std::cout << (int)area << std::endl;
-
             ftr += area * feature(reg, POS_NEG_REG) * feature(reg, REGION_RATIO);
-//            std::cout << "are: " << area << " " << ftr << std::endl;
         }
-
-//        qDebug() << ftr;
         return ftr <= tau;
     }
 };

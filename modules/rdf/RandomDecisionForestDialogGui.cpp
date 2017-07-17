@@ -94,10 +94,20 @@ void RandomDecisionForestDialogGui::onTrain()
 
 void RandomDecisionForestDialogGui::onTest()
 {
-    if(ui->checkBox_isRDFC->isChecked())
-        test(m_rdf_c);
+    if(ui->checkBox_isMNIST->isChecked())
+    {
+        if(ui->checkBox_isRDFC->isChecked())
+            test(m_rdf_c);
+        else
+            test(m_rdf);
+    }
     else
-        test(m_rdf);
+    {
+        if(ui->checkBox_isRDFC->isChecked())
+            testSingleFrame(m_rdf_c);
+        else
+            testSingleFrame(m_rdf);
+    }
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()

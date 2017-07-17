@@ -66,6 +66,7 @@ class RandomDecisionTree
 
 
   public:
+    tauType MAX_TAU = std::numeric_limits<tauType>::max();
     SignalSenderInterface *m_signalsender;
     RandomDecisionTree() { }
     RandomDecisionTree(DataSet *DS, RDFParams *params);
@@ -93,6 +94,18 @@ class RandomDecisionTree
             else
                 curr = m_nodes[2 * curr.id + 2];
         return curr.hist;
+    }
+
+
+    Node inline getLeaf(Pixel &px, const cv::Mat &roi)
+    {
+        auto curr = m_nodes[0];
+        for (quint32 depth = 1; depth < m_height; ++depth)
+            if (curr.isLeft(px, roi))
+                curr = m_nodes[2 * curr.id + 1];
+            else
+                curr = m_nodes[2 * curr.id + 2];
+        return curr;
     }
 
     void inline setProbeDistanceX(int probe_distanceX)
@@ -178,14 +191,14 @@ class RandomDecisionTree
 
         // Supress all nodes to other node if this node is empty
         if (pxCount == 0)
-            m_nodes[parentId].tau = 1000*mult - 500;
+            m_nodes[parentId].tau = MAX_TAU*(2*mult-1); //1000*mult - 500;    // TODO: 500 fix
         else if(m_nodes[parentId].isLeaf || isLeaf(m_nodes[index].start, m_nodes[index].end))
         {
             ++m_leafCount;
             m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
             generateTeta(m_nodes[index].teta1);
             generateTeta(m_nodes[index].teta2);
-            m_nodes[index].tau = 500;
+            m_nodes[index].tau = MAX_TAU;       // TODO: 500 fix
             m_nodes[index].isLeaf = true;
         }
         else
@@ -225,7 +238,7 @@ class RandomDecisionTree
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
+        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist(m_pixelCloud.pixels1[pxIndex].label);
         hist /= (end - start);
         return hist;
@@ -304,11 +317,11 @@ class RandomDecisionTree
         int idx = m_nodes_mat.rows - 1;
 
         // Add let
-        if(m_nodes[nodeIdx].tau != -500)
+        if(m_nodes[nodeIdx].tau != -MAX_TAU)
             compressNodes(2*nodeIdx + 1);
 
         // Add right
-        if(m_nodes[nodeIdx].tau != 500)
+        if(m_nodes[nodeIdx].tau != MAX_TAU)
         {
             auto right = compressNodes(2*nodeIdx + 2);
             m_nodes_mat(idx,0) = right;
@@ -389,6 +402,90 @@ private:
         m_nodes[index].teta1 = maxTeta1;
         m_nodes[index].teta2 = maxTeta2;
         m_nodes[index].ftrID = maxFeatureIndex;
+    }
+
+    inline void computeRegressionStats(quint32 index)
+    {
+
+        // K-Means
+        auto clusterCount = 2;
+        std::vector<cv::Point2f> points;
+        std::vector<float> all_hw;
+        cv::Mat lbls, centers;
+
+
+        // Fill points
+        auto start = m_nodes[index].start;
+        auto end = m_nodes[index].end;
+        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
+        {
+            auto& px = m_pixelCloud.pixels1[pxIndex];
+            if(px.label == 0)            // 0 means positive
+            {
+                cv::Point2f pt(px.box_c_dx, px.box_c_dy);
+                points.push_back(pt);
+                all_hw.push_back((float)px.box_hw);
+            }
+        }
+
+
+        if(points.size() > clusterCount)
+        {
+            cv::kmeans(points, clusterCount, lbls,
+                       cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
+                       3, cv::KMEANS_PP_CENTERS, centers);
+
+            m_nodes[index].dx = centers.at<float>(0, 0);
+            m_nodes[index].dy = centers.at<float>(0, 1);
+
+
+            lbls.release();
+            centers.release();
+            cv::kmeans(all_hw, clusterCount, lbls,
+                       cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
+                       3, cv::KMEANS_PP_CENTERS, centers);
+
+            m_nodes[index].hw = centers.at<float>(0, 0);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        auto count{0};
+//        auto start = m_nodes[index].start;
+//        auto end = m_nodes[index].end;
+//        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
+//        {
+//            auto& px = m_pixelCloud.pixels1[pxIndex];
+//            if(px.label == 0)            // 0 means positive
+//            {
+//                m_nodes[index].dx += px.box_c_dx;
+//                m_nodes[index].dy += px.box_c_dy;
+//                m_nodes[index].hw += px.box_hw;
+//                ++count;
+//            }
+//        }
+
+//        if(count != 0)
+//        {
+//            m_nodes[index].dx /= count;
+//            m_nodes[index].dy /= count;
+//            m_nodes[index].hw /= count;
+//        }
     }
 };
 

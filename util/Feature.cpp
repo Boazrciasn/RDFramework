@@ -102,15 +102,20 @@ void Feature::init(){
 
 void Feature::load(QString features_file)
 {
-    QFile in_features(features_file);
-    if (!in_features.open(QIODevice::ReadOnly))
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    QString reducedFile = "/home/neko/Desktop/DesktopFolders/trackingData/featureReduced_2.txt";
+    QFile in_reduced(reducedFile);
+    if (!in_reduced.open(QIODevice::ReadOnly))
         return;
+    QVector<bool> isUsed;
+    QTextStream input_red(&in_reduced);
+    while (!input_red.atEnd())
+        isUsed.push_back(input_red.readLine().toInt() == 1);
 
-    QTextStream input(&in_features);
-    auto line    = input.readLine().trimmed();
-    auto total   = line.toInt();
-    auto counter = 0;
-
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
 
     // point
     MatFeature pt_mat = MatFeature::zeros(2, FEATURE_COL_SIZE);
@@ -132,6 +137,15 @@ void Feature::load(QString features_file)
 
 
 
+
+    QFile in_features(features_file);
+    if (!in_features.open(QIODevice::ReadOnly))
+        return;
+
+    QTextStream input(&in_features);
+    auto line    = input.readLine().trimmed();
+    auto total   = line.toInt();
+    auto counter = 0;
 
     while (!input.atEnd() && counter < total)
     {
@@ -162,10 +176,13 @@ void Feature::load(QString features_file)
 
         }
 
-        features_mat.push_back(new_feature.clone());
-        features_integral.push_back(new_feature.clone());
-        new_feature.release();
         ++counter;
+        if(isUsed[counter])
+        {
+            features_mat.push_back(new_feature.clone());
+            features_integral.push_back(new_feature.clone());
+        }
+        new_feature.release();
     }
 }
 

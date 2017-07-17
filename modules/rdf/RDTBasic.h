@@ -38,7 +38,7 @@ public:
     }
 
 private:
-    cv::Mat_<qint32> m_nodes{};
+    cv::Mat_<nodesType> m_nodes{};
     cv::Mat_<featureType> m_features{};
     quint16 m_padding_x{};
     quint16 m_padding_y{};
@@ -50,6 +50,7 @@ private:
     void processPixel3b(qint16 x, qint16 y, const cv::Mat &roi, cv::Mat_<float> &layeredHist);
 
     void processPixel2b(qint16 x, qint16 y, const cv::Mat &roi, cv::Mat_<float> &layeredHist);
+    void processPixelIntegral2b(qint16 x, qint16 y, const cv::Mat &integral_roi, cv::Mat_<float> &layeredHist);
 
 
 

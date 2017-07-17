@@ -8,6 +8,14 @@
 class RDFBasic
 {
 public:
+    void getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &regressionMat, cv::Mat_<uchar> &regressionWidth)
+    {
+        // TODO: remove it
+    }
+
+
+
+
     RDFBasic() { }
     ~RDFBasic() {
         m_trees.clear();
