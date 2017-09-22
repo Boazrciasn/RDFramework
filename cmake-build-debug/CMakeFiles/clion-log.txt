@@ -1,0 +1,25 @@
+/SHARE/Apps/clion/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /HOME/baris.ozcan/ImageCLEF/src
+-- Found CUDA: /usr/local/cuda-8.0 (found suitable exact version "8.0") 
+-- Found CUDA: /usr/local/cuda-8.0 (found version "8.0") 
+-- Boost version: 1.64.0
+-- Could NOT find TBB (missing:  TBB_INCLUDE_DIRS TBB_LIBRARIES) 
+CMake Error at CMakeLists.txt:26 (FIND_PACKAGE):
+  By not providing "FindQt5Widgets.cmake" in CMAKE_MODULE_PATH this project
+  has asked CMake to find a package configuration file provided by
+  "Qt5Widgets", but CMake did not find one.
+
+  Could not find a package configuration file provided by "Qt5Widgets" with
+  any of the following names:
+
+    Qt5WidgetsConfig.cmake
+    qt5widgets-config.cmake
+
+  Add the installation prefix of "Qt5Widgets" to CMAKE_PREFIX_PATH or set
+  "Qt5Widgets_DIR" to a directory containing one of the above files.  If
+  "Qt5Widgets" provides a separate development package or SDK, be sure it has
+  been installed.
+
+
+-- Configuring incomplete, errors occurred!
+See also "/HOME/baris.ozcan/ImageCLEF/src/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "/HOME/baris.ozcan/ImageCLEF/src/cmake-build-debug/CMakeFiles/CMakeError.log".

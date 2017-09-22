@@ -3,7 +3,7 @@ set(project_name "RDF")
 
 project("${project_name}")
 
-SET(GPU_ARCH "50" CACHE STRING "GPU architecture to be used")
+SET(GPU_ARCH "60" CACHE STRING "GPU architecture to be used")
 SET(USE_OPENMP FALSE CACHE BOOL "Use OpenMP")
 SET(USE_CLANG_FOR_GPU FALSE CACHE BOOL "Set this for using Clang during GPU kernel compiles")
 
@@ -85,12 +85,13 @@ if (CUDA_FOUND)
 #        target_link_libraries(${project_name} "cudart_static" "cuda" "dl" "pthread")
 
     else()
-        LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
-        LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
+        #LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
+        #LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
+        LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -Xptxas -dlcm=cg)
         LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_${GPU_ARCH},code=sm_${GPU_ARCH})
 
         CUDA_ADD_EXECUTABLE(
-            "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
+            "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}
             ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
             )
     endif()
@@ -98,7 +99,7 @@ else()
 
     add_executable(
         "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
-        ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs}
+        ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs}
         )
 
 endif()
@@ -116,7 +117,6 @@ INCLUDE_DIRECTORIES(
     )
 
 qt5_use_modules("${project_name}" Core Gui Widgets)
-
 target_link_libraries(
     "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
     tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets ${CUDART}

@@ -105,7 +105,7 @@ void Feature::load(QString features_file)
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    QString reducedFile = "/home/neko/Desktop/DesktopFolders/trackingData/featureReduced_2.txt";
+    QString reducedFile = "/HOME/baris.ozcan/ImageCLEF/src/featureReduced_2.txt";
     QFile in_reduced(reducedFile);
     if (!in_reduced.open(QIODevice::ReadOnly))
         return;

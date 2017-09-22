@@ -408,7 +408,7 @@ private:
     {
 
         // K-Means
-        auto clusterCount = 2;
+        int clusterCount = 2;
         std::vector<cv::Point2f> points;
         std::vector<float> all_hw;
         cv::Mat lbls, centers;

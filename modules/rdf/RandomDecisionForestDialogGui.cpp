@@ -119,8 +119,11 @@ void RandomDecisionForestDialogGui::onPreProcess()
 
 void RandomDecisionForestDialogGui::printMsg(QString msg)
 {
-    ui->console->append(msg);
+    QString datetime = QDateTime::currentDateTime().toString("dd/MM/yy hh:mm");
+    QString datetimeText = datetime + " ---- " + msg;
+    ui->console->append(datetimeText);
     ui->console->repaint();
+    std::cout<< datetimeText.toStdString()<< std::endl;
 }
 
 void RandomDecisionForestDialogGui::onLoad()

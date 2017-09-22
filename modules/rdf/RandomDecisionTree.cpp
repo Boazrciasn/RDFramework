@@ -185,6 +185,7 @@ void RandomDecisionTree::constructRootNode()
 
 void RandomDecisionTree::constructTreeDecisionNodes()
 {
+
     for (quint32 depth = 1; depth < m_height - 1; ++depth)
     {
         SignalSenderInterface::instance().printsend("Tree at depth " + QString::number(depth) + " being processed...");
@@ -192,17 +193,29 @@ void RandomDecisionTree::constructTreeDecisionNodes()
         m_nonLeafpxCount = m_pixelCloud.pixels1.size();
         int level_nodes = 1ul << depth;          // Number of nodes at this level
         int tot_nodes   = (1ul << (depth + 1)) - 1; // Number of nodes at this and previous levels
-        tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
-        {
+
+//        tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
+//        tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
+//        {
+//            processNode(nodeIndex);
+//            rearrange(nodeIndex);
+//        });
+
+
+
+#pragma omp parallel for
+        for (int nodeIndex = tot_nodes-level_nodes; nodeIndex < tot_nodes; ++nodeIndex) {
             processNode(nodeIndex);
             rearrange(nodeIndex);
-        });
+
+        }
         m_pixelCloud.swap();
         calculateImpurity(depth);
         m_statLog.logPxCount(m_nonLeafpxCount, depth);
         m_statLog.logLeafCount(m_leafCount, depth);
         qApp->processEvents();
     }
+
 }
 
 void RandomDecisionTree::updateNodesWithNewDada()
@@ -220,6 +233,8 @@ void RandomDecisionTree::updateNodesWithNewDada()
     {
         int level_nodes = 1ul << depth;          // Number of nodes at this level
         int tot_nodes   = (1ul << (depth + 1)) - 1; // Number of nodes at this and previous levels
+        tbb::task_scheduler_init decisionTask(20);
+
         tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
         {
             auto mult                = (nodeIndex + 1) % 2; // 0 if left, 1 if right
