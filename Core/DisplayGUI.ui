@@ -22,6 +22,12 @@
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
    <item>
     <widget class="QLabel" name="label_Display">
+     <property name="maximumSize">
+      <size>
+       <width>800</width>
+       <height>800</height>
+      </size>
+     </property>
      <property name="text">
       <string/>
      </property>

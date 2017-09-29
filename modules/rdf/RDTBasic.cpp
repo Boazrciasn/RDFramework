@@ -14,6 +14,7 @@ void RDTBasic::computeLayeredHist(const cv::Mat& roi, cv::Mat_<float> &layeredHi
     cv::integral(padded_roi, integral_roi);
 
     for (auto x = 0; x < cols; ++x) {
+        tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
         tbb::parallel_for(0, rows, 1, [ =, &layeredHist ](int y)
         {
             //            processPixel(x, y, padded_roi, layeredHist);

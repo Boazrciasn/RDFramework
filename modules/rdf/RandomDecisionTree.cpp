@@ -194,21 +194,19 @@ void RandomDecisionTree::constructTreeDecisionNodes()
         int level_nodes = 1ul << depth;          // Number of nodes at this level
         int tot_nodes   = (1ul << (depth + 1)) - 1; // Number of nodes at this and previous levels
 
-//        tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
-//        tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
-//        {
-//            processNode(nodeIndex);
-//            rearrange(nodeIndex);
-//        });
-
-
-
-#pragma omp parallel for
-        for (int nodeIndex = tot_nodes-level_nodes; nodeIndex < tot_nodes; ++nodeIndex) {
+        tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
+        tbb::parallel_for(tot_nodes - level_nodes, tot_nodes, 1, [ = ](int nodeIndex)
+        {
             processNode(nodeIndex);
             rearrange(nodeIndex);
+        });
 
-        }
+
+//        #pragma omp parallel for num_threads(56)
+//        for (int nodeIndex = tot_nodes-level_nodes; nodeIndex < tot_nodes; ++nodeIndex) {
+//            processNode(nodeIndex);
+//            rearrange(nodeIndex);
+//        }
         m_pixelCloud.swap();
         calculateImpurity(depth);
         m_statLog.logPxCount(m_nonLeafpxCount, depth);

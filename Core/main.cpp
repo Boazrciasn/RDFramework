@@ -5,41 +5,15 @@
 
 #include <random>
 #include "Util.h"
-#include "rdf/Node.h"
+#include "cpuafiinityinterface.h"
 
-
+int NCPU;
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    const int iterationCount = 1000000000;
-    double pi{};
 
-    #pragma omp parallel for num_threads(56)
-    for (int i = 0; i < iterationCount; i++)
-    {
-        pi += 4 * (i % 2 ? -1 : 1) / (2.0 * i + 1.0);
-        qDebug()<<i;
-    }
-
-    #pragma omp parallel for num_threads(56)
-    for (int i = 0; i < iterationCount; i++)
-    {
-        pi += 4 * (i % 2 ? -1 : 1) / (2.0 * i + 1.0);
-    }
-    qDebug()<<pi;
-    #pragma omp parallel for num_threads(56)
-    for (int i = 0; i < iterationCount; i++)
-    {
-        pi += 4 * (i % 2 ? -1 : 1) / (2.0 * i + 1.0);
-    }
-    qDebug()<<pi;
-    #pragma omp parallel for num_threads(56)
-    for (int i = 0; i < iterationCount; i++)
-    {
-        pi += 4 * (i % 2 ? -1 : 1) / (2.0 * i + 1.0);
-    }
-    qDebug()<<pi;
+    NCPU = setAffinity();
 
     Feature::init();
     Feature::load("/HOME/baris.ozcan/ImageCLEF/src/features9.txt");

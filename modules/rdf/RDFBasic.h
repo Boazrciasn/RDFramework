@@ -75,7 +75,7 @@ public:
 
         labels = cv::Mat::zeros(nRows, nCols, CV_8UC3);
         confs = cv::Mat_<float>::zeros(nRows, nCols);
-
+        tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
         for (int row = 0; row < nRows; ++row)
             tbb::parallel_for(0, nCols, 1, [ =, &labels, &confs ](int col)
             {

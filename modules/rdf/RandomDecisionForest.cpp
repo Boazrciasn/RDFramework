@@ -60,6 +60,7 @@ float RandomDecisionForest::testForest()
         return 0;
 
     std::atomic<int> posCounter(0);
+    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
     tbb::parallel_for(0, totalImgs, 1, [ =, &posCounter ](int nodeIndex)
     {
         int label{};
@@ -87,6 +88,7 @@ float RandomDecisionForest::testForest(tbb::concurrent_vector<cv::Mat>& output)
     if (totalImgs == 0) return 0.0f;
 
     std::atomic<int> posCounter(0);
+    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
     tbb::parallel_for(0, totalImgs, 1, [ =, &posCounter, &output ](int nodeIndex)
     {
         cv::Mat labels{};
@@ -140,6 +142,7 @@ cv::Mat_<float> RandomDecisionForest::getLayeredHist(cv::Mat &roi)
     // therefore, ROW is the same COL is COL*LABEL_COUNT
     cv::Mat_<float> layeredHist = cv::Mat_<float>::zeros(roi.rows, roi.cols * labelCount);
 
+    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
     for (int row = 0; row < nRows; ++row)
         tbb::parallel_for(0, nCols, 1, [ =, &layeredHist ](int col)
         {
@@ -206,7 +209,7 @@ void RandomDecisionForest::getLabelAndConfMat(cv::Mat_<float> &layeredHist,
 
 void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &regressionMat, cv::Mat_<uchar> &regressionWidth)
 {
-
+    qDebug()<<"getting regression results";
     cv::Mat padded_roi;
     //FIX ME: refactor code.
     cv::copyMakeBorder(roi, padded_roi, m_params.probDistY + Feature::max_h, m_params.probDistY + Feature::max_h,
@@ -218,7 +221,7 @@ void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &re
 
     int nRows = roi.rows;
     int nCols = roi.cols;
-
+    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
     for (int row = 0; row < nRows; ++row)
         tbb::parallel_for(0, nCols, 1, [ =, &regressionMat, &regressionWidth ](int col)
         {
@@ -236,7 +239,6 @@ void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &re
 
             }
         });
-
     for (int row = 0; row < nRows; ++row)
         tbb::parallel_for(0, nCols, 1, [ =, &regressionMat, &regressionWidth ](int col)
         {
@@ -244,5 +246,6 @@ void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &re
                 regressionWidth(row, col) /= regressionMat(row, col);
 
         });
+    qDebug()<< "Regression done";
 
 }

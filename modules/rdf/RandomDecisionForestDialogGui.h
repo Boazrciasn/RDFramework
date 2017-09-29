@@ -166,7 +166,7 @@ private:
             MeanShift *msp = new MeanShift();
             double kernel_bandwidth = 11;
             std::vector<std::vector<double> > points;
-
+            qDebug()<< "Regression started!";
 
             for (int r = 0; r < regression.rows; ++r) {
                 for (int c = 0; c < regression.cols; ++c) {

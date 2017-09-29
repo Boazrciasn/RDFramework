@@ -69,7 +69,6 @@ vector<vector<double> > MeanShift::meanshift(const vector<vector<double> > & poi
                 shifted_points[i] = point_new;
             }
         }
-//        printf("max_shift_distance: %f\n", max_shift_distance);
     } while (max_shift_distance > EPSILON);
     return shifted_points;
 }

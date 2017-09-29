@@ -34,7 +34,7 @@ void DisplayImagesWidgetGui::display()
     QPixmap *newScaledPixmap = new QPixmap(QPixmap::fromImage(scaledImage));
     ui->label->setScaledContents(true);
     ui->label->setPixmap(*newScaledPixmap);
-    ui->label->resize(ui->label->pixmap()->size());
+//    ui->label->resize(ui->label->pixmap()->size());
     if(m_labelsLoaded)
         ui->Image_label->setText(QString::number(m_readerGUI->DS()->labels[m_fileIndex]));
 

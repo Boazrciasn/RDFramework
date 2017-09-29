@@ -86,8 +86,21 @@ void RandomDecisionForestDialogGui::onTrain()
     m_forest.setParams(PARAMS);
     m_forest.setPreProcess(m_preprocessGUI->preprocesses());
     m_forest.setDataSet(m_dataReaderGUI->DS());
+    QString dirname = QFileDialog::getExistingDirectory(this,
+                                                        tr("Open Save Directory"), PARAMS.trainImagesDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString fname = "nT_" + QString::number(m_forest.params().nTrees) + "_D_" +
+                    QString::number(m_forest.params().maxDepth)
+                    //                    + "_nTImg_" + QString::number(m_forest.m_imagesContainer.size()) // TODO: add later
+                    + "_nPxPI_" + QString::number(m_forest.params().pixelsPerImage)
+                    + ".bin";
+    qApp->processEvents();
     if (m_forest.trainForest())
+    {
         printMsg("Forest Trained ! ");
+        m_forest.saveForest(dirname + "/" + fname);
+        ui->console->append("FOREST SAVED");
+    }
     else
         printMsg("Failed to Train Forest! (Forest DS is not set) ");
 }
