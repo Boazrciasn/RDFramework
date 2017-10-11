@@ -4,35 +4,12 @@
 
 #include "Util.h"
 
-#include "omp.h"
 #include <vector>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 
 tableLookupType TableLookUp::lookUp[TableLookUp::size];
-
-void openmp_deneme()
-{
-    //    quint32 nThreads = std::thread::hardware_concurrency();
-    //    int nThreads = omp_get_max_threads();
-}
-
-void deneme()
-{
-    cv::Mat_<float> A(3, 3);
-    cv::Mat_<int> B(5, 5);
-    A.setTo(0);
-    B.setTo(10);
-    doForAllPixels<float>(A, [](float pixval, quint16 i, quint16 j)
-    {
-        return pixval + 1;
-    });
-    doForAllPixels<int>(B, [](int pixval, quint16 i, quint16 j)
-    {
-        return pixval * 5;
-    });
-}
 
 void Util::print3DHistogram(cv::Mat &inMat)
 {

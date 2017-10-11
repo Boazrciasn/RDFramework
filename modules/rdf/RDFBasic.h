@@ -8,11 +8,17 @@
 class RDFBasic
 {
 public:
+    void getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &regressionMat, cv::Mat_<uchar> &regressionWidth)
+    {
+        // TODO: remove it
+    }
+
+
+
+
     RDFBasic() { }
     ~RDFBasic() {
         m_trees.clear();
-        delete &m_params;
-        delete &colorcode;
     }
 
     void inline detect(const cv::Mat& roi, int& label, float &conf)
@@ -49,6 +55,16 @@ public:
         return layeredHist/m_nTreesForDetection;
     }
 
+    cv::Mat inline computeLabels(const cv::Mat &roi)
+    {
+        cv::Mat_<float> confs;
+        cv::Mat_<float> layered = getLayeredHist(roi);
+        cv::Mat res;
+        getLabelAndConfMat(layered, res, confs);
+        return res;
+    }
+
+
     cv::Mat_<float> getCumulativeProbHist(const cv::Mat_<float> &layeredHist);
 
     void inline getLabelAndConfMat(cv::Mat_<float> &layeredHist, cv::Mat &labels, cv::Mat_<float> &confs)
@@ -57,10 +73,9 @@ public:
         auto nRows = layeredHist.rows;
         auto nCols = layeredHist.cols / labelCount;
 
-        labels = cv::Mat(nRows, nCols, CV_8UC3);
-        labels.setTo(cv::Scalar(255, 255, 255));
+        labels = cv::Mat::zeros(nRows, nCols, CV_8UC3);
         confs = cv::Mat_<float>::zeros(nRows, nCols);
-
+        tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
         for (int row = 0; row < nRows; ++row)
             tbb::parallel_for(0, nCols, 1, [ =, &labels, &confs ](int col)
             {
@@ -68,8 +83,15 @@ public:
                 cv::Point max_loc;
                 auto tmpProbHist = layeredHist(cv::Range(row, row + 1), cv::Range(col * labelCount, (col + 1) * labelCount));
                 cv::minMaxLoc(tmpProbHist, NULL, &max, NULL, &max_loc);
-                labels.at<cv::Vec3b>(row, col) = colorcode.colors[max_loc.x];
-                confs(row, col) = max;
+
+
+                if (cv::sum(tmpProbHist)[0] != 0)
+                {
+                    labels.at<cv::Vec3b>(row, col) = colorcode.colors[max_loc.x];
+                    //                if( max_loc.x == 0)
+                    //                    labels.at<uchar>(row, col) = max*255;
+                    confs(row, col) = max;
+                }
             });
 
 //            for (int col = 0; col < nCols; ++col)

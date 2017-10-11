@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
+    <width>498</width>
     <height>121</height>
    </rect>
   </property>
@@ -101,6 +101,16 @@
          <string>MNIST</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>TME</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>MOT</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
@@ -131,7 +141,7 @@
      <item>
       <widget class="QSpinBox" name="max_img_load_spinBox">
        <property name="maximum">
-        <number>1000</number>
+        <number>10000</number>
        </property>
        <property name="singleStep">
         <number>100</number>
@@ -148,7 +158,7 @@
      <item>
       <widget class="QSpinBox" name="skip_img_load_spinBox">
        <property name="maximum">
-        <number>1000</number>
+        <number>10000</number>
        </property>
        <property name="singleStep">
         <number>100</number>

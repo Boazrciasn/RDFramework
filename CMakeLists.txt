@@ -1,87 +1,123 @@
-cmake_minimum_required(VERSION 3.0.0)
-set(project_name "ImageCLEF")
+cmake_minimum_required(VERSION 3.2)
+set(project_name "RDF")
 
-# set the project name
 project("${project_name}")
+
+SET(GPU_ARCH "60" CACHE STRING "GPU architecture to be used")
+SET(USE_OPENMP FALSE CACHE BOOL "Use OpenMP")
+SET(USE_CLANG_FOR_GPU FALSE CACHE BOOL "Set this for using Clang during GPU kernel compiles")
+
+if(USE_OPENMP)
+    SET(OPENMP_FLAGS "-fopenmp")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall ${OPENMP_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 ${OPENMP_FLAGS}")
+
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 
 SET(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fopenmp")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -fopenmp -O3")
-
-# OpenCV package
 FIND_PACKAGE(OpenCV 3 REQUIRED)
-#Boost find package
-find_package(Boost)
+FIND_PACKAGE(CUDA)
+FIND_PACKAGE(Boost)
+FIND_PACKAGE(TBB)
 
-
-
-#add OpenCV directories
-include_directories(${OpenCV_INCLUDE_DIRS}
-                    ${Boost_INCLUDE_DIRS} Core/       3rdparty/qcustomplot/ 3rdparty/cereal/
-                                            modules/    util/)
-
-# Qt5 package
 FIND_PACKAGE(Qt5Widgets REQUIRED)
-find_package(Qt5Xml REQUIRED)
-find_package(Qt5Multimedia REQUIRED)
-find_package(Qt5MultimediaWidgets REQUIRED)
+FIND_PACKAGE(Qt5Xml REQUIRED)
+FIND_PACKAGE(Qt5Multimedia REQUIRED)
+FIND_PACKAGE(Qt5MultimediaWidgets REQUIRED)
+FIND_PACKAGE(Qt5PrintSupport REQUIRED)
 
-# TBB package
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
-find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+SET(QT_USE_QTXML TRUE)
+SET(CMAKE_AUTOMOC ON)
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# NM Not tested yet
-find_package(Qt5PrintSupport REQUIRED)
-
-set(QT_USE_QTXML TRUE)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-
-file(GLOB CORE Core/*.ui Core/*.cpp Core/*.h Core/*.hpp)
-file(GLOB OCR modules/ocr/*.ui modules/ocr/*.cpp modules/ocr/*.h modules/ocr/*.hpp)
-file(GLOB RDF modules/rdf/*.ui modules/rdf/*.cpp modules/rdf/*.h modules/rdf/*.hpp)
-file(GLOB PF modules/tracking/particlefilter/*.ui modules/tracking/particlefilter/*.cpp
-             modules/tracking/particlefilter/*.h  modules/tracking/particlefilter/*.hpp)
-file(GLOB VIDEOPLAYER modules/tracking/videoplayer/*.ui modules/tracking/videoplayer/*.cpp
-                      modules/tracking/videoplayer/*.h modules/tracking/videoplayer/*.hpp)
-file(GLOB UTIL util/*.ui util/*.cpp util/*.h util/*.hpp)
-file(GLOB QCUSTOMPLOT 3rdparty/qcustomplot/*.ui 3rdparty/qcustomplot/*.cpp
-                      3rdparty/qcustomplot/*.h 3rdparty/qcustomplot/*.hpp)
-file(GLOB CEREAL 3rdparty/cereal/*)
-file(GLOB 3RDPARTY 3rdparty/*.ui 3rdparty/*.cpp 3rdparty/*.h 3rdparty/*.hpp)
-file(GLOB PCG 3rdparty/pcg-cpp-0.98/include/*.hpp)
-file(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataExtraction/*.hpp
-                   modules/tracking/dataExtraction/*.h modules/tracking/dataExtraction/*.ui)
-
-
+FILE(GLOB CORE Core/*.ui Core/*.cpp Core/*.h Core/*.hpp)
+FILE(GLOB OCR modules/ocr/*.ui modules/ocr/*.cpp modules/ocr/*.h modules/ocr/*.hpp)
+FILE(GLOB RDF modules/rdf/*.ui modules/rdf/*.cpp modules/rdf/*.h modules/rdf/*.hpp)
+FILE(GLOB PF modules/tracking/particlefilter/*.ui modules/tracking/particlefilter/*.cpp
+    modules/tracking/particlefilter/*.h  modules/tracking/particlefilter/*.hpp)
+FILE(GLOB VIDEOPLAYER modules/tracking/videoplayer/*.ui modules/tracking/videoplayer/*.cpp
+    modules/tracking/videoplayer/*.h modules/tracking/videoplayer/*.hpp)
+FILE(GLOB UTIL util/*.ui util/*.cpp util/*.h util/*.hpp)
+FILE(GLOB QCUSTOMPLOT 3rdparty/qcustomplot/*.ui 3rdparty/qcustomplot/*.cpp
+    3rdparty/qcustomplot/*.h 3rdparty/qcustomplot/*.hpp)
+FILE(GLOB CEREAL 3rdparty/cereal/*)
+FILE(GLOB 3RDPARTY 3rdparty/*.ui 3rdparty/*.cpp 3rdparty/*.h 3rdparty/*.hpp)
+FILE(GLOB PCG 3rdparty/pcg-cpp-0.98/include/*.hpp)
+FILE(GLOB DEXTRACT modules/tracking/dataExtraction/*.cpp modules/tracking/dataExtraction/*.hpp
+    modules/tracking/dataExtraction/*.h modules/tracking/dataExtraction/*.ui)
 
 # Create Qt MOC files
-QT5_WRAP_UI(UISrcs  Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui Core/DisplayGUI.ui Core/PreProcessGUI.ui
-                    modules/ocr/AnnExtractorDialogGui.ui modules/ocr/ExtractedDialogGui.ui modules/ocr/HistogramDialogGui.ui modules/ocr/MyDialogGui.ui
-                    modules/rdf/RandomDecisionForestDialogGui.ui
-                    modules/tracking/particlefilter/ParticleFilterWidgetGui.ui
-                    modules/tracking/dataExtraction/DataExtractorGui.ui
-                    modules/tracking/dataExtraction/PredictorGui.ui
-                    modules/tracking/videoplayer/VideoPlayerGui.ui
-                    util/ReaderGUI.ui util/CamCalibGUI.ui)
+QT5_WRAP_UI(
+    UISrcs Core/MainWindowGui.ui Core/DisplayImagesWidgetGui.ui Core/ResizeAllImagesDialogGui.ui Core/DisplayGUI.ui Core/PreProcessGUI.ui
+    modules/ocr/AnnExtractorDialogGui.ui modules/ocr/ExtractedDialogGui.ui modules/ocr/HistogramDialogGui.ui modules/ocr/MyDialogGui.ui
+    modules/rdf/RandomDecisionForestDialogGui.ui
+    modules/tracking/particlefilter/ParticleFilterWidgetGui.ui
+    modules/tracking/dataExtraction/DataExtractorGui.ui
+    modules/tracking/dataExtraction/PredictorGui.ui
+    modules/tracking/videoplayer/VideoPlayerGui.ui
+    util/ReaderGUI.ui
+    )
 
-add_executable("${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}  ${UTIL}
-                ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs})
 
-# NM Not tested yet
-target_link_libraries( "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES} tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets)
+if (CUDA_FOUND)
+    SET(CUDART ${CUDA_CUDART_LIBRARY})
+
+    FILE(GLOB CUDA_FILES modules/rdf/*.cu)
+
+    if(USE_CLANG_FOR_GPU)
+        add_executable(
+            "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
+            ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
+            )
+
+        set_property(SOURCE ${CUDA_FILES}
+            PROPERTY LANGUAGE CXX
+            )
+
+        set_property(SOURCE ${CUDA_FILES}
+            APPEND_STRING PROPERTY
+            COMPILE_FLAGS " -Wall --cuda-path=${CUDA_TOOLKIT_ROOT_DIR} --cuda-gpu-arch=sm_${GPU_ARCH} -x cuda"
+            )
+
+#        target_link_libraries(${project_name} "cudart_static" "cuda" "dl" "pthread")
+
+    else()
+        #LIST(APPEND CMAKE_CXX_FLAGS "-ffast-math")
+        #LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -use_fast_math -Xptxas -dlcm=cg)
+        LIST(APPEND CUDA_NVCC_FLAGS --compiler-options -fno-strict-aliasing -lineinfo -Xptxas -dlcm=cg)
+        LIST(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_${GPU_ARCH},code=sm_${GPU_ARCH})
+
+        CUDA_ADD_EXECUTABLE(
+            "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER}
+            ${UTIL} ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs} ${CUDA_FILES}
+            )
+    endif()
+else()
+
+    add_executable(
+        "${project_name}" ${CORE} ${OCR} ${RDF} ${PF} ${VIDEOPLAYER} ${UTIL}
+        ${QCUSTOMPLOT} ${CEREAL} ${PCG} ${3RDPARTY} ${DEXTRACT} ${UISrcs}
+        )
+
+endif()
+
+INCLUDE_DIRECTORIES(
+    ${OpenCV_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${CUDA_INCLUDE_DIRS}
+    ${TBB_INCLUDE_DIRS}
+    Core/
+    3rdparty/qcustomplot/
+    3rdparty/cereal/
+    modules/
+    util/
+    )
 
 qt5_use_modules("${project_name}" Core Gui Widgets)
-
-
-################################# TBB #################################
-#IF (APPLE)
-#    SET(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};/Users/furkankirac/DEV/tbb44_20160413oss/")
-#ENDIF ()
-## FIND_PACKAGE(TBB REQUIRED)
-#INCLUDE(DetectTBB REQUIRED)
-#IF (APPLE)
-#    ADD_AS_LIB(TBB "libtbb.dylib")
-#ENDIF ()
+target_link_libraries(
+    "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
+    tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets ${CUDART}
+    )

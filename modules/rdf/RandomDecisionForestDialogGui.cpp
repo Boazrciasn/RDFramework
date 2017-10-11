@@ -18,6 +18,7 @@ void RandomDecisionForestDialogGui::initParamValues()
     ui->spinBox_TauRange->setValue(PARAMS.tauRange);
     ui->checkBox_isPositive->setChecked(PARAMS.isPositiveRange);
     ui->spinBox_MaxPixelsEntropy->setValue(PARAMS.maxPxForEntropy);
+    ui->checkBox_isMNIST->setChecked(PARAMS.isMNIST);
 }
 
 RandomDecisionForestDialogGui::RandomDecisionForestDialogGui(QWidget *parent) :
@@ -53,7 +54,7 @@ RandomDecisionForestDialogGui::~RandomDecisionForestDialogGui()
     delete m_dataReaderGUI;
     delete m_displayImagesGUI;
     delete &m_forest;
-    delete &m_forest_basic;
+    delete &m_rdf;
     delete &m_preprocesses;
     delete m_preprocessGUI;
     delete m_splitterHori;
@@ -85,44 +86,41 @@ void RandomDecisionForestDialogGui::onTrain()
     m_forest.setParams(PARAMS);
     m_forest.setPreProcess(m_preprocessGUI->preprocesses());
     m_forest.setDataSet(m_dataReaderGUI->DS());
+    QString dirname = QFileDialog::getExistingDirectory(this,
+                                                        tr("Open Save Directory"), PARAMS.trainImagesDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString fname = "nT_" + QString::number(m_forest.params().nTrees) + "_D_" +
+                    QString::number(m_forest.params().maxDepth)
+                    //                    + "_nTImg_" + QString::number(m_forest.m_imagesContainer.size()) // TODO: add later
+                    + "_nPxPI_" + QString::number(m_forest.params().pixelsPerImage)
+                    + ".bin";
+    qApp->processEvents();
     if (m_forest.trainForest())
+    {
         printMsg("Forest Trained ! ");
+        m_forest.saveForest(dirname + "/" + fname);
+        ui->console->append("FOREST SAVED");
+    }
     else
         printMsg("Failed to Train Forest! (Forest DS is not set) ");
 }
 
 void RandomDecisionForestDialogGui::onTest()
 {
-//    m_forest_basic.setNTreesForDetection(m_nTreesForDetection);
-    auto begin = std::chrono::high_resolution_clock::now();
-//    auto accuracy = m_forest.testForest();
-
-    // ///////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////
-    // New Test
-    auto size = m_dataReaderGUI->DS()->images.size();
-    std::vector<cv::Mat> results{};
-
-
-    for(auto i = 0u; i <  size; ++i)
+    if(ui->checkBox_isMNIST->isChecked())
     {
-        cv::Mat labels{};
-        cv::Mat_<float> confs{};
-        cv::Mat_<float> layered = m_forest_basic.getLayeredHist(m_dataReaderGUI->DS()->images[i]);
-        m_forest_basic.getLabelAndConfMat(layered, labels, confs);
-
-        results.push_back(m_dataReaderGUI->DS()->images[i]);
-        results.push_back(labels);
+        if(ui->checkBox_isRDFC->isChecked())
+            test(m_rdf_c);
+        else
+            test(m_rdf);
     }
-
-    m_displayImagesGUI->setImageSet(results);
-    // ///////////////////////////////////////////////////
-    // ///////////////////////////////////////////////////
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto time = std::chrono::duration_cast<std::chrono::seconds>(end-begin).count();
-
-    printMsg("Testing time: " + QString::number(time) + QString(" sec  ") + QString::number(time/60) + QString(" min"));
+    else
+    {
+        if(ui->checkBox_isRDFC->isChecked())
+            testSingleFrame(m_rdf_c);
+        else
+            testSingleFrame(m_rdf);
+    }
 }
 
 void RandomDecisionForestDialogGui::onPreProcess()
@@ -134,8 +132,11 @@ void RandomDecisionForestDialogGui::onPreProcess()
 
 void RandomDecisionForestDialogGui::printMsg(QString msg)
 {
-    ui->console->append(msg);
+    QString datetime = QDateTime::currentDateTime().toString("dd/MM/yy hh:mm");
+    QString datetimeText = datetime + " ---- " + msg;
+    ui->console->append(datetimeText);
     ui->console->repaint();
+    std::cout<< datetimeText.toStdString()<< std::endl;
 }
 
 void RandomDecisionForestDialogGui::onLoad()
@@ -148,7 +149,11 @@ void RandomDecisionForestDialogGui::onLoad()
                         tr("BINARY (*.bin);;TEXT (*.txt);;All files (*.*)"),
                         &selfilter
                     );
-    m_forest_basic.loadForest(fname);
+
+    if(ui->checkBox_isRDFC->isChecked())
+         m_rdf_c.loadForest(fname);
+    else
+        m_rdf.loadForest(fname);
     ui->console->append("FOREST LOADED");
 }
 
@@ -188,6 +193,7 @@ void RandomDecisionForestDialogGui::writeSettings()
     settings.setValue("tauRange", PARAMS.tauRange);
     settings.setValue("isPositiveRange", PARAMS.isPositiveRange);
     settings.setValue("maxPxForEntropy", PARAMS.maxPxForEntropy);
+    settings.setValue("isMNIST", PARAMS.isMNIST);
     settings.endGroup();
 }
 
@@ -206,6 +212,7 @@ void RandomDecisionForestDialogGui::readSettings()
     PARAMS.tauRange = settings.value("tauRange", 127).toInt();
     PARAMS.isPositiveRange = settings.value("isPositiveRange", false).toBool();
     PARAMS.maxPxForEntropy = settings.value("maxPxForEntropy", 1000).toInt();
+    PARAMS.isMNIST = settings.value("isMNIST", false).toBool();
     settings.endGroup();
 }
 
@@ -264,3 +271,9 @@ void RandomDecisionForestDialogGui::onPositiveTau(bool value)
 {
     PARAMS.isPositiveRange = value;
 }
+
+void RandomDecisionForestDialogGui::onMNIST(bool value)
+{
+    PARAMS.isMNIST = value;
+}
+

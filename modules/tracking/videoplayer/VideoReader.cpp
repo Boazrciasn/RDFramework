@@ -14,12 +14,12 @@ void VideoReader::run()
         while (getBufferSize() < 200 && m_bufferEndPos <= m_numOfFrames)
         {
             bool capSuccess = m_capture->read(m_frame);
-            if (!capSuccess)
-                qDebug() << "NULL";
-            cv::cvtColor(m_frame, m_RGBframe, CV_BGR2RGB);
-            m_FrameBuffer->enqueue(m_RGBframe.clone());
-            ++m_bufferEndPos;
-            msleep(0);
+            if (capSuccess)
+            {
+                m_FrameBuffer->enqueue(m_frame.clone());
+                ++m_bufferEndPos;
+                msleep(0);
+            }
         }
     }
 }

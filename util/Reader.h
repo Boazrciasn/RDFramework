@@ -16,7 +16,9 @@ enum
 {
     Type_STD_ONE = 0,
     Type_Standard = 1,
-    Type_MNIST = 2
+    Type_MNIST = 2,
+    Type_TME = 3,
+    Type_MOT = 4
 };
 
 class Reader

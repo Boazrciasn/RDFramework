@@ -1,61 +1,72 @@
 #ifndef RECTANGLEPARTICLE_H
 #define RECTANGLEPARTICLE_H
 
-#include "Particle.h"
-#include "Util.h"
+#include "precompiled.h"
 
-class RectangleParticle : public Particle
+class RectangleParticle
 {
 public:
-    RectangleParticle(int x, int y, int width, int height, float weight, cv::Mat target, int histSize) :
-        Particle(x, y, weight, target, histSize)
+    uint16_t x{};
+    uint16_t y{};
+    uint16_t width{};
+    uint16_t height{};
+    uint8_t r{};
+    int16_t theta{};
+    uint16_t age{};
+    uint8_t cluster{};
+    float weight{};
+    bool isVisited{};
+
+
+    float dx{};
+    float dy{};
+    float sig_x{};
+    float sig_y{};
+    float sig_w{};
+    float sig_h{};
+
+    RectangleParticle() {}
+
+    RectangleParticle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, float weight) :
+        x(x), y(y), width(width), height(height), weight(weight) { }
+
+    RectangleParticle clone()
     {
-        m_width = width;
-        m_height = height;
+        RectangleParticle clone(x, y, width, height, weight);
+        clone.r = r;
+        clone.theta = theta;
+        clone.age = age;
+        clone.dx = dx;
+        clone.dy = dy;
+        clone.sig_x = sig_x;
+        clone.sig_y = sig_y;
+        return clone;
     }
 
-    Particle *clone() override
+    void exec(const cv::Mat& integralImg)
     {
-        return new RectangleParticle(m_x, m_y, m_width, m_height, m_weight, m_targetHist, m_histSize);
+        float weight_outer = integralImg.at<int>(y, x) + integralImg.at<int>(y + height, x + width) -
+                integralImg.at<int>(y + height, x) - integralImg.at<int>(y,x + width);
+
+        auto pad = 10;
+        float weight_inner = integralImg.at<int>(y + pad, x + pad) + integralImg.at<int>(y + height - pad, x + width - pad) -
+                integralImg.at<int>(y + height - pad, x + pad) - integralImg.at<int>(y + pad, x + width - pad);
+
+        weight_outer /= (width*height);
+        weight_outer = (weight_outer==0) ? 1 : weight_outer;
+        weight_inner /= (width*height);
+
+        weight = weight_outer; //(weight_inner*weight_inner)/weight_outer;
     }
 
-
-    void exec(cv::Mat *img) override
+    inline cv::Rect boundingBox()
     {
-        if (m_x + m_width >= img->cols || m_y + m_height >= img->rows) {
-            setWeight(0); // to discard (we can shrink particle)
-            return;
-        }
-
-//        cv::Mat roi(*img, cv::Rect(m_x, m_y, m_width, m_height));
-//        cv::cvtColor(roi, roi, CV_RGB2GRAY);
-//        cv::resize(roi,roi,cv::Size(100,100));
-
-        int label{};
-        float conf{};
-
-//        m_forest->detect(roi,label,conf);
-
-        if(label == 0)
-            setWeight(conf);
-        else
-            setWeight(0.01);
-//        if(label == 1)
-//            qDebug() << label << " conf: " << conf;
+        return cv::Rect(x, y, width, height);
     }
 
-    inline cv::Rect getParticle() const { return cv::Rect(m_x, m_y, m_width, m_height); }
-
-    inline int getWidth() const {return m_width;}
-    inline void setWidth(int value) {m_width = value;}
-
-    inline int getHeight() const {return m_height;}
-    inline void setHeight(int value) {m_height = value;}
-
-
-private:
-    int m_width;
-    int m_height;
+    inline cv::Point center(){
+        return cv::Point(x + width/2, y + height/2);
+    }
 };
 
 #endif // RECTANGLEPARTICLE_H

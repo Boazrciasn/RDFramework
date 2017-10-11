@@ -10,15 +10,20 @@
 
 struct Node
 {
-    quint32 id{};
-    quint32 start{};
-    quint32 end{};
-    quint32 leftCount{};
-    qint16 tau{};
+    uint32_t id{};
+    uint32_t start{};
+    uint32_t end{};
+    uint32_t leftCount{};
+
+    int32_t dx{};
+    int32_t dy{};
+    uint16_t hw{};          // half width
+
+    tauType tau{};
     cv::Point teta1{}, teta2{};
 
     cv::Mat_<float> hist;
-    quint8 ftrID{};
+    ftrIdType ftrID{};
     bool isLeaf{};
 
     Node() : Node(0)
@@ -48,7 +53,7 @@ private:
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw);
 
     }
 
@@ -56,7 +61,7 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
@@ -127,6 +132,40 @@ struct Node3b : public Node
             fr2 = cv::Vec3f(0,0,0);
         auto dist = cv::norm(fr1,fr2,CV_L2);
         return dist <= tau;
+    }
+};
+
+struct NodeIntegral2b : public Node
+{
+    bool inline isLeft(Pixel &p, const cv::Mat &integral_img)
+    {
+        auto feature = Feature::features_integral[ftrID];
+
+        auto fr1_x = teta1.x + p.position.x;
+        auto fr1_y = teta1.y + p.position.y;
+
+        auto fr2_x = feature(1,0)*(teta2.x + p.position.x) + (((int)feature(1,0) + 1)%2)*fr1_x;
+        auto fr2_y = feature(1,0)*(teta2.y + p.position.y) + (((int)feature(1,0) + 1)%2)*fr1_y;
+
+        featureType ftr{};
+
+        auto reg_count = (int)feature(0, REGION_COUNT);
+        for (auto reg = 0; reg < reg_count; ++reg)
+        {
+            auto switch_1 = (int)(feature(reg, POS_NEG_REG) + 1)/2;
+            auto switch_2 = (switch_1 + 1) % 2;
+            auto tmp_x = (int)(switch_1*fr1_x + switch_2*fr2_x);
+            auto tmp_y = (int)(switch_1*fr1_y + switch_2*fr2_y);
+
+            auto area = (float)(
+                    integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, LEFT)) -
+                    integral_img.at<int>(tmp_y + feature(reg, TOP), tmp_x + feature(reg, RIGHT) + 1) -
+                    integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, LEFT)) +
+                    integral_img.at<int>(tmp_y + feature(reg, BOTTOM) + 1, tmp_x + feature(reg, RIGHT) + 1));
+
+            ftr += area * feature(reg, POS_NEG_REG) * feature(reg, REGION_RATIO);
+        }
+        return ftr <= tau;
     }
 };
 

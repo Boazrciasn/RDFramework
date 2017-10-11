@@ -1,20 +1,23 @@
 #ifndef PARTICLEFILTERWIDGETGUI_H
 #define PARTICLEFILTERWIDGETGUI_H
+
 #include "precompiled.h"
 
-#include <QWidget>
+#include <tuple>
 
+#include <QWidget>
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <tuple>
-#include "Util.h"
+
+#include <opencv2/objdetect.hpp>
+
 #include "tracking/videoplayer/VideoReader.h"
 #include "tracking/videoplayer/VideoPlayer.h"
 #include "tracking/particlefilter/ParticleFilter.h"
-#include "Target.h"
 #include "tracking/dataExtraction/PredictorGui.h"
-#include <opencv2/objdetect.hpp>
+#include "Target.h"
+#include "Util.h"
 
 class RectangleParticle;
 
@@ -32,9 +35,9 @@ protected:
 
   public:
     explicit ParticleFilterWidgetGui(QWidget *parent = 0);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     inline void setSVM(cv::Ptr<cv::ml::SVM> svm){m_svm = svm;}
     ~ParticleFilterWidgetGui();
@@ -61,6 +64,9 @@ protected:
     void onHistSizeChanged(int value);
     void onStepSizeChanged(int value);
 
+    void onDBSCANEpsChanged(double value);
+    void onDBSCANMinPtsChanged(int value);
+
   private:
     Ui::ParticleFilterWidgetGui *ui;
     VideoPlayer *m_VideoPlayer;
@@ -73,12 +79,14 @@ protected:
     cv::Mat m_Frame;
     cv::Mat m_FrameGray;
     cv::Mat m_FrameOut;
-    int m_particleCount;
-    int m_numIters;
-    int m_particleWidth;
-    int m_particleHeight;
-    int m_histSize ;
-    int m_stepSize;
+    int m_particleCount{};
+    int m_numIters{};
+    int m_particleWidth{};
+    int m_particleHeight{};
+    int m_numTrackers{};
+    int m_stepSize{};
+    int m_dbscan_min_pts{};
+    float m_dbscan_eps{};
     bool m_VideoLodaded{};
     bool m_isPlaying{};
     bool m_dragging{};
@@ -88,13 +96,13 @@ protected:
     QPoint m_PointMove;
 
     // resize ratio
-    float m_ratio_w{1};
-    float m_ratio_h{1};
+    float m_ratio_w{1.0f};
+    float m_ratio_h{1.0f};
 
     RectangleParticle *m_RectParticle;
 
     QVector<Target *> m_TargetsVector;
-    quint32 m_TargetCount = 0 ;
+    quint32 m_TargetCount = 0;
     int m_currFrame;
 
     void writeSettings();

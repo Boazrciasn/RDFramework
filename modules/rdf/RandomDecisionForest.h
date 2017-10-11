@@ -32,6 +32,8 @@ public:
     void getLabelAndConfMat(cv::Mat_<float> &layeredHist,
                             cv::Mat &labels, cv::Mat_<float> &confs);
 
+    void getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &regressionMat, cv::Mat_<uchar> &regressionWidth);         // TODO:: It is for testing purpose only
+
     void setParams(const RDFParams &params)
     {
         m_params = params;
@@ -69,6 +71,14 @@ public:
             m_DS->isBordered = true;
         }
         computePixelPerImgMap();
+
+
+        // TODO:: move to proper position
+        for (auto& img : m_DS->images) {
+            cv::Mat integral_img;
+            cv::integral(img, integral_img);
+            m_DS->integral_images.push_back(integral_img.clone());
+        }
     }
 
     inline void preprocessDS()

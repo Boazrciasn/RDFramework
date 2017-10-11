@@ -5,7 +5,7 @@
 
 DisplayGUI::DisplayGUI(QWidget *parent) :
     QWidget(parent),
-    ui(std::make_unique<Ui::DisplayGUI>())
+    ui(new Ui::DisplayGUI)
 {
     ui->setupUi(this);
     ui->horizontalScrollBar_imageIndex->setEnabled(false);

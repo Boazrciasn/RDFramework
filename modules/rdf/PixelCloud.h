@@ -36,6 +36,11 @@ struct Pixel
     quint32 id;
     int label;
 
+    int32_t box_c_dx{};       // bounding box center x
+    int32_t box_c_dy{};       // bounding box center y
+    uint16_t box_hw{};      // bounding box half width
+    uint16_t box_hh{};      // bounding box half height
+
     Pixel() : Pixel(cv::Point(0,0),0,0)
     {
     }
@@ -45,7 +50,14 @@ struct Pixel
     {
     }
 
-    Pixel(const Pixel &px): position(px.position), id(px.id), label(px.label)
+    Pixel(const Pixel &px):
+        position(px.position),
+        id(px.id),
+        label(px.label),
+        box_c_dx(px.box_c_dx),
+        box_c_dy(px.box_c_dy),
+        box_hw(px.box_hw),
+        box_hh(px.box_hh)
     {
     }
 };

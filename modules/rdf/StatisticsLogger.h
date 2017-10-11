@@ -36,10 +36,10 @@ class StatisticsLogger
     }
 
     void inline logFeatureFreq(tbb::concurrent_vector<int> frequency) {
-        m_featureSelectionRatio.resize(frequency.size());
-        float total = std::accumulate(frequency.begin(), frequency.end(), 0);
-        for (int i = 0; i < frequency.size(); ++i) {
-            m_featureSelectionRatio[i] = 100*frequency[i]/total;
+        m_featureSelectionRatio.resize((int)frequency.size());
+        auto total = (float)std::accumulate(frequency.begin(), frequency.end(), 0);
+        for (auto i = 0u; i < frequency.size(); ++i) {
+            m_featureSelectionRatio[i] = 100.0f*frequency[i]/total;
         }
     }
 
@@ -49,10 +49,12 @@ class StatisticsLogger
     {
         SignalSenderInterface::instance().printsend(m_header);
         for (int d = 0; d < m_pxCount.size(); ++d)
-            SignalSenderInterface::instance().printsend(QString::number(d) + "  " + QString::number(
-                                                            m_pxCount[d]) + "  " + QString::number(
-                                                            m_pxRatio[d]) + "%  " + QString::number(m_leafCount[d]) + "  " + QString::number(m_impurity[d]) + "  " +
-                                                        QString::number(m_impurityRatio[d]) + "%");
+            SignalSenderInterface::instance().printsend
+                    (QString::number(d) + "  " + QString::number(
+                         m_pxCount[d]) + "  " + QString::number(
+                         m_pxRatio[d]) + "%  " + QString::number(m_leafCount[d]) + "  " + QString::number(m_impurity[d]) + "  " +
+                     QString::number(m_impurityRatio[d]) + "%");
+
         SignalSenderInterface::instance().printsend("Training Time : " + QString::number(m_trainingTime) + QString(" sec  /  ")
                                                     + QString::number(m_trainingTime/60) + QString(" min"));
 
@@ -63,7 +65,8 @@ class StatisticsLogger
     {
         QString features;
         for (int d = 0; d < m_featureSelectionRatio.size(); ++d)
-            features += QString::number(d).sprintf(": %2.2f %\n", m_featureSelectionRatio[d]) + Feature::features_str[d];
+            features += QString::number(d).sprintf("%d: %2.2f %%\n", d, m_featureSelectionRatio[d]); // + Feature::features_str[d];
+
 
 
         SignalSenderInterface::instance().printsend(features);

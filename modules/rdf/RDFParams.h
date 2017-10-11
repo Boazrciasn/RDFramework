@@ -19,6 +19,7 @@ struct RDFParams
     int maxPxForEntropy{};
     int tauRange;
     bool isPositiveRange{};
+    bool isMNIST{};
 
     template<class Archive>
     void serialize(Archive &archive)

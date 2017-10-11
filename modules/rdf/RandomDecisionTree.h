@@ -22,8 +22,6 @@
 #include "util/SignalSenderInterface.h"
 #include "StatisticsLogger.h"
 
-#define MIN_ENTROPY 0.05
-
 #include "Node.h"
 #include "DataSet.h"
 #include "RDFParams.h"
@@ -41,13 +39,13 @@ class RandomDecisionTree
     // RDTBasic var
     cv::Mat_<qint32> m_nodes_mat{};
     cv::Mat_<featureType> m_features_mat{};
-    quint16 m_padding_x{};
-    quint16 m_padding_y{};
-    quint8 m_label_count{};
+    uint16_t m_padding_x{};
+    uint16_t m_padding_y{};
+    uint8_t m_label_count{};
 
 
     // TODO: convert to template
-    std::vector<Node3b> m_nodes;
+    std::vector<NodeIntegral2b> m_nodes;
     tbb::concurrent_vector<int> m_featureFreq;
     PixelCloud m_pixelCloud;
     DataSet *m_DS;
@@ -68,6 +66,7 @@ class RandomDecisionTree
 
 
   public:
+    tauType MAX_TAU = std::numeric_limits<tauType>::max();
     SignalSenderInterface *m_signalsender;
     RandomDecisionTree() { }
     RandomDecisionTree(DataSet *DS, RDFParams *params);
@@ -95,6 +94,18 @@ class RandomDecisionTree
             else
                 curr = m_nodes[2 * curr.id + 2];
         return curr.hist;
+    }
+
+
+    Node inline getLeaf(Pixel &px, const cv::Mat &roi)
+    {
+        auto curr = m_nodes[0];
+        for (quint32 depth = 1; depth < m_height; ++depth)
+            if (curr.isLeft(px, roi))
+                curr = m_nodes[2 * curr.id + 1];
+            else
+                curr = m_nodes[2 * curr.id + 2];
+        return curr;
     }
 
     void inline setProbeDistanceX(int probe_distanceX)
@@ -142,6 +153,7 @@ class RandomDecisionTree
     void constructTree();
     void constructRootNode();
     void constructTreeDecisionNodes();
+    void updateNodesWithNewDada();
     void computeLeafHistograms();
     void computeDivisionAt(quint32 index);
     void computeDivisionWithLookUpAt(quint32 index);
@@ -167,10 +179,10 @@ class RandomDecisionTree
 
     void inline processNode(quint32 index)
     {
-        int mult = (index + 1) % 2; // 0 if left, 1 if right
-        int parentId = (index + 1) / 2 - 1;
-        quint32 leftCount = m_nodes[parentId].leftCount;
-        quint32 rightCount = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
+        auto mult = (index + 1) % 2; // 0 if left, 1 if right
+        auto parentId = (index + 1) / 2 - 1;
+        auto leftCount = m_nodes[parentId].leftCount;
+        auto rightCount = m_nodes[parentId].end - m_nodes[parentId].start - leftCount;
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
@@ -179,14 +191,14 @@ class RandomDecisionTree
 
         // Supress all nodes to other node if this node is empty
         if (pxCount == 0)
-            m_nodes[parentId].tau = 1000*mult - 500;
+            m_nodes[parentId].tau = MAX_TAU*(2*mult-1); //1000*mult - 500;    // TODO: 500 fix
         else if(m_nodes[parentId].isLeaf || isLeaf(m_nodes[index].start, m_nodes[index].end))
         {
             ++m_leafCount;
             m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
             generateTeta(m_nodes[index].teta1);
             generateTeta(m_nodes[index].teta2);
-            m_nodes[index].tau = 500;
+            m_nodes[index].tau = MAX_TAU;       // TODO: 500 fix
             m_nodes[index].isLeaf = true;
         }
         else
@@ -226,7 +238,7 @@ class RandomDecisionTree
     {
         cv::Mat_<float> hist(1, labelCount);
         hist.setTo(0.0f);
-        for (quint32 pxIndex = start; pxIndex < end; ++pxIndex)
+        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
             ++hist(m_pixelCloud.pixels1[pxIndex].label);
         hist /= (end - start);
         return hist;
@@ -254,12 +266,13 @@ class RandomDecisionTree
         for(auto i = 1; i < ftr_count; ++i)
             for(auto j = 0; j < ftr_px_count; ++j)
                 m_features_mat(i,j) = Feature::features[i](j/Feature::max_w,j%Feature::max_h);
-        std::cout << m_features_mat << std::endl;
+//        std::cout << m_features_mat << std::endl;
     }
 
     inline cv::Mat_<qint32> leaf2Mat(quint32 index)
     {
-        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
+//        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
+        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,11);
         auto& hist = m_nodes[index].hist;
         leaf_mat(0,0) = -1;
 
@@ -270,7 +283,8 @@ class RandomDecisionTree
 
     inline cv::Mat_<qint32> node2Mat(quint32 index)
     {
-        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
+//        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
+        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,11);
         auto& node = m_nodes[index];
         node_mat(0,1) = node.ftrID;
         node_mat(0,2) = node.tau;
@@ -303,11 +317,11 @@ class RandomDecisionTree
         int idx = m_nodes_mat.rows - 1;
 
         // Add let
-        if(m_nodes[nodeIdx].tau != -500)
+        if(m_nodes[nodeIdx].tau != -MAX_TAU)
             compressNodes(2*nodeIdx + 1);
 
         // Add right
-        if(m_nodes[nodeIdx].tau != 500)
+        if(m_nodes[nodeIdx].tau != MAX_TAU)
         {
             auto right = compressNodes(2*nodeIdx + 2);
             m_nodes_mat(idx,0) = right;
@@ -321,7 +335,9 @@ public:
         m_nodes_mat.reserve(300000);
         compressFtr();
         compressNodes(0);
-//        cv::FileStorage storage("/home/neko/Desktop/RDT.yml", cv::FileStorage::WRITE);
+//        static int treeId = 0;
+//        std::string fname = "RDT_" + std::to_string(treeId++) + ".yml";
+//        cv::FileStorage storage(fname, cv::FileStorage::WRITE);
 //        storage << "m_nodes_mat" << m_nodes_mat;
 //        storage << "m_features_mat" << m_features_mat;
 //        storage.release();
@@ -334,6 +350,7 @@ private:
     template<class Archive>
     void serialize(Archive &archive)
     {
+//        archive(quint32(), std::vector<Node3b>(), m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
         archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
     }
 
@@ -365,7 +382,7 @@ private:
         {
             px_index = start + (shift + i*step)%total;
             auto &px = m_pixelCloud.pixels1[px_index];
-            auto &img = m_DS->images[px.id];
+            auto &img = m_DS->integral_images[px.id];
             if (m_nodes[index].isLeft(px, img))
             {
                 ++leftHist[px.label];
@@ -379,12 +396,96 @@ private:
         }
     }
 
-    inline void setParamsFor(auto maxFeatureIndex, cv::Point maxTeta1, cv::Point maxTeta2, quint32 index, auto maxTau)
+    inline void setParamsFor(quint8 maxFeatureIndex, cv::Point maxTeta1, cv::Point maxTeta2, quint32 index, qint16 maxTau)
     {
         m_nodes[index].tau = maxTau;
         m_nodes[index].teta1 = maxTeta1;
         m_nodes[index].teta2 = maxTeta2;
         m_nodes[index].ftrID = maxFeatureIndex;
+    }
+
+    inline void computeRegressionStats(quint32 index)
+    {
+
+        // K-Means
+        int clusterCount = 2;
+        std::vector<cv::Point2f> points;
+        std::vector<float> all_hw;
+        cv::Mat lbls, centers;
+
+
+        // Fill points
+        auto start = m_nodes[index].start;
+        auto end = m_nodes[index].end;
+        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
+        {
+            auto& px = m_pixelCloud.pixels1[pxIndex];
+            if(px.label == 0)            // 0 means positive
+            {
+                cv::Point2f pt(px.box_c_dx, px.box_c_dy);
+                points.push_back(pt);
+                all_hw.push_back((float)px.box_hw);
+            }
+        }
+
+
+        if(points.size() > clusterCount)
+        {
+            cv::kmeans(points, clusterCount, lbls,
+                       cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
+                       3, cv::KMEANS_PP_CENTERS, centers);
+
+            m_nodes[index].dx = centers.at<float>(0, 0);
+            m_nodes[index].dy = centers.at<float>(0, 1);
+
+
+            lbls.release();
+            centers.release();
+            cv::kmeans(all_hw, clusterCount, lbls,
+                       cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
+                       3, cv::KMEANS_PP_CENTERS, centers);
+
+            m_nodes[index].hw = centers.at<float>(0, 0);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        auto count{0};
+//        auto start = m_nodes[index].start;
+//        auto end = m_nodes[index].end;
+//        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
+//        {
+//            auto& px = m_pixelCloud.pixels1[pxIndex];
+//            if(px.label == 0)            // 0 means positive
+//            {
+//                m_nodes[index].dx += px.box_c_dx;
+//                m_nodes[index].dy += px.box_c_dy;
+//                m_nodes[index].hw += px.box_hw;
+//                ++count;
+//            }
+//        }
+
+//        if(count != 0)
+//        {
+//            m_nodes[index].dx /= count;
+//            m_nodes[index].dy /= count;
+//            m_nodes[index].hw /= count;
+//        }
     }
 };
 

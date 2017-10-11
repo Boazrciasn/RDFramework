@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>761</height>
+    <width>1369</width>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
       <item>
        <widget class="QLabel" name="display_label">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="styleSheet">
          <string notr="true">Background-color: #000;</string>
         </property>
@@ -139,7 +142,7 @@
          <string>PF Settings</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="10" column="0" colspan="2">
+         <item row="12" column="0" colspan="2">
           <widget class="QLabel" name="label">
            <property name="font">
             <font>
@@ -152,7 +155,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="0" colspan="2">
+         <item row="13" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QSlider" name="particlesToDisplaySlider">
@@ -177,7 +180,7 @@
           </layout>
          </item>
          <item row="8" column="1">
-          <widget class="QSpinBox" name="histogramSizespinBox">
+          <widget class="QSpinBox" name="numTrackersSpinBox">
            <property name="minimum">
             <number>8</number>
            </property>
@@ -208,14 +211,14 @@
          <item row="0" column="1">
           <widget class="QSpinBox" name="particleCountSpinBox">
            <property name="maximum">
-            <number>1000</number>
+            <number>100000</number>
            </property>
            <property name="value">
             <number>100</number>
            </property>
           </widget>
          </item>
-         <item row="22" column="0">
+         <item row="24" column="0">
           <widget class="QPushButton" name="setupPF_pushButton">
            <property name="font">
             <font>
@@ -228,7 +231,7 @@
            </property>
           </widget>
          </item>
-         <item row="12" column="0">
+         <item row="14" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="QLabel" name="label_2">
@@ -245,7 +248,89 @@
            </item>
           </layout>
          </item>
-         <item row="13" column="0">
+         <item row="17" column="0" rowspan="3" colspan="2">
+          <widget class="QFrame" name="predictorFrame">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="1">
+          <widget class="QLabel" name="roi_class">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="20" column="0">
+          <widget class="QLabel" name="stepSizeSizeLabel">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Step size (conf map)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="20" column="1">
+          <widget class="QSpinBox" name="stepSizeSizeSpinBox">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>60</number>
+           </property>
+           <property name="singleStep">
+            <number>4</number>
+           </property>
+           <property name="value">
+            <number>15</number>
+           </property>
+          </widget>
+         </item>
+         <item row="21" column="0" colspan="2">
+          <widget class="QPushButton" name="computeConfMapPushButton">
+           <property name="text">
+            <string>compute conf map</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="HistogramSizelabel_3">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>DBSCAN MIN PTS</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="HistogramSizelabel_2">
+           <property name="font">
+            <font>
+             <family>Futura</family>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>DBSCAN EPS</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QLabel" name="label_5">
@@ -322,7 +407,7 @@
           </widget>
          </item>
          <item row="8" column="0">
-          <widget class="QLabel" name="HistogramSizelabel">
+          <widget class="QLabel" name="numTrackersLabel">
            <property name="font">
             <font>
              <family>Futura</family>
@@ -330,7 +415,14 @@
             </font>
            </property>
            <property name="text">
-            <string>Histogram Size</string>
+            <string># Trackers/obj</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="1">
+          <widget class="QLabel" name="roi_confidence">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -344,7 +436,7 @@
            </property>
           </widget>
          </item>
-         <item row="21" column="0">
+         <item row="23" column="0">
           <widget class="QListWidget" name="targets_ListWidget">
            <property name="enabled">
             <bool>true</bool>
@@ -368,14 +460,7 @@
            </property>
           </widget>
          </item>
-         <item row="12" column="1">
-          <widget class="QLabel" name="roi_confidence">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="20" column="0">
+         <item row="22" column="0">
           <widget class="QLabel" name="label_3">
            <property name="font">
             <font>
@@ -388,59 +473,26 @@
            </property>
           </widget>
          </item>
-         <item row="15" column="0" rowspan="3" colspan="2">
-          <widget class="QFrame" name="predictorFrame">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="1">
-          <widget class="QLabel" name="roi_class">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="18" column="0">
-          <widget class="QLabel" name="stepSizeSizeLabel">
-           <property name="font">
-            <font>
-             <family>Futura</family>
-             <pointsize>14</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Step size (conf map)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="18" column="1">
-          <widget class="QSpinBox" name="stepSizeSizeSpinBox">
+         <item row="11" column="1">
+          <widget class="QSpinBox" name="dbscanMinPtsSizespinBox">
            <property name="minimum">
             <number>1</number>
            </property>
            <property name="maximum">
-            <number>60</number>
+            <number>256</number>
            </property>
            <property name="singleStep">
             <number>4</number>
            </property>
            <property name="value">
-            <number>15</number>
+            <number>20</number>
            </property>
           </widget>
          </item>
-         <item row="19" column="0" colspan="2">
-          <widget class="QPushButton" name="computeConfMapPushButton">
-           <property name="text">
-            <string>compute conf map</string>
+         <item row="10" column="1">
+          <widget class="QDoubleSpinBox" name="dbscanEpsDoubleSpinBox">
+           <property name="value">
+            <double>8.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -461,8 +513,8 @@
    <slot>onActionOpen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>279</x>
-     <y>741</y>
+     <x>321</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>163</x>
@@ -477,8 +529,8 @@
    <slot>onActionPlay()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>365</x>
-     <y>741</y>
+     <x>414</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
@@ -493,8 +545,8 @@
    <slot>onActionPause()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>451</x>
-     <y>741</y>
+     <x>500</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>450</x>
@@ -510,7 +562,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>230</x>
-     <y>703</y>
+     <y>676</y>
     </hint>
     <hint type="destinationlabel">
      <x>193</x>
@@ -526,7 +578,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>113</x>
-     <y>703</y>
+     <y>676</y>
     </hint>
     <hint type="destinationlabel">
      <x>48</x>
@@ -541,7 +593,7 @@
    <slot>onParticleCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>71</y>
     </hint>
     <hint type="destinationlabel">
@@ -557,7 +609,7 @@
    <slot>onIterationCountChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
@@ -573,7 +625,7 @@
    <slot>onParticleWidthChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>131</y>
     </hint>
     <hint type="destinationlabel">
@@ -589,8 +641,8 @@
    <slot>onSetParticleCountSliderMoved(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1032</x>
-     <y>242</y>
+     <x>1064</x>
+     <y>302</y>
     </hint>
     <hint type="destinationlabel">
      <x>912</x>
@@ -605,8 +657,8 @@
    <slot>onActionSaveTarget()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>595</x>
-     <y>741</y>
+     <x>587</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
@@ -615,13 +667,13 @@
    </hints>
   </connection>
   <connection>
-   <sender>histogramSizespinBox</sender>
+   <sender>numTrackersSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ParticleFilterWidgetGui</receiver>
    <slot>onHistSizeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>191</y>
     </hint>
     <hint type="destinationlabel">
@@ -637,8 +689,8 @@
    <slot>onActionSetupPF()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1001</x>
-     <y>730</y>
+     <x>1062</x>
+     <y>704</y>
     </hint>
     <hint type="destinationlabel">
      <x>758</x>
@@ -654,7 +706,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>160</x>
-     <y>703</y>
+     <y>676</y>
     </hint>
     <hint type="destinationlabel">
      <x>146</x>
@@ -669,11 +721,11 @@
    <slot>onParticleHeightChange(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1069</x>
+     <x>1264</x>
      <y>161</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1134</x>
+     <x>1101</x>
      <y>264</y>
     </hint>
    </hints>
@@ -685,11 +737,11 @@
    <slot>onStepSizeChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1045</x>
-     <y>332</y>
+     <x>1264</x>
+     <y>411</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1204</x>
+     <x>1101</x>
      <y>351</y>
     </hint>
    </hints>
@@ -701,12 +753,44 @@
    <slot>onActionDispConfMap()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1016</x>
-     <y>356</y>
+     <x>1069</x>
+     <y>440</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1156</x>
+     <x>1101</x>
      <y>424</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dbscanEpsDoubleSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>ParticleFilterWidgetGui</receiver>
+   <slot>onDBSCANEpsChanged(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1264</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>780</x>
+     <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dbscanMinPtsSizespinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ParticleFilterWidgetGui</receiver>
+   <slot>onDBSCANMinPtsChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1264</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>777</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>
@@ -728,5 +812,7 @@
   <slot>onParticleHeightChange(int)</slot>
   <slot>onStepSizeChanged(int)</slot>
   <slot>onActionDispConfMap()</slot>
+  <slot>onDBSCANEpsChanged(double)</slot>
+  <slot>onDBSCANMinPtsChanged(int)</slot>
  </slots>
 </ui>

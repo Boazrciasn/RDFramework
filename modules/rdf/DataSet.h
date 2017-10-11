@@ -8,6 +8,7 @@ struct DataSet
 {
     QVector<QVector<QRect>> frameRects{};
     std::vector<cv::Mat> images{};
+    std::vector<cv::Mat> integral_images{};
     std::vector<int> labels{};
     std::map<quint16,quint16> map_dataPerLabel;
     QString info;
@@ -22,7 +23,7 @@ struct DataSet
 
     QString toString() const
     {
-        auto res = QString("<<<< DataSet >>>>\n   images: ") + QString::number(images.size())
+        auto res = "<<<< DataSet >>>>\n   images: "_qs + QString::number(images.size())
                 + QString("\n   Images per Label: \n");
         for (auto it = std::begin(map_dataPerLabel); it != std::end(map_dataPerLabel); ++it)
             res += QString("      ") + QString::number(it->first)

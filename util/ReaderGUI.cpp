@@ -37,7 +37,6 @@ void ReaderGUI::countLabels()
             avgH += m_DS->images[i].rows;
             ++counter;
         }
-
     }
 
     avgW /= counter;
@@ -53,7 +52,8 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
     auto drawRect = ui->draw_rect_checkBox->isChecked();
     auto load_color = ui->Load_color_comboBox->currentIndex();
 
-    auto img_size = 416;
+    auto img_size_row = 416;
+    auto img_size_col = 416;
     auto img_row_ratio = 1.0f;
     auto img_col_ratio = 1.0f;
     auto max_w_h = 100;
@@ -73,9 +73,9 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
             QStringList file_ = line.trimmed().split(" ");
             QString img_file = dir + "/frames/" + file_[0] + file_[1] +".png";
             cv::Mat img = cv::imread(img_file.toStdString(),load_color);
-            img_row_ratio = (float)img_size/img.rows;
-            img_col_ratio = (float)img_size/img.cols;
-            cv::resize(img,img,cv::Size(img_size,img_size));
+            img_row_ratio = (float)img_size_row/img.rows;
+            img_col_ratio = (float)img_size_col/img.cols;
+            cv::resize(img,img,cv::Size(img_size_col,img_size_row));
 
             QVector<QRect> rects;
             line = in.readLine();
@@ -111,6 +111,131 @@ void ReaderGUI::loadFrames(QString dir, std::vector<cv::Mat> &images, QVector<QV
         for(auto& img : images)
             cv::cvtColor(img,img,CV_BGR2Lab);
 }
+
+void ReaderGUI::loadTME(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects)
+{
+    QFile inputFile(dir + "/data.txt");
+    int max_img = ui->max_img_load_spinBox->value();
+    int skip_img = ui->skip_img_load_spinBox->value();
+    auto drawRect = ui->draw_rect_checkBox->isChecked();
+    auto load_color = ui->Load_color_comboBox->currentIndex();
+
+    auto img_size_row = 416;
+    auto img_size_col = 416;
+    auto img_row_ratio = 1.0f;
+    auto img_col_ratio = 1.0f;
+
+    auto skip_counter = 0;
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&inputFile);
+        QString line;
+        while (!in.atEnd())
+        {
+            line = in.readLine();
+            if(!line.contains("frame_"))
+                continue;
+
+            if(++skip_counter <= skip_img)
+                continue;
+
+
+            QStringList file_ = line.trimmed().split(" ");
+            QString img_file = dir + "/data/" + file_[1] +".png";
+            cv::Mat _img_ = cv::imread(img_file.toStdString(),load_color);
+            img_row_ratio = (float)img_size_row/_img_.rows;
+            img_col_ratio = (float)img_size_col/_img_.cols;
+
+            cv::Mat img;
+            for (int i = 1; i < _img_.cols; i += 2) {
+                img.push_back((_img_(cv::Range::all(), cv::Range(i,i+1))).t());
+            }
+
+            img = img.t();
+            _img_.release();
+            for (int i = 1; i < img.rows; i += 2) {
+                _img_.push_back(img(cv::Range(i,i+1), cv::Range::all()));
+            }
+
+            img = _img_;
+
+            cv::resize(img,img,cv::Size(img_size_col,img_size_row));
+
+            QVector<QRect> rects;
+            line = in.readLine();
+            auto count = 0;
+            while (!in.atEnd() && !line.isEmpty())
+            {
+                QStringList rect = line.split(" ");
+                rects.push_back(QRect((int)rect[0].toFloat()*img_col_ratio, (int)rect[1].toFloat()*img_row_ratio,
+                        (int)rect[2].toFloat()*img_col_ratio, (int)rect[3].toFloat()*img_row_ratio));
+                if(drawRect)
+                {
+                    auto rect = rects.last();
+                    cv::rectangle(img,cv::Rect(rect.x(),rect.y(),rect.width(),rect.height()), cv::Scalar(200,0,0),2);
+                }
+
+                line = in.readLine();
+                count++;
+            }
+
+            images.push_back(img);
+            frameRects.push_back(rects);
+            if(max_img != 0 && images.size() >= max_img)
+                break;
+        }
+    }
+    inputFile.close();
+
+    if(ui->lab_checkBox->isChecked())
+        for(auto& img : images)
+            cv::cvtColor(img,img,CV_BGR2Lab);
+
+}
+
+
+void ReaderGUI::loadMOT(QString dir, std::vector<cv::Mat> &images, QVector<QVector<QRect> > &frameRects)
+{
+    QFile inputFile(dir + "/gt/gt.txt");
+    auto drawRect = ui->draw_rect_checkBox->isChecked();
+    auto load_color = ui->Load_color_comboBox->currentIndex();
+
+
+
+    QString path = dir + "/img1";
+    QDir img_dir( path );
+    img_dir.setFilter( QDir::AllEntries | QDir::NoDotAndDotDot );
+    int total_files = img_dir.count();
+
+    for (int img_id = 1; img_id <= total_files; ++img_id) {
+        auto img_file = path + QString("/%1.jpg").arg(img_id, 6, 10, QChar('0'));
+        cv::Mat img = cv::imread(img_file.toStdString(),load_color);
+        images.push_back(img);
+    }
+
+
+    if (!inputFile.open(QIODevice::ReadOnly))
+        return;
+
+    frameRects.resize(total_files);
+    QTextStream in(&inputFile);
+    while (!in.atEnd())
+    {
+        auto line = in.readLine();
+        auto line_tokens = line.trimmed().split(",");
+        auto frame_id   = line_tokens[0].toInt() - 1;
+        frameRects[frame_id].push_back(QRect((int)line_tokens[2].toFloat(), (int)line_tokens[3].toFloat(),
+                (int)line_tokens[4].toFloat(), (int)line_tokens[5].toFloat()));
+
+        if(drawRect)
+        {
+            auto rect = frameRects[frame_id].last();
+            cv::rectangle(images[frame_id],cv::Rect(rect.x(),rect.y(),rect.width(),rect.height()), cv::Scalar(200,0,0),2);
+        }
+    }
+}
+
+
 
 void ReaderGUI::load()
 {
@@ -190,8 +315,8 @@ void ReaderGUI::load()
 
         // TODO: move resize to proper place
         for(auto& img : m_DS->images)
-            cv::resize(img,img, cv::Size(50,50));
-
+            cv::resize(img,img, cv::Size(64,128));
+        countLabels();
         break;
     }
     case Type_MNIST:
@@ -203,6 +328,7 @@ void ReaderGUI::load()
             m_fileDir.replace(QRegExp("images.idx3"), "labels.idx1");
             m_reader->readLabels(m_fileDir, m_DS->labels, m_dFlag);
         }
+        countLabels();
         break;
     }
     case Type_STD_ONE:
@@ -211,6 +337,22 @@ void ReaderGUI::load()
                                                         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
         loadFrames(m_fileDir, m_DS->images, m_DS->frameRects);
+        break;
+    }
+    case Type_TME:
+    {
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        loadTME(m_fileDir, m_DS->images, m_DS->frameRects);
+        break;
+    }
+    case Type_MOT:
+    {
+        m_fileDir = QFileDialog::getExistingDirectory(this, tr("Open Image Directory"), m_fileDir,
+                                                        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+        loadMOT(m_fileDir, m_DS->images, m_DS->frameRects);
         break;
     }
     default:
