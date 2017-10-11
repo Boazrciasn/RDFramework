@@ -55,8 +55,8 @@ class RandomDecisionTree
     // stat var's :
     quint32 m_nonLeafpxCount;
     quint32 m_leafCount{};
-
     void calculateImpurity(quint32 d);
+
 
     // Random number generators
     pcg32 m_generator;
@@ -407,13 +407,14 @@ private:
     inline void computeRegressionStats(quint32 index)
     {
 
+        //TODO : convert to all around regression for bounding boxes.
         // K-Means
         int clusterCount = 2;
         std::vector<cv::Point2f> points;
         std::vector<float> all_hw;
         cv::Mat lbls, centers;
 
-
+        //TODO: change half width
         // Fill points
         auto start = m_nodes[index].start;
         auto end = m_nodes[index].end;

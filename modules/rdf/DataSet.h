@@ -33,7 +33,4 @@ struct DataSet
     }
 };
 
-//std::ostream& operator<<(std::ostream &strm, const DataSet &a) {
-//  return strm << "A(" << a.toString().toStdString() << ")";
-//}
 #endif // DATASET_H

@@ -74,7 +74,6 @@ void RandomDecisionTree::getSubSampleSingleFrame()
                 px.box_c_dy = cy - row;
                 px.box_hw = rects[i].width()/2;
                 px.box_hh = rects[i].height()/2;
-
                 m_pixelCloud.pixels1.push_back(px);
             }
         }
@@ -137,10 +136,6 @@ void RandomDecisionTree::getSubSample()
                 row = (m_generator() % (nRows - 2 * (m_probe_distanceY + Feature::max_h))) + m_probe_distanceY + Feature::max_h;
                 col = (m_generator() % (nCols - 2 * (m_probe_distanceX + Feature::max_w))) + m_probe_distanceX + Feature::max_w;
                 intensity = image.at<uchar>(row, col);
-
-//                qDebug() << id << " " << intensity << " sum: " << sum;
-//                if(sum < 25500)
-//                    break;
             }
             auto &px = m_pixelCloud.pixels1[last + k];
             px.id = id;

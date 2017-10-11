@@ -141,6 +141,7 @@ private:
         Colorcode colorsBag;
         std::atomic<int> posCounter(0);
         auto pxAcc = 0.0f;
+        // FIX ME : first 50 images are processed only 50 ??
         for(auto i = 0u; i <  50; ++i)
         {
             qDebug() << "Image " << i << " is being procecced!";
@@ -149,11 +150,6 @@ private:
             auto layered = rdf.getLayeredHist(m_dataReaderGUI->DS()->images[i]);
             auto rects = m_dataReaderGUI->DS()->frameRects[i];
             rdf.getLabelAndConfMat(layered, labels, confs);
-
-
-
-
-
             auto& img = m_dataReaderGUI->DS()->images[i];
             cv::Mat_<uchar> regression = cv::Mat_<uchar>::zeros(img.rows, img.cols);
             cv::Mat_<uchar> regressionW = cv::Mat_<uchar>::zeros(img.rows, img.cols);
@@ -165,6 +161,8 @@ private:
 
             MeanShift *msp = new MeanShift();
             double kernel_bandwidth = 11;
+
+            //TODO: change here for multi-dimensional clustering.
             std::vector<std::vector<double> > points;
             qDebug()<< "Regression started!";
 
@@ -188,26 +186,7 @@ private:
             auto clusters = msp->cluster(points, kernel_bandwidth);
 
 
-            // K-Means
-//            auto clusterCount = 3;
-//            cv::Mat_<float> pts(points.size(), 2);
-//            cv::Mat lbls, centers;
-//            for(auto pt = 0; pt < points.size(); ++pt)
-//            {
-//                pts(pt,0) = points[pt][0];
-//                pts(pt,1) = points[pt][1];
-//            }
-
-//            cv::kmeans(pts, clusterCount, lbls,
-//                        cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
-//            3, cv::KMEANS_PP_CENTERS, centers);
-
-//            for (int var = 0; var < centers.rows; ++var) {
-//                cv::Point center(centers.at<float>(var, 0), centers.at<float>(var, 1));
-//                cv::circle(img, center, 10, cv::Scalar(255,0,0), 2);
-//            }
-
-
+            // Bounding box draving.
             for(auto cluster : clusters)
             {
                 if(cluster.shifted_points.size() < 5)
@@ -218,30 +197,11 @@ private:
                 cv::circle(labels, center, 5, cv::Scalar(0,255,0), 2);
             }
 
-
             /////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////
-
-
-//            for (int r = 0; r < regression.rows; ++r) {
-//                for (int c = 0; c < regression.cols; ++c) {
-//                    if(regression(r,c) > 5)
-//                    {
-//                        cv::Point center(c,r);
-//                        cv::Point halfWH(regressionW(r,c), 2.5*regressionW(r,c));
-//                        cv::circle(labels, center, 2, cv::Scalar(255,255,255), 1);
-//                        cv::rectangle(img, cv::Rect(center-halfWH, center+halfWH), cv::Scalar(255,0,0));
-//                    }
-//                }
-//            }
-
 
             results.push_back(img.clone());
             results.push_back(labels.clone());
-//            results.push_back(reg);
-
-
-
 
             auto color_pos = colorsBag.colors[0];       // TODO:: in single frame 0 is positive and 1 is negative
             auto color_neg = colorsBag.colors[1];
@@ -254,9 +214,6 @@ private:
                 gt(cv::Rect(rect.x(), rect.y(), rect.width(), rect.height())) = color_pos;
             }
 
-
-
-
             auto counter = 0.0f;
             for (int row = 0; row < labels.rows; ++row)
                 for (int col = 0; col < labels.cols; ++col)
@@ -264,15 +221,10 @@ private:
                         ++counter;
 
             pxAcc += counter/(labels.rows*labels.cols);
-
-//            int label{};
-//            float conf{};
-//            rdf.detect(m_dataReaderGUI->DS()->images[i], label, conf);
-//            if (label == m_dataReaderGUI->DS()->labels[i])
-//                ++posCounter;
         }
 
         m_displayImagesGUI->setImageSet(results);
+
         // ///////////////////////////////////////////////////
         // ///////////////////////////////////////////////////
 
