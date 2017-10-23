@@ -18,10 +18,33 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/")
 
 SET(CMAKE_CXX_STANDARD 14)
 
+
+##MLPACK FINDER ONLY FOR UNIX BASED.
+# Store the mlpack include directory in MLPACK_INCLUDE_DIR.
+# The PATHS variable may be specified to give hints for where to find core.hpp.
+FIND_PATH(MLPACK_INCLUDE_DIR core.hpp
+          PATHS /usr/local/include/mlpack
+                /usr/include/mlpack
+         )
+message(STATUS "MLPACK include dir : ${MLPACK_INCLUDE_DIR}")
+
+# Find libmlpack.so (or equivalent) and store it in MLPACK_LIBRARY.
+# If this example script were smarter, it would also find other dependencies of mlpack and store them in
+# an MLPACK_LIBRARIES variable instead.
+SET(SEARCH_PATHS
+    "${MLPACK_INCLUDE_DIR}/../lib"
+    "${MLPACK_INCLUDE_DIR}/../../lib"
+    "${MLPACK_LIBRARY_DIR}")
+FIND_LIBRARY(MLPACK_LIBRARY NAMES mlpack PATHS ${SEARCH_PATHS})
+
+
+message(STATUS "MLPACK library dir : ${MLPACK_LIBRARY}")
+
 FIND_PACKAGE(OpenCV 3 REQUIRED)
 FIND_PACKAGE(CUDA)
 FIND_PACKAGE(Boost)
 FIND_PACKAGE(TBB)
+FIND_PACKAGE(Armadillo REQUIRED)
 
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 FIND_PACKAGE(Qt5Xml REQUIRED)
@@ -109,6 +132,8 @@ INCLUDE_DIRECTORIES(
     ${Boost_INCLUDE_DIRS}
     ${CUDA_INCLUDE_DIRS}
     ${TBB_INCLUDE_DIRS}
+    ${MLPACK_INCLUDE_DIR}
+    ${ARMADILLO_INCLUDE_DIRS}
     Core/
     3rdparty/qcustomplot/
     3rdparty/cereal/
@@ -120,4 +145,4 @@ qt5_use_modules("${project_name}" Core Gui Widgets)
 target_link_libraries(
     "${project_name}" ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES}
     tbb Qt5::Xml Qt5::PrintSupport Qt5::Multimedia Qt5::MultimediaWidgets ${CUDART}
-    )
+     ${MLPACK_LIBRARY} ${ARMADILLO_LIBRARIES})

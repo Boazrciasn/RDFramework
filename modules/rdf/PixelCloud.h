@@ -36,10 +36,11 @@ struct Pixel
     quint32 id;
     int label;
 
-    int32_t box_c_dx{};       // bounding box center x
-    int32_t box_c_dy{};       // bounding box center y
-    uint16_t box_hw{};      // bounding box half width
-    uint16_t box_hh{};      // bounding box half height
+    //Changed to double for armadillo mat.
+    double box_c_dx{};       // bounding box center x
+    double box_c_dy{};       // bounding box center y
+    double box_hw{};      // bounding box half width
+    double box_hh{};      // bounding box half height
 
     Pixel() : Pixel(cv::Point(0,0),0,0)
     {
@@ -60,6 +61,7 @@ struct Pixel
         box_hh(px.box_hh)
     {
     }
+
 };
 
 struct PixelCloud

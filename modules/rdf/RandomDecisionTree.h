@@ -414,10 +414,13 @@ private:
         std::vector<float> all_hw;
         cv::Mat lbls, centers;
 
-        //TODO: change half width
+        //TODO: change half width REGRESSION
         // Fill points
         auto start = m_nodes[index].start;
         auto end = m_nodes[index].end;
+
+        auto pxSize = end - start;
+//        arma::mat leafvotes =
         for (auto pxIndex = start; pxIndex < end; ++pxIndex)
         {
             auto& px = m_pixelCloud.pixels1[pxIndex];

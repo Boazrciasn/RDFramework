@@ -12,6 +12,9 @@
 #include "RDFBasic.h"
 #include "util/MeanShift.h"
 
+//MLPACK TEST
+#include <mlpack/core.hpp>
+#include <armadillo>
 namespace Ui
 {
 class RandomDecisionForestDialogGui;
@@ -166,20 +169,10 @@ private:
             std::vector<std::vector<double> > points;
             qDebug()<< "Regression started!";
 
+            arma::mat A;
             for (int r = 0; r < regression.rows; ++r) {
                 for (int c = 0; c < regression.cols; ++c) {
-                    if(regression(r,c) > 5)
-                    {
-                        std::vector<double> pt;
-                        pt.push_back(c);
-                        pt.push_back(r);
-                        points.push_back(pt);
-
-                        cv::Point center(c,r);
-                        cv::Point halfWH(regressionW(r,c), 2.5*regressionW(r,c));
-                        cv::circle(labels, center, 2, cv::Scalar(255,255,255), 1);
-//                        cv::rectangle(img, cv::Rect(center-halfWH, center+halfWH), cv::Scalar(255,0,0));
-                    }
+                    //Armadillo mat creation for mean shift : rows : samples, cols: dimensions
                 }
             }
 

@@ -231,7 +231,7 @@ void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &re
             for (size_t i = 0; i < m_nTreesForDetection; ++i)
             {
                 Node node = m_trees[i].getLeaf(px, integral_roi);
-                if(node.hist(0,0) > node.hist(0,1))     // if it is psitive
+                if(node.hist(0,0) > node.hist(0,1))     // if it is positive
                 {
                     ++regressionMat(node.dy + row, node.dx + col);
                     regressionWidth(node.dy + row, node.dx + col) += node.hw;
@@ -239,6 +239,7 @@ void RandomDecisionForest::getRegressionResult(cv::Mat &roi, cv::Mat_<uchar> &re
 
             }
         });
+
     for (int row = 0; row < nRows; ++row)
         tbb::parallel_for(0, nCols, 1, [ =, &regressionMat, &regressionWidth ](int col)
         {
