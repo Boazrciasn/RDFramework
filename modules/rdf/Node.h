@@ -19,7 +19,7 @@ struct Node
     int32_t dx{};
     int32_t dy{};
     uint16_t hw{};          // half width
-    arma::vec vote;
+    arma::vec vote{};
     tauType tau{};
     cv::Point teta1{}, teta2{};
 
@@ -49,12 +49,16 @@ private:
     template<class Archive>
     void save(Archive &archive) const
     {
-        // cv::Point is not serializable
+        // cv::Point & arma:mat etc. is not serializable
         const int x1 = teta1.x;
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw);
+        const double cx = vote(0);
+        const double cy = vote(1);
+        const double w = vote(2);
+        const double h = vote(3);
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h);
 
     }
 
@@ -62,11 +66,13 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw);
+        double cx, cy, w, h;
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
         teta2.y = y2;
+        vote = {cx, cy, w, h};
     }
 };
 

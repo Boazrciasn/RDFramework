@@ -399,10 +399,8 @@ class RandomDecisionTree
     {
         //TODO : convert to all around regression for bounding boxes.
         // K-Means
-        int clusterCount = 2;
         std::vector<cv::Point2f> points;
         std::vector<float> all_hw;
-        cv::Mat lbls, centers;
         //TODO: change half width REGRESSION
         // Fill points
         auto start = m_nodes[index].start;
@@ -422,15 +420,19 @@ class RandomDecisionTree
                 all_hw.push_back((float)px.box_hw);
             }
         }
-        voteData = voteData.cols(0, voteCount);
+        if(voteCount > 0)
+            voteData = voteData.cols(0, voteCount-1);
+        else
+            voteData = voteData.col(0);
+
         //Setup Meanshift requirements DATA MUST BE COL MAJOR
         arma::Col<size_t> assignments; // Cluster assignments.
         arma::mat centroids; // Cluster centroids.
         mlpack::meanshift::MeanShift<true> MeanShift;
-        //TODO : minmum pixel number 5 must be fixed.
+
         if (voteData.n_cols > 5)
         {
-            MeanShift.Cluster(voteData, assignments, centroids);
+            MeanShift.Cluster(voteData, assignments, centroids);   
             //Get the largest cluster.
             int max{};
             int maxcInd;
@@ -438,7 +440,6 @@ class RandomDecisionTree
             for (int c = 0; c < centroids.n_cols; ++c)
             {
                 arma::uvec ind = arma::find(assignments == c);
-                std::cout << ind.n_elem << std::endl;
                 if (ind.n_elem > max)
                 {
                     maxCentroid = centroids.col(c);
@@ -448,17 +449,6 @@ class RandomDecisionTree
             }
             m_nodes[index].vote = maxCentroid;
 
-            cv::kmeans(points, clusterCount, lbls,
-                       cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10, 1.0),
-                       3, cv::KMEANS_PP_CENTERS, centers);
-            m_nodes[index].dx = centers.at<float>(0, 0);
-            m_nodes[index].dy = centers.at<float>(0, 1);
-            lbls.release();
-            centers.release();
-            cv::kmeans(all_hw, clusterCount, lbls,
-                       cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10, 1.0),
-                       3, cv::KMEANS_PP_CENTERS, centers);
-            m_nodes[index].hw = centers.at<float>(0, 0);
         }
     }
 };

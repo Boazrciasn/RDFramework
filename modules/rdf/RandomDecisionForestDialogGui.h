@@ -147,7 +147,7 @@ private:
         // FIX ME : first 50 images are processed only 50 ??
         for(auto i = 0u; i <  50; ++i)
         {
-            qDebug() << "Image " << i << " is being procecced!";
+            qDebug() << "Image " << i << " is being processed!";
             cv::Mat labels{};
             cv::Mat_<float> confs{};
             auto layered = rdf.getLayeredHist(m_dataReaderGUI->DS()->images[i]);

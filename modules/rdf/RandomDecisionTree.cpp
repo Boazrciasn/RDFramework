@@ -63,8 +63,8 @@ void RandomDecisionTree::getSubSampleSingleFrame()
         // Positive label
         for (int i = 0; i < rectCount; ++i)
         {
-            auto cx = rects[i].x() + rects[i].width()/2 + m_probe_distanceX + Feature::max_w;
-            auto cy = rects[i].y() + rects[i].height()/2 + m_probe_distanceY + Feature::max_h;
+            double cx = rects[i].x() + rects[i].width()/2 + m_probe_distanceX + Feature::max_w;
+            double cy = rects[i].y() + rects[i].height()/2 + m_probe_distanceY + Feature::max_h;
             for (int k = 0; k < m_params->pixelsPerImage; ++k)
             {
                 int row = (m_generator() % rects[i].height()) + rects[i].y() + m_probe_distanceY + Feature::max_h;
