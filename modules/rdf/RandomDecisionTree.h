@@ -13,7 +13,10 @@
 #include <3rdparty/cereal/types/vector.hpp>
 #include <3rdparty/cereal/types/string.hpp>
 #include <3rdparty/cereal/access.hpp>
-#include "3rdparty/pcg-cpp-0.98/include/pcg_random.hpp"
+#include <3rdparty/pcg-cpp-0.98/include/pcg_random.hpp>
+#include <armadillo>
+#include <mlpack/core.hpp>
+#include <mlpack/methods/mean_shift/mean_shift.hpp>
 
 #include "Util.h"
 #include "rdf/PixelCloud.h"
@@ -75,7 +78,8 @@ class RandomDecisionTree
     void setSignalInterface(SignalSenderInterface *signalsender) {m_signalsender = signalsender;}
     pcg32 inline getGenerator() {return m_generator;}
 
-    void inline setParams(RDFParams *params) {
+    void inline setParams(RDFParams *params)
+    {
         m_params = params;
         m_label_count = m_params->labelCount;
         m_padding_x = m_params->probDistX + Feature::max_w;
@@ -165,7 +169,7 @@ class RandomDecisionTree
         setProbeDistanceY(m_params->probDistY);
         setMaxDepth(m_params->maxDepth);
         setMinimumLeafPixelCount(m_params->minLeafPixels);
-        if(m_params->isPositiveRange)
+        if (m_params->isPositiveRange)
             setTauRangePos(m_params->tauRange);
         else
             setTauRange(m_params->tauRange);
@@ -186,13 +190,11 @@ class RandomDecisionTree
         m_nodes[index].id = index;
         m_nodes[index].start = m_nodes[parentId].start + mult * leftCount;
         m_nodes[index].end = m_nodes[parentId].end - ((mult + 1) % 2) * rightCount;
-
         auto pxCount = m_nodes[index].end - m_nodes[index].start;
-
         // Supress all nodes to other node if this node is empty
         if (pxCount == 0)
-            m_nodes[parentId].tau = MAX_TAU*(2*mult-1); //1000*mult - 500;    // TODO: 500 fix
-        else if(m_nodes[parentId].isLeaf || isLeaf(m_nodes[index].start, m_nodes[index].end))
+            m_nodes[parentId].tau = MAX_TAU * (2 * mult - 1); //1000*mult - 500;    // TODO: 500 fix
+        else if (m_nodes[parentId].isLeaf || isLeaf(m_nodes[index].start, m_nodes[index].end))
         {
             ++m_leafCount;
             m_nonLeafpxCount = m_nonLeafpxCount - pxCount;
@@ -203,7 +205,7 @@ class RandomDecisionTree
         }
         else
         {
-            if(pxCount >= TableLookUp::size)
+            if (pxCount >= TableLookUp::size)
                 computeDivisionAt(index);
             else
                 computeDivisionWithLookUpAt(index);
@@ -257,100 +259,92 @@ class RandomDecisionTree
     inline void compressFtr()
     {
         auto ftr_count = Feature::features.size();
-        auto ftr_px_count = Feature::max_h*Feature::max_w;
-        m_features_mat = cv::Mat_<featureType>::zeros(ftr_count,ftr_px_count);
-
+        auto ftr_px_count = Feature::max_h * Feature::max_w;
+        m_features_mat = cv::Mat_<featureType>::zeros(ftr_count, ftr_px_count);
         // feature one is single pixel
-        m_features_mat(0,0) = 1;
-
-        for(auto i = 1; i < ftr_count; ++i)
-            for(auto j = 0; j < ftr_px_count; ++j)
-                m_features_mat(i,j) = Feature::features[i](j/Feature::max_w,j%Feature::max_h);
-//        std::cout << m_features_mat << std::endl;
+        m_features_mat(0, 0) = 1;
+        for (auto i = 1; i < ftr_count; ++i)
+            for (auto j = 0; j < ftr_px_count; ++j)
+                m_features_mat(i, j) = Feature::features[i](j / Feature::max_w, j % Feature::max_h);
+        //        std::cout << m_features_mat << std::endl;
     }
 
     inline cv::Mat_<qint32> leaf2Mat(quint32 index)
     {
-//        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
-        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,11);
-        auto& hist = m_nodes[index].hist;
-        leaf_mat(0,0) = -1;
-
+        //        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1,7);
+        cv::Mat_<qint32> leaf_mat = cv::Mat_<qint32>::zeros(1, 11);
+        auto &hist = m_nodes[index].hist;
+        leaf_mat(0, 0) = -1;
         for (int i = 0; i < hist.cols; ++i)
-            leaf_mat(0,i + 1) = hist(0,i)*255;
+            leaf_mat(0, i + 1) = hist(0, i) * 255;
         return leaf_mat;
     }
 
     inline cv::Mat_<qint32> node2Mat(quint32 index)
     {
-//        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
-        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,11);
-        auto& node = m_nodes[index];
-        node_mat(0,1) = node.ftrID;
-        node_mat(0,2) = node.tau;
-        node_mat(0,3) = node.teta1.x;
-        node_mat(0,4) = node.teta1.y;
-        node_mat(0,5) = node.teta2.x;
-        node_mat(0,6) = node.teta2.y;
-
+        //        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1,7);
+        cv::Mat_<qint32> node_mat = cv::Mat_<qint32>::zeros(1, 11);
+        auto &node = m_nodes[index];
+        node_mat(0, 1) = node.ftrID;
+        node_mat(0, 2) = node.tau;
+        node_mat(0, 3) = node.teta1.x;
+        node_mat(0, 4) = node.teta1.y;
+        node_mat(0, 5) = node.teta2.x;
+        node_mat(0, 6) = node.teta2.y;
         return node_mat;
     }
 
     inline qint32 compressNodes(quint32 nodeIdx)
     {
-//        qDebug() << "id: " << m_nodes[nodeIdx].id
-//                 << " start: " << m_nodes[nodeIdx].start
-//                 << " end: " << m_nodes[nodeIdx].end
-//                 << " tau: " << m_nodes[nodeIdx].tau
-//                 << " isLeaf: " << m_nodes[nodeIdx].isLeaf;
-
-        if(m_nodes[nodeIdx].isLeaf)
+        //        qDebug() << "id: " << m_nodes[nodeIdx].id
+        //                 << " start: " << m_nodes[nodeIdx].start
+        //                 << " end: " << m_nodes[nodeIdx].end
+        //                 << " tau: " << m_nodes[nodeIdx].tau
+        //                 << " isLeaf: " << m_nodes[nodeIdx].isLeaf;
+        if (m_nodes[nodeIdx].isLeaf)
         {
-            auto node_h = m_height - (quint32)log2(nodeIdx+1) - 1;
+            auto node_h = m_height - (quint32)log2(nodeIdx + 1) - 1;
             auto leafIndex = (1 << node_h) * (nodeIdx + 1) - 1;
             m_nodes_mat.push_back(leaf2Mat(leafIndex));
             return m_nodes_mat.rows - 1;
         }
-
         // Add root
         m_nodes_mat.push_back(node2Mat(nodeIdx));
         int idx = m_nodes_mat.rows - 1;
-
         // Add let
-        if(m_nodes[nodeIdx].tau != -MAX_TAU)
-            compressNodes(2*nodeIdx + 1);
-
+        if (m_nodes[nodeIdx].tau != -MAX_TAU)
+            compressNodes(2 * nodeIdx + 1);
         // Add right
-        if(m_nodes[nodeIdx].tau != MAX_TAU)
+        if (m_nodes[nodeIdx].tau != MAX_TAU)
         {
-            auto right = compressNodes(2*nodeIdx + 2);
-            m_nodes_mat(idx,0) = right;
+            auto right = compressNodes(2 * nodeIdx + 2);
+            m_nodes_mat(idx, 0) = right;
         }
-
         return idx;
     }
 
-public:
-    inline void compreseTree() {
+  public:
+    inline void compreseTree()
+    {
         m_nodes_mat.reserve(300000);
         compressFtr();
         compressNodes(0);
-//        static int treeId = 0;
-//        std::string fname = "RDT_" + std::to_string(treeId++) + ".yml";
-//        cv::FileStorage storage(fname, cv::FileStorage::WRITE);
-//        storage << "m_nodes_mat" << m_nodes_mat;
-//        storage << "m_features_mat" << m_features_mat;
-//        storage.release();
+        //        static int treeId = 0;
+        //        std::string fname = "RDT_" + std::to_string(treeId++) + ".yml";
+        //        cv::FileStorage storage(fname, cv::FileStorage::WRITE);
+        //        storage << "m_nodes_mat" << m_nodes_mat;
+        //        storage << "m_features_mat" << m_features_mat;
+        //        storage.release();
     }
 
 
-private:
+  private:
     friend class cereal::access;
 
     template<class Archive>
     void serialize(Archive &archive)
     {
-//        archive(quint32(), std::vector<Node3b>(), m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
+        //        archive(quint32(), std::vector<Node3b>(), m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
         archive(m_height, m_nodes, m_nodes_mat, m_features_mat, m_label_count, m_padding_x, m_padding_y);
     }
 
@@ -361,26 +355,23 @@ private:
         m_nodes[index].tau = generateTau();
     }
 
-    inline void computeHistograms(quint32 index, QVector<quint32>& rightHist, QVector<quint32>& leftHist)
+    inline void computeHistograms(quint32 index, QVector<quint32> &rightHist, QVector<quint32> &leftHist)
     {
         leftHist.fill(0);
         rightHist.fill(0);
         auto sizeLeft  = 0;
         auto sizeRight = 0;
-
         auto shift = m_generator();
         auto max_px_count = m_params->maxPxForEntropy;
         auto start = m_nodes[index].start;
         auto end = m_nodes[index].end;
-        auto total = end-start;
+        auto total = end - start;
         max_px_count = (total > max_px_count) ? max_px_count : total;
-        auto step = total/max_px_count + 1;
-
+        auto step = total / max_px_count + 1;
         quint32 px_index;
-
         for (auto i = 0; i < max_px_count; ++i)
         {
-            px_index = start + (shift + i*step)%total;
+            px_index = start + (shift + i * step) % total;
             auto &px = m_pixelCloud.pixels1[px_index];
             auto &img = m_DS->integral_images[px.id];
             if (m_nodes[index].isLeft(px, img))
@@ -406,90 +397,69 @@ private:
 
     inline void computeRegressionStats(quint32 index)
     {
-
         //TODO : convert to all around regression for bounding boxes.
         // K-Means
         int clusterCount = 2;
         std::vector<cv::Point2f> points;
         std::vector<float> all_hw;
         cv::Mat lbls, centers;
-
         //TODO: change half width REGRESSION
         // Fill points
         auto start = m_nodes[index].start;
         auto end = m_nodes[index].end;
-
-        auto pxSize = end - start;
-//        arma::mat leafvotes =
+        auto n_pxs = end - start;
+        arma::mat voteData(4, n_pxs);
+        int voteCount{};
         for (auto pxIndex = start; pxIndex < end; ++pxIndex)
         {
-            auto& px = m_pixelCloud.pixels1[pxIndex];
-            if(px.label == 0)            // 0 means positive
+            auto &px = m_pixelCloud.pixels1[pxIndex];
+            if (px.label == 0)           // 0 means positive
             {
+                voteData.col(voteCount) = px.armaVote();
+                ++voteCount;
                 cv::Point2f pt(px.box_c_dx, px.box_c_dy);
                 points.push_back(pt);
                 all_hw.push_back((float)px.box_hw);
             }
         }
-
-
-        if(points.size() > clusterCount)
+        voteData = voteData.cols(0, voteCount);
+        //Setup Meanshift requirements DATA MUST BE COL MAJOR
+        arma::Col<size_t> assignments; // Cluster assignments.
+        arma::mat centroids; // Cluster centroids.
+        mlpack::meanshift::MeanShift<true> MeanShift;
+        //TODO : minmum pixel number 5 must be fixed.
+        if (voteData.n_cols > 5)
         {
-            cv::kmeans(points, clusterCount, lbls,
-                       cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
-                       3, cv::KMEANS_PP_CENTERS, centers);
+            MeanShift.Cluster(voteData, assignments, centroids);
+            //Get the largest cluster.
+            int max{};
+            int maxcInd;
+            arma::mat maxCentroid;
+            for (int c = 0; c < centroids.n_cols; ++c)
+            {
+                arma::uvec ind = arma::find(assignments == c);
+                std::cout << ind.n_elem << std::endl;
+                if (ind.n_elem > max)
+                {
+                    maxCentroid = centroids.col(c);
+                    maxcInd = c;
+                    max = ind.n_elem;
+                }
+            }
+            m_nodes[index].vote = maxCentroid;
 
+            cv::kmeans(points, clusterCount, lbls,
+                       cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10, 1.0),
+                       3, cv::KMEANS_PP_CENTERS, centers);
             m_nodes[index].dx = centers.at<float>(0, 0);
             m_nodes[index].dy = centers.at<float>(0, 1);
-
-
             lbls.release();
             centers.release();
             cv::kmeans(all_hw, clusterCount, lbls,
-                       cv::TermCriteria( cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0),
+                       cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT, 10, 1.0),
                        3, cv::KMEANS_PP_CENTERS, centers);
-
             m_nodes[index].hw = centers.at<float>(0, 0);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        auto count{0};
-//        auto start = m_nodes[index].start;
-//        auto end = m_nodes[index].end;
-//        for (auto pxIndex = start; pxIndex < end; ++pxIndex)
-//        {
-//            auto& px = m_pixelCloud.pixels1[pxIndex];
-//            if(px.label == 0)            // 0 means positive
-//            {
-//                m_nodes[index].dx += px.box_c_dx;
-//                m_nodes[index].dy += px.box_c_dy;
-//                m_nodes[index].hw += px.box_hw;
-//                ++count;
-//            }
-//        }
-
-//        if(count != 0)
-//        {
-//            m_nodes[index].dx /= count;
-//            m_nodes[index].dy /= count;
-//            m_nodes[index].hw /= count;
-//        }
     }
 };
 

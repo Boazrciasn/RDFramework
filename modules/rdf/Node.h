@@ -6,6 +6,7 @@
 #include "PixelCloud.h"
 
 #include <3rdparty/cereal/access.hpp>
+#include <armadillo>
 #include "Feature.h"
 
 struct Node
@@ -18,7 +19,7 @@ struct Node
     int32_t dx{};
     int32_t dy{};
     uint16_t hw{};          // half width
-
+    arma::vec vote;
     tauType tau{};
     cv::Point teta1{}, teta2{};
 

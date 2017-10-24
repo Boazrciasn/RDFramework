@@ -154,6 +154,7 @@ private:
             auto rects = m_dataReaderGUI->DS()->frameRects[i];
             rdf.getLabelAndConfMat(layered, labels, confs);
             auto& img = m_dataReaderGUI->DS()->images[i];
+
             cv::Mat_<uchar> regression = cv::Mat_<uchar>::zeros(img.rows, img.cols);
             cv::Mat_<uchar> regressionW = cv::Mat_<uchar>::zeros(img.rows, img.cols);
             rdf.getRegressionResult(img, regression, regressionW);

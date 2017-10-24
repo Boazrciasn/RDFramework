@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "precompiled.h"
+#include <armadillo>
 #include <tbb/tbb.h>
 
 struct Colorcode
@@ -61,6 +62,8 @@ struct Pixel
         box_hh(px.box_hh)
     {
     }
+
+    arma::colvec armaVote(){ return arma::colvec( {box_c_dx, box_c_dy, box_hw, box_hh}); }
 
 };
 
