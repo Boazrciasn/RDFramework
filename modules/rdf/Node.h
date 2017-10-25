@@ -19,7 +19,7 @@ struct Node
     int32_t dx{};
     int32_t dy{};
     uint16_t hw{};          // half width
-    arma::vec vote{};
+    arma::vec vote = arma::vec(4);
     tauType tau{};
     cv::Point teta1{}, teta2{};
 
