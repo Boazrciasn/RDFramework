@@ -423,15 +423,18 @@ class RandomDecisionTree
         if(voteCount > 0)
             voteData = voteData.cols(0, voteCount-1);
         else
-            voteData = voteData.col(0);
+            voteData = voteData.cols(0,0);
 
         //Setup Meanshift requirements DATA MUST BE COL MAJOR
         arma::Col<size_t> assignments; // Cluster assignments.
         arma::mat centroids; // Cluster centroids.
         mlpack::meanshift::MeanShift<true> MeanShift;
-
-        if (voteData.n_cols > 5)
+        MeanShift.Kernel().Bandwidth(11);
+//        Min number of samples required in 4 dimensional space for mean shift algorithm to run smoothly.
+        if (voteData.n_cols > 16)
         {
+//            qDebug()<< "\n\n\n";
+//            voteData.print();
             MeanShift.Cluster(voteData, assignments, centroids);   
             //Get the largest cluster.
             int max{};
