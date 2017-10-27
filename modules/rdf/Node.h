@@ -9,6 +9,14 @@
 #include <armadillo>
 #include "Feature.h"
 
+
+struct BBoxVote
+{
+   arma::vec vote = arma::vec(4);
+   double weight;
+};
+
+
 struct Node
 {
     uint32_t id{};
@@ -19,7 +27,7 @@ struct Node
     int32_t dx{};
     int32_t dy{};
     uint16_t hw{};          // half width
-    arma::vec vote = arma::vec(4);
+    BBoxVote vote;
     tauType tau{};
     cv::Point teta1{}, teta2{};
 
@@ -54,10 +62,10 @@ private:
         const int y1 = teta1.y;
         const int x2 = teta2.x;
         const int y2 = teta2.y;
-        const double cx = vote(0);
-        const double cy = vote(1);
-        const double w = vote(2);
-        const double h = vote(3);
+        const double cx = vote.vote(0);
+        const double cy = vote.vote(1);
+        const double w = vote.vote(2);
+        const double h = vote.vote(3);
         archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h);
 
     }
@@ -72,7 +80,7 @@ private:
         teta1.y = y1;
         teta2.x = x2;
         teta2.y = y2;
-        vote = {cx, cy, w, h};
+        vote.vote = {cx, cy, w, h};
     }
 };
 

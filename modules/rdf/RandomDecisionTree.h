@@ -424,14 +424,14 @@ class RandomDecisionTree
             voteData = voteData.cols(0, voteCount-1);
         else
             voteData = voteData.cols(0,0);
-
         //Setup Meanshift requirements DATA MUST BE COL MAJOR
+        double totalvotecount = voteData.n_cols;
         arma::Col<size_t> assignments; // Cluster assignments.
         arma::mat centroids; // Cluster centroids.
         mlpack::meanshift::MeanShift<true> MeanShift;
         MeanShift.Kernel().Bandwidth(11);
 //        Min number of samples required in 4 dimensional space for mean shift algorithm to run smoothly.
-        if (voteData.n_cols > 16)
+        if (totalvotecount > 16)
         {
 //            qDebug()<< "\n\n\n";
 //            voteData.print();
@@ -450,7 +450,8 @@ class RandomDecisionTree
                     max = ind.n_elem;
                 }
             }
-            m_nodes[index].vote = maxCentroid;
+            m_nodes[index].vote.vote = maxCentroid;
+            m_nodes[index].vote.weight = max/totalvotecount;
 
         }
     }
