@@ -66,7 +66,8 @@ private:
         const double cy = vote.vote(1);
         const double w = vote.vote(2);
         const double h = vote.vote(3);
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h);
+        const double weight = vote.weight;
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h, weight);
 
     }
 
@@ -74,13 +75,14 @@ private:
     void load(Archive &archive)
     {
         int x1, y1, x2, y2;
-        double cx, cy, w, h;
-        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h);
+        double cx, cy, w, h, weight;
+        archive( id , start, end, leftCount, tau, ftrID, hist, isLeaf, x1, y1, x2, y2, dx, dy, hw, cx, cy, w, h, weight);
         teta1.x = x1;
         teta1.y = y1;
         teta2.x = x2;
         teta2.y = y2;
         vote.vote = {cx, cy, w, h};
+        vote.weight = weight;
     }
 };
 
